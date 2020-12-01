@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "target": "esnext",
+        "moduleResolution": "node",
+        "module": "esnext",
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "jsx": "react"
+    }
+}
