@@ -7,7 +7,6 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/HintKeep/HintKeep.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -40,6 +39,21 @@
                 "group": "watch",
                 "panel": "shared"
             }
+        },
+        {
+            "label": "test: api",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile"
         }
     ]
 }

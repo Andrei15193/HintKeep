@@ -8,7 +8,7 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build: api",
             "program": "${workspaceFolder}/HintKeep/bin/Debug/net5.0/HintKeep.dll",
             "args": [],
             "cwd": "${workspaceFolder}/HintKeep",
