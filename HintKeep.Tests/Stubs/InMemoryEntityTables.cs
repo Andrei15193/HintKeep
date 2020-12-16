@@ -1,5 +1,5 @@
 using CloudStub;
-using HintKeep.Data;
+using HintKeep.Storage;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.Tests.Stubs

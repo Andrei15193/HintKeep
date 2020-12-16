@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using HintKeep.Commands.Users;
+using HintKeep.Requests.Users.Commands;
 using HintKeep.ViewModels.Users;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

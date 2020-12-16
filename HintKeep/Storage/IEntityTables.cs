@@ -1,6 +1,6 @@
 using Microsoft.Azure.Cosmos.Table;
 
-namespace HintKeep.Data
+namespace HintKeep.Storage
 {
     public interface IEntityTables
     {

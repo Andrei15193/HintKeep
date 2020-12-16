@@ -1,4 +1,4 @@
-namespace HintKeep.Data.Entities
+namespace HintKeep.Storage.Entities
 {
     public enum UserState
     {

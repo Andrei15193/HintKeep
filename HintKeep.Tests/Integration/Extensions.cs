@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using HintKeep.Data;
+using HintKeep.Storage;
 using HintKeep.Services;
 using HintKeep.Tests.Stubs;
 using Microsoft.AspNetCore.Mvc.Testing;

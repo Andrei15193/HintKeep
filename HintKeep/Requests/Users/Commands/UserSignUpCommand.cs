@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace HintKeep.Commands.Users
+namespace HintKeep.Requests.Users.Commands
 {
     public class UserSignUpCommand : IRequest
     {

@@ -11,9 +11,11 @@ The aim of the application is to make a practical and useful application that ap
 * Use translation keys for everythign that comes from the API, translation happens on the front-end exclusively (except for user entered values)
 
 ## Project Patterns
-The project uses CQRS to handle requests, The `Commands` and `Queries` directories contain these definition scoped by the area they cover (e.g.: `Users`, commands and queries under these directories have to do with users). The `Handlers` direcotry maps to the previously mentioned folders, it contains the handlers for each type of request.
+The `Controllers` directory contains the controllers that handle requests. Each controller corresponds to an area of an application (e.g.: users, hints).
 
-The communication between requests and controllers is done through view models, all of them are defined in the `ViewModels` direcotry where they are scoped by the area they cover (e.g.: `Users` contains view models that represent users). Note that view models do not map directly to the commands and queries scopes, a command or query relating to password hints may use a user view model to represent the owner of said password hint. Along side each scope, the `ViewModels` directory contains a `ValidationAttributes` directory which contains all attributes used to validate view model properties. The ones provided with .NET are not directly provided as the error messages for each validation is a translation label rather than a translated text. Translation is handled on the front-end side.
+The project uses CQRS to handle requests, The `Requests` and `RequestsHandlers` each contain scoped definitions for requests (commands and querries) and their handlers respectively. The scoping is done by area of the application, for instance, the commands and queries related to `Users` are contained in a directory with the same name.
+
+The communication between requests (both HTTP and query results) and controllers is done through view models, all of them are defined in the `ViewModels` direcotry where they are scoped by the area they cover (e.g.: `Users` contains view models that represent users). Note that view models do not map directly to the commands and queries scopes, a command or query relating to password hints may use a user view model to represent the owner of said password hint. Along side each scope, the `ViewModels` directory contains a `ValidationAttributes` directory which contains all attributes used to validate view model properties. The ones provided with .NET are not directly provided as the error messages for each validation is a translation label rather than a translated text. Translation is handled on the front-end side.
 
 The `Services` directory contains all service interface definitions (along side the data transfer objects that are used by these services as they are considered to be part of the interface), while the `Implementations` subdirectory contains their implementations. Each implementation that requires configuration has an associated configuration object that reads data from an [IConfigurationSection](https://docs.microsoft.com/dotnet/api/microsoft.extensions.configuration.iconfigurationsection) which is defined in the `Configs` subdirectory of the `Implementations` one. The naming pattern contains the base service name, the interface starts with an `I` the config one has a `Config` at the end.
 
@@ -36,9 +38,7 @@ Each service is configured in a section having the same name as the service base
 }
 ```
 
-The `Data` directory contains all definitions for handling storage of data. The `Entities` contains table entity definitions which are stored in Azure Table Storage. The `IEntityTables` interface exposes all defined tables in the application.
-
-Finally, the `Controllers` directory contains the controllers that handle requests. Each controller corresponds to an area of an application (e.g.: users, hints).
+The `Storage` directory contains all definitions for handling storage of data. The `Entities` contains table entity definitions which are stored in Azure Table Storage. The `IEntityTables` interface exposes all defined tables in the application.
 
 ## Tests Patterns
 The tests project (HintKeep.Tests) contains both unit tests and integration tests. They are split at the root directory into `Integration` and `Unit` which contains their respective tests.

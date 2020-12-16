@@ -1,13 +1,13 @@
 using System.Threading;
 using System.Threading.Tasks;
-using HintKeep.Commands.Users;
-using HintKeep.Data;
-using HintKeep.Data.Entities;
+using HintKeep.Requests.Users.Commands;
+using HintKeep.Storage;
+using HintKeep.Storage.Entities;
 using HintKeep.Services;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
 
-namespace HintKeep.Handlers.Commands.Users
+namespace HintKeep.RequestHandlers.Users.Commands
 {
     public class UserSignUpCommandHandler : AsyncRequestHandler<UserSignUpCommand>
     {
