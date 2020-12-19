@@ -19,14 +19,13 @@ namespace HintKeep.Tests.Integration
                     services =>
                     {
                         var inMemoryEntityTables = new InMemoryEntityTables();
-                        Task
-                            .WhenAll(
-                                from property in typeof(InMemoryEntityTables).GetProperties()
-                                where property.CanRead && typeof(CloudTable) == property.PropertyType
-                                let cloudTable = (CloudTable)property.GetValue(inMemoryEntityTables)
-                                select cloudTable.CreateAsync()
-                            )
-                            .Wait();
+                        var cloudTables = typeof(IEntityTables)
+                            .GetProperties()
+                            .Where(property => property.CanRead && property.PropertyType == typeof(CloudTable))
+                            .Select(property => property.GetValue(inMemoryEntityTables))
+                            .Cast<CloudTable>();
+                        foreach (var cloudTable in cloudTables)
+                            cloudTable.CreateIfNotExists();
 
                         setupCallback?.Invoke(inMemoryEntityTables);
                         services.AddSingleton<IEntityTables>(inMemoryEntityTables);

@@ -19,13 +19,14 @@ namespace HintKeep
         }
 
         private static void _EnsureAzureTableStorage(IEntityTables entityTables)
-            => Task
-                .WhenAll(
-                    from property in typeof(IEntityTables).GetProperties()
-                    where property.CanRead && property.PropertyType == typeof(CloudTable)
-                    let cloudTable = (CloudTable)property.GetValue(entityTables)
-                    select cloudTable.CreateIfNotExistsAsync()
-                )
-                .Wait();
+        {
+            var cloudTables = typeof(IEntityTables)
+                .GetProperties()
+                .Where(property => property.CanRead && property.PropertyType == typeof(CloudTable))
+                .Select(property => property.GetValue(entityTables))
+                .Cast<CloudTable>();
+            foreach (var cloudTable in cloudTables)
+                cloudTable.CreateIfNotExists();
+        }
     }
 }
