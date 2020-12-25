@@ -6,6 +6,7 @@ using HintKeep.Storage.Entities;
 using HintKeep.Services;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
+using System;
 
 namespace HintKeep.RequestHandlers.Users.Commands
 {
@@ -40,7 +41,8 @@ namespace HintKeep.RequestHandlers.Users.Commands
                 PartitionKey = userEntity.PartitionKey,
                 RowKey = "confirmation_tokens-" + confirmationToken,
                 Token = confirmationToken,
-                Intent = (int)TokenIntent.ConfirmUserRegistration
+                Intent = (int)TokenIntent.ConfirmUserRegistration,
+                Created = DateTime.UtcNow
             };
 
             await _emailService.SendAsync(new EmailMessage

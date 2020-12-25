@@ -11,7 +11,11 @@ The aim of the application is to make a practical and useful application that ap
 * Use translation keys for everythign that comes from the API, translation happens on the front-end exclusively (except for user entered values)
 
 ## Project Patterns
-The `Controllers` directory contains the controllers that handle requests. Each controller corresponds to an area of an application (e.g.: users, hints).
+The `Controllers` directory contains the controllers that handle requests. Each controller corresponds to an area of an application (e.g.: users, hints). Under the `Controllers` directory, an `Filters` directory contains all the ASP.NET Core filter definitions.
+
+The `Exceptions` directory is defined which contains concrete `ApplicationException` declarations that maps to different HTTP status codes. Below is a list of mappings between exceptions and corresponding status codes, these are treated in a custom filter and handled globally the same way to reduce repetitive code in controllers and enforce a common way of using these exceptions at the same time.
+
+* __PreconditionFailedException__ - `412` Precondition Failed. If the exception contains a message, it will be sent as the response content.
 
 The project uses CQRS to handle requests, The `Requests` and `RequestsHandlers` each contain scoped definitions for requests (commands and querries) and their handlers respectively. The scoping is done by area of the application, for instance, the commands and queries related to `Users` are contained in a directory with the same name.
 

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using HintKeep.Controllers.Filters;
 
 namespace HintKeep
 {
@@ -40,7 +41,10 @@ namespace HintKeep
             services.AddMediatR(config => config.Using<Mediator>().AsSingleton(), typeof(Startup).Assembly);
 
             services
-                .AddControllers()
+                .AddControllers(options =>
+                {
+                    options.Filters.Add<ExceptionFilter>();
+                })
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.AllowTrailingCommas = false;

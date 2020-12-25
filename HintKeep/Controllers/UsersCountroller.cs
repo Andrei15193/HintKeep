@@ -24,7 +24,18 @@ namespace HintKeep.Controllers
                 Email = userSignUp.Email,
                 Password = userSignUp.Password
             });
-            return Created(new Uri("/users/confirmations", UriKind.Relative), string.Empty);
+            return Created(new Uri("/users/confirmations", UriKind.Relative), null);
+        }
+
+        [HttpPost("confirmations")]
+        public async Task<IActionResult> PostConfirmation(UserConfirmation userConfirmation)
+        {
+            await _mediator.Send(new UserRegistrationConfirmationCommand
+            {
+                Email = userConfirmation.Email,
+                ConfirmationToken = userConfirmation.ConfirmationToken
+            });
+            return Created(new Uri("/users", UriKind.Relative), string.Empty);
         }
     }
 }
