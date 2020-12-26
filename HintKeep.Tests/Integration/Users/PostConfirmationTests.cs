@@ -1,11 +1,9 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
-using HintKeep.Tests.Stubs;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
@@ -20,7 +18,7 @@ namespace HintKeep.Tests.Integration.Users
             => _webApplicationFactory = webApplicationFactory;
 
         [Fact]
-        public async Task PostWithEmptyObjectReturnsUnprocessableEntity()
+        public async Task Post_WithEmptyObject_ReturnsUnprocessableEntity()
         {
             var client = _webApplicationFactory.CreateClient();
 
@@ -31,7 +29,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task PostWithInvalidEmailAndConfirmationTokenReturnsUnprocessableEntity()
+        public async Task Post_WithInvalidEmailAndConfirmationToken_ReturnsUnprocessableEntity()
         {
             var client = _webApplicationFactory.CreateClient();
 
@@ -42,7 +40,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task PostWithNonExistantUserReturnsPreconditionFailed()
+        public async Task Post_WithNonExistantUser_ReturnsPreconditionFailed()
         {
             var client = _webApplicationFactory.WithInMemoryDatabase().CreateClient();
 
@@ -53,7 +51,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task PostWithValidEmailButExpiredConfirmationTokenReturnsPreconditionFailed()
+        public async Task Post_WithValidEmailButExpiredConfirmationToken_ReturnsPreconditionFailed()
         {
             var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
@@ -85,7 +83,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task PostWithValidEmailButConfirmationTokenOfDifferentIntentReturnsPreconditionFailed()
+        public async Task Post_WithValidEmailButConfirmationTokenOfDifferentIntent_ReturnsPreconditionFailed()
         {
             var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
@@ -117,7 +115,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task PostWithConfirmedUserReturnsPreconditionFailed()
+        public async Task Post_WithConfirmedUser_ReturnsPreconditionFailed()
         {
             var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
@@ -138,7 +136,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task PostWithValidEmailAndConfirmationTokenReturnsCreated()
+        public async Task Post_WithValidEmailAndConfirmationToken_ReturnsCreated()
         {
             var entityTables = default(IEntityTables);
             var client = _webApplicationFactory

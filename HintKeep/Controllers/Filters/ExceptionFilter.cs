@@ -11,18 +11,19 @@ namespace HintKeep.Controllers.Filters
         {
             switch (context.Exception)
             {
-                case PreconditionFailedException preconditionFailedException when !string.IsNullOrWhiteSpace(preconditionFailedException.Message):
-                    context.Result = new ContentResult
-                    {
-                        StatusCode = (int)HttpStatusCode.PreconditionFailed,
-                        Content = preconditionFailedException.Message
-                    };
-                    break;
-                    
                 case PreconditionFailedException preconditionFailedException:
                     context.Result = new ContentResult
                     {
-                        StatusCode = (int)HttpStatusCode.PreconditionFailed
+                        StatusCode = (int)HttpStatusCode.PreconditionFailed,
+                        Content = string.IsNullOrWhiteSpace(preconditionFailedException.Message) ? null : preconditionFailedException.Message
+                    };
+                    break;
+
+                case ConflictException conflictException:
+                    context.Result = new ContentResult
+                    {
+                        StatusCode = (int)HttpStatusCode.Conflict,
+                        Content = string.IsNullOrWhiteSpace(conflictException.Message) ? null : conflictException.Message
                     };
                     break;
 

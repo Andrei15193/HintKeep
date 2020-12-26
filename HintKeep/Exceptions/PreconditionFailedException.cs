@@ -5,7 +5,7 @@ namespace HintKeep.Exceptions
     public class PreconditionFailedException : ApplicationException
     {
         public PreconditionFailedException()
-            : base (string.Empty)
+            : base(string.Empty)
         {
         }
 
@@ -16,6 +16,11 @@ namespace HintKeep.Exceptions
 
         public PreconditionFailedException(string message, Exception innerException)
             : base(message, innerException)
+        {
+        }
+
+        public PreconditionFailedException(Exception innerException)
+            : base(string.Empty, innerException)
         {
         }
     }

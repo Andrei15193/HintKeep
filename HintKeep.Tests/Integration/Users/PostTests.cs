@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -20,7 +19,7 @@ namespace HintKeep.Tests.Integration.Users
             => _webApplicationFactory = webApplicationFactory;
 
         [Fact]
-        public async Task PostWithEmptyObjectReturnsUnprocessableEntity()
+        public async Task Post_WithEmptyObject_ReturnsUnprocessableEntity()
         {
             var client = _webApplicationFactory.CreateClient();
 
@@ -31,7 +30,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task PostWithInvalidEmailAndPasswordReturnsUnprocessableEntity()
+        public async Task Post_WithInvalidEmailAndPassword_ReturnsUnprocessableEntity()
         {
             var client = _webApplicationFactory.CreateClient();
 
@@ -42,7 +41,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task PostWithValidEmailAndPasswordReturnsCreated()
+        public async Task Post_WithValidEmailAndPassword_ReturnsCreated()
         {
             var entityTables = default(IEntityTables);
             var emailService = default(InMemoryEmailService);
@@ -79,6 +78,29 @@ namespace HintKeep.Tests.Integration.Users
             Assert.Equal("eMail@DOMAIN.TLD", confirmationEmail.To);
             Assert.Contains(tokenEntity.Token, confirmationEmail.Content);
             Assert.True(DateTime.UtcNow.AddMinutes(-1) <= tokenEntity.Created && tokenEntity.Created <= DateTime.UtcNow.AddMinutes(1));
+        }
+
+        [Fact]
+        public async Task Post_WithExistingEmailAddress_ReturnsConflict()
+        {
+            var entityTables = default(IEntityTables);
+            var emailService = default(InMemoryEmailService);
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryEmailService(actualEmailService => emailService = actualEmailService)
+                .CreateClient();
+
+            entityTables.Users.Execute(TableOperation.Insert(new TableEntity
+            {
+                PartitionKey = "email@domain.tld",
+                RowKey = "user"
+            }));
+
+            var response = await client.PostAsJsonAsync("/users", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });
+
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
+            Assert.Empty(emailService.SentEmailMessages);
         }
     }
 }

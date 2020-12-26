@@ -7,6 +7,8 @@ using HintKeep.Services;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
 using System;
+using System.Net;
+using HintKeep.Exceptions;
 
 namespace HintKeep.RequestHandlers.Users.Commands
 {
@@ -44,14 +46,21 @@ namespace HintKeep.RequestHandlers.Users.Commands
                 Intent = (int)TokenIntent.ConfirmUserRegistration,
                 Created = DateTime.UtcNow
             };
-
-            await _emailService.SendAsync(new EmailMessage
+            try
             {
-                Title = "Welcome to HintKeep!",
-                To = command.Email,
-                Content = $"Welcome to HintKeep, use the following token to confirm your account. Confirmation token {confirmationToken}."
-            });
-            await _entityTables.Users.ExecuteBatchAsync(new TableBatchOperation { TableOperation.Insert(userEntity), TableOperation.Insert(confirmationTokenEntity) });
+                await _entityTables.Users.ExecuteBatchAsync(new TableBatchOperation { TableOperation.Insert(userEntity), TableOperation.Insert(confirmationTokenEntity) });
+
+                await _emailService.SendAsync(new EmailMessage
+                {
+                    Title = "Welcome to HintKeep!",
+                    To = command.Email,
+                    Content = $"Welcome to HintKeep, use the following token to confirm your account. Confirmation token {confirmationToken}."
+                });
+            }
+            catch (StorageException storageException) when (storageException.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
+            {
+                throw new ConflictException(storageException);
+            }
         }
     }
 }
