@@ -9,7 +9,7 @@ using HintKeep.Storage.Entities;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
 
-namespace HintKeep.RequestHandlers.Users.Commands
+namespace HintKeep.RequestsHandlers.Users.Commands
 {
     public class UserRegistrationConfirmationCommandHandler : AsyncRequestHandler<UserRegistrationConfirmationCommand>
     {

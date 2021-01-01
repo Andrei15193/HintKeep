@@ -1,8 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using HintKeep.Requests.Users.Commands;
+using HintKeep.Requests.Users.Queries;
 using HintKeep.ViewModels.Users;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HintKeep.Controllers
@@ -16,7 +18,7 @@ namespace HintKeep.Controllers
         public UsersController(IMediator mediator)
             => _mediator = mediator;
 
-        [HttpPost]
+        [AllowAnonymous,HttpPost]
         public async Task<IActionResult> Post(UserSignUp userSignUp)
         {
             await _mediator.Send(new UserSignUpCommand
@@ -27,7 +29,7 @@ namespace HintKeep.Controllers
             return Created(new Uri("/users/confirmations", UriKind.Relative), null);
         }
 
-        [HttpPost("confirmations")]
+        [AllowAnonymous,HttpPost("confirmations")]
         public async Task<IActionResult> PostConfirmation(UserConfirmation userConfirmation)
         {
             await _mediator.Send(new UserRegistrationConfirmationCommand
@@ -36,6 +38,17 @@ namespace HintKeep.Controllers
                 ConfirmationToken = userConfirmation.ConfirmationToken
             });
             return Created(new Uri("/users", UriKind.Relative), string.Empty);
+        }
+
+        [AllowAnonymous, HttpPost("authentications")]
+        public async Task<IActionResult> PostAuthentication(UserLogin userLogin)
+        {
+            var userInfo = await _mediator.Send(new UserAuthenticationQuery
+            {
+                Email = userLogin.Email,
+                Password = userLogin.Password
+            });
+            return Created(new Uri("/users/authentications", UriKind.Relative), userInfo);
         }
     }
 }

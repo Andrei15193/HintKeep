@@ -15,6 +15,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using HintKeep.Controllers.Filters;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System;
 
 namespace HintKeep
 {
@@ -27,16 +33,20 @@ namespace HintKeep
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var jsonWebTokenServiceConfig = new JsonWebTokenServiceConfig(_configuration.GetSection(nameof(JsonWebTokenService)));
+
             services.AddSingleton<IEntityTables>(new AzureEntityTables(CloudStorageAccount.Parse(_configuration.GetConnectionString("AZURE_STORAGE")).CreateCloudTableClient()));
 
             services.AddTransient(serviceProvider => new CryptographicHashServiceConfig(_configuration.GetSection(nameof(CryptographicHashService))));
             services.AddSingleton(new EmailServiceConfig(_configuration.GetSection(nameof(EmailService))));
             services.AddSingleton(new SaltServiceConfig(_configuration.GetSection(nameof(SaltService))));
+            services.AddSingleton(jsonWebTokenServiceConfig);
 
             services.AddSingleton<IRngService, RngService>();
             services.AddTransient<ICryptographicHashService, CryptographicHashService>();
             services.AddTransient<ISaltService, SaltService>();
             services.AddTransient<IEmailService, EmailService>();
+            services.AddTransient<IJsonWebTokenService, JsonWebTokenService>();
 
             services.AddMediatR(config => config.Using<Mediator>().AsSingleton(), typeof(Startup).Assembly);
 
@@ -44,6 +54,13 @@ namespace HintKeep
                 .AddControllers(options =>
                 {
                     options.Filters.Add<ExceptionFilter>();
+
+                    var policy = new AuthorizationPolicyBuilder()
+                        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                        .RequireAuthenticatedUser()
+                        .RequireClaim(ClaimTypes.Name)
+                        .Build();
+                    options.Filters.Add(new AuthorizeFilter(policy));
                 })
                 .AddJsonOptions(options =>
                 {
@@ -60,6 +77,32 @@ namespace HintKeep
                 {
                     options.InvalidModelStateResponseFactory = actionContext => new UnprocessableEntityObjectResult(actionContext.ModelState);
                 });
+
+            services
+                .AddAuthentication(
+                    options =>
+                    {
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    }
+                )
+                .AddJwtBearer(
+                    options =>
+                    {
+                        options.RequireHttpsMetadata = true;
+                        options.SaveToken = false;
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = jsonWebTokenServiceConfig.SigningKey,
+                            ValidateIssuer = false,
+                            ValidateAudience = false,
+                            ValidateLifetime = true,
+                            LifetimeValidator = (notBefore, expires, securityToken, validationParameters)
+                                => notBefore != null && expires != null && notBefore.Value.ToUniversalTime() <= DateTime.UtcNow && DateTime.UtcNow < expires.Value.ToUniversalTime()
+                        };
+                    }
+                );
 
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "HintKeep", Version = "v1" }));
         }

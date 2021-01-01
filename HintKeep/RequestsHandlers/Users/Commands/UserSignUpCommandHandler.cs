@@ -10,7 +10,7 @@ using System;
 using System.Net;
 using HintKeep.Exceptions;
 
-namespace HintKeep.RequestHandlers.Users.Commands
+namespace HintKeep.RequestsHandlers.Users.Commands
 {
     public class UserSignUpCommandHandler : AsyncRequestHandler<UserSignUpCommand>
     {

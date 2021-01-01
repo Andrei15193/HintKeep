@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
-using HintKeep.RequestHandlers.Users.Commands;
+using HintKeep.RequestsHandlers.Users.Commands;
 using HintKeep.Requests.Users.Commands;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;

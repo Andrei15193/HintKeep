@@ -11,11 +11,11 @@ namespace HintKeep.Controllers.Filters
         {
             switch (context.Exception)
             {
-                case PreconditionFailedException preconditionFailedException:
+                case UnauthorizedException unauthorizedException:
                     context.Result = new ContentResult
                     {
-                        StatusCode = (int)HttpStatusCode.PreconditionFailed,
-                        Content = string.IsNullOrWhiteSpace(preconditionFailedException.Message) ? null : preconditionFailedException.Message
+                        StatusCode = (int)HttpStatusCode.Unauthorized,
+                        Content = string.IsNullOrWhiteSpace(unauthorizedException.Message) ? null : unauthorizedException.Message
                     };
                     break;
 
@@ -24,6 +24,14 @@ namespace HintKeep.Controllers.Filters
                     {
                         StatusCode = (int)HttpStatusCode.Conflict,
                         Content = string.IsNullOrWhiteSpace(conflictException.Message) ? null : conflictException.Message
+                    };
+                    break;
+
+                case PreconditionFailedException preconditionFailedException:
+                    context.Result = new ContentResult
+                    {
+                        StatusCode = (int)HttpStatusCode.PreconditionFailed,
+                        Content = string.IsNullOrWhiteSpace(preconditionFailedException.Message) ? null : preconditionFailedException.Message
                     };
                     break;
 
