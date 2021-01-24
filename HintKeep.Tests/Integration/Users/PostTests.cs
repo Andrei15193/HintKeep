@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using HintKeep.Tests.Stubs;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
@@ -13,7 +12,7 @@ namespace HintKeep.Tests.Integration.Users
 {
     public class BasicTests : IClassFixture<HintKeepWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Startup> _webApplicationFactory;
+        private readonly HintKeepWebApplicationFactory _webApplicationFactory;
 
         public BasicTests(HintKeepWebApplicationFactory webApplicationFactory)
             => _webApplicationFactory = webApplicationFactory;

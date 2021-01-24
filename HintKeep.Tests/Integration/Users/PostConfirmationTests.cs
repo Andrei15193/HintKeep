@@ -4,7 +4,6 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
@@ -12,7 +11,7 @@ namespace HintKeep.Tests.Integration.Users
 {
     public class PostConfirmationTests : IClassFixture<HintKeepWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Startup> _webApplicationFactory;
+        private readonly HintKeepWebApplicationFactory _webApplicationFactory;
 
         public PostConfirmationTests(HintKeepWebApplicationFactory webApplicationFactory)
             => _webApplicationFactory = webApplicationFactory;

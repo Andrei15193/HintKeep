@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using HintKeep.Requests.Users.Commands;
 using HintKeep.Requests.Users.Queries;
@@ -18,7 +19,7 @@ namespace HintKeep.Controllers
         public UsersController(IMediator mediator)
             => _mediator = mediator;
 
-        [AllowAnonymous,HttpPost]
+        [AllowAnonymous, HttpPost]
         public async Task<IActionResult> Post(UserSignUp userSignUp)
         {
             await _mediator.Send(new UserSignUpCommand
@@ -29,7 +30,7 @@ namespace HintKeep.Controllers
             return Created(new Uri("/users/confirmations", UriKind.Relative), null);
         }
 
-        [AllowAnonymous,HttpPost("confirmations")]
+        [AllowAnonymous, HttpPost("confirmations")]
         public async Task<IActionResult> PostConfirmation(UserConfirmation userConfirmation)
         {
             await _mediator.Send(new UserRegistrationConfirmationCommand
@@ -49,6 +50,15 @@ namespace HintKeep.Controllers
                 Password = userLogin.Password
             });
             return Created(new Uri("/users/authentications", UriKind.Relative), userInfo);
+        }
+
+        [HttpDelete("authentications")]
+        public IActionResult DeleteAuthentication(bool? current)
+        {
+            if (current ?? Request.Query.ContainsKey(nameof(current)))
+                return NoContent();
+            else
+                return BadRequest(string.Empty);
         }
     }
 }

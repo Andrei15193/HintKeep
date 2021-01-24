@@ -6,7 +6,6 @@ using HintKeep.Services;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using HintKeep.ViewModels.Users;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
@@ -14,7 +13,7 @@ namespace HintKeep.Tests.Integration.Users
 {
     public class PostAutenticationTests : IClassFixture<HintKeepWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Startup> _webApplicationFactory;
+        private readonly HintKeepWebApplicationFactory _webApplicationFactory;
 
         public PostAutenticationTests(HintKeepWebApplicationFactory webApplicationFactory)
             => _webApplicationFactory = webApplicationFactory;

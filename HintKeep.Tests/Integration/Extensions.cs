@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using HintKeep.Storage;
 using HintKeep.Services;
 using HintKeep.Tests.Stubs;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.DependencyInjection;
+using HintKeep.Storage.Entities;
+using Microsoft.AspNetCore.TestHost;
 
 namespace HintKeep.Tests.Integration
 {
@@ -15,7 +16,7 @@ namespace HintKeep.Tests.Integration
         public static WebApplicationFactory<TEntryPoint> WithInMemoryDatabase<TEntryPoint>(this WebApplicationFactory<TEntryPoint> webApplicationFactory, Action<IEntityTables> setupCallback = null)
                 where TEntryPoint : class
             => webApplicationFactory.WithWebHostBuilder(
-                builder => builder.ConfigureServices(
+                builder => builder.ConfigureTestServices(
                     services =>
                     {
                         var inMemoryEntityTables = new InMemoryEntityTables();
@@ -36,7 +37,7 @@ namespace HintKeep.Tests.Integration
         public static WebApplicationFactory<TEntryPoint> WithInMemoryEmailService<TEntryPoint>(this WebApplicationFactory<TEntryPoint> webApplicationFactory, Action<InMemoryEmailService> setupCallback = null)
                 where TEntryPoint : class
             => webApplicationFactory.WithWebHostBuilder(
-                builder => builder.ConfigureServices(
+                builder => builder.ConfigureTestServices(
                     services =>
                     {
                         var inMemoryEmailService = new InMemoryEmailService();
