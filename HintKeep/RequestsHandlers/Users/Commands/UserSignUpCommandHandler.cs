@@ -29,26 +29,33 @@ namespace HintKeep.RequestsHandlers.Users.Commands
             var passwordHash = _cryptographicHashService.GetHash(passwordSalt + command.Password);
             var confirmationToken = _rngService.Generate(12).ToLowerInvariant();
 
+            var userId = Guid.NewGuid();
             var userEntity = new UserEntity
             {
+                PartitionKey = userId.ToString("D"),
+                RowKey = "details",
+                Email = command.Email
+            };
+            var loginEntity = new EmailLoginEntity
+            {
                 PartitionKey = command.Email.ToLowerInvariant(),
-                RowKey = "user",
-                Email = command.Email,
+                RowKey = nameof(LoginEntityType.EmailLogin),
                 PasswordSalt = passwordSalt,
                 PasswordHash = passwordHash,
-                State = (int)UserState.PendingConfirmation
+                State = nameof(EmailLoginEntityState.PendingConfirmation),
+                UserId = userId
             };
-            var confirmationTokenEntity = new TokenEntity
+            var loginTokenEntity = new EmailLoginTokenEntity
             {
-                PartitionKey = userEntity.PartitionKey,
-                RowKey = "confirmation_tokens-" + confirmationToken,
+                PartitionKey = command.Email.ToLowerInvariant(),
+                RowKey = nameof(LoginEntityType.EmailLogin) + "-confirmationToken",
                 Token = confirmationToken,
-                Intent = (int)TokenIntent.ConfirmUserRegistration,
                 Created = DateTime.UtcNow
             };
             try
             {
-                await _entityTables.Users.ExecuteBatchAsync(new TableBatchOperation { TableOperation.Insert(userEntity), TableOperation.Insert(confirmationTokenEntity) });
+                await _entityTables.Users.ExecuteAsync(TableOperation.Insert(userEntity));
+                await _entityTables.Logins.ExecuteBatchAsync(new TableBatchOperation { TableOperation.Insert(loginEntity), TableOperation.Insert(loginTokenEntity) });
 
                 await _emailService.SendAsync(new EmailMessage
                 {

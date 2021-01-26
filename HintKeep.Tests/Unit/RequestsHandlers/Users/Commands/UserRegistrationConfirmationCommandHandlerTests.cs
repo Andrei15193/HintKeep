@@ -20,28 +20,28 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public UserRegistrationConfirmationCommandHandlerTests()
         {
             _entityTables = new InMemoryEntityTables();
-            _entityTables.Users.Create();
+            _entityTables.Logins.Create();
             _userRegistrationConfirmationCommandHandler = new UserRegistrationConfirmationCommandHandler(_entityTables);
         }
 
         [Fact]
         public async Task Handle_WhenUserIsPendingConfirmationWithValidToken_ConfirmsTheUser()
         {
-            _entityTables.Users.ExecuteBatch(new TableBatchOperation
+            var userId = Guid.NewGuid();
+            _entityTables.Logins.ExecuteBatch(new TableBatchOperation
             {
-                TableOperation.Insert(new UserEntity
+                TableOperation.Insert(new EmailLoginEntity
                 {
                     PartitionKey = "test-email",
-                    RowKey = "user",
-                    State = (int)UserState.PendingConfirmation
+                    RowKey = "EmailLogin",
+                    State = "PendingConfirmation"
                 }),
-                TableOperation.Insert(new TokenEntity
+                TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     PartitionKey = "test-email",
-                    RowKey = "confirmation_tokens-test-token",
+                    RowKey = "EmailLogin-confirmationToken",
                     Token = "test-token",
-                    Intent = (int)TokenIntent.ConfirmUserRegistration,
-                    Created = DateTime.UtcNow.AddMinutes(-1)
+                    Created = DateTime.UtcNow
                 })
             });
 
@@ -52,31 +52,29 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             };
             await _userRegistrationConfirmationCommandHandler.Handle(command, default);
 
-            var entities = _entityTables.Users.ExecuteQuery(new TableQuery());
-            var userEntity = Assert.Single(entities);
-            Assert.Equal("test-email", userEntity.PartitionKey);
-            Assert.Equal("user", userEntity.RowKey);
-            Assert.Equal(UserState.Confirmed, (UserState)userEntity.Properties[nameof(UserEntity.State)].Int32Value);
+            var loginEntity = Assert.Single(_entityTables.Logins.ExecuteQuery(new TableQuery()));
+            Assert.Equal("test-email", loginEntity.PartitionKey);
+            Assert.Equal("EmailLogin", loginEntity.RowKey);
+            Assert.Equal("Confirmed", loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue);
         }
         
         [Fact]
         public async Task Handle_WhenUserIsPendingConfirmationWithExpiredToken_ThrowsException()
         {
-            _entityTables.Users.ExecuteBatch(new TableBatchOperation
+            _entityTables.Logins.ExecuteBatch(new TableBatchOperation
             {
-                TableOperation.Insert(new UserEntity
+                TableOperation.Insert(new EmailLoginEntity
                 {
                     PartitionKey = "test-email",
-                    RowKey = "user",
-                    State = (int)UserState.PendingConfirmation
+                    RowKey = "EmailLogin",
+                    State = "PendingConfirmation"
                 }),
-                TableOperation.Insert(new TokenEntity
+                TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     PartitionKey = "test-email",
-                    RowKey = "confirmation_tokens-test-token",
+                    RowKey = "EmailLogin-confirmationToken",
                     Token = "test-token",
-                    Intent = (int)TokenIntent.ConfirmUserRegistration,
-                    Created = DateTime.UtcNow.AddDays(-2)
+                    Created = DateTime.UtcNow.AddDays(-11)
                 })
             });
 
@@ -93,21 +91,20 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenUserIsConfirmed_ThrowsException()
         {
-            _entityTables.Users.ExecuteBatch(new TableBatchOperation
+            _entityTables.Logins.ExecuteBatch(new TableBatchOperation
             {
-                TableOperation.Insert(new UserEntity
+                TableOperation.Insert(new EmailLoginEntity
                 {
                     PartitionKey = "test-email",
-                    RowKey = "user",
-                    State = (int)UserState.Confirmed
+                    RowKey = "EmailLogin",
+                    State = "Confirmed"
                 }),
-                TableOperation.Insert(new TokenEntity
+                TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     PartitionKey = "test-email",
-                    RowKey = "confirmation_tokens-test-token",
+                    RowKey = "EmailLogin-confirmationToken",
                     Token = "test-token",
-                    Intent = (int)TokenIntent.ConfirmUserRegistration,
-                    Created = DateTime.UtcNow.AddMinutes(-1)
+                    Created = DateTime.UtcNow
                 })
             });
 
@@ -124,15 +121,12 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenThereIsNoConfirmationToken_ThrowsException()
         {
-            _entityTables.Users.ExecuteBatch(new TableBatchOperation
+            _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
-                TableOperation.Insert(new UserEntity
-                {
-                    PartitionKey = "test-email",
-                    RowKey = "user",
-                    State = (int)UserState.Confirmed
-                })
-            });
+                PartitionKey = "test-email",
+                RowKey = "EmailLogin",
+                State = "Confirmed"
+            }));
 
             var command = new UserRegistrationConfirmationCommand
             {
@@ -147,13 +141,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenThereIsNoUser_ThrowsException()
         {
-            _entityTables.Users.ExecuteBatch(new TableBatchOperation
+            _entityTables.Logins.ExecuteBatch(new TableBatchOperation
             {
-                TableOperation.Insert(new UserEntity
+                TableOperation.Insert(new EmailLoginEntity
                 {
                     PartitionKey = "test-email-2",
-                    RowKey = "user",
-                    State = (int)UserState.Confirmed
+                    RowKey = "EmailLogin",
+                    State = "Confirmed"
                 })
             });
 

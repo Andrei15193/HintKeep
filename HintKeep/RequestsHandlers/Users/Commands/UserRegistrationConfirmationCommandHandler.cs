@@ -20,49 +20,37 @@ namespace HintKeep.RequestsHandlers.Users.Commands
 
         protected override async Task Handle(UserRegistrationConfirmationCommand command, CancellationToken cancellationToken)
         {
-            var queryResult = await _entityTables.Users.ExecuteQuerySegmentedAsync(new TableQuery()
-                .Where(
-                    TableQuery.CombineFilters(
-                        TableQuery.CombineFilters(
-                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, command.Email.ToLowerInvariant()),
-                            TableOperators.And,
-                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.Equal, "user")
-                        ),
-                        TableOperators.Or,
-                        TableQuery.CombineFilters(
-                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, command.Email.ToLowerInvariant()),
-                            TableOperators.And,
-                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.Equal, "confirmation_tokens-" + command.ConfirmationToken.ToLowerInvariant())
-                        )
-                    )
-                )
+            var queryResult = await _entityTables.Logins.ExecuteQuerySegmentedAsync(new TableQuery()
+                .Where(TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, command.Email.ToLowerInvariant()))
                 .Select(new[]
                 {
                     nameof(ITableEntity.PartitionKey),
                     nameof(ITableEntity.RowKey),
                     nameof(ITableEntity.ETag),
-                    nameof(UserEntity.State),
-                    nameof(TokenEntity.Token),
-                    nameof(TokenEntity.Intent),
-                    nameof(TokenEntity.Created)
+                    nameof(EmailLoginEntity.State),
+                    nameof(EmailLoginTokenEntity.Token),
+                    nameof(EmailLoginTokenEntity.Created)
                 })
                 .Take(2),
                 null,
                 cancellationToken
             );
 
-            var userEntity = queryResult.SingleOrDefault(entity => entity.RowKey == "user");
-            var tokenEntity = queryResult.SingleOrDefault(entity => entity.RowKey.StartsWith("confirmation_tokens-"));
-            if (userEntity is object
+            var loginEntity = queryResult.SingleOrDefault(entity => entity.RowKey == nameof(LoginEntityType.EmailLogin));
+            var tokenEntity = queryResult.SingleOrDefault(entity => entity.RowKey == nameof(LoginEntityType.EmailLogin) + "-confirmationToken");
+            if (loginEntity is object
+                && loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue == nameof(EmailLoginEntityState.PendingConfirmation)
                 && tokenEntity is object
-                && userEntity.Properties[nameof(UserEntity.State)].Int32Value == (int)UserState.PendingConfirmation
-                && tokenEntity.Properties[nameof(TokenEntity.Intent)].Int32Value == (int)TokenIntent.ConfirmUserRegistration
-                && (DateTime.UtcNow - tokenEntity.Properties[nameof(TokenEntity.Created)].DateTime.Value).TotalDays < 1)
+                && tokenEntity.Properties[nameof(EmailLoginTokenEntity.Token)].StringValue == command.ConfirmationToken
+                && (DateTime.UtcNow - tokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime.Value).TotalDays < 1)
             {
-                userEntity.Properties[nameof(UserEntity.State)].Int32Value = (int)UserState.Confirmed;
-
-                await _entityTables.Users.ExecuteBatchAsync(
-                    new TableBatchOperation { TableOperation.Merge(userEntity), TableOperation.Delete(tokenEntity) },
+                loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue = nameof(EmailLoginEntityState.Confirmed);
+                await _entityTables.Logins.ExecuteBatchAsync(
+                    new TableBatchOperation
+                    {
+                        TableOperation.Merge(loginEntity),
+                        TableOperation.Delete(tokenEntity)
+                    },
                     cancellationToken
                 );
             }

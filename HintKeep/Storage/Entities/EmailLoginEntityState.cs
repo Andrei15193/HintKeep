@@ -1,6 +1,6 @@
 namespace HintKeep.Storage.Entities
 {
-    public enum UserState
+    public enum EmailLoginEntityState
     {
         PendingConfirmation,
         Confirmed

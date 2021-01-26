@@ -1,4 +1,5 @@
 
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using Xunit;
@@ -26,7 +27,7 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Delete_WithoutCurrentParameter_ReturnsBadRequest()
         {
-            var client = _webApplicationFactory.WithAuthentication("test-email").CreateClient();
+            var client = _webApplicationFactory.WithAuthentication(Guid.NewGuid()).CreateClient();
 
             var response = await client.DeleteAsync("/users/authentications");
 
@@ -37,7 +38,7 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Delete_WithCurrentParameterSetToFalse_ReturnsBadRequest()
         {
-            var client = _webApplicationFactory.WithAuthentication("test-email").CreateClient();
+            var client = _webApplicationFactory.WithAuthentication(Guid.NewGuid()).CreateClient();
 
             var response = await client.DeleteAsync("/users/authentications?current=false");
 
@@ -48,7 +49,7 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Delete_WithCurrentParameterSetToTrue_ReturnsNoContent()
         {
-            var client = _webApplicationFactory.WithAuthentication("test-email").CreateClient();
+            var client = _webApplicationFactory.WithAuthentication(Guid.NewGuid()).CreateClient();
 
             var response = await client.DeleteAsync("/users/authentications?current=true");
 
@@ -59,7 +60,7 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Delete_WithCurrentParameterAsFlag_ReturnsNoContent()
         {
-            var client = _webApplicationFactory.WithAuthentication("test-email").CreateClient();
+            var client = _webApplicationFactory.WithAuthentication(Guid.NewGuid()).CreateClient();
 
             var response = await client.DeleteAsync("/users/authentications?current");
 

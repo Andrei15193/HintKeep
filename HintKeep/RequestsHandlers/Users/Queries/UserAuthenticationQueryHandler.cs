@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
@@ -24,22 +25,28 @@ namespace HintKeep.RequestsHandlers.Users.Queries
 
         public async Task<UserInfo> Handle(UserAuthenticationQuery query, CancellationToken cancellationToken)
         {
-            var userResult = await _entityTables.Users.ExecuteAsync(
-                TableOperation.Retrieve<UserEntity>(
+            var loginResult = await _entityTables.Logins.ExecuteAsync(
+                TableOperation.Retrieve<EmailLoginEntity>(
                     query.Email.ToLowerInvariant(),
-                    "user",
-                    new List<string> { nameof(UserEntity.Email), nameof(UserEntity.PasswordSalt), nameof(UserEntity.PasswordHash), nameof(UserEntity.State) }
+                    nameof(LoginEntityType.EmailLogin),
+                    new List<string>
+                    {
+                        nameof(EmailLoginEntity.PasswordSalt),
+                        nameof(EmailLoginEntity.PasswordHash),
+                        nameof(EmailLoginEntity.State),
+                        nameof(EmailLoginEntity.UserId)
+                    }
                 ),
                 cancellationToken
             );
-            if (!(userResult.Result is UserEntity userEntity)
-                || userEntity.PasswordHash != _cryptographicHashService.GetHash(userEntity.PasswordSalt + query.Password)
-                || userEntity.State != (int)UserState.Confirmed)
+            if (!(loginResult.Result is EmailLoginEntity loginEntity)
+                || loginEntity.PasswordHash != _cryptographicHashService.GetHash(loginEntity.PasswordSalt + query.Password)
+                || loginEntity.State != nameof(EmailLoginEntityState.Confirmed))
                 throw new UnauthorizedException();
 
             return new UserInfo
             {
-                JsonWebToken = _jsonWebTokenService.GetJsonWebToken(userEntity.Email)
+                JsonWebToken = _jsonWebTokenService.GetJsonWebToken(loginEntity.UserId)
             };
         }
     }

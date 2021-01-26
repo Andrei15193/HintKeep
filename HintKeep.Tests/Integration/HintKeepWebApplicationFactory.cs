@@ -1,7 +1,6 @@
-using System.Linq;
+using System;
 using System.Net.Http;
 using HintKeep.Services;
-using HintKeep.Storage.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -14,11 +13,11 @@ namespace HintKeep.Tests.Integration
 {
     public class HintKeepWebApplicationFactory : WebApplicationFactory<Startup>
     {
-        private string _authenticatedEmail;
+        private Guid? _authenticatedUserId;
 
-        public HintKeepWebApplicationFactory WithAuthentication(string email)
+        public HintKeepWebApplicationFactory WithAuthentication(Guid userId)
         {
-            _authenticatedEmail = email;
+            _authenticatedUserId = userId;
             return this;
         }
 
@@ -36,10 +35,10 @@ namespace HintKeep.Tests.Integration
         protected override void ConfigureClient(HttpClient client)
         {
             base.ConfigureClient(client);
-            if (!string.IsNullOrWhiteSpace(_authenticatedEmail))
+            if (_authenticatedUserId.HasValue)
             {
                 var jsonWebTokenService = (IJsonWebTokenService)Services.GetService(typeof(IJsonWebTokenService));
-                var jwt = jsonWebTokenService.GetJsonWebToken(_authenticatedEmail);
+                var jwt = jsonWebTokenService.GetJsonWebToken(_authenticatedUserId.Value);
                 client.DefaultRequestHeaders.Add(HeaderNames.Authorization, $"{JwtBearerDefaults.AuthenticationScheme} {jwt}");
             }
         }

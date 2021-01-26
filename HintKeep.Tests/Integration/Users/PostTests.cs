@@ -55,28 +55,28 @@ namespace HintKeep.Tests.Integration.Users
             Assert.Empty(await response.Content.ReadAsStringAsync());
             Assert.Equal(new Uri("/users/confirmations", UriKind.Relative), response.Headers.Location);
 
-            var userEntity = (UserEntity)entityTables.Users.Execute(TableOperation.Retrieve<UserEntity>("email@domain.tld", "user")).Result;
-            Assert.Equal("email@domain.tld", userEntity.PartitionKey);
-            Assert.Equal("user", userEntity.RowKey);
-            Assert.Equal("eMail@DOMAIN.TLD", userEntity.Email);
-            Assert.Equal(UserState.PendingConfirmation, (UserState)userEntity.State);
-            Assert.Equal(128, userEntity.PasswordHash.Length);
-            Assert.Equal(10, userEntity.PasswordSalt.Length);
+            var emailLoginEntity = (EmailLoginEntity)entityTables.Logins.Execute(TableOperation.Retrieve<EmailLoginEntity>("email@domain.tld", "EmailLogin")).Result;
+            Assert.Equal("email@domain.tld", emailLoginEntity.PartitionKey);
+            Assert.Equal("EmailLogin", emailLoginEntity.RowKey);
+            Assert.Equal("PendingConfirmation", emailLoginEntity.State);
+            Assert.Equal(128, emailLoginEntity.PasswordHash.Length);
+            Assert.Equal(10, emailLoginEntity.PasswordSalt.Length);
 
-            var tokenEntityQuery = new TableQuery<TokenEntity>()
-                .Where(TableQuery.GenerateFilterCondition(nameof(TokenEntity.RowKey), QueryComparisons.NotEqual, string.Empty))
-                .Take(1);
-            var tokenEntity = Assert.Single(entityTables.Users.ExecuteQuery<TokenEntity>(tokenEntityQuery, null));
+            var tokenEntity = (EmailLoginTokenEntity)entityTables.Logins.Execute(TableOperation.Retrieve<EmailLoginTokenEntity>("email@domain.tld", "EmailLogin-confirmationToken")).Result;
             Assert.Equal("email@domain.tld", tokenEntity.PartitionKey);
-            Assert.Equal("confirmation_tokens-" + tokenEntity.Token, tokenEntity.RowKey);
+            Assert.Equal("EmailLogin-confirmationToken", tokenEntity.RowKey);
             Assert.Equal(12, tokenEntity.Token.Length);
-            Assert.Equal(TokenIntent.ConfirmUserRegistration, (TokenIntent)tokenEntity.Intent);
+            Assert.True(DateTime.UtcNow.AddMinutes(-1) <= tokenEntity.Created && tokenEntity.Created <= DateTime.UtcNow.AddMinutes(1));
+
+            var userEntity = (UserEntity)entityTables.Users.Execute(TableOperation.Retrieve<UserEntity>(emailLoginEntity.UserId.ToString("D"), "details")).Result;
+            Assert.Equal(emailLoginEntity.UserId.ToString("D"), userEntity.PartitionKey);
+            Assert.Equal("details", userEntity.RowKey);
+            Assert.Equal("eMail@DOMAIN.TLD", userEntity.Email);
 
             var confirmationEmail = Assert.Single(emailService.SentEmailMessages);
             Assert.Equal("Welcome to HintKeep!", confirmationEmail.Title);
             Assert.Equal("eMail@DOMAIN.TLD", confirmationEmail.To);
             Assert.Contains(tokenEntity.Token, confirmationEmail.Content);
-            Assert.True(DateTime.UtcNow.AddMinutes(-1) <= tokenEntity.Created && tokenEntity.Created <= DateTime.UtcNow.AddMinutes(1));
         }
 
         [Fact]
@@ -89,10 +89,10 @@ namespace HintKeep.Tests.Integration.Users
                 .WithInMemoryEmailService(actualEmailService => emailService = actualEmailService)
                 .CreateClient();
 
-            entityTables.Users.Execute(TableOperation.Insert(new TableEntity
+            entityTables.Logins.Execute(TableOperation.Insert(new TableEntity
             {
                 PartitionKey = "email@domain.tld",
-                RowKey = "user"
+                RowKey = "EmailLogin"
             }));
 
             var response = await client.PostAsJsonAsync("/users", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });

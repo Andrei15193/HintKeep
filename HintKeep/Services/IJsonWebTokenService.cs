@@ -1,7 +1,9 @@
+using System;
+
 namespace HintKeep.Services
 {
     public interface IJsonWebTokenService
     {
-        string GetJsonWebToken(string userEmail);
+        string GetJsonWebToken(Guid userEmail);
     }
 }

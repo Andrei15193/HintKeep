@@ -1,4 +1,5 @@
 
+using System;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -59,16 +60,16 @@ namespace HintKeep.Tests.Integration.Users
                 .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
                 .CreateClient();
             var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
-            entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 PartitionKey = "email@domain.tld",
-                RowKey = "user",
-                Email = "eMail@DOMAIN.TLD",
+                RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",
                 PasswordHash = cryptographicHashService.GetHash("test-salt" + "test-PASSWORD-1"),
-                State = (int)UserState.Confirmed
+                State = "Confirmed",
+                UserId = Guid.NewGuid()
             }));
-
+            
             var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -84,14 +85,14 @@ namespace HintKeep.Tests.Integration.Users
                 .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
                 .CreateClient();
             var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
-            entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 PartitionKey = "email@domain.tld",
-                RowKey = "user",
-                Email = "eMail@DOMAIN.TLD",
+                RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",
                 PasswordHash = cryptographicHashService.GetHash("test-salt" + "test-PASSWORD-1"),
-                State = (int)UserState.PendingConfirmation
+                State = "PendingConfirmation",
+                UserId = Guid.NewGuid()
             }));
 
             var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });
@@ -108,17 +109,16 @@ namespace HintKeep.Tests.Integration.Users
                 .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
                 .CreateClient();
             var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
-            entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 PartitionKey = "email@domain.tld",
-                RowKey = "user",
-                Email = "eMail@DOMAIN.TLD",
+                RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",
-                PasswordHash = cryptographicHashService.GetHash("test-salt" + "test-PASSWORD-1-bad"),
-                State = (int)UserState.Confirmed
+                PasswordHash = cryptographicHashService.GetHash("test-salt" + "test-PASSWORD-1"),
+                State = "Confirmed"
             }));
 
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1-bad" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

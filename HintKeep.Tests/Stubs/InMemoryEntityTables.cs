@@ -7,5 +7,7 @@ namespace HintKeep.Tests.Stubs
     public class InMemoryEntityTables : IEntityTables
     {
         public CloudTable Users { get; } = new InMemoryCloudTable(nameof(Users));
+
+        public CloudTable Logins { get; } = new InMemoryCloudTable(nameof(Logins));
     }
 }

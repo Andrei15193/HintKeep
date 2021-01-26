@@ -57,53 +57,20 @@ namespace HintKeep.Tests.Integration.Users
                 .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
                 .CreateClient();
 
-            entityTables.Users.ExecuteBatch(new TableBatchOperation
+            entityTables.Logins.ExecuteBatch(new TableBatchOperation
             {
-                TableOperation.Insert(new UserEntity
+                TableOperation.Insert(new EmailLoginEntity
                 {
                     PartitionKey = "email@domain.tld",
-                    RowKey = "user",
-                    State = (int)UserState.Confirmed
+                    RowKey = "EmailLogin",
+                    State = "PendingConfirmation"
                 }),
-                TableOperation.Insert(new TokenEntity
+                TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     PartitionKey = "email@domain.tld",
-                    RowKey = "confirmation_tokens-token",
+                    RowKey = "EmailLogin-confirmationToken",
                     Token = "token",
-                    Intent = (int)TokenIntent.ConfirmUserRegistration,
-                    Created = DateTime.UtcNow.AddDays(-10)
-                })
-            });
-
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "eMail@DOMAIN.TLD", confirmationToken = "token" });
-
-            Assert.Equal(HttpStatusCode.PreconditionFailed, response.StatusCode);
-            Assert.Empty(await response.Content.ReadAsStringAsync());
-        }
-
-        [Fact]
-        public async Task Post_WithValidEmailButConfirmationTokenOfDifferentIntent_ReturnsPreconditionFailed()
-        {
-            var entityTables = default(IEntityTables);
-            var client = _webApplicationFactory
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
-                .CreateClient();
-
-            entityTables.Users.ExecuteBatch(new TableBatchOperation
-            {
-                TableOperation.Insert(new UserEntity
-                {
-                    PartitionKey = "email@domain.tld",
-                    RowKey = "user",
-                    State = (int)UserState.Confirmed
-                }),
-                TableOperation.Insert(new TokenEntity
-                {
-                    PartitionKey = "email@domain.tld",
-                    RowKey = "confirmation_tokens-token",
-                    Token = "token",
-                    Intent = -1,
-                    Created = DateTime.UtcNow.AddMinutes(-1)
+                    Created = DateTime.UtcNow.AddDays(-11)
                 })
             });
 
@@ -121,11 +88,11 @@ namespace HintKeep.Tests.Integration.Users
                 .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
                 .CreateClient();
 
-            entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 PartitionKey = "email@domain.tld",
-                RowKey = "user",
-                State = (int)UserState.Confirmed
+                RowKey = "EmailLogin",
+                State = "Confirmed"
             }));
 
             var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "eMail@DOMAIN.TLD", confirmationToken = "token" });
@@ -142,20 +109,19 @@ namespace HintKeep.Tests.Integration.Users
                 .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
                 .CreateClient();
 
-            entityTables.Users.ExecuteBatch(new TableBatchOperation{
-                TableOperation.Insert(new UserEntity
+            entityTables.Logins.ExecuteBatch(new TableBatchOperation{
+                TableOperation.Insert(new EmailLoginEntity
                 {
                     PartitionKey = "email@domain.tld",
-                    RowKey = "user",
-                    State = (int)UserState.PendingConfirmation
+                    RowKey = "EmailLogin",
+                    State = "PendingConfirmation"
                 }),
-                TableOperation.Insert(new TokenEntity
+                TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     PartitionKey = "email@domain.tld",
-                    RowKey = "confirmation_tokens-token",
+                    RowKey = "EmailLogin-confirmationToken",
                     Token = "token",
-                    Intent = (int)TokenIntent.ConfirmUserRegistration,
-                    Created = DateTime.UtcNow.AddMinutes(-1)
+                    Created = DateTime.UtcNow
                 })
             });
 
@@ -165,13 +131,13 @@ namespace HintKeep.Tests.Integration.Users
             Assert.Empty(await response.Content.ReadAsStringAsync());
             Assert.Equal(new Uri("/users", UriKind.Relative), response.Headers.Location);
 
-            var userEntity = (UserEntity)entityTables.Users.Execute(TableOperation.Retrieve<UserEntity>("email@domain.tld", "user")).Result;
-            Assert.Equal(UserState.Confirmed, (UserState)userEntity.State);
+            var loginEntity = (EmailLoginEntity)entityTables.Logins.Execute(TableOperation.Retrieve<EmailLoginEntity>("email@domain.tld", "EmailLogin")).Result;
+            Assert.Equal("Confirmed", loginEntity.State);
 
-            var tokenEntityQuery = new TableQuery<TokenEntity>()
-                .Where(TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.NotEqual, "user"))
+            var tokenEntityQuery = new TableQuery<EmailLoginTokenEntity>()
+                .Where(TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.NotEqual, "EmailLogin"))
                 .Take(1);
-            Assert.Empty(entityTables.Users.ExecuteQuery<TokenEntity>(tokenEntityQuery));
+            Assert.Empty(entityTables.Logins.ExecuteQuery<EmailLoginTokenEntity>(tokenEntityQuery));
         }
     }
 }

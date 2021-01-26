@@ -25,7 +25,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
         public UserAuthenticationQueryHandlerTests()
         {
             _entityTables = new InMemoryEntityTables();
-            _entityTables.Users.Create();
+            _entityTables.Logins.Create();
             _cryptographicHashService = new Mock<ICryptographicHashService>();
             _jsonWebTokenService = new Mock<IJsonWebTokenService>();
             _userAuthenticationQueryHandler = new UserAuthenticationQueryHandler(_entityTables, _cryptographicHashService.Object, _jsonWebTokenService.Object);
@@ -56,22 +56,23 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
         [Fact]
         public async Task Handle_WhenUserExistsAndPasswordsMatch_ReturnsUserInfo()
         {
+            var userId = Guid.NewGuid();
             _cryptographicHashService
                 .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salt" + "test-password"))
                 .Returns("test-hash")
                 .Verifiable();
             _jsonWebTokenService
-                .Setup(jsonWebTokenService => jsonWebTokenService.GetJsonWebToken("test-EMAIL"))
+                .Setup(jsonWebTokenService => jsonWebTokenService.GetJsonWebToken(userId))
                 .Returns("jwt")
                 .Verifiable();
-            _entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 PartitionKey = "test-email",
-                RowKey = "user",
-                Email = "test-EMAIL",
+                RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",
                 PasswordHash = "test-hash",
-                State = (int)UserState.Confirmed
+                State = "Confirmed",
+                UserId = userId
             }));
 
             var query = new UserAuthenticationQuery
@@ -91,15 +92,24 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
                 .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salt" + "test-password"))
                 .Returns("test-hash")
                 .Verifiable();
-            _entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            _entityTables.Logins.ExecuteBatch(new TableBatchOperation
             {
-                PartitionKey = "test-email",
-                RowKey = "user",
-                Email = "test-EMAIL",
-                PasswordSalt = "test-salt",
-                PasswordHash = "test-hash",
-                State = (int)UserState.PendingConfirmation
-            }));
+                TableOperation.Insert(new EmailLoginEntity
+                {
+                    PartitionKey = "test-email",
+                    RowKey = "EmailLogin",
+                    PasswordSalt = "test-salt",
+                    PasswordHash = "test-hash",
+                    State = "PendingConfirmation",
+                }),
+                TableOperation.Insert(new EmailLoginTokenEntity
+                {
+                    PartitionKey = "test-email",
+                    RowKey = "EmailLogin-confirmationToken",
+                    Token = "token",
+                    Created = DateTime.UtcNow
+                })
+            });
 
             var query = new UserAuthenticationQuery
             {
@@ -118,14 +128,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
                 .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salt" + "test-password"))
                 .Returns("test-hash-bad")
                 .Verifiable();
-            _entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 PartitionKey = "test-email",
-                RowKey = "user",
-                Email = "test-EMAIL",
+                RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",
                 PasswordHash = "test-hash",
-                State = (int)UserState.PendingConfirmation
+                State = "Confirmed"
             }));
 
             var query = new UserAuthenticationQuery

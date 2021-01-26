@@ -26,6 +26,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public UserSignUpCommandHandlerTests()
         {
             _entityTables = new InMemoryEntityTables();
+            _entityTables.Logins.Create();
             _entityTables.Users.Create();
             _rngService = new Mock<IRngService>();
             _saltService = new Mock<ISaltService>();
@@ -76,21 +77,24 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             };
             await _userSignUpCommandHandler.Handle(command, default);
 
-            var entities = _entityTables.Users.ExecuteQuery(new TableQuery());
-            var userEntity = Assert.Single(entities, entity => entity.RowKey == "user");
-            var confirmationTokenEntity = Assert.Single(entities, entity => entity.RowKey != "user");
-            Assert.Equal("test-email", userEntity.PartitionKey);
-            Assert.Equal("user", userEntity.RowKey);
-            Assert.Equal("test-eMail", userEntity.Properties[nameof(UserEntity.Email)].StringValue);
-            Assert.Equal("test-salt", userEntity.Properties[nameof(UserEntity.PasswordSalt)].StringValue);
-            Assert.Equal("test-hash", userEntity.Properties[nameof(UserEntity.PasswordHash)].StringValue);
-            Assert.Equal(UserState.PendingConfirmation, (UserState)userEntity.Properties[nameof(UserEntity.State)].Int32Value);
+            var entities = _entityTables.Logins.ExecuteQuery(new TableQuery());
+            var loginEntity = Assert.Single(entities, entity => entity.RowKey == "EmailLogin");
+            Assert.Equal("test-email", loginEntity.PartitionKey);
+            Assert.Equal("EmailLogin", loginEntity.RowKey);
+            Assert.Equal("test-salt", loginEntity.Properties[nameof(EmailLoginEntity.PasswordSalt)].StringValue);
+            Assert.Equal("test-hash", loginEntity.Properties[nameof(EmailLoginEntity.PasswordHash)].StringValue);
+            Assert.Equal("PendingConfirmation", loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue);
 
-            Assert.Equal("test-email", confirmationTokenEntity.PartitionKey);
-            Assert.Equal("confirmation_tokens-test-confirmation-token", confirmationTokenEntity.RowKey);
-            Assert.Equal("test-confirmation-token", confirmationTokenEntity.Properties[nameof(TokenEntity.Token)].StringValue);
-            Assert.True(DateTime.UtcNow.AddMinutes(-1) <= confirmationTokenEntity.Properties[nameof(TokenEntity.Created)].DateTime && confirmationTokenEntity.Properties[nameof(TokenEntity.Created)].DateTime <= DateTime.UtcNow.AddMinutes(1));
-            Assert.Equal(TokenIntent.ConfirmUserRegistration, (TokenIntent)confirmationTokenEntity.Properties[nameof(TokenEntity.Intent)].Int32Value);
+            var loginConfirmationTokenEntity = Assert.Single(entities, entity => entity.RowKey != "EmailLogin");
+            Assert.Equal("test-email", loginConfirmationTokenEntity.PartitionKey);
+            Assert.Equal("EmailLogin-confirmationToken", loginConfirmationTokenEntity.RowKey);
+            Assert.Equal("test-confirmation-token", loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Token)].StringValue);
+            Assert.True(DateTime.UtcNow.AddMinutes(-1) <= loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime && loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime <= DateTime.UtcNow.AddMinutes(1));
+
+            var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery()));
+            Assert.Equal(loginEntity.Properties[nameof(EmailLoginEntity.UserId)].GuidValue.Value.ToString("D"), userEntity.PartitionKey);
+            Assert.Equal("details", userEntity.RowKey);
+            Assert.Equal("test-eMail", userEntity.Properties[nameof(UserEntity.Email)].StringValue);
         }
 
         [Fact]
@@ -108,7 +112,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salttest-password"))
                 .Returns("test-hash")
                 .Verifiable();
-            _entityTables.Users.Execute(TableOperation.Insert(new TableEntity("test-email", "user")));
+            _entityTables.Logins.Execute(TableOperation.Insert(new TableEntity("test-email", "EmailLogin")));
 
             var command = new UserSignUpCommand
             {
