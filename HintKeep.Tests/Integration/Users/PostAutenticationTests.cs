@@ -67,7 +67,7 @@ namespace HintKeep.Tests.Integration.Users
                 PasswordSalt = "test-salt",
                 PasswordHash = cryptographicHashService.GetHash("test-salt" + "test-PASSWORD-1"),
                 State = "Confirmed",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid().ToString("N")
             }));
             
             var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });
@@ -92,7 +92,7 @@ namespace HintKeep.Tests.Integration.Users
                 PasswordSalt = "test-salt",
                 PasswordHash = cryptographicHashService.GetHash("test-salt" + "test-PASSWORD-1"),
                 State = "PendingConfirmation",
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid().ToString("N")
             }));
 
             var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });

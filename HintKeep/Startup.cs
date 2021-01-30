@@ -21,6 +21,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace HintKeep
 {
@@ -36,6 +38,15 @@ namespace HintKeep
             var jsonWebTokenServiceConfig = new JsonWebTokenServiceConfig(_configuration.GetSection(nameof(JsonWebTokenService)));
 
             services.AddSingleton<IEntityTables>(new AzureEntityTables(CloudStorageAccount.Parse(_configuration.GetConnectionString("AZURE_STORAGE")).CreateCloudTableClient()));
+
+            services.AddHttpContextAccessor();
+            services.AddScoped(serviceProvider =>
+            {
+                var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
+                return httpContext.User.Identity.IsAuthenticated
+                    ? new LoginInfo(httpContext.User.Claims.Single(claim => claim.Type == ClaimTypes.Name).Value)
+                    : null;
+            });
 
             services.AddTransient(serviceProvider => new CryptographicHashServiceConfig(_configuration.GetSection(nameof(CryptographicHashService))));
             services.AddSingleton(new EmailServiceConfig(_configuration.GetSection(nameof(EmailService))));
@@ -53,14 +64,8 @@ namespace HintKeep
             services
                 .AddControllers(options =>
                 {
+                    options.Filters.Add(new AuthorizeFilter());
                     options.Filters.Add<ExceptionFilter>();
-
-                    var policy = new AuthorizationPolicyBuilder()
-                        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                        .RequireAuthenticatedUser()
-                        .RequireClaim(ClaimTypes.Name)
-                        .Build();
-                    options.Filters.Add(new AuthorizeFilter(policy));
                 })
                 .AddJsonOptions(options =>
                 {
@@ -79,6 +84,16 @@ namespace HintKeep
                 });
 
             services
+                .AddAuthorization(
+                    options =>
+                    {
+                        options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                            .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                            .RequireAuthenticatedUser()
+                            .RequireClaim(ClaimTypes.Name)
+                            .Build();
+                    }
+                )
                 .AddAuthentication(
                     options =>
                     {

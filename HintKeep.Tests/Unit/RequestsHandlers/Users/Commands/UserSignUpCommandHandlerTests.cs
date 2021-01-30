@@ -92,7 +92,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             Assert.True(DateTime.UtcNow.AddMinutes(-1) <= loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime && loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime <= DateTime.UtcNow.AddMinutes(1));
 
             var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery()));
-            Assert.Equal(loginEntity.Properties[nameof(EmailLoginEntity.UserId)].GuidValue.Value.ToString("D"), userEntity.PartitionKey);
+            Assert.Equal(loginEntity.Properties[nameof(EmailLoginEntity.UserId)].StringValue, userEntity.PartitionKey);
             Assert.Equal("details", userEntity.RowKey);
             Assert.Equal("test-eMail", userEntity.Properties[nameof(UserEntity.Email)].StringValue);
         }

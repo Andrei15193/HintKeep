@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using HintKeep.Requests.Users.Commands;
 using HintKeep.Requests.Users.Queries;
@@ -20,7 +19,7 @@ namespace HintKeep.Controllers
             => _mediator = mediator;
 
         [AllowAnonymous, HttpPost]
-        public async Task<IActionResult> Post(UserSignUp userSignUp)
+        public async Task<IActionResult> PostAsync(UserSignUp userSignUp)
         {
             await _mediator.Send(new UserSignUpCommand
             {
@@ -31,7 +30,7 @@ namespace HintKeep.Controllers
         }
 
         [AllowAnonymous, HttpPost("confirmations")]
-        public async Task<IActionResult> PostConfirmation(UserConfirmation userConfirmation)
+        public async Task<IActionResult> PostConfirmationAsync(UserConfirmation userConfirmation)
         {
             await _mediator.Send(new UserRegistrationConfirmationCommand
             {
@@ -42,7 +41,7 @@ namespace HintKeep.Controllers
         }
 
         [AllowAnonymous, HttpPost("authentications")]
-        public async Task<IActionResult> PostAuthentication(UserLogin userLogin)
+        public async Task<IActionResult> PostAuthenticationAsync(UserLogin userLogin)
         {
             var userInfo = await _mediator.Send(new UserAuthenticationQuery
             {

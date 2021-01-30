@@ -4,26 +4,30 @@ using Xunit;
 
 namespace HintKeep.Tests.Unit.ViewModels.ValidationAttributes
 {
-    public class MediumTextAttributeTests
+    public class RequiredMediumTextAttributeTests
     {
-        private readonly MediumTextAttribute _mediumTextAttribute = new MediumTextAttribute();
-
-        [Theory]
-        [InlineData("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456")]
-        public void InvalidText(string invalidText)
-        {
-            var validationResult = _mediumTextAttribute.GetValidationResult(invalidText, new ValidationContext(new object()) { MemberName = "TestMemberName" });
-            Assert.NotNull(validationResult);
-            Assert.Equal("validation.errors.invalidMediumText", validationResult.ErrorMessage);
-            Assert.Equal(new[] { "TestMemberName" }, validationResult.MemberNames);
-        }
+        private readonly RequiredMediumTextAttribute _requiredMediumTextAttribute = new RequiredMediumTextAttribute();
 
         [Theory]
         [InlineData(null)]
         [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("\t")]
+        [InlineData("\r")]
+        [InlineData("\n")]
+        [InlineData("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456")]
+        public void InvalidText(string invalidText)
+        {
+            var validationResult = _requiredMediumTextAttribute.GetValidationResult(invalidText, new ValidationContext(new object()) { MemberName = "TestMemberName" });
+            Assert.NotNull(validationResult);
+            Assert.Equal("validation.errors.invalidRequiredMediumText", validationResult.ErrorMessage);
+            Assert.Equal(new[] { "TestMemberName" }, validationResult.MemberNames);
+        }
+
+        [Theory]
         [InlineData("1234567890")]
         [InlineData("123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345")]
         public void ValidText(string invalidText)
-            => Assert.Null(_mediumTextAttribute.GetValidationResult(invalidText, new ValidationContext(new object()) { MemberName = "TestMemberName" }));
+            => Assert.Null(_requiredMediumTextAttribute.GetValidationResult(invalidText, new ValidationContext(new object()) { MemberName = "TestMemberName" }));
     }
 }

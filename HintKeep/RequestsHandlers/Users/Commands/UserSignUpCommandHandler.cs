@@ -29,10 +29,10 @@ namespace HintKeep.RequestsHandlers.Users.Commands
             var passwordHash = _cryptographicHashService.GetHash(passwordSalt + command.Password);
             var confirmationToken = _rngService.Generate(12).ToLowerInvariant();
 
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString("N");
             var userEntity = new UserEntity
             {
-                PartitionKey = userId.ToString("D"),
+                PartitionKey = userId,
                 RowKey = "details",
                 Email = command.Email
             };

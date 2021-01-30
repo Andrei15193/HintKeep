@@ -4,6 +4,6 @@ namespace HintKeep.Services
 {
     public interface IJsonWebTokenService
     {
-        string GetJsonWebToken(Guid userEmail);
+        string GetJsonWebToken(string userId);
     }
 }

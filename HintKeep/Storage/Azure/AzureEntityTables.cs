@@ -14,5 +14,8 @@ namespace HintKeep.Storage.Azure
 
         public CloudTable Logins
             => _cloudTableClient.GetTableReference(nameof(Logins));
+
+        public CloudTable Accounts
+            => _cloudTableClient.GetTableReference(nameof(Accounts));
     }
 }

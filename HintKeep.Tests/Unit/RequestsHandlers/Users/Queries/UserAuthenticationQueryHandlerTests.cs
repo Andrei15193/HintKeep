@@ -56,7 +56,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
         [Fact]
         public async Task Handle_WhenUserExistsAndPasswordsMatch_ReturnsUserInfo()
         {
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString("N");
             _cryptographicHashService
                 .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salt" + "test-password"))
                 .Returns("test-hash")

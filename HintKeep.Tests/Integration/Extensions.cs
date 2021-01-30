@@ -6,7 +6,6 @@ using HintKeep.Tests.Stubs;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.DependencyInjection;
-using HintKeep.Storage.Entities;
 using Microsoft.AspNetCore.TestHost;
 
 namespace HintKeep.Tests.Integration

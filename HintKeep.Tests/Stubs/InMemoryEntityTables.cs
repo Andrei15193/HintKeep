@@ -9,5 +9,7 @@ namespace HintKeep.Tests.Stubs
         public CloudTable Users { get; } = new InMemoryCloudTable(nameof(Users));
 
         public CloudTable Logins { get; } = new InMemoryCloudTable(nameof(Logins));
+
+        public CloudTable Accounts { get; } = new InMemoryCloudTable(nameof(Accounts));
     }
 }

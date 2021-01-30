@@ -68,8 +68,8 @@ namespace HintKeep.Tests.Integration.Users
             Assert.Equal(12, tokenEntity.Token.Length);
             Assert.True(DateTime.UtcNow.AddMinutes(-1) <= tokenEntity.Created && tokenEntity.Created <= DateTime.UtcNow.AddMinutes(1));
 
-            var userEntity = (UserEntity)entityTables.Users.Execute(TableOperation.Retrieve<UserEntity>(emailLoginEntity.UserId.ToString("D"), "details")).Result;
-            Assert.Equal(emailLoginEntity.UserId.ToString("D"), userEntity.PartitionKey);
+            var userEntity = (UserEntity)entityTables.Users.Execute(TableOperation.Retrieve<UserEntity>(emailLoginEntity.UserId, "details")).Result;
+            Assert.Equal(emailLoginEntity.UserId, userEntity.PartitionKey);
             Assert.Equal("details", userEntity.RowKey);
             Assert.Equal("eMail@DOMAIN.TLD", userEntity.Email);
 

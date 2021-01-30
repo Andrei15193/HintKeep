@@ -13,13 +13,17 @@ namespace HintKeep.Tests.Integration
 {
     public class HintKeepWebApplicationFactory : WebApplicationFactory<Startup>
     {
-        private Guid? _authenticatedUserId;
+        private readonly string _authenticatedUserId;
 
-        public HintKeepWebApplicationFactory WithAuthentication(Guid userId)
+        public HintKeepWebApplicationFactory()
         {
-            _authenticatedUserId = userId;
-            return this;
         }
+
+        private HintKeepWebApplicationFactory(string authenticatedUserId)
+            => _authenticatedUserId = authenticatedUserId;
+
+        public HintKeepWebApplicationFactory WithAuthentication(string userId)
+            => new HintKeepWebApplicationFactory(userId);
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -35,10 +39,10 @@ namespace HintKeep.Tests.Integration
         protected override void ConfigureClient(HttpClient client)
         {
             base.ConfigureClient(client);
-            if (_authenticatedUserId.HasValue)
+            if (!string.IsNullOrWhiteSpace(_authenticatedUserId))
             {
                 var jsonWebTokenService = (IJsonWebTokenService)Services.GetService(typeof(IJsonWebTokenService));
-                var jwt = jsonWebTokenService.GetJsonWebToken(_authenticatedUserId.Value);
+                var jwt = jsonWebTokenService.GetJsonWebToken(_authenticatedUserId);
                 client.DefaultRequestHeaders.Add(HeaderNames.Authorization, $"{JwtBearerDefaults.AuthenticationScheme} {jwt}");
             }
         }
