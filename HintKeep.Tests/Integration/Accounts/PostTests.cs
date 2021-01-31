@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -10,11 +9,11 @@ using Xunit;
 
 namespace HintKeep.Tests.Integration.Accounts
 {
-    public class BasicTests : IClassFixture<HintKeepWebApplicationFactory>
+    public class PostTests : IClassFixture<HintKeepWebApplicationFactory>
     {
         private readonly HintKeepWebApplicationFactory _webApplicationFactory;
 
-        public BasicTests(HintKeepWebApplicationFactory webApplicationFactory)
+        public PostTests(HintKeepWebApplicationFactory webApplicationFactory)
             => _webApplicationFactory = webApplicationFactory;
 
         [Fact]

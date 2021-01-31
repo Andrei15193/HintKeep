@@ -10,11 +10,11 @@ using Xunit;
 
 namespace HintKeep.Tests.Integration.Users
 {
-    public class BasicTests : IClassFixture<HintKeepWebApplicationFactory>
+    public class PostTests : IClassFixture<HintKeepWebApplicationFactory>
     {
         private readonly HintKeepWebApplicationFactory _webApplicationFactory;
 
-        public BasicTests(HintKeepWebApplicationFactory webApplicationFactory)
+        public PostTests(HintKeepWebApplicationFactory webApplicationFactory)
             => _webApplicationFactory = webApplicationFactory;
 
         [Fact]

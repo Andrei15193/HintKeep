@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using HintKeep.Requests.Accounts.Commands;
+using HintKeep.Requests.Accounts.Queries;
 using HintKeep.ViewModels.Accounts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,13 @@ namespace HintKeep.Controllers
             });
 
             return Created(new Uri($"/accounts/{accountId}", UriKind.Relative), null);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAsync()
+        {
+            var accounts = await _mediator.Send(new GetAccountsQuery());
+            return Ok(accounts);
         }
     }
 }
