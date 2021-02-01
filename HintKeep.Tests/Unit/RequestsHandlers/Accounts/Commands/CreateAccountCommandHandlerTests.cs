@@ -41,7 +41,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                 CancellationToken.None
             );
 
-            Assert.Equal(2, _entityTables.Accounts.ExecuteQuery(new TableQuery<AccountEntity>()).Count());
+            Assert.Equal(3, _entityTables.Accounts.ExecuteQuery(new TableQuery<AccountEntity>()).Count());
 
             var accountEntity = (AccountEntity)_entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>(_userId, $"id-{accountId}")).Result;
             Assert.Equal(_userId, accountEntity.PartitionKey);
@@ -54,6 +54,16 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             Assert.Equal(_userId, indexedEntity.PartitionKey);
             Assert.Equal("name-test-account", indexedEntity.RowKey);
             Assert.Equal(accountId, indexedEntity.IndexedEntityId);
+
+            var accountHintEntity = Assert.Single(_entityTables.Accounts.ExecuteQuery(
+                new TableQuery<AccountHintEntity>()
+                    .Where(TableQuery.GenerateFilterCondition(nameof(AccountHintEntity.AccountId), QueryComparisons.NotEqual, string.Empty))
+            ));
+            Assert.Equal(_userId, accountHintEntity.PartitionKey);
+            Assert.Equal($"id-{accountId}-hintDate-{accountHintEntity.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}", accountHintEntity.RowKey);
+            Assert.NotNull(accountHintEntity.StartDate);
+            Assert.Equal(accountEntity.Id, accountHintEntity.AccountId);
+            Assert.Equal("Test-Hint", accountHintEntity.Hint);
         }
 
         [Fact]

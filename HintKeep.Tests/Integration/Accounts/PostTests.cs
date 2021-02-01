@@ -72,9 +72,20 @@ namespace HintKeep.Tests.Integration.Accounts
             var accountEntity = (AccountEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>(userId, $"id-{indexedEntity.IndexedEntityId}")).Result;
             Assert.Equal(userId, accountEntity.PartitionKey);
             Assert.Equal($"id-{indexedEntity.IndexedEntityId}", accountEntity.RowKey);
+            Assert.Equal(indexedEntity.IndexedEntityId, accountEntity.Id);
             Assert.Equal("Test-Account", accountEntity.Name);
             Assert.Equal("Test-Hint", accountEntity.Hint);
             Assert.True(accountEntity.IsPinned);
+
+            var accountHintEntity = Assert.Single(entityTables.Accounts.ExecuteQuery(
+                new TableQuery<AccountHintEntity>()
+                    .Where(TableQuery.GenerateFilterCondition(nameof(AccountHintEntity.AccountId), QueryComparisons.NotEqual, string.Empty))
+            ));
+            Assert.Equal(userId, accountHintEntity.PartitionKey);
+            Assert.Equal($"id-{indexedEntity.IndexedEntityId}-hintDate-{accountHintEntity.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}", accountHintEntity.RowKey);
+            Assert.NotNull(accountHintEntity.StartDate);
+            Assert.Equal(accountEntity.Id, accountHintEntity.AccountId);
+            Assert.Equal("Test-Hint", accountHintEntity.Hint);
 
             Assert.Equal(new Uri($"/accounts/{indexedEntity.IndexedEntityId}", UriKind.Relative), response.Headers.Location);
         }

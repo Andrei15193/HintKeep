@@ -40,7 +40,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
                     from accountEntity in result
                     select new Account
                     {
-                        Id = accountEntity.RowKey.Substring("id-".Length),
+                        Id = accountEntity.Id,
                         Name = accountEntity.Name,
                         Hint = accountEntity.Hint,
                         IsPinned = accountEntity.IsPinned

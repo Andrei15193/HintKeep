@@ -21,29 +21,41 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
 
         public async Task<string> Handle(CreateAccountCommand command, CancellationToken cancellationToken)
         {
+            var now = DateTime.UtcNow;
             var accountId = Guid.NewGuid().ToString("N");
             try
             {
                 await _entityTables.Accounts.ExecuteBatchAsync(
                     new TableBatchOperation{
-                    TableOperation.Insert(
-                        new IndexEntity
-                        {
-                            PartitionKey = $"{_login.UserId}",
-                            RowKey = $"name-{command.Name.ToLowerInvariant()}",
-                            IndexedEntityId = accountId
-                        }
-                    ),
-                    TableOperation.Insert(
-                        new AccountEntity
-                        {
-                            PartitionKey = $"{_login.UserId}",
-                            RowKey = $"id-{accountId}",
-                            Name = command.Name,
-                            Hint = command.Hint,
-                            IsPinned = command.IsPinned
-                        }
-                    )
+                        TableOperation.Insert(
+                            new IndexEntity
+                            {
+                                PartitionKey = _login.UserId,
+                                RowKey = $"name-{command.Name.ToLowerInvariant()}",
+                                IndexedEntityId = accountId
+                            }
+                        ),
+                        TableOperation.Insert(
+                            new AccountEntity
+                            {
+                                PartitionKey = _login.UserId,
+                                RowKey = $"id-{accountId}",
+                                Id = accountId,
+                                Name = command.Name,
+                                Hint = command.Hint,
+                                IsPinned = command.IsPinned
+                            }
+                        ),
+                        TableOperation.Insert(
+                            new AccountHintEntity
+                            {
+                                PartitionKey = _login.UserId,
+                                RowKey = $"id-{accountId}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
+                                AccountId = accountId,
+                                StartDate = now,
+                                Hint = command.Hint
+                            }
+                        )
                     },
                     cancellationToken
                 );

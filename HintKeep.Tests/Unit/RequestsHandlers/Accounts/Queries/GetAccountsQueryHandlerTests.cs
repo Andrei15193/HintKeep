@@ -47,9 +47,17 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 {
                     PartitionKey = _userId,
                     RowKey = "id-1",
+                    Id = "1",
                     Name = "test-name",
                     Hint = "test-hint",
                     IsPinned = false
+                }),
+                TableOperation.Insert(new AccountHintEntity
+                {
+                    PartitionKey = _userId,
+                    RowKey = "id-1-hintDate-1",
+                    AccountId = "1",
+                    Hint = "test-hint"
                 })
             });
             _entityTables.Accounts.ExecuteBatch(new TableBatchOperation
@@ -64,9 +72,17 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 {
                     PartitionKey = otherUserId,
                     RowKey = "id-2",
+                    Id = "2",
                     Name = "test-name",
                     Hint = "test-hint",
                     IsPinned = false
+                }),
+                TableOperation.Insert(new AccountHintEntity
+                {
+                    PartitionKey = otherUserId,
+                    RowKey = "id-2-hintDate-2",
+                    AccountId = "2",
+                    Hint = "test-hint"
                 })
             });
 

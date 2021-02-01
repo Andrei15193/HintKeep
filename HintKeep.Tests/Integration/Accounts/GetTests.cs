@@ -49,6 +49,8 @@ namespace HintKeep.Tests.Integration.Accounts
                     .Select(accountId => (userId: otherUserId, accountId: accountId.ToString())))
                 .Select((pair, index) => (pair.userId, pair.accountId, accountNumber: index + 1));
             foreach (var (userId, accountId, accountNumber) in accountsToInsert)
+            {
+                var now = DateTime.UtcNow;
                 entityTables.Accounts.ExecuteBatch(new TableBatchOperation
                 {
                     TableOperation.Insert(new IndexEntity
@@ -61,11 +63,21 @@ namespace HintKeep.Tests.Integration.Accounts
                     {
                         PartitionKey = userId,
                         RowKey = $"id-{accountId}",
+                        Id = accountId,
                         Name = $"test-account-{accountNumber}",
                         Hint = $"test-hint-{accountNumber}",
                         IsPinned = true
+                    }),
+                    TableOperation.Insert(new AccountHintEntity
+                    {
+                        PartitionKey = userId,
+                        RowKey = $"id-{accountId}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
+                        AccountId = accountId,
+                        StartDate = now,
+                        Hint = $"test-hint-{accountNumber}",
                     })
                 });
+            }
 
             var response = await client.GetAsync("/accounts");
 
@@ -116,6 +128,14 @@ namespace HintKeep.Tests.Integration.Accounts
                     Hint = "test-hint",
                     IsPinned = false
                 }),
+                TableOperation.Insert(new AccountHintEntity
+                {
+                    PartitionKey = userId,
+                    RowKey = "hintDate-1",
+                    AccountId = "1",
+                    StartDate = DateTime.UtcNow,
+                    Hint = "test-hint"
+                }),
                 TableOperation.Insert(new IndexEntity
                 {
                     PartitionKey = userId,
@@ -129,6 +149,14 @@ namespace HintKeep.Tests.Integration.Accounts
                     Name = "A",
                     Hint = "test-hint",
                     IsPinned = false
+                }),
+                TableOperation.Insert(new AccountHintEntity
+                {
+                    PartitionKey = userId,
+                    RowKey = "hintDate-2",
+                    AccountId = "2",
+                    StartDate = DateTime.UtcNow,
+                    Hint = "test-hint"
                 }),
                 TableOperation.Insert(new IndexEntity
                 {
@@ -144,6 +172,14 @@ namespace HintKeep.Tests.Integration.Accounts
                     Hint = "test-hint",
                     IsPinned = true
                 }),
+                TableOperation.Insert(new AccountHintEntity
+                {
+                    PartitionKey = userId,
+                    RowKey = "hintDate-3",
+                    AccountId = "3",
+                    StartDate = DateTime.UtcNow,
+                    Hint = "test-hint"
+                }),
                 TableOperation.Insert(new IndexEntity
                 {
                     PartitionKey = userId,
@@ -157,6 +193,14 @@ namespace HintKeep.Tests.Integration.Accounts
                     Name = "AA",
                     Hint = "test-hint",
                     IsPinned = true
+                }),
+                TableOperation.Insert(new AccountHintEntity
+                {
+                    PartitionKey = userId,
+                    RowKey = "hintDate-4",
+                    AccountId = "4",
+                    StartDate = DateTime.UtcNow,
+                    Hint = "test-hint"
                 })
             });
 
