@@ -62,6 +62,7 @@ namespace HintKeep.Tests.Integration.Users
             var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
+                EntityType = "EmailLoginEntity",
                 PartitionKey = "email@domain.tld",
                 RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",
@@ -87,6 +88,7 @@ namespace HintKeep.Tests.Integration.Users
             var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
+                EntityType = "EmailLoginEntity",
                 PartitionKey = "email@domain.tld",
                 RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",
@@ -111,6 +113,7 @@ namespace HintKeep.Tests.Integration.Users
             var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
+                EntityType = "EmailLoginEntity",
                 PartitionKey = "email@domain.tld",
                 RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",

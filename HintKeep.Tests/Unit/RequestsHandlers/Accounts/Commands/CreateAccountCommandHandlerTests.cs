@@ -44,6 +44,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             Assert.Equal(3, _entityTables.Accounts.ExecuteQuery(new TableQuery<AccountEntity>()).Count());
 
             var accountEntity = (AccountEntity)_entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>(_userId, $"id-{accountId}")).Result;
+            Assert.Equal("AccountEntity", accountEntity.EntityType);
             Assert.Equal(_userId, accountEntity.PartitionKey);
             Assert.Equal($"id-{accountId}", accountEntity.RowKey);
             Assert.Equal("Test-Account", accountEntity.Name);
@@ -51,6 +52,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             Assert.True(accountEntity.IsPinned);
 
             var indexedEntity = (IndexEntity)_entityTables.Accounts.Execute(TableOperation.Retrieve<IndexEntity>(_userId, "name-test-account")).Result;
+            Assert.Equal("IndexEntity", indexedEntity.EntityType);
             Assert.Equal(_userId, indexedEntity.PartitionKey);
             Assert.Equal("name-test-account", indexedEntity.RowKey);
             Assert.Equal(accountId, indexedEntity.IndexedEntityId);
@@ -59,6 +61,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                 new TableQuery<AccountHintEntity>()
                     .Where(TableQuery.GenerateFilterCondition(nameof(AccountHintEntity.AccountId), QueryComparisons.NotEqual, string.Empty))
             ));
+            Assert.Equal("AccountHintEntity", accountHintEntity.EntityType);
             Assert.Equal(_userId, accountHintEntity.PartitionKey);
             Assert.Equal($"id-{accountId}-hintDate-{accountHintEntity.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}", accountHintEntity.RowKey);
             Assert.NotNull(accountHintEntity.StartDate);
@@ -71,8 +74,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             _entityTables.Accounts.Execute(TableOperation.Insert(new IndexEntity
             {
+                EntityType = "IndexEntity",
                 PartitionKey = _userId,
-                RowKey = "name-test-account"
+                RowKey = "name-test-account",
+                IndexedEntityId = "entity-id"
             }));
 
             var exception = await Assert.ThrowsAsync<ConflictException>(

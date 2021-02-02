@@ -27,7 +27,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
                     TableQuery.CombineFilters(
                         TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, _login.UserId),
                         TableOperators.And,
-                        TableQuery.GenerateFilterCondition(nameof(AccountEntity.Name), QueryComparisons.NotEqual, string.Empty)
+                        TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountEntity")
                     )
                 );
             var accounts = new List<Account>();

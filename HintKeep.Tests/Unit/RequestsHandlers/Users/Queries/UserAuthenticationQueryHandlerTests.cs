@@ -67,6 +67,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
                 .Verifiable();
             _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
+                EntityType = "EmailLoginEntity",
                 PartitionKey = "test-email",
                 RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",
@@ -96,6 +97,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
             {
                 TableOperation.Insert(new EmailLoginEntity
                 {
+                    EntityType = "EmailLoginEntity",
                     PartitionKey = "test-email",
                     RowKey = "EmailLogin",
                     PasswordSalt = "test-salt",
@@ -104,6 +106,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
                 }),
                 TableOperation.Insert(new EmailLoginTokenEntity
                 {
+                    EntityType = "EmailLoginTokenEntity",
                     PartitionKey = "test-email",
                     RowKey = "EmailLogin-confirmationToken",
                     Token = "token",
@@ -130,6 +133,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
                 .Verifiable();
             _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
+                EntityType = "EmailLoginEntity",
                 PartitionKey = "test-email",
                 RowKey = "EmailLogin",
                 PasswordSalt = "test-salt",

@@ -39,12 +39,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
             {
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = _userId,
                     RowKey = "test-name",
                     IndexedEntityId = "1"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = _userId,
                     RowKey = "id-1",
                     Id = "1",
@@ -54,6 +56,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 }),
                 TableOperation.Insert(new AccountHintEntity
                 {
+                    EntityType = "AccountHintEntity",
                     PartitionKey = _userId,
                     RowKey = "id-1-hintDate-1",
                     AccountId = "1",
@@ -64,12 +67,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
             {
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = otherUserId,
                     RowKey = "name-A",
                     IndexedEntityId = "2"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = otherUserId,
                     RowKey = "id-2",
                     Id = "2",
@@ -79,6 +84,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 }),
                 TableOperation.Insert(new AccountHintEntity
                 {
+                    EntityType = "AccountHintEntity",
                     PartitionKey = otherUserId,
                     RowKey = "id-2-hintDate-2",
                     AccountId = "2",
@@ -102,12 +108,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
             {
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = _userId,
                     RowKey = "name-B",
                     IndexedEntityId = "1"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = _userId,
                     RowKey = "id-1",
                     Name = "B",
@@ -116,12 +124,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 }),
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = _userId,
                     RowKey = "name-A",
                     IndexedEntityId = "2"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = _userId,
                     RowKey = "id-2",
                     Name = "A",
@@ -130,12 +140,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 }),
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = _userId,
                     RowKey = "name-BB",
                     IndexedEntityId = "3"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = _userId,
                     RowKey = "id-3",
                     Name = "BB",
@@ -144,12 +156,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 }),
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = _userId,
                     RowKey = "name-AA",
                     IndexedEntityId = "4"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = _userId,
                     RowKey = "id-4",
                     Name = "AA",

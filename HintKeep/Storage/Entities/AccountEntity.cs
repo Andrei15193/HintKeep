@@ -1,8 +1,6 @@
-using Microsoft.Azure.Cosmos.Table;
-
 namespace HintKeep.Storage.Entities
 {
-    public class AccountEntity : TableEntity
+    public class AccountEntity : HintKeepTableEntity
     {
         public string Id { get; set; }
 

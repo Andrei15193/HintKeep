@@ -30,6 +30,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                         TableOperation.Insert(
                             new IndexEntity
                             {
+                                EntityType = "IndexEntity",
                                 PartitionKey = _login.UserId,
                                 RowKey = $"name-{command.Name.ToLowerInvariant()}",
                                 IndexedEntityId = accountId
@@ -38,6 +39,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                         TableOperation.Insert(
                             new AccountEntity
                             {
+                                EntityType = "AccountEntity",
                                 PartitionKey = _login.UserId,
                                 RowKey = $"id-{accountId}",
                                 Id = accountId,
@@ -49,6 +51,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                         TableOperation.Insert(
                             new AccountHintEntity
                             {
+                                EntityType = "AccountHintEntity",
                                 PartitionKey = _login.UserId,
                                 RowKey = $"id-{accountId}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
                                 AccountId = accountId,

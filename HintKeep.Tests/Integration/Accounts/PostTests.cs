@@ -65,11 +65,13 @@ namespace HintKeep.Tests.Integration.Accounts
             Assert.Empty(await response.Content.ReadAsStringAsync());
 
             var indexedEntity = (IndexEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<IndexEntity>(userId, "name-test-account")).Result;
+            Assert.Equal("IndexEntity", indexedEntity.EntityType);
             Assert.Equal(userId, indexedEntity.PartitionKey);
             Assert.Equal("name-test-account", indexedEntity.RowKey);
             Assert.NotEmpty(indexedEntity.IndexedEntityId);
 
             var accountEntity = (AccountEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>(userId, $"id-{indexedEntity.IndexedEntityId}")).Result;
+            Assert.Equal("AccountEntity", accountEntity.EntityType);
             Assert.Equal(userId, accountEntity.PartitionKey);
             Assert.Equal($"id-{indexedEntity.IndexedEntityId}", accountEntity.RowKey);
             Assert.Equal(indexedEntity.IndexedEntityId, accountEntity.Id);
@@ -81,6 +83,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 new TableQuery<AccountHintEntity>()
                     .Where(TableQuery.GenerateFilterCondition(nameof(AccountHintEntity.AccountId), QueryComparisons.NotEqual, string.Empty))
             ));
+            Assert.Equal("AccountHintEntity", accountHintEntity.EntityType);
             Assert.Equal(userId, accountHintEntity.PartitionKey);
             Assert.Equal($"id-{indexedEntity.IndexedEntityId}-hintDate-{accountHintEntity.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}", accountHintEntity.RowKey);
             Assert.NotNull(accountHintEntity.StartDate);
@@ -101,6 +104,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.Accounts.Execute(TableOperation.Insert(new IndexEntity
             {
+                EntityType = "IndexEntity",
                 PartitionKey = userId,
                 RowKey = "name-test-account"
             }));

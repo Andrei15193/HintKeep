@@ -61,12 +61,14 @@ namespace HintKeep.Tests.Integration.Users
             {
                 TableOperation.Insert(new EmailLoginEntity
                 {
+                    EntityType = "EmailLoginEntity",
                     PartitionKey = "email@domain.tld",
                     RowKey = "EmailLogin",
                     State = "PendingConfirmation"
                 }),
                 TableOperation.Insert(new EmailLoginTokenEntity
                 {
+                    EntityType = "EmailLoginTokenEntity",
                     PartitionKey = "email@domain.tld",
                     RowKey = "EmailLogin-confirmationToken",
                     Token = "token",
@@ -90,6 +92,7 @@ namespace HintKeep.Tests.Integration.Users
 
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
+                EntityType = "EmailLoginEntity",
                 PartitionKey = "email@domain.tld",
                 RowKey = "EmailLogin",
                 State = "Confirmed"
@@ -112,12 +115,14 @@ namespace HintKeep.Tests.Integration.Users
             entityTables.Logins.ExecuteBatch(new TableBatchOperation{
                 TableOperation.Insert(new EmailLoginEntity
                 {
+                    EntityType = "EmailLoginEntity",
                     PartitionKey = "email@domain.tld",
                     RowKey = "EmailLogin",
                     State = "PendingConfirmation"
                 }),
                 TableOperation.Insert(new EmailLoginTokenEntity
                 {
+                    EntityType = "EmailLoginTokenEntity",
                     PartitionKey = "email@domain.tld",
                     RowKey = "EmailLogin-confirmationToken",
                     Token = "token",
@@ -135,7 +140,7 @@ namespace HintKeep.Tests.Integration.Users
             Assert.Equal("Confirmed", loginEntity.State);
 
             var tokenEntityQuery = new TableQuery<EmailLoginTokenEntity>()
-                .Where(TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.NotEqual, "EmailLogin"))
+                .Where(TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "EmailLoginTokenEntity"))
                 .Take(1);
             Assert.Empty(entityTables.Logins.ExecuteQuery<EmailLoginTokenEntity>(tokenEntityQuery));
         }

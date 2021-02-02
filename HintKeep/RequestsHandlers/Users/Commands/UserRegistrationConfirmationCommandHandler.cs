@@ -27,6 +27,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
                     nameof(ITableEntity.PartitionKey),
                     nameof(ITableEntity.RowKey),
                     nameof(ITableEntity.ETag),
+                    nameof(HintKeepTableEntity.EntityType),
                     nameof(EmailLoginEntity.State),
                     nameof(EmailLoginTokenEntity.Token),
                     nameof(EmailLoginTokenEntity.Created)
@@ -36,8 +37,8 @@ namespace HintKeep.RequestsHandlers.Users.Commands
                 cancellationToken
             );
 
-            var loginEntity = queryResult.SingleOrDefault(entity => entity.RowKey == nameof(LoginEntityType.EmailLogin));
-            var tokenEntity = queryResult.SingleOrDefault(entity => entity.RowKey == nameof(LoginEntityType.EmailLogin) + "-confirmationToken");
+            var loginEntity = queryResult.SingleOrDefault(entity => entity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue == "EmailLoginEntity");
+            var tokenEntity = queryResult.SingleOrDefault(entity => entity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue == "EmailLoginTokenEntity");
             if (loginEntity is object
                 && loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue == nameof(EmailLoginEntityState.PendingConfirmation)
                 && tokenEntity is object

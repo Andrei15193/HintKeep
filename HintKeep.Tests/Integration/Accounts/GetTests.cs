@@ -55,12 +55,14 @@ namespace HintKeep.Tests.Integration.Accounts
                 {
                     TableOperation.Insert(new IndexEntity
                     {
+                        EntityType = "IndexEntity",
                         PartitionKey = userId,
                         RowKey = $"name-test-account-{accountNumber}",
                         IndexedEntityId = accountId
                     }),
                     TableOperation.Insert(new AccountEntity
                     {
+                        EntityType = "AccountEntity",
                         PartitionKey = userId,
                         RowKey = $"id-{accountId}",
                         Id = accountId,
@@ -70,6 +72,7 @@ namespace HintKeep.Tests.Integration.Accounts
                     }),
                     TableOperation.Insert(new AccountHintEntity
                     {
+                        EntityType = "AccountHintEntity",
                         PartitionKey = userId,
                         RowKey = $"id-{accountId}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
                         AccountId = accountId,
@@ -116,12 +119,14 @@ namespace HintKeep.Tests.Integration.Accounts
             {
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = userId,
                     RowKey = "name-B",
                     IndexedEntityId = "1"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-1",
                     Name = "B",
@@ -130,6 +135,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 }),
                 TableOperation.Insert(new AccountHintEntity
                 {
+                    EntityType = "AccountHintEntity",
                     PartitionKey = userId,
                     RowKey = "hintDate-1",
                     AccountId = "1",
@@ -138,12 +144,14 @@ namespace HintKeep.Tests.Integration.Accounts
                 }),
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = userId,
                     RowKey = "name-A",
                     IndexedEntityId = "2"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-2",
                     Name = "A",
@@ -152,6 +160,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 }),
                 TableOperation.Insert(new AccountHintEntity
                 {
+                    EntityType = "AccountHintEntity",
                     PartitionKey = userId,
                     RowKey = "hintDate-2",
                     AccountId = "2",
@@ -160,12 +169,14 @@ namespace HintKeep.Tests.Integration.Accounts
                 }),
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = userId,
                     RowKey = "name-BB",
                     IndexedEntityId = "3"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-3",
                     Name = "BB",
@@ -174,6 +185,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 }),
                 TableOperation.Insert(new AccountHintEntity
                 {
+                    EntityType = "AccountHintEntity",
                     PartitionKey = userId,
                     RowKey = "hintDate-3",
                     AccountId = "3",
@@ -182,12 +194,14 @@ namespace HintKeep.Tests.Integration.Accounts
                 }),
                 TableOperation.Insert(new IndexEntity
                 {
+                    EntityType = "IndexEntity",
                     PartitionKey = userId,
                     RowKey = "name-AA",
                     IndexedEntityId = "4"
                 }),
                 TableOperation.Insert(new AccountEntity
                 {
+                    EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-4",
                     Name = "AA",
@@ -196,6 +210,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 }),
                 TableOperation.Insert(new AccountHintEntity
                 {
+                    EntityType = "AccountHintEntity",
                     PartitionKey = userId,
                     RowKey = "hintDate-4",
                     AccountId = "4",

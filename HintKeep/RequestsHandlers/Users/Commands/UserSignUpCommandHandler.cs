@@ -32,12 +32,14 @@ namespace HintKeep.RequestsHandlers.Users.Commands
             var userId = Guid.NewGuid().ToString("N");
             var userEntity = new UserEntity
             {
+                EntityType = "UserEntity",
                 PartitionKey = userId,
                 RowKey = "details",
                 Email = command.Email
             };
             var loginEntity = new EmailLoginEntity
             {
+                EntityType = "EmailLoginEntity",
                 PartitionKey = command.Email.ToLowerInvariant(),
                 RowKey = nameof(LoginEntityType.EmailLogin),
                 PasswordSalt = passwordSalt,
@@ -47,6 +49,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
             };
             var loginTokenEntity = new EmailLoginTokenEntity
             {
+                EntityType = "EmailLoginTokenEntity",
                 PartitionKey = command.Email.ToLowerInvariant(),
                 RowKey = nameof(LoginEntityType.EmailLogin) + "-confirmationToken",
                 Token = confirmationToken,

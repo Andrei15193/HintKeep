@@ -1,9 +1,6 @@
-using System;
-using Microsoft.Azure.Cosmos.Table;
-
 namespace HintKeep.Storage.Entities
 {
-    public class EmailLoginEntity : TableEntity
+    public class EmailLoginEntity : HintKeepTableEntity
     {
         public string PasswordSalt { get; set; }
 

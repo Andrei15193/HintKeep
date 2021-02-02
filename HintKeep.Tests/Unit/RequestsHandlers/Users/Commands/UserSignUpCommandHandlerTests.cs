@@ -79,6 +79,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
 
             var entities = _entityTables.Logins.ExecuteQuery(new TableQuery());
             var loginEntity = Assert.Single(entities, entity => entity.RowKey == "EmailLogin");
+            Assert.Equal("EmailLoginEntity", loginEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
             Assert.Equal("test-email", loginEntity.PartitionKey);
             Assert.Equal("EmailLogin", loginEntity.RowKey);
             Assert.Equal("test-salt", loginEntity.Properties[nameof(EmailLoginEntity.PasswordSalt)].StringValue);
@@ -86,12 +87,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             Assert.Equal("PendingConfirmation", loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue);
 
             var loginConfirmationTokenEntity = Assert.Single(entities, entity => entity.RowKey != "EmailLogin");
+            Assert.Equal("EmailLoginTokenEntity", loginConfirmationTokenEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
             Assert.Equal("test-email", loginConfirmationTokenEntity.PartitionKey);
             Assert.Equal("EmailLogin-confirmationToken", loginConfirmationTokenEntity.RowKey);
             Assert.Equal("test-confirmation-token", loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Token)].StringValue);
             Assert.True(DateTime.UtcNow.AddMinutes(-1) <= loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime && loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime <= DateTime.UtcNow.AddMinutes(1));
 
             var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery()));
+            Assert.Equal("UserEntity", userEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
             Assert.Equal(loginEntity.Properties[nameof(EmailLoginEntity.UserId)].StringValue, userEntity.PartitionKey);
             Assert.Equal("details", userEntity.RowKey);
             Assert.Equal("test-eMail", userEntity.Properties[nameof(UserEntity.Email)].StringValue);

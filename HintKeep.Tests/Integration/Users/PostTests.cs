@@ -56,6 +56,7 @@ namespace HintKeep.Tests.Integration.Users
             Assert.Equal(new Uri("/users/confirmations", UriKind.Relative), response.Headers.Location);
 
             var emailLoginEntity = (EmailLoginEntity)entityTables.Logins.Execute(TableOperation.Retrieve<EmailLoginEntity>("email@domain.tld", "EmailLogin")).Result;
+            Assert.Equal("EmailLoginEntity", emailLoginEntity.EntityType);
             Assert.Equal("email@domain.tld", emailLoginEntity.PartitionKey);
             Assert.Equal("EmailLogin", emailLoginEntity.RowKey);
             Assert.Equal("PendingConfirmation", emailLoginEntity.State);
@@ -63,6 +64,7 @@ namespace HintKeep.Tests.Integration.Users
             Assert.Equal(10, emailLoginEntity.PasswordSalt.Length);
 
             var tokenEntity = (EmailLoginTokenEntity)entityTables.Logins.Execute(TableOperation.Retrieve<EmailLoginTokenEntity>("email@domain.tld", "EmailLogin-confirmationToken")).Result;
+            Assert.Equal("EmailLoginTokenEntity", tokenEntity.EntityType);
             Assert.Equal("email@domain.tld", tokenEntity.PartitionKey);
             Assert.Equal("EmailLogin-confirmationToken", tokenEntity.RowKey);
             Assert.Equal(12, tokenEntity.Token.Length);
@@ -89,10 +91,15 @@ namespace HintKeep.Tests.Integration.Users
                 .WithInMemoryEmailService(actualEmailService => emailService = actualEmailService)
                 .CreateClient();
 
-            entityTables.Logins.Execute(TableOperation.Insert(new TableEntity
+            entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
+                EntityType = "EmailLoginEntity",
                 PartitionKey = "email@domain.tld",
-                RowKey = "EmailLogin"
+                RowKey = "EmailLogin",
+                PasswordSalt = "test-salt",
+                PasswordHash = "test-hash",
+                State = nameof(EmailLoginEntityState.PendingConfirmation),
+                UserId = "user-id"
             }));
 
             var response = await client.PostAsJsonAsync("/users", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });

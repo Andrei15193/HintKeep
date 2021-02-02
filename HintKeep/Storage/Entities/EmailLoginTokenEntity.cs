@@ -1,9 +1,8 @@
 using System;
-using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.Storage.Entities
 {
-    public class EmailLoginTokenEntity : TableEntity
+    public class EmailLoginTokenEntity : HintKeepTableEntity
     {
         public string Token { get; set; }
 
