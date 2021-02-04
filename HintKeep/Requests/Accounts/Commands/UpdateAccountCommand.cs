@@ -2,8 +2,10 @@ using MediatR;
 
 namespace HintKeep.Requests.Accounts.Commands
 {
-    public class CreateAccountCommand : IRequest<string>
+    public class UpdateAccountCommand : IRequest
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
 
         public string Hint { get; set; }

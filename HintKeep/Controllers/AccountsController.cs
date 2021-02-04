@@ -17,6 +17,10 @@ namespace HintKeep.Controllers
         public AccountsController(IMediator mediator)
             => _mediator = mediator;
 
+        [HttpGet]
+        public async Task<IActionResult> GetAsync()
+            => Ok(await _mediator.Send(new GetAccountsQuery()));
+
         [HttpPost]
         public async Task<IActionResult> PostAsync(AccountCreation accountCreation)
         {
@@ -30,11 +34,18 @@ namespace HintKeep.Controllers
             return Created(new Uri($"/accounts/{accountId}", UriKind.Relative), null);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAsync()
+        [HttpPut("/accounts/{accountId}")]
+        public async Task<IActionResult> PutAsync([FromRoute] string accountId, [FromBody] AccountUpdate accountUpdate)
         {
-            var accounts = await _mediator.Send(new GetAccountsQuery());
-            return Ok(accounts);
+            await _mediator.Send(new UpdateAccountCommand
+            {
+                Id = accountId,
+                Name = accountUpdate.Name,
+                Hint = accountUpdate.Hint,
+                IsPinned = accountUpdate.IsPinned
+            });
+
+            return NoContent();
         }
     }
 }

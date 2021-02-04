@@ -19,6 +19,14 @@ namespace HintKeep.Controllers.Filters
                     };
                     break;
 
+                case NotFoundException notFoundException:
+                    context.Result = new ContentResult
+                    {
+                        StatusCode = (int)HttpStatusCode.NotFound,
+                        Content = string.IsNullOrWhiteSpace(notFoundException.Message) ? null : notFoundException.Message
+                    };
+                    break;
+
                 case ConflictException conflictException:
                     context.Result = new ContentResult
                     {
