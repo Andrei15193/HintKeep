@@ -78,6 +78,7 @@ namespace HintKeep.Tests.Integration.Accounts
             Assert.Equal("Test-Account", accountEntity.Name);
             Assert.Equal("Test-Hint", accountEntity.Hint);
             Assert.True(accountEntity.IsPinned);
+            Assert.False(accountEntity.IsDeleted);
 
             var accountHintEntity = Assert.Single(entityTables.Accounts.ExecuteQuery(
                 new TableQuery<AccountHintEntity>()
@@ -102,12 +103,83 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication(userId)
                 .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
                 .CreateClient();
-            entityTables.Accounts.Execute(TableOperation.Insert(new IndexEntity
+            entityTables.Accounts.ExecuteBatch(new TableBatchOperation
             {
-                EntityType = "IndexEntity",
-                PartitionKey = userId,
-                RowKey = "name-test-account"
-            }));
+                TableOperation.Insert(new IndexEntity
+                {
+                    EntityType = "IndexEntity",
+                    PartitionKey = userId,
+                    RowKey = "name-test-account",
+                    IndexedEntityId = "1"
+                }),
+                TableOperation.Insert(new AccountEntity
+                {
+                    EntityType = "AccountEntity",
+                    PartitionKey = userId,
+                    RowKey = "id-1",
+                    Id = "1",
+                    Name= "test-account",
+                    Hint = "test-hint",
+                    IsPinned = true,
+                    IsDeleted = false
+                }),
+                TableOperation.Insert(new AccountHintEntity
+                {
+                    EntityType = "AccountHintEntity",
+                    PartitionKey = userId,
+                    RowKey = "id-1-hintDate-1",
+                    AccountId = "1",
+                    Hint = "test-hint",
+                    StartDate = DateTime.UtcNow
+                })
+            });
+
+            var response = await client.PostAsJsonAsync("/accounts", new { name = "Test-Account", hint = "Test-Hint", isPinned = true });
+
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Post_WhenDeletedAccountHasSameName_ReturnsConflict()
+        {
+
+            var userId = Guid.NewGuid().ToString("N");
+            var entityTables = default(IEntityTables);
+            var client = _webApplicationFactory
+                .WithAuthentication(userId)
+                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .CreateClient();
+            entityTables.Accounts.ExecuteBatch(new TableBatchOperation
+            {
+                TableOperation.Insert(new IndexEntity
+                {
+                    EntityType = "IndexEntity",
+                    PartitionKey = userId,
+                    RowKey = "name-test-account",
+                    IndexedEntityId = "1"
+                }),
+                TableOperation.Insert(new AccountEntity
+                {
+                    EntityType = "AccountEntity",
+                    PartitionKey = userId,
+                    RowKey = "id-1",
+                    Id = "1",
+                    Name= "test-account",
+                    Hint = "test-hint",
+                    IsPinned = true,
+                    IsDeleted = true
+                }),
+                TableOperation.Insert(new AccountHintEntity
+                {
+                    EntityType = "AccountHintEntity",
+                    PartitionKey = userId,
+                    RowKey = "id-1-hintDate-1",
+                    AccountId = "1",
+                    Hint = "test-hint",
+                    StartDate = DateTime.UtcNow
+                })
+            });
 
             var response = await client.PostAsJsonAsync("/accounts", new { name = "Test-Account", hint = "Test-Hint", isPinned = true });
 

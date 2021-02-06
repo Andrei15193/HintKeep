@@ -20,21 +20,25 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
         public GetAccountsQueryHandler(IEntityTables entityTables, LoginInfo login)
             => (_entityTables, _login) = (entityTables, login);
 
-        public async Task<IReadOnlyList<Account>> Handle(GetAccountsQuery request, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<Account>> Handle(GetAccountsQuery query, CancellationToken cancellationToken)
         {
-            var query = new TableQuery<AccountEntity>()
+            var tableQuery = new TableQuery<AccountEntity>()
                 .Where(
                     TableQuery.CombineFilters(
-                        TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, _login.UserId),
+                        TableQuery.CombineFilters(
+                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, _login.UserId),
+                            TableOperators.And,
+                            TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountEntity")
+                        ),
                         TableOperators.And,
-                        TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountEntity")
+                        TableQuery.GenerateFilterConditionForBool(nameof(AccountEntity.IsDeleted), QueryComparisons.Equal, false)
                     )
                 );
             var accounts = new List<Account>();
             var continuationToken = default(TableContinuationToken);
             do
             {
-                var result = await _entityTables.Accounts.ExecuteQuerySegmentedAsync(query, continuationToken);
+                var result = await _entityTables.Accounts.ExecuteQuerySegmentedAsync(tableQuery, continuationToken);
                 continuationToken = result.ContinuationToken;
                 accounts.AddRange(
                     from accountEntity in result

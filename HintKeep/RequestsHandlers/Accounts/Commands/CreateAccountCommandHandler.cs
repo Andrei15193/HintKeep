@@ -45,7 +45,8 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                                 Id = accountId,
                                 Name = command.Name,
                                 Hint = command.Hint,
-                                IsPinned = command.IsPinned
+                                IsPinned = command.IsPinned,
+                                IsDeleted = false
                             }
                         ),
                         TableOperation.Insert(

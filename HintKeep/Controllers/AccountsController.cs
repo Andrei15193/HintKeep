@@ -34,8 +34,8 @@ namespace HintKeep.Controllers
             return Created(new Uri($"/accounts/{accountId}", UriKind.Relative), null);
         }
 
-        [HttpPut("/accounts/{accountId}")]
-        public async Task<IActionResult> PutAsync([FromRoute] string accountId, [FromBody] AccountUpdate accountUpdate)
+        [HttpPut("{accountId}")]
+        public async Task<IActionResult> PutAsync(string accountId, AccountUpdate accountUpdate)
         {
             await _mediator.Send(new UpdateAccountCommand
             {
@@ -43,6 +43,18 @@ namespace HintKeep.Controllers
                 Name = accountUpdate.Name,
                 Hint = accountUpdate.Hint,
                 IsPinned = accountUpdate.IsPinned
+            });
+
+            return NoContent();
+        }
+
+
+        [HttpDelete("{accountId}")]
+        public async Task<IActionResult> DeleteAsync(string accountId)
+        {
+            await _mediator.Send(new MoveAccountToBinCommand
+            {
+                Id = accountId
             });
 
             return NoContent();

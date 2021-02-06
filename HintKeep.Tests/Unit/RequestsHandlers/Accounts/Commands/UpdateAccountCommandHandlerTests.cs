@@ -65,12 +65,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Id = "account-id",
                     Name = "test-name",
                     Hint = "test-hint",
-                    IsPinned = true
+                    IsPinned = true,
+                    IsDeleted = false
                 }),
                 TableOperation.Insert(new AccountHintEntity
                 {
                     EntityType = "AccountHintEntity",
-                    PartitionKey ="user-id",
+                    PartitionKey = "user-id",
                     RowKey = $"id-account-id-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
                     AccountId = "account-id",
                     Hint = "test-hint",
@@ -104,6 +105,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             Assert.Equal("test-name-updated", accountEntity.Name);
             Assert.Equal("test-hint", accountEntity.Hint);
             Assert.True(accountEntity.IsPinned);
+            Assert.False(accountEntity.IsDeleted);
 
             var accountHintEntity = (AccountHintEntity)_entityTables.Accounts.Execute(TableOperation.Retrieve<AccountHintEntity>("user-id", $"id-account-id-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}")).Result;
             Assert.Equal("AccountHintEntity", accountHintEntity.EntityType);
@@ -135,12 +137,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Id = "account-id",
                     Name = "test-name",
                     Hint = "test-hint",
-                    IsPinned = true
+                    IsPinned = true,
+                    IsDeleted = false
                 }),
                 TableOperation.Insert(new AccountHintEntity
                 {
                     EntityType = "AccountHintEntity",
-                    PartitionKey ="user-id",
+                    PartitionKey = "user-id",
                     RowKey = $"id-account-id-hintDate-{yestarday:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
                     AccountId = "account-id",
                     Hint = "test-hint",
@@ -174,6 +177,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             Assert.Equal("test-name", accountEntity.Name);
             Assert.Equal("test-hint-updated", accountEntity.Hint);
             Assert.True(accountEntity.IsPinned);
+            Assert.False(accountEntity.IsDeleted);
 
             var olderAccountHintEntity = (AccountHintEntity)_entityTables.Accounts.Execute(TableOperation.Retrieve<AccountHintEntity>("user-id", $"id-account-id-hintDate-{yestarday:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}")).Result;
             Assert.Equal("AccountHintEntity", olderAccountHintEntity.EntityType);
@@ -219,12 +223,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Id = "account-id",
                     Name = "test-name",
                     Hint = "test-hint",
-                    IsPinned = true
+                    IsPinned = true,
+                    IsDeleted = false
                 }),
                 TableOperation.Insert(new AccountHintEntity
                 {
                     EntityType = "AccountHintEntity",
-                    PartitionKey ="user-id",
+                    PartitionKey = "user-id",
                     RowKey = $"id-account-id-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
                     AccountId = "account-id",
                     Hint = "test-hint",
@@ -258,6 +263,80 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             Assert.Equal("test-name", accountEntity.Name);
             Assert.Equal("test-hint", accountEntity.Hint);
             Assert.False(accountEntity.IsPinned);
+            Assert.False(accountEntity.IsDeleted);
+
+            var accountHintEntity = (AccountHintEntity)_entityTables.Accounts.Execute(TableOperation.Retrieve<AccountHintEntity>("user-id", $"id-account-id-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}")).Result;
+            Assert.Equal("AccountHintEntity", accountHintEntity.EntityType);
+            Assert.Equal("user-id", accountHintEntity.PartitionKey);
+            Assert.Equal($"id-account-id-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}", accountHintEntity.RowKey);
+            Assert.Equal("account-id", accountHintEntity.AccountId);
+            Assert.Equal("test-hint", accountHintEntity.Hint);
+            Assert.Equal(now, accountHintEntity.StartDate);
+        }
+
+        [Fact]
+        public async Task Handle_ExistingDeletedAccount_ThrowsException()
+        {
+            var now = DateTime.UtcNow;
+            _entityTables.Accounts.ExecuteBatch(new TableBatchOperation
+            {
+                TableOperation.Insert(new IndexEntity
+                {
+                    EntityType = "IndexEntity",
+                    PartitionKey = "user-id",
+                    RowKey = "name-test-name",
+                    IndexedEntityId = "account-id"
+                }),
+                TableOperation.Insert(new AccountEntity
+                {
+                    EntityType = "AccountEntity",
+                    PartitionKey = "user-id",
+                    RowKey = "id-account-id",
+                    Id = "account-id",
+                    Name = "test-name",
+                    Hint = "test-hint",
+                    IsPinned = true,
+                    IsDeleted = true
+                }),
+                TableOperation.Insert(new AccountHintEntity
+                {
+                    EntityType = "AccountHintEntity",
+                    PartitionKey = "user-id",
+                    RowKey = $"id-account-id-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
+                    AccountId = "account-id",
+                    Hint = "test-hint",
+                    StartDate = now
+                })
+            });
+
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _updateAccountCommandHandler.Handle(
+                new UpdateAccountCommand
+                {
+                    Id = "account-id",
+                    Name = "test-name-updated",
+                    Hint = "test-hint-updated",
+                    IsPinned = false
+                },
+                CancellationToken.None
+            ));
+            Assert.Empty(exception.Message);
+
+            Assert.Equal(3, _entityTables.Accounts.ExecuteQuery(new TableQuery()).Count());
+            var indexEntity = (IndexEntity)_entityTables.Accounts.Execute(TableOperation.Retrieve<IndexEntity>("user-id", "name-test-name")).Result;
+            Assert.Equal("IndexEntity", indexEntity.EntityType);
+            Assert.Equal("user-id", indexEntity.PartitionKey);
+            Assert.Equal("name-test-name", indexEntity.RowKey);
+            Assert.Equal("account-id", indexEntity.IndexedEntityId);
+
+            var accountEntity = (AccountEntity)_entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>("user-id", "id-account-id")).Result;
+            Assert.Equal("AccountEntity", accountEntity.EntityType);
+            Assert.Equal("user-id", accountEntity.PartitionKey);
+            Assert.Equal("id-account-id", accountEntity.RowKey);
+            Assert.Equal("account-id", accountEntity.Id);
+            Assert.Equal("test-name", accountEntity.Name);
+            Assert.Equal("test-hint", accountEntity.Hint);
+            Assert.True(accountEntity.IsPinned);
+            Assert.True(accountEntity.IsDeleted);
 
             var accountHintEntity = (AccountHintEntity)_entityTables.Accounts.Execute(TableOperation.Retrieve<AccountHintEntity>("user-id", $"id-account-id-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}")).Result;
             Assert.Equal("AccountHintEntity", accountHintEntity.EntityType);

@@ -21,7 +21,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
         protected override async Task Handle(UpdateAccountCommand command, CancellationToken cancellationToken)
         {
             var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(TableOperation.Retrieve<AccountEntity>(_login.UserId, $"id-{command.Id}"), cancellationToken)).Result;
-            if (accountEntity is null)
+            if (accountEntity is null || accountEntity.IsDeleted)
                 throw new NotFoundException();
 
             var tableBatchOperation = new TableBatchOperation();
