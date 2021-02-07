@@ -54,6 +54,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
             }
             accountEntity.Name = command.Name;
             accountEntity.Hint = command.Hint;
+            accountEntity.Notes = command.Notes;
             accountEntity.IsPinned = command.IsPinned;
 
             tableBatchOperation.Add(TableOperation.Replace(accountEntity));

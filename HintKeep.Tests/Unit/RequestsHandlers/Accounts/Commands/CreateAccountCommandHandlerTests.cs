@@ -36,6 +36,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                 {
                     Name = "Test-Account",
                     Hint = "Test-Hint",
+                    Notes = "Test-Notes",
                     IsPinned = true
                 },
                 CancellationToken.None
@@ -55,6 +56,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             Assert.Equal($"id-{accountId}", accountEntity.RowKey);
             Assert.Equal("Test-Account", accountEntity.Name);
             Assert.Equal("Test-Hint", accountEntity.Hint);
+            Assert.Equal("Test-Notes", accountEntity.Notes);
             Assert.True(accountEntity.IsPinned);
             Assert.False(accountEntity.IsDeleted);
 
@@ -91,6 +93,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Id = "account-id",
                     Name = "test-name",
                     Hint = "test-hint",
+                    Notes = "test-notes",
                     IsPinned = true,
                     IsDeleted = false
                 }),
@@ -131,6 +134,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             Assert.Equal("account-id", accountEntity.Id);
             Assert.Equal("test-name", accountEntity.Name);
             Assert.Equal("test-hint", accountEntity.Hint);
+            Assert.Equal("test-notes", accountEntity.Notes);
             Assert.True(accountEntity.IsPinned);
             Assert.False(accountEntity.IsDeleted);
 
@@ -164,6 +168,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Id = "account-id",
                     Name = "test-name",
                     Hint = "test-hint",
+                    Notes = "test-notes",
                     IsPinned = true,
                     IsDeleted = true
                 }),
@@ -204,6 +209,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             Assert.Equal("account-id", accountEntity.Id);
             Assert.Equal("test-name", accountEntity.Name);
             Assert.Equal("test-hint", accountEntity.Hint);
+            Assert.Equal("test-notes", accountEntity.Notes);
             Assert.True(accountEntity.IsPinned);
             Assert.True(accountEntity.IsDeleted);
 

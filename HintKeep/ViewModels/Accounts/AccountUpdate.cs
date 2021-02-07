@@ -10,6 +10,9 @@ namespace HintKeep.ViewModels.Accounts
         [RequiredMediumText]
         public string Hint { get; set; }
 
+        [LongText]
+        public string Notes { get; set; }
+
         public bool IsPinned { get; set; }
     }
 }

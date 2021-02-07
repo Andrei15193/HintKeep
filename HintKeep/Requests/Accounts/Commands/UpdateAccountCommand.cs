@@ -10,6 +10,8 @@ namespace HintKeep.Requests.Accounts.Commands
 
         public string Hint { get; set; }
 
+        public string Notes { get; set; }
+
         public bool IsPinned { get; set; }
     }
 }

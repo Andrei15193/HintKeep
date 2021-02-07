@@ -39,18 +39,18 @@ namespace HintKeep.Tests.Integration.Accounts
         }
 
         [Fact]
-        public async Task Post_WithInvalidNameAndPassword_ReturnsUnprocessableEntity()
+        public async Task Post_WithInvalidNameHintAndNotes_ReturnsUnprocessableEntity()
         {
             var client = _webApplicationFactory.WithAuthentication(Guid.NewGuid().ToString("N")).CreateClient();
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = " ", hint = " " });
+            var response = await client.PostAsJsonAsync("/accounts", new { name = " ", hint = " ", notes = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901" });
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-            Assert.Equal(@"{""hint"":[""validation.errors.invalidRequiredMediumText""],""name"":[""validation.errors.invalidRequiredMediumText""]}", await response.Content.ReadAsStringAsync());
+            Assert.Equal(@"{""hint"":[""validation.errors.invalidRequiredMediumText""],""name"":[""validation.errors.invalidRequiredMediumText""],""notes"":[""validation.errors.invalidLongText""]}", await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
-        public async Task Post_WithValidNameAndHint_ReturnsCreated()
+        public async Task Post_WithValidNameHintAndNotes_ReturnsCreated()
         {
             var userId = Guid.NewGuid().ToString("N");
             var entityTables = default(IEntityTables);
@@ -59,7 +59,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
                 .CreateClient();
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = "Test-Account", hint = "Test-Hint", isPinned = true });
+            var response = await client.PostAsJsonAsync("/accounts", new { name = "Test-Account", hint = "Test-Hint", notes = "Test-Notes", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -77,6 +77,7 @@ namespace HintKeep.Tests.Integration.Accounts
             Assert.Equal(indexedEntity.IndexedEntityId, accountEntity.Id);
             Assert.Equal("Test-Account", accountEntity.Name);
             Assert.Equal("Test-Hint", accountEntity.Hint);
+            Assert.Equal("Test-Notes", accountEntity.Notes);
             Assert.True(accountEntity.IsPinned);
             Assert.False(accountEntity.IsDeleted);
 

@@ -28,6 +28,7 @@ namespace HintKeep.Controllers
             {
                 Name = accountCreation.Name,
                 Hint = accountCreation.Hint,
+                Notes = accountCreation.Notes,
                 IsPinned = accountCreation.IsPinned
             });
 
@@ -42,6 +43,7 @@ namespace HintKeep.Controllers
                 Id = accountId,
                 Name = accountUpdate.Name,
                 Hint = accountUpdate.Hint,
+                Notes = accountUpdate.Notes,
                 IsPinned = accountUpdate.IsPinned
             });
 

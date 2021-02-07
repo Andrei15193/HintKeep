@@ -45,6 +45,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                                 Id = accountId,
                                 Name = command.Name,
                                 Hint = command.Hint,
+                                Notes = command.Notes,
                                 IsPinned = command.IsPinned,
                                 IsDeleted = false
                             }
