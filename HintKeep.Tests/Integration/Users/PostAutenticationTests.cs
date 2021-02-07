@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using HintKeep.Services;
-using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using HintKeep.ViewModels.Users;
 using Microsoft.Azure.Cosmos.Table;
@@ -55,9 +54,8 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Post_WithValidUser_ReturnsUserInfo()
         {
-            var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
             var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
@@ -81,9 +79,8 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Post_WithUnconfirmedUser_ReturnsUnauthorized()
         {
-            var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
             var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
@@ -106,9 +103,8 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Post_WithInvalidPassword_ReturnsUnauthorized()
         {
-            var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
             var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity

@@ -7,6 +7,8 @@ using HintKeep.Requests.Accounts.Queries;
 using HintKeep.RequestsHandlers.Accounts.Queries;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
+using HintKeep.Tests.Data;
+using HintKeep.Tests.Data.Extensions;
 using HintKeep.Tests.Stubs;
 using HintKeep.ViewModels.Accounts;
 using MediatR;
@@ -32,187 +34,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
         [Fact]
         public async Task Handle_ExistingAccounts_ReturnsOnlyOwnUserAccounts()
         {
-            var otherUserId = Guid.NewGuid().ToString("N");
-            while (otherUserId == _userId)
-                otherUserId = Guid.NewGuid().ToString("N");
-            _entityTables.Accounts.ExecuteBatch(new TableBatchOperation
+            var account = new Account
             {
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = _userId,
-                    RowKey = "test-name",
-                    IndexedEntityId = "1"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-1",
-                    Id = "1",
-                    Name = "test-name",
-                    Hint = "test-hint",
-                    IsPinned = false,
-                    IsDeleted = false
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-1-hintDate-1",
-                    AccountId = "1",
-                    Hint = "test-hint"
-                })
-            });
-            _entityTables.Accounts.ExecuteBatch(new TableBatchOperation
-            {
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = otherUserId,
-                    RowKey = "name-A",
-                    IndexedEntityId = "2"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = otherUserId,
-                    RowKey = "id-2",
-                    Id = "2",
-                    Name = "test-name",
-                    Hint = "test-hint",
-                    IsPinned = false,
-                    IsDeleted = false
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = otherUserId,
-                    RowKey = "id-2-hintDate-2",
-                    AccountId = "2",
-                    Hint = "test-hint"
-                })
-            });
-
-            var accounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), CancellationToken.None);
-
-            var account = Assert.Single(accounts);
-            Assert.Equal("1", account.Id);
-            Assert.Equal("test-name", account.Name);
-            Assert.Equal("test-hint", account.Hint);
-            Assert.False(account.IsPinned);
-        }
-
-        [Fact]
-        public async Task Handle_ExistingAccounts_ReturnsAllAccountsSortedByIsPinnedThenByName()
-        {
-            _entityTables.Accounts.ExecuteBatch(new TableBatchOperation
-            {
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = _userId,
-                    RowKey = "name-B",
-                    IndexedEntityId = "1"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-1",
-                    Name = "B",
-                    Hint = "test-hint",
-                    IsPinned = false,
-                    IsDeleted = false
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-1-hintDate-1",
-                    AccountId = "1",
-                    Hint = "test-hint",
-                    StartDate = DateTime.UtcNow
-                }),
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = _userId,
-                    RowKey = "name-A",
-                    IndexedEntityId = "2"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-2",
-                    Name = "A",
-                    Hint = "test-hint",
-                    IsPinned = false,
-                    IsDeleted = false
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-2-hintDate-2",
-                    AccountId = "2",
-                    Hint = "test-hint",
-                    StartDate = DateTime.UtcNow
-                }),
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = _userId,
-                    RowKey = "name-BB",
-                    IndexedEntityId = "3"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-3",
-                    Name = "BB",
-                    Hint = "test-hint",
-                    IsPinned = true,
-                    IsDeleted = false
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-3-hintDate-3",
-                    AccountId = "3",
-                    Hint = "test-hint",
-                    StartDate = DateTime.UtcNow
-                }),
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = _userId,
-                    RowKey = "name-AA",
-                    IndexedEntityId = "4"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-4",
-                    Name = "AA",
-                    Hint = "test-hint",
-                    IsPinned = true,
-                    IsDeleted = false
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-4-hintDate-4",
-                    AccountId = "4",
-                    Hint = "test-hint",
-                    StartDate = DateTime.UtcNow
-                })
-            });
+                UserId = _userId
+            };
+            _entityTables.AddAccounts(account, new Account { UserId = "other-user-id" });
 
             var accounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), CancellationToken.None);
 
@@ -221,30 +47,77 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 {
                     new
                     {
-                        Name = "AA",
-                        IsPinned = true
-                    },
-                    new
-                    {
-                        Name = "BB",
-                        IsPinned = true
-                    },
-                    new
-                    {
-                        Name = "A",
-                        IsPinned = false
-                    },
-                    new
-                    {
-                        Name = "B",
-                        IsPinned = false
+                        account.Id,
+                        account.Name,
+                        account.Hints.Single().Hint,
+                        account.IsPinned
                     }
                 },
                 accounts
                     .Select(account => new
                     {
+                        account.Id,
                         account.Name,
+                        account.Hint,
                         account.IsPinned
+                    })
+                    .ToArray()
+            );
+        }
+
+        [Fact]
+        public async Task Handle_ExistingAccounts_ReturnsAllAccountsSortedByIsPinnedThenByName()
+        {
+            var expectedAccounts = new[]
+            {
+                new Account
+                {
+                    UserId = _userId,
+                    Name = "B",
+                    IsPinned = false
+                },
+                new Account
+                {
+                    UserId = _userId,
+                    Name = "A",
+                    IsPinned = false
+                },
+                new Account
+                {
+                    UserId = _userId,
+                    Name = "BB",
+                    IsPinned = true
+                },
+                new Account
+                {
+                    UserId = _userId,
+                    Name = "AA",
+                    IsPinned = true
+                }
+            };
+            _entityTables.AddAccounts(expectedAccounts);
+
+            var actualAccounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), CancellationToken.None);
+
+            Assert.Equal(
+                expectedAccounts
+                    .OrderByDescending(account => account.IsPinned)
+                    .ThenBy(account => account.Name)
+                    .Select(account => new
+                    {
+                        account.Id,
+                        account.Name,
+                        account.Hints.Single().Hint,
+                        account.IsPinned
+                    })
+                    .ToArray(),
+                actualAccounts
+                    .Select(accountResult => new
+                    {
+                        accountResult.Id,
+                        accountResult.Name,
+                        accountResult.Hint,
+                        accountResult.IsPinned
                     })
                     .ToArray()
             );
@@ -253,61 +126,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
         [Fact]
         public async Task Handle_WithDeletedAccounts_ReturnsOnlyNonDeletedAccounts()
         {
-            _entityTables.Accounts.ExecuteBatch(new TableBatchOperation
-            {
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = _userId,
-                    RowKey = "name-A",
-                    IndexedEntityId = "1"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-1",
-                    Name = "A",
-                    Hint = "test-hint",
-                    IsPinned = false,
-                    IsDeleted = false
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-1-hintDate-1",
-                    AccountId = "1",
-                    Hint = "test-hint",
-                    StartDate = DateTime.UtcNow
-                }),
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = _userId,
-                    RowKey = "name-B",
-                    IndexedEntityId = "2"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-2",
-                    Name = "B",
-                    Hint = "test-hint",
-                    IsPinned = false,
-                    IsDeleted = true
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-2-hintDate-2",
-                    AccountId = "2",
-                    Hint = "test-hint",
-                    StartDate = DateTime.UtcNow
-                })
-            });
+            var account = new Account { UserId = _userId };
+            _entityTables.AddAccounts(account, new Account { UserId = _userId, Name = "Test-Name-Deleted", IsDeleted = true });
 
             var accounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), CancellationToken.None);
 
@@ -316,14 +136,18 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 {
                     new
                     {
-                        Name = "A",
-                        IsPinned = false
+                        account.Id,
+                        account.Name,
+                        account.Hints.Single().Hint,
+                        account.IsPinned
                     }
                 },
                 accounts
                     .Select(account => new
                     {
+                        account.Id,
                         account.Name,
+                        account.Hint,
                         account.IsPinned
                     })
                     .ToArray()

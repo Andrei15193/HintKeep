@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
@@ -52,9 +51,8 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Post_WithValidEmailButExpiredConfirmationToken_ReturnsPreconditionFailed()
         {
-            var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
 
             entityTables.Logins.ExecuteBatch(new TableBatchOperation
@@ -85,9 +83,8 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Post_WithConfirmedUser_ReturnsPreconditionFailed()
         {
-            var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
 
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
@@ -107,9 +104,8 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Post_WithValidEmailAndConfirmationToken_ReturnsCreated()
         {
-            var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
 
             entityTables.Logins.ExecuteBatch(new TableBatchOperation{

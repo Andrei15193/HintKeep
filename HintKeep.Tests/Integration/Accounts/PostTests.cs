@@ -2,8 +2,9 @@ using System;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using HintKeep.Storage;
 using HintKeep.Storage.Entities;
+using HintKeep.Tests.Data;
+using HintKeep.Tests.Data.Extensions;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
@@ -53,89 +54,48 @@ namespace HintKeep.Tests.Integration.Accounts
         public async Task Post_WithValidNameHintAndNotes_ReturnsCreated()
         {
             var userId = Guid.NewGuid().ToString("N");
-            var entityTables = default(IEntityTables);
             var client = _webApplicationFactory
                 .WithAuthentication(userId)
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = "Test-Account", hint = "Test-Hint", notes = "Test-Notes", isPinned = true });
+            var response = await client.PostAsJsonAsync("/accounts", new { name = "Test-Name", hint = "Test-Hint", notes = "Test-Notes", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
 
-            var indexedEntity = (IndexEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<IndexEntity>(userId, "name-test-account")).Result;
-            Assert.Equal("IndexEntity", indexedEntity.EntityType);
-            Assert.Equal(userId, indexedEntity.PartitionKey);
-            Assert.Equal("name-test-account", indexedEntity.RowKey);
-            Assert.NotEmpty(indexedEntity.IndexedEntityId);
+            var accountHintEntity = Assert.Single(entityTables.Accounts.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(
+                TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
+            )));
 
-            var accountEntity = (AccountEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>(userId, $"id-{indexedEntity.IndexedEntityId}")).Result;
-            Assert.Equal("AccountEntity", accountEntity.EntityType);
-            Assert.Equal(userId, accountEntity.PartitionKey);
-            Assert.Equal($"id-{indexedEntity.IndexedEntityId}", accountEntity.RowKey);
-            Assert.Equal(indexedEntity.IndexedEntityId, accountEntity.Id);
-            Assert.Equal("Test-Account", accountEntity.Name);
-            Assert.Equal("Test-Hint", accountEntity.Hint);
-            Assert.Equal("Test-Notes", accountEntity.Notes);
-            Assert.True(accountEntity.IsPinned);
-            Assert.False(accountEntity.IsDeleted);
-
-            var accountHintEntity = Assert.Single(entityTables.Accounts.ExecuteQuery(
-                new TableQuery<AccountHintEntity>()
-                    .Where(TableQuery.GenerateFilterCondition(nameof(AccountHintEntity.AccountId), QueryComparisons.NotEqual, string.Empty))
-            ));
-            Assert.Equal("AccountHintEntity", accountHintEntity.EntityType);
-            Assert.Equal(userId, accountHintEntity.PartitionKey);
-            Assert.Equal($"id-{indexedEntity.IndexedEntityId}-hintDate-{accountHintEntity.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}", accountHintEntity.RowKey);
-            Assert.NotNull(accountHintEntity.StartDate);
-            Assert.Equal(accountEntity.Id, accountHintEntity.AccountId);
-            Assert.Equal("Test-Hint", accountHintEntity.Hint);
-
-            Assert.Equal(new Uri($"/accounts/{indexedEntity.IndexedEntityId}", UriKind.Relative), response.Headers.Location);
+            Assert.Equal(new Uri($"/accounts/{accountHintEntity.AccountId}", UriKind.Relative), response.Headers.Location);
+            entityTables.AssertAccounts(new Account
+            {
+                UserId = userId,
+                Id = accountHintEntity.AccountId,
+                Name = "Test-Name",
+                Hints = new[]
+                {
+                    new AccountHint
+                    {
+                        Hint = "Test-Hint",
+                        StartDate = accountHintEntity.StartDate.Value
+                    }
+                }
+            });
         }
 
         [Fact]
         public async Task Post_WithDuplicateName_ReturnsConflict()
         {
-            var userId = Guid.NewGuid().ToString("N");
-            var entityTables = default(IEntityTables);
+            var account = new Account();
             var client = _webApplicationFactory
-                .WithAuthentication(userId)
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithAuthentication(account.UserId)
+                .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
-            entityTables.Accounts.ExecuteBatch(new TableBatchOperation
-            {
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = userId,
-                    RowKey = "name-test-account",
-                    IndexedEntityId = "1"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = userId,
-                    RowKey = "id-1",
-                    Id = "1",
-                    Name= "test-account",
-                    Hint = "test-hint",
-                    IsPinned = true,
-                    IsDeleted = false
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = userId,
-                    RowKey = "id-1-hintDate-1",
-                    AccountId = "1",
-                    Hint = "test-hint",
-                    StartDate = DateTime.UtcNow
-                })
-            });
+            entityTables.AddAccounts(account);
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = "Test-Account", hint = "Test-Hint", isPinned = true });
+            var response = await client.PostAsJsonAsync("/accounts", new { name = account.Name, hint = "Test-Hint", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -144,45 +104,14 @@ namespace HintKeep.Tests.Integration.Accounts
         [Fact]
         public async Task Post_WhenDeletedAccountHasSameName_ReturnsConflict()
         {
-
-            var userId = Guid.NewGuid().ToString("N");
-            var entityTables = default(IEntityTables);
+            var account = new Account { IsDeleted = true };
             var client = _webApplicationFactory
-                .WithAuthentication(userId)
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithAuthentication(account.UserId)
+                .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
-            entityTables.Accounts.ExecuteBatch(new TableBatchOperation
-            {
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = userId,
-                    RowKey = "name-test-account",
-                    IndexedEntityId = "1"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = userId,
-                    RowKey = "id-1",
-                    Id = "1",
-                    Name= "test-account",
-                    Hint = "test-hint",
-                    IsPinned = true,
-                    IsDeleted = true
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = userId,
-                    RowKey = "id-1-hintDate-1",
-                    AccountId = "1",
-                    Hint = "test-hint",
-                    StartDate = DateTime.UtcNow
-                })
-            });
+            entityTables.AddAccounts(account);
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = "Test-Account", hint = "Test-Hint", isPinned = true });
+            var response = await client.PostAsJsonAsync("/accounts", new { name = account.Name, hint = "Test-Hint", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

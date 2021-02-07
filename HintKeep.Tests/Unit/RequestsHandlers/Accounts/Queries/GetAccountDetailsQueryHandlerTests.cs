@@ -1,15 +1,16 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
 using HintKeep.Requests.Accounts.Queries;
 using HintKeep.RequestsHandlers.Accounts.Queries;
 using HintKeep.Storage;
-using HintKeep.Storage.Entities;
+using HintKeep.Tests.Data;
+using HintKeep.Tests.Data.Extensions;
 using HintKeep.Tests.Stubs;
 using HintKeep.ViewModels.Accounts;
 using MediatR;
-using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
 namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
@@ -38,49 +39,24 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
         [Fact]
         public async Task Handle_WhenAccountExists_ReturnsAccountDetails()
         {
-            _entityTables.Accounts.ExecuteBatch(new TableBatchOperation
+            var account = new Account
             {
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = _userId,
-                    RowKey = "name-test-name",
-                    IndexedEntityId = "account-id"
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-account-id",
-                    Id = "account-id",
-                    Name = "test-name",
-                    Hint = "test-hint",
-                    Notes = "test-notes",
-                    IsPinned = true,
-                    IsDeleted = true
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = _userId,
-                    RowKey = "id-account-id-hintDate-1",
-                    AccountId = "account-id",
-                    Hint = "test-hint",
-                    StartDate = DateTime.UtcNow
-                })
-            });
+                UserId = _userId,
+                IsDeleted = true
+            };
+            _entityTables.AddAccounts(account);
 
-            var accountDetails = await _getAccountsQueryHandler.Handle(new GetAccountDetailsQuery { Id = "account-id" }, CancellationToken.None);
+            var accountDetails = await _getAccountsQueryHandler.Handle(new GetAccountDetailsQuery { Id = account.Id }, CancellationToken.None);
 
             Assert.Equal(
                 new
                 {
-                    Id = "account-id",
-                    Name = "test-name",
-                    Hint = "test-hint",
-                    Notes = "test-notes",
-                    IsPinned = true,
-                    IsDeleted = true
+                    account.Id,
+                    account.Name,
+                    account.Hints.Single().Hint,
+                    account.Notes,
+                    account.IsPinned,
+                    account.IsDeleted
                 },
                 new
                 {

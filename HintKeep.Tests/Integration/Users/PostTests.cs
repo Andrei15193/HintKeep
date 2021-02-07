@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using HintKeep.Tests.Stubs;
 using Microsoft.Azure.Cosmos.Table;
@@ -42,10 +41,9 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Post_WithValidEmailAndPassword_ReturnsCreated()
         {
-            var entityTables = default(IEntityTables);
             var emailService = default(InMemoryEmailService);
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryDatabase(out var entityTables)
                 .WithInMemoryEmailService(actualEmailService => emailService = actualEmailService)
                 .CreateClient();
 
@@ -84,10 +82,9 @@ namespace HintKeep.Tests.Integration.Users
         [Fact]
         public async Task Post_WithExistingEmailAddress_ReturnsConflict()
         {
-            var entityTables = default(IEntityTables);
             var emailService = default(InMemoryEmailService);
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(actualEntityTables => entityTables = actualEntityTables)
+                .WithInMemoryDatabase(out var entityTables)
                 .WithInMemoryEmailService(actualEmailService => emailService = actualEmailService)
                 .CreateClient();
 

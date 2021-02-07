@@ -1,17 +1,15 @@
-
-using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using HintKeep.Storage.Entities;
-using Microsoft.Azure.Cosmos.Table;
+using HintKeep.Tests.Data;
+using HintKeep.Tests.Data.Extensions;
 using Xunit;
 
 namespace HintKeep.Tests.Integration.Accounts
 {
     public class GetIdTests : IClassFixture<HintKeepWebApplicationFactory>
     {
-        private readonly string _accountId = Guid.NewGuid().ToString("N");
         private readonly HintKeepWebApplicationFactory _webApplicationFactory;
 
         public GetIdTests(HintKeepWebApplicationFactory webApplicationFactory)
@@ -22,7 +20,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.GetAsync($"/accounts/{_accountId}");
+            var response = await client.GetAsync($"/accounts/account-id");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -31,71 +29,40 @@ namespace HintKeep.Tests.Integration.Accounts
         [Fact]
         public async Task Get_WhenAccountDoesNotExist_ReturnsNotFound()
         {
-            var authenticatedUserId = Guid.NewGuid().ToString("N");
             var client = _webApplicationFactory
-                .WithAuthentication(authenticatedUserId)
+                .WithAuthentication("user-id")
                 .WithInMemoryDatabase()
                 .CreateClient();
 
-            var response = await client.GetAsync($"/accounts/{_accountId}");
+            var response = await client.GetAsync($"/accounts/account-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
-        public async Task Get_WhenAccountExist_ReturnsNotFound()
+        public async Task Get_WhenAccountExist_ReturnsOk()
         {
-            var userId = Guid.NewGuid().ToString("N");
+            var account = new Account();
             var client = _webApplicationFactory
-                .WithAuthentication(userId)
+                .WithAuthentication(account.UserId)
                 .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
-            entityTables.Accounts.ExecuteBatch(new TableBatchOperation
-            {
-                TableOperation.Insert(new IndexEntity
-                {
-                    EntityType = "IndexEntity",
-                    PartitionKey = userId,
-                    RowKey = "name-test-name",
-                    IndexedEntityId = _accountId
-                }),
-                TableOperation.Insert(new AccountEntity
-                {
-                    EntityType = "AccountEntity",
-                    PartitionKey = userId,
-                    RowKey = $"id-{_accountId}",
-                    Id = _accountId,
-                    Name = "test-name",
-                    Hint = "test-hint",
-                    Notes = "test-notes",
-                    IsPinned = true,
-                    IsDeleted = true
-                }),
-                TableOperation.Insert(new AccountHintEntity
-                {
-                    EntityType = "AccountHintEntity",
-                    PartitionKey = userId,
-                    RowKey = $"id-{_accountId}-hintDate-1",
-                    AccountId = _accountId,
-                    StartDate = DateTime.UtcNow,
-                    Hint = "test-hint"
-                })
-            });
+            entityTables.AddAccounts(account);
 
-            var response = await client.GetAsync($"/accounts/{_accountId}");
+            var response = await client.GetAsync($"/accounts/{account.Id}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var accountResult = await response.Content.ReadFromJsonAsync<AccountGetResult>();
             Assert.Equal(
                 new
                 {
-                    Id = _accountId,
-                    Name = "test-name",
-                    Hint = "test-hint",
-                    Notes = "test-notes",
-                    IsPinned = true,
-                    IsDeleted = true
+                    Id = account.Id,
+                    Name = account.Name,
+                    account.Hints.Single().Hint,
+                    Notes = account.Notes,
+                    IsPinned = account.IsPinned,
+                    IsDeleted = account.IsDeleted
                 },
                 new
                 {
@@ -107,6 +74,22 @@ namespace HintKeep.Tests.Integration.Accounts
                     accountResult.IsDeleted
                 }
             );
+        }
+
+        [Fact]
+        public async Task Get_WhenAccountExistForDifferentUser_ReturnsNotFound()
+        {
+            var account = new Account();
+            var client = _webApplicationFactory
+                .WithAuthentication("user-id")
+                .WithInMemoryDatabase(out var entityTables)
+                .CreateClient();
+            entityTables.AddAccounts(account);
+
+            var response = await client.GetAsync($"/accounts/{account.Id}");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
         private class AccountGetResult
