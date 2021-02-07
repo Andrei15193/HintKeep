@@ -130,6 +130,7 @@ namespace HintKeep.Tests.Integration.Accounts
                     EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-1",
+                    Id = "1",
                     Name = "B",
                     Hint = "test-hint",
                     IsPinned = false,
@@ -156,6 +157,7 @@ namespace HintKeep.Tests.Integration.Accounts
                     EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-2",
+                    Id = "2",
                     Name = "A",
                     Hint = "test-hint",
                     IsPinned = false,
@@ -182,6 +184,7 @@ namespace HintKeep.Tests.Integration.Accounts
                     EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-3",
+                    Id = "3",
                     Name = "BB",
                     Hint = "test-hint",
                     IsPinned = true,
@@ -208,6 +211,7 @@ namespace HintKeep.Tests.Integration.Accounts
                     EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-4",
+                    Id = "4",
                     Name = "AA",
                     Hint = "test-hint",
                     IsPinned = true,
@@ -233,29 +237,39 @@ namespace HintKeep.Tests.Integration.Accounts
                 {
                     new
                     {
+                        Id = "4",
                         Name = "AA",
+                        Hint = "test-hint",
                         IsPinned = true
                     },
                     new
                     {
+                        Id = "3",
                         Name = "BB",
+                        Hint = "test-hint",
                         IsPinned = true
                     },
                     new
                     {
+                        Id = "2",
                         Name = "A",
+                        Hint = "test-hint",
                         IsPinned = false
                     },
                     new
                     {
+                        Id = "1",
                         Name = "B",
+                        Hint = "test-hint",
                         IsPinned = false
                     }
                 },
                 accountsResult
                     .Select(accountResult => new
                     {
+                        accountResult.Id,
                         accountResult.Name,
+                        accountResult.Hint,
                         accountResult.IsPinned
                     })
                     .ToArray()
@@ -285,6 +299,7 @@ namespace HintKeep.Tests.Integration.Accounts
                     EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-1",
+                    Id = "1",
                     Name = "A",
                     Hint = "test-hint",
                     IsPinned = false,
@@ -311,6 +326,7 @@ namespace HintKeep.Tests.Integration.Accounts
                     EntityType = "AccountEntity",
                     PartitionKey = userId,
                     RowKey = "id-2",
+                    Id = "2",
                     Name = "B",
                     Hint = "test-hint",
                     IsPinned = false,
@@ -336,14 +352,18 @@ namespace HintKeep.Tests.Integration.Accounts
                 {
                     new
                     {
+                        Id = "1",
                         Name = "A",
+                        Hint = "test-hint",
                         IsPinned = false
                     }
                 },
                 accountsResult
                     .Select(accountResult => new
                     {
+                        accountResult.Id,
                         accountResult.Name,
+                        accountResult.Hint,
                         accountResult.IsPinned
                     })
                     .ToArray()
@@ -353,6 +373,7 @@ namespace HintKeep.Tests.Integration.Accounts
         private class AccountGetResult
         {
             public string Id { get; set; }
+
             public string Name { get; set; }
 
             public string Hint { get; set; }

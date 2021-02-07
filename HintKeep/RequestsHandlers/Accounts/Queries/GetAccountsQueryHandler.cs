@@ -12,7 +12,7 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.Accounts.Queries
 {
-    public class GetAccountsQueryHandler : IRequestHandler<GetAccountsQuery, IReadOnlyList<Account>>
+    public class GetAccountsQueryHandler : IRequestHandler<GetAccountsQuery, IReadOnlyList<AccountSummary>>
     {
         private readonly IEntityTables _entityTables;
         private readonly LoginInfo _login;
@@ -20,7 +20,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
         public GetAccountsQueryHandler(IEntityTables entityTables, LoginInfo login)
             => (_entityTables, _login) = (entityTables, login);
 
-        public async Task<IReadOnlyList<Account>> Handle(GetAccountsQuery query, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<AccountSummary>> Handle(GetAccountsQuery query, CancellationToken cancellationToken)
         {
             var tableQuery = new TableQuery<AccountEntity>()
                 .Where(
@@ -34,7 +34,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
                         TableQuery.GenerateFilterConditionForBool(nameof(AccountEntity.IsDeleted), QueryComparisons.Equal, false)
                     )
                 );
-            var accounts = new List<Account>();
+            var accounts = new List<AccountSummary>();
             var continuationToken = default(TableContinuationToken);
             do
             {
@@ -42,7 +42,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
                 continuationToken = result.ContinuationToken;
                 accounts.AddRange(
                     from accountEntity in result
-                    select new Account
+                    select new AccountSummary
                     {
                         Id = accountEntity.Id,
                         Name = accountEntity.Name,
@@ -56,9 +56,9 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
             return accounts;
         }
 
-        private sealed class AccountComparer : IComparer<Account>
+        private sealed class AccountComparer : IComparer<AccountSummary>
         {
-            public int Compare(Account left, Account right)
+            public int Compare(AccountSummary left, AccountSummary right)
             {
                 if (left.IsPinned == right.IsPinned)
                     return StringComparer.OrdinalIgnoreCase.Compare(left.Name, right.Name);

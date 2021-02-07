@@ -1,6 +1,6 @@
 namespace HintKeep.ViewModels.Accounts
 {
-    public class Account
+    public class AccountDetails
     {
         public string Id { get; set; }
 
@@ -8,6 +8,10 @@ namespace HintKeep.ViewModels.Accounts
 
         public string Hint { get; set; }
 
+        public string Notes { get; set; }
+
         public bool IsPinned { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

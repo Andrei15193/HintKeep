@@ -21,6 +21,10 @@ namespace HintKeep.Controllers
         public async Task<IActionResult> GetAsync()
             => Ok(await _mediator.Send(new GetAccountsQuery()));
 
+        [HttpGet("{accountId}")]
+        public async Task<IActionResult> GetAsync(string accountId)
+            => Ok(await _mediator.Send(new GetAccountDetailsQuery { Id = accountId }));
+
         [HttpPost]
         public async Task<IActionResult> PostAsync(AccountCreation accountCreation)
         {

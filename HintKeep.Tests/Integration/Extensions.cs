@@ -34,6 +34,26 @@ namespace HintKeep.Tests.Integration
                 )
             );
 
+        public static WebApplicationFactory<TEntryPoint> WithInMemoryDatabase<TEntryPoint>(this WebApplicationFactory<TEntryPoint> webApplicationFactory)
+            where TEntryPoint : class
+            => webApplicationFactory.WithInMemoryDatabase(out var _);
+
+        public static WebApplicationFactory<TEntryPoint> WithInMemoryDatabase<TEntryPoint>(this WebApplicationFactory<TEntryPoint> webApplicationFactory, out IEntityTables entityTables)
+            where TEntryPoint : class
+        {
+            var inMemoryEntityTables = new InMemoryEntityTables();
+            var cloudTables = typeof(IEntityTables)
+                .GetProperties()
+                .Where(property => property.CanRead && property.PropertyType == typeof(CloudTable))
+                .Select(property => property.GetValue(inMemoryEntityTables))
+                .Cast<CloudTable>();
+            foreach (var cloudTable in cloudTables)
+                cloudTable.CreateIfNotExists();
+            entityTables = inMemoryEntityTables;
+
+            return webApplicationFactory.WithWebHostBuilder(builder => builder.ConfigureTestServices(services => services.AddSingleton<IEntityTables>(inMemoryEntityTables)));
+        }
+
         public static WebApplicationFactory<TEntryPoint> WithInMemoryEmailService<TEntryPoint>(this WebApplicationFactory<TEntryPoint> webApplicationFactory, Action<InMemoryEmailService> setupCallback = null)
                 where TEntryPoint : class
             => webApplicationFactory.WithWebHostBuilder(

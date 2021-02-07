@@ -19,7 +19,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
     {
         private readonly string _userId;
         private readonly IEntityTables _entityTables;
-        private readonly IRequestHandler<GetAccountsQuery, IReadOnlyList<Account>> _getAccountsQueryHandler;
+        private readonly IRequestHandler<GetAccountsQuery, IReadOnlyList<AccountSummary>> _getAccountsQueryHandler;
 
         public GetAccountsQueryHandlerTests()
         {
