@@ -33,15 +33,15 @@ namespace HintKeep.RequestsHandlers.Users.Commands
             var userEntity = new UserEntity
             {
                 EntityType = "UserEntity",
-                PartitionKey = userId,
-                RowKey = "details",
+                PartitionKey = userId.ToEncodedKeyProperty(),
+                RowKey = "details".ToEncodedKeyProperty(),
                 Email = command.Email
             };
             var loginEntity = new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
-                PartitionKey = command.Email.ToLowerInvariant(),
-                RowKey = nameof(LoginEntityType.EmailLogin),
+                PartitionKey = command.Email.ToLowerInvariant().ToEncodedKeyProperty(),
+                RowKey = nameof(LoginEntityType.EmailLogin).ToEncodedKeyProperty(),
                 PasswordSalt = passwordSalt,
                 PasswordHash = passwordHash,
                 State = nameof(EmailLoginEntityState.PendingConfirmation),
@@ -50,8 +50,8 @@ namespace HintKeep.RequestsHandlers.Users.Commands
             var loginTokenEntity = new EmailLoginTokenEntity
             {
                 EntityType = "EmailLoginTokenEntity",
-                PartitionKey = command.Email.ToLowerInvariant(),
-                RowKey = nameof(LoginEntityType.EmailLogin) + "-confirmationToken",
+                PartitionKey = command.Email.ToLowerInvariant().ToEncodedKeyProperty(),
+                RowKey = (nameof(LoginEntityType.EmailLogin) + "-confirmationToken").ToEncodedKeyProperty(),
                 Token = confirmationToken,
                 Created = DateTime.UtcNow
             };

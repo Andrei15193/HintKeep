@@ -59,7 +59,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithInMemoryDatabase()
                 .CreateClient();
 
-            var response = await client.PutAsJsonAsync($"/accounts/account-id", new { name = "test-name", hint = "test-hint", isPinned = true });
+            var response = await client.PutAsJsonAsync($"/accounts/account-id", new { name = "#Test-Name", hint = "#Test-Hint", isPinned = true });
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -75,7 +75,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.PutAsJsonAsync($"/accounts/{account.Id}", new { name = "Test-Name-Updated", hint = "Test-Hint-Updated", notes = "Test-Notes-Updated", isPinned = true });
+            var response = await client.PutAsJsonAsync($"/accounts/{account.Id}", new { name = "#Test-Name-Updated", hint = "#Test-Hint-Updated", notes = "#Test-Notes-Updated", isPinned = true });
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -88,17 +88,17 @@ namespace HintKeep.Tests.Integration.Accounts
                 .Last();
             entityTables.AssertAccounts(new Account(account)
             {
-                Name = "Test-Name-Updated",
+                Name = "#Test-Name-Updated",
                 Hints = new[]
                 {
                     account.Hints.Single(),
                     new AccountHint
                     {
-                        Hint = "Test-Hint-Updated",
+                        Hint = "#Test-Hint-Updated",
                         StartDate = latestAccountHintEntity.StartDate.Value
                     }
                 },
-                Notes = "Test-Notes-Updated",
+                Notes = "#Test-Notes-Updated",
                 IsPinned = true
             });
         }
@@ -113,7 +113,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.PutAsJsonAsync($"/accounts/{account.Id}", new { name = "Test-Name-Updated", hint = "Test-Hint-Updated", isPinned = true });
+            var response = await client.PutAsJsonAsync($"/accounts/{account.Id}", new { name = "#Test-Name-Updated", hint = "#Test-Hint-Updated", isPinned = true });
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

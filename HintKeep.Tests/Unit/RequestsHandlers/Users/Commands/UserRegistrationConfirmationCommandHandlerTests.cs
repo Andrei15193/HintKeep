@@ -33,31 +33,31 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 TableOperation.Insert(new EmailLoginEntity
                 {
                     EntityType = "EmailLoginEntity",
-                    PartitionKey = "test-email",
-                    RowKey = "EmailLogin",
+                    PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin".ToEncodedKeyProperty(),
                     State = "PendingConfirmation"
                 }),
                 TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     EntityType = "EmailLoginTokenEntity",
-                    PartitionKey = "test-email",
-                    RowKey = "EmailLogin-confirmationToken",
-                    Token = "test-token",
+                    PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin-confirmationToken".ToEncodedKeyProperty(),
+                    Token = "#test-token",
                     Created = DateTime.UtcNow
                 })
             });
 
             var command = new UserRegistrationConfirmationCommand
             {
-                Email = "test-email",
-                ConfirmationToken = "test-token"
+                Email = "#test-email",
+                ConfirmationToken = "#test-token"
             };
             await _userRegistrationConfirmationCommandHandler.Handle(command, default);
 
             var loginEntity = Assert.Single(_entityTables.Logins.ExecuteQuery(new TableQuery()));
             Assert.Equal("EmailLoginEntity", loginEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
-            Assert.Equal("test-email", loginEntity.PartitionKey);
-            Assert.Equal("EmailLogin", loginEntity.RowKey);
+            Assert.Equal("#test-email", loginEntity.PartitionKey.FromEncodedKeyProperty());
+            Assert.Equal("EmailLogin", loginEntity.RowKey.FromEncodedKeyProperty());
             Assert.Equal("Confirmed", loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue);
         }
         
@@ -69,24 +69,24 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 TableOperation.Insert(new EmailLoginEntity
                 {
                     EntityType = "EmailLoginEntity",
-                    PartitionKey = "test-email",
-                    RowKey = "EmailLogin",
+                    PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin".ToEncodedKeyProperty(),
                     State = "PendingConfirmation"
                 }),
                 TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     EntityType = "EmailLoginTokenEntity",
-                    PartitionKey = "test-email",
-                    RowKey = "EmailLogin-confirmationToken",
-                    Token = "test-token",
+                    PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin-confirmationToken".ToEncodedKeyProperty(),
+                    Token = "#test-token",
                     Created = DateTime.UtcNow.AddDays(-11)
                 })
             });
 
             var command = new UserRegistrationConfirmationCommand
             {
-                Email = "test-email",
-                ConfirmationToken = "test-token"
+                Email = "#test-email",
+                ConfirmationToken = "#test-token"
             };
 
             var exception = await Assert.ThrowsAsync<PreconditionFailedException>(() => _userRegistrationConfirmationCommandHandler.Handle(command, default));
@@ -101,24 +101,24 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 TableOperation.Insert(new EmailLoginEntity
                 {
                     EntityType = "EmailLoginEntity",
-                    PartitionKey = "test-email",
-                    RowKey = "EmailLogin",
+                    PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin".ToEncodedKeyProperty(),
                     State = "Confirmed"
                 }),
                 TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     EntityType = "EmailLoginTokenEntity",
-                    PartitionKey = "test-email",
-                    RowKey = "EmailLogin-confirmationToken",
-                    Token = "test-token",
+                    PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin-confirmationToken".ToEncodedKeyProperty(),
+                    Token = "#test-token",
                     Created = DateTime.UtcNow
                 })
             });
 
             var command = new UserRegistrationConfirmationCommand
             {
-                Email = "test-email",
-                ConfirmationToken = "test-token"
+                Email = "#test-email",
+                ConfirmationToken = "#test-token"
             };
 
             var exception = await Assert.ThrowsAsync<PreconditionFailedException>(() => _userRegistrationConfirmationCommandHandler.Handle(command, default));
@@ -131,15 +131,15 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
-                PartitionKey = "test-email",
-                RowKey = "EmailLogin",
+                PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
                 State = "Confirmed"
             }));
 
             var command = new UserRegistrationConfirmationCommand
             {
-                Email = "test-email",
-                ConfirmationToken = "test-token"
+                Email = "#test-email",
+                ConfirmationToken = "#test-token"
             };
 
             var exception = await Assert.ThrowsAsync<PreconditionFailedException>(() => _userRegistrationConfirmationCommandHandler.Handle(command, default));
@@ -154,16 +154,16 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 TableOperation.Insert(new EmailLoginEntity
                 {
                     EntityType = "EmailLoginEntity",
-                    PartitionKey = "test-email-2",
-                    RowKey = "EmailLogin",
+                    PartitionKey = "#test-email-2".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin".ToEncodedKeyProperty(),
                     State = "Confirmed"
                 })
             });
 
             var command = new UserRegistrationConfirmationCommand
             {
-                Email = "test-email",
-                ConfirmationToken = "test-token"
+                Email = "#test-email",
+                ConfirmationToken = "#test-token"
             };
 
             var exception = await Assert.ThrowsAsync<PreconditionFailedException>(() => _userRegistrationConfirmationCommandHandler.Handle(command, default));

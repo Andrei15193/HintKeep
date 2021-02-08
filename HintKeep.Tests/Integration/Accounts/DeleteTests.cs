@@ -46,7 +46,6 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication(account.UserId)
                 .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
-
             entityTables.AddAccounts(account);
 
             var response = await client.DeleteAsync($"/accounts/{account.Id}");

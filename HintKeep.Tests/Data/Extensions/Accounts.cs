@@ -21,15 +21,15 @@ namespace HintKeep.Tests.Data.Extensions
                     TableOperation.Insert(new IndexEntity
                     {
                         EntityType = "IndexEntity",
-                        PartitionKey = account.UserId,
-                        RowKey = $"name-{account.Name.ToLowerInvariant()}",
+                        PartitionKey = account.UserId.ToEncodedKeyProperty(),
+                        RowKey = $"name-{account.Name.ToLowerInvariant()}".ToEncodedKeyProperty(),
                         IndexedEntityId = account.Id,
                     }),
                     TableOperation.Insert(new AccountEntity
                     {
                         EntityType = "AccountEntity",
-                        PartitionKey = account.UserId,
-                        RowKey = $"id-{account.Id}",
+                        PartitionKey = account.UserId.ToEncodedKeyProperty(),
+                        RowKey = $"id-{account.Id}".ToEncodedKeyProperty(),
                         Id = account.Id,
                         Name = account.Name,
                         Hint = account.Hints.OrderByDescending(accountHint => accountHint.StartDate).First().Hint,
@@ -42,8 +42,8 @@ namespace HintKeep.Tests.Data.Extensions
                     tableBatchOperation.Add(TableOperation.Insert(new AccountHintEntity
                     {
                         EntityType = "AccountHintEntity",
-                        PartitionKey = account.UserId,
-                        RowKey = $"id-{account.Id}-hintDate-{accountHint.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
+                        PartitionKey = account.UserId.ToEncodedKeyProperty(),
+                        RowKey = $"id-{account.Id}-hintDate-{accountHint.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}".ToEncodedKeyProperty(),
                         AccountId = account.Id,
                         Hint = accountHint.Hint,
                         StartDate = accountHint.StartDate
@@ -65,18 +65,18 @@ namespace HintKeep.Tests.Data.Extensions
             Assert.Equal(accounts.Sum(account => 2 + account.Hints.Count), entityTables.Accounts.ExecuteQuery(new TableQuery()).Count());
             foreach (var account in accounts)
             {
-                var indexEntity = (IndexEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<IndexEntity>(account.UserId, $"name-{account.Name.ToLowerInvariant()}")).Result;
+                var indexEntity = (IndexEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<IndexEntity>(account.UserId.ToEncodedKeyProperty(), $"name-{account.Name.ToLowerInvariant()}".ToEncodedKeyProperty())).Result;
                 Assert.NotNull(indexEntity);
                 Assert.Equal("IndexEntity", indexEntity.EntityType);
-                Assert.Equal(account.UserId, indexEntity.PartitionKey);
-                Assert.Equal($"name-{account.Name.ToLowerInvariant()}", indexEntity.RowKey);
+                Assert.Equal(account.UserId, indexEntity.PartitionKey.FromEncodedKeyProperty());
+                Assert.Equal($"name-{account.Name.ToLowerInvariant()}", indexEntity.RowKey.FromEncodedKeyProperty());
                 Assert.Equal(account.Id, indexEntity.IndexedEntityId);
 
-                var accountEntity = (AccountEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>(account.UserId, $"id-{account.Id}")).Result;
+                var accountEntity = (AccountEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>(account.UserId.ToEncodedKeyProperty(), $"id-{account.Id}".ToEncodedKeyProperty())).Result;
                 Assert.NotNull(accountEntity);
                 Assert.Equal("AccountEntity", accountEntity.EntityType);
-                Assert.Equal(account.UserId, accountEntity.PartitionKey);
-                Assert.Equal($"id-{account.Id}", accountEntity.RowKey);
+                Assert.Equal(account.UserId, accountEntity.PartitionKey.FromEncodedKeyProperty());
+                Assert.Equal($"id-{account.Id}", accountEntity.RowKey.FromEncodedKeyProperty());
                 Assert.Equal(account.Id, accountEntity.Id);
                 Assert.Equal(account.Name, accountEntity.Name);
                 Assert.Equal(account.Hints.OrderByDescending(accountHint => accountHint.StartDate).First().Hint, accountEntity.Hint);
@@ -94,11 +94,11 @@ namespace HintKeep.Tests.Data.Extensions
 
                 foreach (var accountHint in account.Hints)
                 {
-                    var accountHintEntity = (AccountHintEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountHintEntity>(account.UserId, $"id-{account.Id}-hintDate-{accountHint.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}")).Result;
+                    var accountHintEntity = (AccountHintEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountHintEntity>(account.UserId.ToEncodedKeyProperty(), $"id-{account.Id}-hintDate-{accountHint.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}".ToEncodedKeyProperty())).Result;
                     Assert.NotNull(accountHintEntity);
                     Assert.Equal("AccountHintEntity", accountHintEntity.EntityType);
-                    Assert.Equal(account.UserId, accountHintEntity.PartitionKey);
-                    Assert.Equal($"id-{account.Id}-hintDate-{accountHint.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}", accountHintEntity.RowKey);
+                    Assert.Equal(account.UserId, accountHintEntity.PartitionKey.FromEncodedKeyProperty());
+                    Assert.Equal($"id-{account.Id}-hintDate-{accountHint.StartDate:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}".FromEncodedKeyProperty(), accountHintEntity.RowKey);
                     Assert.Equal(account.Id, accountHintEntity.AccountId);
                     Assert.Equal(accountHint.Hint, accountHintEntity.Hint);
                     Assert.Equal(accountHint.StartDate, accountHintEntity.StartDate);

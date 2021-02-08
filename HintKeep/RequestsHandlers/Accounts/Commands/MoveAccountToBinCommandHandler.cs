@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
@@ -20,12 +20,35 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
 
         protected override async Task Handle(MoveAccountToBinCommand command, CancellationToken cancellationToken)
         {
-            var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(TableOperation.Retrieve<AccountEntity>(_login.UserId, $"id-{command.Id}"), cancellationToken)).Result;
+            var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
+                TableOperation.Retrieve<AccountEntity>(
+                    _login.UserId.ToEncodedKeyProperty(),
+                    $"id-{command.Id}".ToEncodedKeyProperty(),
+                    new List<string>
+                    {
+                        nameof(AccountEntity.IsDeleted)
+                    }
+                ),
+                cancellationToken
+            )).Result;
             if (accountEntity is null || accountEntity.IsDeleted)
                 throw new NotFoundException();
 
-            accountEntity.IsDeleted = true;
-            await _entityTables.Accounts.ExecuteAsync(TableOperation.Replace(accountEntity), cancellationToken);
+            await _entityTables.Accounts.ExecuteAsync(
+                TableOperation.Merge(
+                    new DynamicTableEntity
+                    {
+                        PartitionKey = accountEntity.PartitionKey,
+                        RowKey = accountEntity.RowKey,
+                        ETag = accountEntity.ETag,
+                        Properties = new Dictionary<string, EntityProperty>
+                        {
+                            { nameof(AccountEntity.IsDeleted), EntityProperty.GeneratePropertyForBool(true) }
+                        }
+                    }
+                ),
+                cancellationToken
+            );
         }
     }
 }

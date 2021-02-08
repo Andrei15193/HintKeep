@@ -37,9 +37,9 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                 () => _updateAccountCommandHandler.Handle(
                     new UpdateAccountCommand
                     {
-                        Id = "account-id",
-                        Name = "test-name-updated",
-                        Hint = "test-hint",
+                        Id = "#account-id",
+                        Name = "#Test-Name-Updated",
+                        Hint = "#test-hint",
                         IsPinned = true
                     },
                     CancellationToken.None
@@ -61,7 +61,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                 new UpdateAccountCommand
                 {
                     Id = account.Id,
-                    Name = "Test-Name-Updated",
+                    Name = "#Test-Name-Updated",
                     Hint = account.Hints.Single().Hint,
                     Notes = account.Notes,
                     IsPinned = account.IsPinned
@@ -69,7 +69,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                 CancellationToken.None
             );
 
-            _entityTables.AssertAccounts(new Account(account) { Name = "Test-Name-Updated" });
+            _entityTables.AssertAccounts(new Account(account) { Name = "#Test-Name-Updated" });
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                 {
                     Id = account.Id,
                     Name = account.Name,
-                    Hint = "Test-Hint-Updated",
+                    Hint = "#Test-Hint-Updated",
                     Notes = account.Notes,
                     IsPinned = account.IsPinned
                 },
@@ -104,7 +104,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     new AccountHint(account.Hints.Single()),
                     new AccountHint
                     {
-                        Hint = "Test-Hint-Updated",
+                        Hint = "#Test-Hint-Updated",
                         StartDate = latestAccountHintEntity.StartDate.Value
                     }
                 }
@@ -126,13 +126,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Id = account.Id,
                     Name = account.Name,
                     Hint = account.Hints.Single().Hint,
-                    Notes = "Test-Notes-Updated",
+                    Notes = "#Test-Notes-Updated",
                     IsPinned = account.IsPinned
                 },
                 CancellationToken.None
             );
 
-            _entityTables.AssertAccounts(new Account(account) { Notes = "Test-Notes-Updated" });
+            _entityTables.AssertAccounts(new Account(account) { Notes = "#Test-Notes-Updated" });
         }
 
         [Fact]

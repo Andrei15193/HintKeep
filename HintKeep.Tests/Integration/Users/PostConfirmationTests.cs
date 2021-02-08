@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
@@ -42,7 +43,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.WithInMemoryDatabase().CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "eMail@DOMAIN.TLD", confirmationToken = "token" });
+            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
 
             Assert.Equal(HttpStatusCode.PreconditionFailed, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -60,21 +61,21 @@ namespace HintKeep.Tests.Integration.Users
                 TableOperation.Insert(new EmailLoginEntity
                 {
                     EntityType = "EmailLoginEntity",
-                    PartitionKey = "email@domain.tld",
-                    RowKey = "EmailLogin",
+                    PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin".ToEncodedKeyProperty(),
                     State = "PendingConfirmation"
                 }),
                 TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     EntityType = "EmailLoginTokenEntity",
-                    PartitionKey = "email@domain.tld",
-                    RowKey = "EmailLogin-confirmationToken",
-                    Token = "token",
+                    PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin-confirmationToken".ToEncodedKeyProperty(),
+                    Token = "#token",
                     Created = DateTime.UtcNow.AddDays(-11)
                 })
             });
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "eMail@DOMAIN.TLD", confirmationToken = "token" });
+            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
 
             Assert.Equal(HttpStatusCode.PreconditionFailed, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -90,12 +91,12 @@ namespace HintKeep.Tests.Integration.Users
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
-                PartitionKey = "email@domain.tld",
-                RowKey = "EmailLogin",
+                PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
                 State = "Confirmed"
             }));
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "eMail@DOMAIN.TLD", confirmationToken = "token" });
+            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
 
             Assert.Equal(HttpStatusCode.PreconditionFailed, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -112,27 +113,27 @@ namespace HintKeep.Tests.Integration.Users
                 TableOperation.Insert(new EmailLoginEntity
                 {
                     EntityType = "EmailLoginEntity",
-                    PartitionKey = "email@domain.tld",
-                    RowKey = "EmailLogin",
+                    PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin".ToEncodedKeyProperty(),
                     State = "PendingConfirmation"
                 }),
                 TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     EntityType = "EmailLoginTokenEntity",
-                    PartitionKey = "email@domain.tld",
-                    RowKey = "EmailLogin-confirmationToken",
-                    Token = "token",
+                    PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin-confirmationToken".ToEncodedKeyProperty(),
+                    Token = "#token",
                     Created = DateTime.UtcNow
                 })
             });
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "eMail@DOMAIN.TLD", confirmationToken = "token" });
+            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
             Assert.Equal(new Uri("/users", UriKind.Relative), response.Headers.Location);
 
-            var loginEntity = (EmailLoginEntity)entityTables.Logins.Execute(TableOperation.Retrieve<EmailLoginEntity>("email@domain.tld", "EmailLogin")).Result;
+            var loginEntity = (EmailLoginEntity)entityTables.Logins.Execute(TableOperation.Retrieve<EmailLoginEntity>("#email@domain.tld".ToEncodedKeyProperty(), "EmailLogin".ToEncodedKeyProperty())).Result;
             Assert.Equal("Confirmed", loginEntity.State);
 
             var tokenEntityQuery = new TableQuery<EmailLoginTokenEntity>()

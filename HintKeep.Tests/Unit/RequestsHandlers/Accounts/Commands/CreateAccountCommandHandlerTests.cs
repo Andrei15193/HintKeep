@@ -36,9 +36,9 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             var accountId = await _createAccountCommandHandler.Handle(
                 new CreateAccountCommand
                 {
-                    Name = "Test-Name",
-                    Hint = "Test-Hint",
-                    Notes = "Test-Notes",
+                    Name = "#Test-Name",
+                    Hint = "#Test-Hint",
+                    Notes = "#Test-Notes",
                     IsPinned = true
                 },
                 CancellationToken.None
@@ -53,16 +53,16 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             {
                 UserId = _userId,
                 Id = accountId,
-                Name = "Test-Name",
+                Name = "#Test-Name",
                 Hints = new[]
                 {
                     new AccountHint
                     {
-                        Hint ="Test-Hint",
+                        Hint ="#Test-Hint",
                         StartDate = accountHintEntity.StartDate.Value
                     }
                 },
-                Notes = "Test-Notes",
+                Notes = "#Test-Notes",
                 IsPinned = true
             });
         }
@@ -81,7 +81,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     new CreateAccountCommand
                     {
                         Name = account.Name,
-                        Hint = "Test-Hint"
+                        Hint = "#Test-Hint"
                     },
                     CancellationToken.None
                 )
@@ -104,8 +104,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                 () => _createAccountCommandHandler.Handle(
                     new CreateAccountCommand
                     {
-                        Name = "Test-Name",
-                        Hint = "Test-Hint-2"
+                        Name = "#Test-Name",
+                        Hint = "#Test-Hint-2"
                     },
                     CancellationToken.None
                 )

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
@@ -27,8 +25,8 @@ namespace HintKeep.RequestsHandlers.Users.Queries
         {
             var loginResult = await _entityTables.Logins.ExecuteAsync(
                 TableOperation.Retrieve<EmailLoginEntity>(
-                    query.Email.ToLowerInvariant(),
-                    nameof(LoginEntityType.EmailLogin),
+                    query.Email.ToLowerInvariant().ToEncodedKeyProperty(),
+                    nameof(LoginEntityType.EmailLogin).ToEncodedKeyProperty(),
                     new List<string>
                     {
                         nameof(EmailLoginEntity.PasswordSalt),

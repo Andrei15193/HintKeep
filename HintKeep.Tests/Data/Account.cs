@@ -25,11 +25,11 @@ namespace HintKeep.Tests.Data
 
         public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
-        public string Name { get; set; } = "Test-Name";
+        public string Name { get; set; } = "#Test-Name";
 
         public IReadOnlyCollection<AccountHint> Hints { get; set; } = new[] { new AccountHint() };
 
-        public string Notes { get; set; } = "Test-Notes";
+        public string Notes { get; set; } = "#Test-Notes";
 
         public bool IsPinned { get; set; } = true;
 

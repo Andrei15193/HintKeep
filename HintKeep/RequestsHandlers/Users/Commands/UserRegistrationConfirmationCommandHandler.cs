@@ -21,7 +21,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
         protected override async Task Handle(UserRegistrationConfirmationCommand command, CancellationToken cancellationToken)
         {
             var queryResult = await _entityTables.Logins.ExecuteQuerySegmentedAsync(new TableQuery()
-                .Where(TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, command.Email.ToLowerInvariant()))
+                .Where(TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, command.Email.ToLowerInvariant().ToEncodedKeyProperty()))
                 .Select(new[]
                 {
                     nameof(ITableEntity.PartitionKey),

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
@@ -20,7 +21,22 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
 
         public async Task<AccountDetails> Handle(GetAccountDetailsQuery query, CancellationToken cancellationToken)
         {
-            var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(TableOperation.Retrieve<AccountEntity>(_login.UserId, $"id-{query.Id}"), cancellationToken)).Result;
+            var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
+                TableOperation.Retrieve<AccountEntity>(
+                    _login.UserId.ToEncodedKeyProperty(),
+                    $"id-{query.Id}".ToEncodedKeyProperty(),
+                    new List<string>
+                    {
+                        nameof(AccountEntity.Id),
+                        nameof(AccountEntity.Name),
+                        nameof(AccountEntity.Hint),
+                        nameof(AccountEntity.Notes),
+                        nameof(AccountEntity.IsPinned),
+                        nameof(AccountEntity.IsDeleted)
+                    }
+                ),
+                cancellationToken
+            )).Result;
             if (accountEntity is null)
                 throw new NotFoundException();
 

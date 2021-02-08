@@ -36,10 +36,10 @@ namespace HintKeep.Tests.Integration.Accounts
                 .Select(accountNumber => new Account
                 {
                     UserId = "user-id",
-                    Name = $"test-name-{accountNumber}",
+                    Name = $"#Test-Name-{accountNumber}",
                     Hints = new[]
                     {
-                        new AccountHint { Hint = $"test-hint-{accountNumber}" }
+                        new AccountHint { Hint = $"#Test-Hint-{accountNumber}" }
                     },
                     IsPinned = true
                 })
@@ -50,10 +50,10 @@ namespace HintKeep.Tests.Integration.Accounts
                 .Select(accountNumber => new Account
                 {
                     UserId = "other-user-id",
-                    Name = $"test-name-{accountNumber}",
+                    Name = $"#Test-Name-{accountNumber}",
                     Hints = new[]
                     {
-                        new AccountHint{ Hint = $"test-hint-{accountNumber}" }
+                        new AccountHint{ Hint = $"#Test-Hint-{accountNumber}" }
                     },
                     IsPinned = true
                 })

@@ -127,7 +127,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
         public async Task Handle_WithDeletedAccounts_ReturnsOnlyNonDeletedAccounts()
         {
             var account = new Account { UserId = _userId };
-            _entityTables.AddAccounts(account, new Account { UserId = _userId, Name = "Test-Name-Deleted", IsDeleted = true });
+            _entityTables.AddAccounts(account, new Account { UserId = _userId, Name = "#Test-Name-Deleted", IsDeleted = true });
 
             var accounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), CancellationToken.None);
 

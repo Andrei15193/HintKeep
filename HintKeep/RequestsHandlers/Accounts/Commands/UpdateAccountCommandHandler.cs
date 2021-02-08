@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
@@ -20,21 +21,39 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
 
         protected override async Task Handle(UpdateAccountCommand command, CancellationToken cancellationToken)
         {
-            var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(TableOperation.Retrieve<AccountEntity>(_login.UserId, $"id-{command.Id}"), cancellationToken)).Result;
+            var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
+                TableOperation.Retrieve<AccountEntity>(
+                    _login.UserId.ToEncodedKeyProperty(),
+                    $"id-{command.Id}".ToEncodedKeyProperty(),
+                    new List<string>
+                    {
+                        nameof(AccountEntity.Name),
+                        nameof(AccountEntity.Hint),
+                        nameof(AccountEntity.IsDeleted)
+                    }
+                ),
+                cancellationToken
+            )).Result;
             if (accountEntity is null || accountEntity.IsDeleted)
                 throw new NotFoundException();
 
             var tableBatchOperation = new TableBatchOperation();
-
             if (!string.Equals(command.Name, accountEntity.Name, StringComparison.OrdinalIgnoreCase))
             {
-                var indexEntity = (IndexEntity)(await _entityTables.Accounts.ExecuteAsync(TableOperation.Retrieve<IndexEntity>(_login.UserId, $"name-{accountEntity.Name.ToLowerInvariant()}"), cancellationToken)).Result;
+                var indexEntity = (IndexEntity)(await _entityTables.Accounts.ExecuteAsync(
+                    TableOperation.Retrieve<IndexEntity>(
+                        _login.UserId.ToEncodedKeyProperty(),
+                        $"name-{accountEntity.Name.ToLowerInvariant()}".ToEncodedKeyProperty(),
+                        new List<string>()
+                    ),
+                    cancellationToken
+                )).Result;
                 tableBatchOperation.Add(TableOperation.Delete(indexEntity));
                 tableBatchOperation.Add(TableOperation.Insert(new IndexEntity
                 {
                     EntityType = "IndexEntity",
-                    PartitionKey = _login.UserId,
-                    RowKey = $"name-{command.Name.ToLowerInvariant()}",
+                    PartitionKey = _login.UserId.ToEncodedKeyProperty(),
+                    RowKey = $"name-{command.Name.ToLowerInvariant()}".ToEncodedKeyProperty(),
                     IndexedEntityId = command.Id
                 }));
             }
@@ -45,8 +64,8 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                 tableBatchOperation.Add(TableOperation.Insert(new AccountHintEntity
                 {
                     EntityType = "AccountHintEntity",
-                    PartitionKey = _login.UserId,
-                    RowKey = $"id-{command.Id}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
+                    PartitionKey = _login.UserId.ToEncodedKeyProperty(),
+                    RowKey = $"id-{command.Id}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}".ToEncodedKeyProperty(),
                     Hint = command.Hint,
                     AccountId = command.Id,
                     StartDate = now,
@@ -57,7 +76,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
             accountEntity.Notes = command.Notes;
             accountEntity.IsPinned = command.IsPinned;
 
-            tableBatchOperation.Add(TableOperation.Replace(accountEntity));
+            tableBatchOperation.Add(TableOperation.Merge(accountEntity));
 
             await _entityTables.Accounts.ExecuteBatchAsync(tableBatchOperation, cancellationToken);
         }

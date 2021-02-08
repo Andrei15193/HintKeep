@@ -55,49 +55,49 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         {
             _rngService
                 .Setup(rngService => rngService.Generate(12))
-                .Returns("test-confirmation-token")
+                .Returns("#test-confirmation-token")
                 .Verifiable();
             _saltService
                 .Setup(saltService => saltService.GetSalt())
-                .Returns("test-salt")
+                .Returns("#test-salt")
                 .Verifiable();
             _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salttest-password"))
-                .Returns("test-hash")
+                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt#test-password"))
+                .Returns("#test-hash")
                 .Verifiable();
             _emailService
-                .Setup(emailService => emailService.SendAsync(It.Is<EmailMessage>(emailMessage => emailMessage.Title == "Welcome to HintKeep!" && emailMessage.To == "test-eMail" && emailMessage.Content.Contains("test-confirmation-token"))))
+                .Setup(emailService => emailService.SendAsync(It.Is<EmailMessage>(emailMessage => emailMessage.Title == "Welcome to HintKeep!" && emailMessage.To == "#test-eMail" && emailMessage.Content.Contains("#test-confirmation-token"))))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
             var command = new UserSignUpCommand
             {
-                Email = "test-eMail",
-                Password = "test-password"
+                Email = "#test-eMail",
+                Password = "#test-password"
             };
             await _userSignUpCommandHandler.Handle(command, default);
 
             var entities = _entityTables.Logins.ExecuteQuery(new TableQuery());
             var loginEntity = Assert.Single(entities, entity => entity.RowKey == "EmailLogin");
             Assert.Equal("EmailLoginEntity", loginEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
-            Assert.Equal("test-email", loginEntity.PartitionKey);
-            Assert.Equal("EmailLogin", loginEntity.RowKey);
-            Assert.Equal("test-salt", loginEntity.Properties[nameof(EmailLoginEntity.PasswordSalt)].StringValue);
-            Assert.Equal("test-hash", loginEntity.Properties[nameof(EmailLoginEntity.PasswordHash)].StringValue);
+            Assert.Equal("#test-email", loginEntity.PartitionKey.FromEncodedKeyProperty());
+            Assert.Equal("EmailLogin", loginEntity.RowKey.FromEncodedKeyProperty());
+            Assert.Equal("#test-salt", loginEntity.Properties[nameof(EmailLoginEntity.PasswordSalt)].StringValue);
+            Assert.Equal("#test-hash", loginEntity.Properties[nameof(EmailLoginEntity.PasswordHash)].StringValue);
             Assert.Equal("PendingConfirmation", loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue);
 
             var loginConfirmationTokenEntity = Assert.Single(entities, entity => entity.RowKey != "EmailLogin");
             Assert.Equal("EmailLoginTokenEntity", loginConfirmationTokenEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
-            Assert.Equal("test-email", loginConfirmationTokenEntity.PartitionKey);
-            Assert.Equal("EmailLogin-confirmationToken", loginConfirmationTokenEntity.RowKey);
-            Assert.Equal("test-confirmation-token", loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Token)].StringValue);
+            Assert.Equal("#test-email", loginConfirmationTokenEntity.PartitionKey.FromEncodedKeyProperty());
+            Assert.Equal("EmailLogin-confirmationToken", loginConfirmationTokenEntity.RowKey.FromEncodedKeyProperty());
+            Assert.Equal("#test-confirmation-token", loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Token)].StringValue);
             Assert.True(DateTime.UtcNow.AddMinutes(-1) <= loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime && loginConfirmationTokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime <= DateTime.UtcNow.AddMinutes(1));
 
             var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery()));
             Assert.Equal("UserEntity", userEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
-            Assert.Equal(loginEntity.Properties[nameof(EmailLoginEntity.UserId)].StringValue, userEntity.PartitionKey);
-            Assert.Equal("details", userEntity.RowKey);
-            Assert.Equal("test-eMail", userEntity.Properties[nameof(UserEntity.Email)].StringValue);
+            Assert.Equal(loginEntity.Properties[nameof(EmailLoginEntity.UserId)].StringValue, userEntity.PartitionKey.FromEncodedKeyProperty());
+            Assert.Equal("details", userEntity.RowKey.FromEncodedKeyProperty());
+            Assert.Equal("#test-eMail", userEntity.Properties[nameof(UserEntity.Email)].StringValue);
         }
 
         [Fact]
@@ -105,22 +105,22 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         {
             _rngService
                 .Setup(rngService => rngService.Generate(12))
-                .Returns("test-confirmation-token")
+                .Returns("#test-confirmation-token")
                 .Verifiable();
             _saltService
                 .Setup(saltService => saltService.GetSalt())
-                .Returns("test-salt")
+                .Returns("#test-salt")
                 .Verifiable();
             _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salttest-password"))
-                .Returns("test-hash")
+                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt#test-password"))
+                .Returns("#test-hash")
                 .Verifiable();
-            _entityTables.Logins.Execute(TableOperation.Insert(new TableEntity("test-email", "EmailLogin")));
+            _entityTables.Logins.Execute(TableOperation.Insert(new TableEntity("#test-email".ToEncodedKeyProperty(), "EmailLogin".ToEncodedKeyProperty())));
 
             var command = new UserSignUpCommand
             {
-                Email = "test-eMail",
-                Password = "test-password"
+                Email = "#test-eMail",
+                Password = "#test-password"
             };
 
             var exception = await Assert.ThrowsAsync<ConflictException>(() => _userSignUpCommandHandler.Handle(command, default));

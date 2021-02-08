@@ -26,13 +26,22 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
                 .Where(
                     TableQuery.CombineFilters(
                         TableQuery.CombineFilters(
-                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, _login.UserId),
+                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, _login.UserId.ToEncodedKeyProperty()),
                             TableOperators.And,
                             TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountEntity")
                         ),
                         TableOperators.And,
                         TableQuery.GenerateFilterConditionForBool(nameof(AccountEntity.IsDeleted), QueryComparisons.Equal, false)
                     )
+                )
+                .Select(
+                    new List<string>
+                    {
+                        nameof(AccountEntity.Id),
+                        nameof(AccountEntity.Name),
+                        nameof(AccountEntity.Hint),
+                        nameof(AccountEntity.IsPinned)
+                    }
                 );
             var accounts = new List<AccountSummary>();
             var continuationToken = default(TableContinuationToken);

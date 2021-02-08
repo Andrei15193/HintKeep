@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using HintKeep.Services;
+using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using HintKeep.ViewModels.Users;
 using Microsoft.Azure.Cosmos.Table;
@@ -45,7 +46,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.WithInMemoryDatabase().CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -61,15 +62,15 @@ namespace HintKeep.Tests.Integration.Users
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
-                PartitionKey = "email@domain.tld",
-                RowKey = "EmailLogin",
-                PasswordSalt = "test-salt",
-                PasswordHash = cryptographicHashService.GetHash("test-salt" + "test-PASSWORD-1"),
+                PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
+                PasswordSalt = "#test-salt",
+                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
                 State = "Confirmed",
                 UserId = Guid.NewGuid().ToString("N")
             }));
             
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             var userInfo = await response.Content.ReadFromJsonAsync<UserInfo>();
@@ -86,15 +87,15 @@ namespace HintKeep.Tests.Integration.Users
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
-                PartitionKey = "email@domain.tld",
-                RowKey = "EmailLogin",
-                PasswordSalt = "test-salt",
-                PasswordHash = cryptographicHashService.GetHash("test-salt" + "test-PASSWORD-1"),
+                PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
+                PasswordSalt = "#test-salt",
+                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
                 State = "PendingConfirmation",
                 UserId = Guid.NewGuid().ToString("N")
             }));
 
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -110,14 +111,14 @@ namespace HintKeep.Tests.Integration.Users
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
-                PartitionKey = "email@domain.tld",
-                RowKey = "EmailLogin",
-                PasswordSalt = "test-salt",
-                PasswordHash = cryptographicHashService.GetHash("test-salt" + "test-PASSWORD-1"),
+                PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
+                PasswordSalt = "#test-salt",
+                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
                 State = "Confirmed"
             }));
 
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "eMail@DOMAIN.TLD", password = "test-PASSWORD-1-bad" });
+            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

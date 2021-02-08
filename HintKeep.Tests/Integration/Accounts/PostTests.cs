@@ -59,7 +59,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = "Test-Name", hint = "Test-Hint", notes = "Test-Notes", isPinned = true });
+            var response = await client.PostAsJsonAsync("/accounts", new { name = "#Test-Name", hint = "#Test-Hint", notes = "#Test-Notes", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -73,12 +73,12 @@ namespace HintKeep.Tests.Integration.Accounts
             {
                 UserId = userId,
                 Id = accountHintEntity.AccountId,
-                Name = "Test-Name",
+                Name = "#Test-Name",
                 Hints = new[]
                 {
                     new AccountHint
                     {
-                        Hint = "Test-Hint",
+                        Hint = "#Test-Hint",
                         StartDate = accountHintEntity.StartDate.Value
                     }
                 }
@@ -95,7 +95,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = account.Name, hint = "Test-Hint", isPinned = true });
+            var response = await client.PostAsJsonAsync("/accounts", new { name = account.Name, hint = "#Test-Hint", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -111,7 +111,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = account.Name, hint = "Test-Hint", isPinned = true });
+            var response = await client.PostAsJsonAsync("/accounts", new { name = account.Name, hint = "#Test-Hint", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

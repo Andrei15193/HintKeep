@@ -26,13 +26,14 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
             try
             {
                 await _entityTables.Accounts.ExecuteBatchAsync(
-                    new TableBatchOperation{
+                    new TableBatchOperation
+                    {
                         TableOperation.Insert(
                             new IndexEntity
                             {
                                 EntityType = "IndexEntity",
-                                PartitionKey = _login.UserId,
-                                RowKey = $"name-{command.Name.ToLowerInvariant()}",
+                                PartitionKey = _login.UserId.ToEncodedKeyProperty(),
+                                RowKey = $"name-{command.Name.ToLowerInvariant()}".ToEncodedKeyProperty(),
                                 IndexedEntityId = accountId
                             }
                         ),
@@ -40,8 +41,8 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                             new AccountEntity
                             {
                                 EntityType = "AccountEntity",
-                                PartitionKey = _login.UserId,
-                                RowKey = $"id-{accountId}",
+                                PartitionKey = _login.UserId.ToEncodedKeyProperty(),
+                                RowKey = $"id-{accountId}".ToEncodedKeyProperty(),
                                 Id = accountId,
                                 Name = command.Name,
                                 Hint = command.Hint,
@@ -54,8 +55,8 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                             new AccountHintEntity
                             {
                                 EntityType = "AccountHintEntity",
-                                PartitionKey = _login.UserId,
-                                RowKey = $"id-{accountId}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}",
+                                PartitionKey = _login.UserId.ToEncodedKeyProperty(),
+                                RowKey = $"id-{accountId}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}".ToEncodedKeyProperty(),
                                 AccountId = accountId,
                                 StartDate = now,
                                 Hint = command.Hint

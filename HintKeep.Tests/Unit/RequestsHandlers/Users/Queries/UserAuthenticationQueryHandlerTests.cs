@@ -45,8 +45,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
         {
             var query = new UserAuthenticationQuery
             {
-                Email = "test-eMail",
-                Password = "test-password"
+                Email = "#test-eMail",
+                Password = "#test-password"
             };
 
             var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _userAuthenticationQueryHandler.Handle(query, default));
@@ -58,8 +58,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
         {
             var userId = Guid.NewGuid().ToString("N");
             _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salt" + "test-password"))
-                .Returns("test-hash")
+                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt" + "#test-password"))
+                .Returns("#test-hash")
                 .Verifiable();
             _jsonWebTokenService
                 .Setup(jsonWebTokenService => jsonWebTokenService.GetJsonWebToken(userId))
@@ -68,18 +68,18 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
             _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
-                PartitionKey = "test-email",
-                RowKey = "EmailLogin",
-                PasswordSalt = "test-salt",
-                PasswordHash = "test-hash",
+                PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
+                PasswordSalt = "#test-salt",
+                PasswordHash = "#test-hash",
                 State = "Confirmed",
                 UserId = userId
             }));
 
             var query = new UserAuthenticationQuery
             {
-                Email = "test-eMail",
-                Password = "test-password"
+                Email = "#test-eMail",
+                Password = "#test-password"
             };
 
             var userInfo = await _userAuthenticationQueryHandler.Handle(query, default);
@@ -90,25 +90,25 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
         public async Task Handle_WhenUserIsNotConfirmed_ThrowsException()
         {
             _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salt" + "test-password"))
-                .Returns("test-hash")
+                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt" + "#test-password"))
+                .Returns("#test-hash")
                 .Verifiable();
             _entityTables.Logins.ExecuteBatch(new TableBatchOperation
             {
                 TableOperation.Insert(new EmailLoginEntity
                 {
                     EntityType = "EmailLoginEntity",
-                    PartitionKey = "test-email",
-                    RowKey = "EmailLogin",
-                    PasswordSalt = "test-salt",
-                    PasswordHash = "test-hash",
+                    PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin".ToEncodedKeyProperty(),
+                    PasswordSalt = "#test-salt",
+                    PasswordHash = "#test-hash",
                     State = "PendingConfirmation",
                 }),
                 TableOperation.Insert(new EmailLoginTokenEntity
                 {
                     EntityType = "EmailLoginTokenEntity",
-                    PartitionKey = "test-email",
-                    RowKey = "EmailLogin-confirmationToken",
+                    PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                    RowKey = "EmailLogin-confirmationToken".ToEncodedKeyProperty(),
                     Token = "token",
                     Created = DateTime.UtcNow
                 })
@@ -116,8 +116,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
 
             var query = new UserAuthenticationQuery
             {
-                Email = "test-eMail",
-                Password = "test-password"
+                Email = "#test-eMail",
+                Password = "#test-password"
             };
 
             var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _userAuthenticationQueryHandler.Handle(query, default));
@@ -128,23 +128,23 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Queries
         public async Task Handle_WhenPasswordsDoNotMatch_ThrowsException()
         {
             _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("test-salt" + "test-password"))
-                .Returns("test-hash-bad")
+                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt#test-password"))
+                .Returns("#test-hash-bad")
                 .Verifiable();
             _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
-                PartitionKey = "test-email",
-                RowKey = "EmailLogin",
-                PasswordSalt = "test-salt",
-                PasswordHash = "test-hash",
+                PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
+                PasswordSalt = "#test-salt",
+                PasswordHash = "#test-hash",
                 State = "Confirmed"
             }));
 
             var query = new UserAuthenticationQuery
             {
-                Email = "test-eMail",
-                Password = "test-password"
+                Email = "#test-eMail",
+                Password = "#test-password"
             };
 
             var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _userAuthenticationQueryHandler.Handle(query, default));

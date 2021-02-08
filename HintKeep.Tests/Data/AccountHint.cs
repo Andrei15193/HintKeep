@@ -14,7 +14,7 @@ namespace HintKeep.Tests.Data
             StartDate = accountHint.StartDate;
         }
 
-        public string Hint { get; set; } = "test-hint";
+        public string Hint { get; set; } = "#Test-Hint";
 
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
     }
