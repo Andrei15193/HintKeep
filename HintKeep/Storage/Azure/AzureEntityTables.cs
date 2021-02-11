@@ -9,11 +9,14 @@ namespace HintKeep.Storage.Azure
         public AzureEntityTables(CloudTableClient cloudTableClient)
             => _cloudTableClient = cloudTableClient;
 
+        public CloudTable Logins
+            => _cloudTableClient.GetTableReference(nameof(Logins));
+
         public CloudTable Users
             => _cloudTableClient.GetTableReference(nameof(Users));
 
-        public CloudTable Logins
-            => _cloudTableClient.GetTableReference(nameof(Logins));
+        public CloudTable UserSessions
+            => _cloudTableClient.GetTableReference(nameof(UserSessions));
 
         public CloudTable Accounts
             => _cloudTableClient.GetTableReference(nameof(Accounts));

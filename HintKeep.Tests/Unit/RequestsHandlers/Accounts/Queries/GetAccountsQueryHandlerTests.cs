@@ -19,16 +19,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
 {
     public class GetAccountsQueryHandlerTests
     {
-        private readonly string _userId;
         private readonly IEntityTables _entityTables;
         private readonly IRequestHandler<GetAccountsQuery, IReadOnlyList<AccountSummary>> _getAccountsQueryHandler;
 
         public GetAccountsQueryHandlerTests()
         {
-            _userId = Guid.NewGuid().ToString("N");
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
-            _getAccountsQueryHandler = new GetAccountsQueryHandler(_entityTables, new LoginInfo(_userId));
+            _getAccountsQueryHandler = new GetAccountsQueryHandler(_entityTables, new Session("#user-id", "#session-id"));
         }
 
         [Fact]
@@ -36,7 +34,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
         {
             var account = new Account
             {
-                UserId = _userId
+                UserId = "#user-id"
             };
             _entityTables.AddAccounts(account, new Account { UserId = "other-user-id" });
 
@@ -72,25 +70,25 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
             {
                 new Account
                 {
-                    UserId = _userId,
+                    UserId = "#user-id",
                     Name = "B",
                     IsPinned = false
                 },
                 new Account
                 {
-                    UserId = _userId,
+                    UserId = "#user-id",
                     Name = "A",
                     IsPinned = false
                 },
                 new Account
                 {
-                    UserId = _userId,
+                    UserId = "#user-id",
                     Name = "BB",
                     IsPinned = true
                 },
                 new Account
                 {
-                    UserId = _userId,
+                    UserId = "#user-id",
                     Name = "AA",
                     IsPinned = true
                 }
@@ -126,8 +124,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
         [Fact]
         public async Task Handle_WithDeletedAccounts_ReturnsOnlyNonDeletedAccounts()
         {
-            var account = new Account { UserId = _userId };
-            _entityTables.AddAccounts(account, new Account { UserId = _userId, Name = "#Test-Name-Deleted", IsDeleted = true });
+            var account = new Account { UserId = "#user-id" };
+            _entityTables.AddAccounts(account, new Account { UserId = "#user-id", Name = "#Test-Name-Deleted", IsDeleted = true });
 
             var accounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), CancellationToken.None);
 

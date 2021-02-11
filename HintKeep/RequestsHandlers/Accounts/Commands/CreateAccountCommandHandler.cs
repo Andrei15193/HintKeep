@@ -14,9 +14,9 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
     public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, string>
     {
         private readonly IEntityTables _entityTables;
-        private readonly LoginInfo _login;
+        private readonly Session _login;
 
-        public CreateAccountCommandHandler(IEntityTables entityTables, LoginInfo login)
+        public CreateAccountCommandHandler(IEntityTables entityTables, Session login)
             => (_entityTables, _login) = (entityTables, login);
 
         public async Task<string> Handle(CreateAccountCommand command, CancellationToken cancellationToken)

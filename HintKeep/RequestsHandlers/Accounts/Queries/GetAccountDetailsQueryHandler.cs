@@ -14,9 +14,9 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
     public class GetAccountDetailsQueryHandler : IRequestHandler<GetAccountDetailsQuery, AccountDetails>
     {
         private readonly IEntityTables _entityTables;
-        private readonly LoginInfo _login;
+        private readonly Session _login;
 
-        public GetAccountDetailsQueryHandler(IEntityTables entityTables, LoginInfo login)
+        public GetAccountDetailsQueryHandler(IEntityTables entityTables, Session login)
             => (_entityTables, _login) = (entityTables, login);
 
         public async Task<AccountDetails> Handle(GetAccountDetailsQuery query, CancellationToken cancellationToken)

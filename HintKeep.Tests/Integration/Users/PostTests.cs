@@ -97,7 +97,7 @@ namespace HintKeep.Tests.Integration.Users
                 PasswordSalt = "#test-salt",
                 PasswordHash = "#test-hash",
                 State = nameof(EmailLoginEntityState.PendingConfirmation),
-                UserId = "user-id"
+                UserId = "#user-id"
             }));
 
             var response = await client.PostAsJsonAsync("/users", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });

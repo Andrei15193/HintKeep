@@ -17,16 +17,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
 {
     public class GetAccountDetailsQueryHandlerTest
     {
-        private readonly string _userId;
         private readonly IEntityTables _entityTables;
         private readonly IRequestHandler<GetAccountDetailsQuery, AccountDetails> _getAccountsQueryHandler;
 
         public GetAccountDetailsQueryHandlerTest()
         {
-            _userId = Guid.NewGuid().ToString("N");
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
-            _getAccountsQueryHandler = new GetAccountDetailsQueryHandler(_entityTables, new LoginInfo(_userId));
+            _getAccountsQueryHandler = new GetAccountDetailsQueryHandler(_entityTables, new Session("#user-id", "#session-id"));
         }
 
         [Fact]
@@ -41,7 +39,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
         {
             var account = new Account
             {
-                UserId = _userId,
+                UserId = "#user-id",
                 IsDeleted = true
             };
             _entityTables.AddAccounts(account);

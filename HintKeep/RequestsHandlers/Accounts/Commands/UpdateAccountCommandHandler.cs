@@ -14,9 +14,9 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
     public class UpdateAccountCommandHandler : AsyncRequestHandler<UpdateAccountCommand>
     {
         private readonly IEntityTables _entityTables;
-        private readonly LoginInfo _login;
+        private readonly Session _login;
 
-        public UpdateAccountCommandHandler(IEntityTables entityTables, LoginInfo login)
+        public UpdateAccountCommandHandler(IEntityTables entityTables, Session login)
             => (_entityTables, _login) = (entityTables, login);
 
         protected override async Task Handle(UpdateAccountCommand command, CancellationToken cancellationToken)

@@ -1,9 +1,9 @@
 using HintKeep.ViewModels.Users;
 using MediatR;
 
-namespace HintKeep.Requests.Users.Queries
+namespace HintKeep.Requests.Users.Commands
 {
-    public class UserAuthenticationQuery : IRequest<UserInfo>
+    public class CreateUserSessionCommand : IRequest<UserSession>
     {
         public string Email { get; set; }
 

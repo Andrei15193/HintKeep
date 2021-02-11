@@ -15,22 +15,20 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
 {
     public class MoveAccountToBinCommandHandlerTests
     {
-        private readonly string _userId;
         private readonly IEntityTables _entityTables;
         private readonly IRequestHandler<MoveAccountToBinCommand> _moveAccountToBinCommandHandler;
 
         public MoveAccountToBinCommandHandlerTests()
         {
-            _userId = Guid.NewGuid().ToString("N");
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
-            _moveAccountToBinCommandHandler = new MoveAccountToBinCommandHandler(_entityTables, new LoginInfo(_userId));
+            _moveAccountToBinCommandHandler = new MoveAccountToBinCommandHandler(_entityTables, new Session("#user-id", "#session-id"));
         }
 
         [Fact]
         public async Task Handle_WhenAccountDoesNotExist_ThrowsException()
         {
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _moveAccountToBinCommandHandler.Handle(new MoveAccountToBinCommand { Id = "account-id" }, CancellationToken.None));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _moveAccountToBinCommandHandler.Handle(new MoveAccountToBinCommand { Id = "#account-id" }, CancellationToken.None));
             Assert.Empty(exception.Message);
         }
 
@@ -39,7 +37,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = _userId
+                UserId = "#user-id"
             };
             _entityTables.AddAccounts(account);
 
@@ -53,12 +51,12 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = _userId,
+                UserId = "#user-id",
                 IsDeleted = true
             };
             _entityTables.AddAccounts(account);
 
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _moveAccountToBinCommandHandler.Handle(new MoveAccountToBinCommand { Id = "account-id" }, CancellationToken.None));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _moveAccountToBinCommandHandler.Handle(new MoveAccountToBinCommand { Id = "#account-id" }, CancellationToken.None));
             Assert.Empty(exception.Message);
             _entityTables.AssertAccounts(account);
         }

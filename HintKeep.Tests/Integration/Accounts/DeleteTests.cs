@@ -28,8 +28,8 @@ namespace HintKeep.Tests.Integration.Accounts
         public async Task Delete_WhenAuthenticatedAndAccountDoesNotExist_ReturnsNotFound()
         {
             var client = _webApplicationFactory
-                .WithAuthentication("user-id")
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication("user-id")
                 .CreateClient();
 
             var response = await client.DeleteAsync($"/accounts/account-id");
@@ -43,8 +43,8 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var account = new Account();
             var client = _webApplicationFactory
-                .WithAuthentication(account.UserId)
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication(account.UserId)
                 .CreateClient();
             entityTables.AddAccounts(account);
 
@@ -61,8 +61,8 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var account = new Account { IsDeleted = true };
             var client = _webApplicationFactory
-                .WithAuthentication(account.UserId)
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication(account.UserId)
                 .CreateClient();
             entityTables.AddAccounts(account);
 

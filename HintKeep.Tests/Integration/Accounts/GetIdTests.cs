@@ -30,8 +30,8 @@ namespace HintKeep.Tests.Integration.Accounts
         public async Task Get_WhenAccountDoesNotExist_ReturnsNotFound()
         {
             var client = _webApplicationFactory
-                .WithAuthentication("user-id")
                 .WithInMemoryDatabase()
+                .WithAuthentication("user-id")
                 .CreateClient();
 
             var response = await client.GetAsync($"/accounts/account-id");
@@ -45,8 +45,8 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var account = new Account();
             var client = _webApplicationFactory
-                .WithAuthentication(account.UserId)
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication(account.UserId)
                 .CreateClient();
             entityTables.AddAccounts(account);
 
@@ -81,8 +81,8 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var account = new Account();
             var client = _webApplicationFactory
-                .WithAuthentication("user-id")
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication("user-id")
                 .CreateClient();
             entityTables.AddAccounts(account);
 

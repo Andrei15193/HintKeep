@@ -18,16 +18,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
 {
     public class CreateAccountCommandHandlerTests
     {
-        private readonly string _userId;
         private readonly IEntityTables _entityTables;
         private readonly IRequestHandler<CreateAccountCommand, string> _createAccountCommandHandler;
 
         public CreateAccountCommandHandlerTests()
         {
-            _userId = Guid.NewGuid().ToString("N");
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
-            _createAccountCommandHandler = new CreateAccountCommandHandler(_entityTables, new LoginInfo(_userId));
+            _createAccountCommandHandler = new CreateAccountCommandHandler(_entityTables, new Session("#user-id", "#session-id"));
         }
 
         [Fact]
@@ -51,7 +49,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             ));
             _entityTables.AssertAccounts(new Account
             {
-                UserId = _userId,
+                UserId = "#user-id",
                 Id = accountId,
                 Name = "#Test-Name",
                 Hints = new[]
@@ -72,7 +70,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = _userId
+                UserId = "#user-id"
             };
             _entityTables.AddAccounts(account);
 
@@ -95,7 +93,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = _userId,
+                UserId = "#user-id",
                 IsDeleted = true
             };
             _entityTables.AddAccounts(account);

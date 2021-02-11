@@ -14,8 +14,8 @@ namespace HintKeep.Services.Implementations
         public JsonWebTokenService(JsonWebTokenServiceConfig config)
             => _config = config;
 
-        public string GetJsonWebToken(string userId)
-            => _GetJsonWebToken(new Claim(ClaimTypes.Name, userId));
+        public string GetJsonWebToken(string userId, string sessionId)
+            => _GetJsonWebToken(new Claim(ClaimTypes.Name, userId), new Claim(ClaimTypes.SerialNumber, sessionId));
 
         private string _GetJsonWebToken(params Claim[] claims)
         {

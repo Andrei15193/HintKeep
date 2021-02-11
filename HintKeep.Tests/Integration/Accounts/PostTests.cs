@@ -31,7 +31,10 @@ namespace HintKeep.Tests.Integration.Accounts
         [Fact]
         public async Task Post_WithEmptyObject_ReturnsUnprocessableEntity()
         {
-            var client = _webApplicationFactory.WithAuthentication(Guid.NewGuid().ToString("N")).CreateClient();
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase()
+                .WithAuthentication(Guid.NewGuid().ToString("N"))
+                .CreateClient();
 
             var response = await client.PostAsJsonAsync("/accounts", new object());
 
@@ -42,7 +45,10 @@ namespace HintKeep.Tests.Integration.Accounts
         [Fact]
         public async Task Post_WithInvalidNameHintAndNotes_ReturnsUnprocessableEntity()
         {
-            var client = _webApplicationFactory.WithAuthentication(Guid.NewGuid().ToString("N")).CreateClient();
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase()
+                .WithAuthentication(Guid.NewGuid().ToString("N"))
+                .CreateClient();
 
             var response = await client.PostAsJsonAsync("/accounts", new { name = " ", hint = " ", notes = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901" });
 
@@ -55,8 +61,8 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var userId = Guid.NewGuid().ToString("N");
             var client = _webApplicationFactory
-                .WithAuthentication(userId)
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication(userId)
                 .CreateClient();
 
             var response = await client.PostAsJsonAsync("/accounts", new { name = "#Test-Name", hint = "#Test-Hint", notes = "#Test-Notes", isPinned = true });
@@ -90,8 +96,8 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var account = new Account();
             var client = _webApplicationFactory
-                .WithAuthentication(account.UserId)
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication(account.UserId)
                 .CreateClient();
             entityTables.AddAccounts(account);
 
@@ -106,8 +112,8 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var account = new Account { IsDeleted = true };
             var client = _webApplicationFactory
-                .WithAuthentication(account.UserId)
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication(account.UserId)
                 .CreateClient();
             entityTables.AddAccounts(account);
 

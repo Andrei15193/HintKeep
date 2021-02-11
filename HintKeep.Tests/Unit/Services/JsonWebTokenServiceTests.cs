@@ -1,4 +1,3 @@
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -15,25 +14,22 @@ namespace HintKeep.Tests.Unit.Services
         [Fact]
         public void GetJsonWebToken_GetsJwt_IsNotEncrypted()
         {
-            var userId = Guid.NewGuid().ToString("N");
             var jsonWebTokenService = new JsonWebTokenService(ServiceConfigFactory.Create<JsonWebTokenServiceConfig>(new { SigningKey = "test-signing-key", SigningAlgorithm = "HmacSha256Signature" }));
 
-            var jsonWebToken = jsonWebTokenService.GetJsonWebToken(userId);
+            var jsonWebToken = jsonWebTokenService.GetJsonWebToken("user-id", "session-id");
 
-            var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = new JwtSecurityTokenHandler().ReadJwtToken(jsonWebToken);
-            Assert.Equal(userId, securityToken.Claims.Single(claim => claim.Type == "unique_name").Value);
+            Assert.Equal("user-id", securityToken.Claims.Single(claim => claim.Type == "unique_name").Value);
+            Assert.Equal("session-id", securityToken.Claims.Single(claim => claim.Type == "certserialnumber").Value);
         }
 
         [Fact]
         public void GetJsonWebToken_GetsJwt_ThatCanBeRead()
         {
-            var userId = Guid.NewGuid().ToString("N");
             var jsonWebTokenService = new JsonWebTokenService(ServiceConfigFactory.Create<JsonWebTokenServiceConfig>(new { SigningKey = "test-signing-key", SigningAlgorithm = "HmacSha256Signature" }));
 
-            var jsonWebToken = jsonWebTokenService.GetJsonWebToken(userId);
+            var jsonWebToken = jsonWebTokenService.GetJsonWebToken("user-id", "session-id");
 
-            var tokenHandler = new JwtSecurityTokenHandler();
             var claims = new JwtSecurityTokenHandler().ValidateToken(
                 jsonWebToken,
                 new TokenValidationParameters
@@ -44,7 +40,8 @@ namespace HintKeep.Tests.Unit.Services
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test-signing-key"))
                 },
                 out var securityToken);
-            Assert.Equal(userId, claims.FindAll(claim => claim.Type == ClaimTypes.Name).Single().Value);
+            Assert.Equal("user-id", claims.FindAll(claim => claim.Type == ClaimTypes.Name).Single().Value);
+            Assert.Equal("session-id", claims.FindAll(claim => claim.Type == ClaimTypes.SerialNumber).Single().Value);
         }
 
         [Fact]
@@ -52,7 +49,7 @@ namespace HintKeep.Tests.Unit.Services
         {
             var jsonWebTokenService = new JsonWebTokenService(ServiceConfigFactory.Create<JsonWebTokenServiceConfig>(new { SigningKey = "test-signing-key", SigningAlgorithm = "HmacSha256Signature" }));
 
-            var jsonWebToken = jsonWebTokenService.GetJsonWebToken(Guid.NewGuid().ToString("N"));
+            var jsonWebToken = jsonWebTokenService.GetJsonWebToken("user-id", "session-id");
 
             Assert.Throws<SecurityTokenInvalidSignatureException>(
                 () => new JwtSecurityTokenHandler().ValidateToken(

@@ -18,16 +18,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
 {
     public class UpdateAccountCommandHandlerTests
     {
-        private readonly string _userId;
         private readonly IEntityTables _entityTables;
         private readonly IRequestHandler<UpdateAccountCommand> _updateAccountCommandHandler;
 
         public UpdateAccountCommandHandlerTests()
         {
-            _userId = Guid.NewGuid().ToString("N");
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
-            _updateAccountCommandHandler = new UpdateAccountCommandHandler(_entityTables, new LoginInfo(_userId));
+            _updateAccountCommandHandler = new UpdateAccountCommandHandler(_entityTables, new Session("#user-id", "#session-id"));
         }
 
         [Fact]
@@ -53,7 +51,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = _userId
+                UserId = "#user-id"
             };
             _entityTables.AddAccounts(account);
 
@@ -77,7 +75,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = _userId
+                UserId = "#user-id"
             };
             _entityTables.AddAccounts(account);
 
@@ -116,7 +114,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = _userId
+                UserId = "#user-id"
             };
             _entityTables.AddAccounts(account);
 
@@ -140,7 +138,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = _userId
+                UserId = "#user-id"
             };
             _entityTables.AddAccounts(account);
 
@@ -164,7 +162,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = _userId,
+                UserId = "#user-id",
                 IsDeleted = true
             };
             _entityTables.AddAccounts(account);

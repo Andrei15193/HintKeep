@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using HintKeep.Requests.Users.Commands;
-using HintKeep.Requests.Users.Queries;
 using HintKeep.ViewModels.Users;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -9,8 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HintKeep.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
+    [ApiController, Route("[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -40,22 +38,25 @@ namespace HintKeep.Controllers
             return Created(new Uri("/users", UriKind.Relative), string.Empty);
         }
 
-        [AllowAnonymous, HttpPost("authentications")]
+        [AllowAnonymous, HttpPost("sessions")]
         public async Task<IActionResult> PostAuthenticationAsync(UserLogin userLogin)
         {
-            var userInfo = await _mediator.Send(new UserAuthenticationQuery
+            var userSessionInfo = await _mediator.Send(new CreateUserSessionCommand
             {
                 Email = userLogin.Email,
                 Password = userLogin.Password
             });
-            return Created(new Uri("/users/authentications", UriKind.Relative), userInfo);
+            return Created(new Uri("/users/sessions", UriKind.Relative), userSessionInfo);
         }
 
-        [HttpDelete("authentications")]
-        public IActionResult DeleteAuthentication(bool? current)
+        [HttpDelete("sessions")]
+        public async Task<IActionResult> DeleteAuthentication(bool? current)
         {
             if (current ?? Request.Query.ContainsKey(nameof(current)))
+            {
+                await _mediator.Send(new DeleteCurrentUserSessionCommand());
                 return NoContent();
+            }
             else
                 return BadRequest(string.Empty);
         }

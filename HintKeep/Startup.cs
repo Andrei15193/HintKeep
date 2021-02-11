@@ -22,7 +22,6 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using Microsoft.AspNetCore.Http;
-using System.Linq;
 
 namespace HintKeep
 {
@@ -44,7 +43,7 @@ namespace HintKeep
             {
                 var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
                 return httpContext.User.Identity.IsAuthenticated
-                    ? new LoginInfo(httpContext.User.Claims.Single(claim => claim.Type == ClaimTypes.Name).Value)
+                    ? new Session(httpContext.User.FindFirstValue(ClaimTypes.Name), httpContext.User.FindFirstValue(ClaimTypes.SerialNumber))
                     : null;
             });
 
@@ -65,6 +64,7 @@ namespace HintKeep
                 .AddControllers(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter());
+                    options.Filters.Add<ActiveSessionAuthorizationFilter>();
                     options.Filters.Add<ExceptionFilter>();
                 })
                 .AddJsonOptions(options =>
@@ -91,6 +91,7 @@ namespace HintKeep
                             .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                             .RequireAuthenticatedUser()
                             .RequireClaim(ClaimTypes.Name)
+                            .RequireClaim(ClaimTypes.SerialNumber)
                             .Build();
                     }
                 )

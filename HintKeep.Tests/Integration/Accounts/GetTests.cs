@@ -60,8 +60,8 @@ namespace HintKeep.Tests.Integration.Accounts
                 .ToArray()
                 .AsEnumerable();
             var client = _webApplicationFactory
-                .WithAuthentication("user-id")
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication("user-id")
                 .CreateClient();
             entityTables
                 .AddAccounts(userAccounts)
@@ -125,8 +125,8 @@ namespace HintKeep.Tests.Integration.Accounts
                 }
             };
             var client = _webApplicationFactory
-                .WithAuthentication(userId)
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication(userId)
                 .CreateClient();
             entityTables.AddAccounts(accounts);
 
@@ -177,8 +177,8 @@ namespace HintKeep.Tests.Integration.Accounts
                 }
             };
             var client = _webApplicationFactory
-                .WithAuthentication(userId)
                 .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication(userId)
                 .CreateClient();
             entityTables.AddAccounts(accounts);
 

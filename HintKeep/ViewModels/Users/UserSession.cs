@@ -1,6 +1,6 @@
 namespace HintKeep.ViewModels.Users
 {
-    public class UserInfo
+    public class UserSession
     {
         public string JsonWebToken { get; set; }
     }

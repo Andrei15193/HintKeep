@@ -12,11 +12,11 @@ using Xunit;
 
 namespace HintKeep.Tests.Integration.Users
 {
-    public class PostAutenticationTests : IClassFixture<HintKeepWebApplicationFactory>
+    public class PostSessionsTests : IClassFixture<HintKeepWebApplicationFactory>
     {
         private readonly HintKeepWebApplicationFactory _webApplicationFactory;
 
-        public PostAutenticationTests(HintKeepWebApplicationFactory webApplicationFactory)
+        public PostSessionsTests(HintKeepWebApplicationFactory webApplicationFactory)
             => _webApplicationFactory = webApplicationFactory;
 
         [Fact]
@@ -24,7 +24,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/authentications", new object());
+            var response = await client.PostAsJsonAsync("/users/sessions", new object());
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidPassword""]}", await response.Content.ReadAsStringAsync());
@@ -35,7 +35,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "invalid-email", password = string.Empty });
+            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "invalid-email", password = string.Empty });
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidPassword""]}", await response.Content.ReadAsStringAsync());
@@ -46,14 +46,14 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.WithInMemoryDatabase().CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
-        public async Task Post_WithValidUser_ReturnsUserInfo()
+        public async Task Post_WithValidUser_ReturnsUserSession()
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
@@ -67,14 +67,20 @@ namespace HintKeep.Tests.Integration.Users
                 PasswordSalt = "#test-salt",
                 PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
                 State = "Confirmed",
-                UserId = Guid.NewGuid().ToString("N")
+                UserId = "#user-id"
             }));
-            
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
+
+            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            var userInfo = await response.Content.ReadFromJsonAsync<UserInfo>();
-            Assert.NotEmpty(userInfo.JsonWebToken);
+            var userSession = await response.Content.ReadFromJsonAsync<UserSession>();
+            Assert.NotEmpty(userSession.JsonWebToken);
+
+            var userSessionEntity = Assert.Single(entityTables.UserSessions.ExecuteQuery(new TableQuery<UserSessionEntity>()));
+            Assert.NotNull(userSessionEntity);
+            Assert.Equal("UserSessionEntity", userSessionEntity.EntityType);
+            Assert.Equal("#user-id", userSessionEntity.PartitionKey.FromEncodedKeyProperty());
+            Assert.NotEmpty(userSessionEntity.RowKey.FromEncodedKeyProperty());
         }
 
         [Fact]
@@ -95,7 +101,7 @@ namespace HintKeep.Tests.Integration.Users
                 UserId = Guid.NewGuid().ToString("N")
             }));
 
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -118,7 +124,7 @@ namespace HintKeep.Tests.Integration.Users
                 State = "Confirmed"
             }));
 
-            var response = await client.PostAsJsonAsync("/users/authentications", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
+            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
