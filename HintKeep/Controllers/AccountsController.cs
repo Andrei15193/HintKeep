@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HintKeep.Controllers
 {
-    [ApiController, Route("[controller]")]
+    [ApiController, Route("accounts")]
     public class AccountsController : ControllerBase
     {
         private readonly IMediator _mediator;

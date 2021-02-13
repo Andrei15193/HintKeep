@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HintKeep.Controllers
 {
-    [ApiController, Route("[controller]")]
+    [ApiController, Route("users")]
     public class UsersController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -36,29 +36,6 @@ namespace HintKeep.Controllers
                 ConfirmationToken = userConfirmation.ConfirmationToken
             });
             return Created(new Uri("/users", UriKind.Relative), string.Empty);
-        }
-
-        [AllowAnonymous, HttpPost("sessions")]
-        public async Task<IActionResult> PostAuthenticationAsync(UserLogin userLogin)
-        {
-            var userSessionInfo = await _mediator.Send(new CreateUserSessionCommand
-            {
-                Email = userLogin.Email,
-                Password = userLogin.Password
-            });
-            return Created(new Uri("/users/sessions", UriKind.Relative), userSessionInfo);
-        }
-
-        [HttpDelete("sessions")]
-        public async Task<IActionResult> DeleteAuthentication(bool? current)
-        {
-            if (current ?? Request.Query.ContainsKey(nameof(current)))
-            {
-                await _mediator.Send(new DeleteCurrentUserSessionCommand());
-                return NoContent();
-            }
-            else
-                return BadRequest(string.Empty);
         }
     }
 }

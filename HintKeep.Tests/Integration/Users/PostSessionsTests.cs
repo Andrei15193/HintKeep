@@ -73,7 +73,7 @@ namespace HintKeep.Tests.Integration.Users
             var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            var userSession = await response.Content.ReadFromJsonAsync<UserSession>();
+            var userSession = await response.Content.ReadFromJsonAsync<UserSessionPostResult>();
             Assert.NotEmpty(userSession.JsonWebToken);
 
             var userSessionEntity = Assert.Single(entityTables.UserSessions.ExecuteQuery(new TableQuery<UserSessionEntity>()));
@@ -128,6 +128,11 @@ namespace HintKeep.Tests.Integration.Users
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
+        }
+
+        private class UserSessionPostResult
+        {
+            public string JsonWebToken { get; set; }
         }
     }
 }

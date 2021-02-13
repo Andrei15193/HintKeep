@@ -1,6 +1,8 @@
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using HintKeep.Storage;
+using HintKeep.Storage.Entities;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
@@ -80,6 +82,30 @@ namespace HintKeep.Tests.Integration.Users
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
             Assert.Empty(entityTables.UserSessions.ExecuteQuery(new TableQuery()));
+        }
+
+        [Fact]
+        public async Task Delete_WhenSessionHasExpired_ReturnsUnauthorized()
+        {
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication("#user-id")
+                .CreateClient();
+            entityTables.UserSessions.Execute(TableOperation.Merge(new DynamicTableEntity
+            {
+                PartitionKey = "#user-id".ToEncodedKeyProperty(),
+                RowKey = "#session-id".ToEncodedKeyProperty(),
+                ETag = "*",
+                Properties =
+                {
+                    { nameof(UserSessionEntity.Expiration), EntityProperty.GeneratePropertyForDateTimeOffset(DateTime.UtcNow.AddMinutes(-1)) }
+                }
+            }));
+
+            var response = await client.DeleteAsync("/users/sessions?current");
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
