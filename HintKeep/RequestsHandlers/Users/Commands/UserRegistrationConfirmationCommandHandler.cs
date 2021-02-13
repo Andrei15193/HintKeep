@@ -20,19 +20,20 @@ namespace HintKeep.RequestsHandlers.Users.Commands
 
         protected override async Task Handle(UserRegistrationConfirmationCommand command, CancellationToken cancellationToken)
         {
-            var queryResult = await _entityTables.Logins.ExecuteQuerySegmentedAsync(new TableQuery()
-                .Where(TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, command.Email.ToLowerInvariant().ToEncodedKeyProperty()))
-                .Select(new[]
-                {
-                    nameof(ITableEntity.PartitionKey),
-                    nameof(ITableEntity.RowKey),
-                    nameof(ITableEntity.ETag),
-                    nameof(HintKeepTableEntity.EntityType),
-                    nameof(EmailLoginEntity.State),
-                    nameof(EmailLoginTokenEntity.Token),
-                    nameof(EmailLoginTokenEntity.Created)
-                })
-                .Take(2),
+            var queryResult = await _entityTables.Logins.ExecuteQuerySegmentedAsync(
+                new TableQuery()
+                    .Where(TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, command.Email.ToLowerInvariant().ToEncodedKeyProperty()))
+                    .Select(new[]
+                    {
+                        nameof(ITableEntity.PartitionKey),
+                        nameof(ITableEntity.RowKey),
+                        nameof(ITableEntity.ETag),
+                        nameof(HintKeepTableEntity.EntityType),
+                        nameof(EmailLoginEntity.State),
+                        nameof(EmailLoginTokenEntity.Token),
+                        nameof(EmailLoginTokenEntity.Created)
+                    })
+                    .Take(2),
                 null,
                 cancellationToken
             );

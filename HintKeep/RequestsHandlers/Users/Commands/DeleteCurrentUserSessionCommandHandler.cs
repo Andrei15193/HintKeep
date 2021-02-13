@@ -21,12 +21,17 @@ namespace HintKeep.RequestsHandlers.Users.Commands
         {
             try
             {
-                await _entityTables.UserSessions.ExecuteAsync(TableOperation.Delete(new TableEntity
-                {
-                    PartitionKey = _session.UserId.ToEncodedKeyProperty(),
-                    RowKey = _session.SessionId.ToEncodedKeyProperty(),
-                    ETag = "*"
-                }));
+                await _entityTables.UserSessions.ExecuteAsync(
+                    TableOperation.Delete(
+                        new TableEntity
+                        {
+                            PartitionKey = _session.UserId.ToEncodedKeyProperty(),
+                            RowKey = _session.SessionId.ToEncodedKeyProperty(),
+                            ETag = "*"
+                        }
+                    ),
+                    cancellationToken
+                );
             }
             catch (StorageException storageException) when (storageException.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {

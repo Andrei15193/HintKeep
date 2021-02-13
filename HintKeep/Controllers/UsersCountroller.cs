@@ -37,5 +37,17 @@ namespace HintKeep.Controllers
             });
             return Created(new Uri("/users", UriKind.Relative), string.Empty);
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(bool? current)
+        {
+            if (current ?? Request.Query.ContainsKey(nameof(current)))
+            {
+                await _mediator.Send(new DeleteCurrentUserCommand());
+                return NoContent();
+            }
+            else
+                return BadRequest(string.Empty);
+        }
     }
 }

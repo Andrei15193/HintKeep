@@ -26,16 +26,21 @@ namespace HintKeep.RequestsHandlers.Users.Commands
         {
             try
             {
-                await _entityTables.UserSessions.ExecuteAsync(TableOperation.Merge(new DynamicTableEntity
-                {
-                    PartitionKey = _session.UserId.ToEncodedKeyProperty(),
-                    RowKey = _session.SessionId.ToEncodedKeyProperty(),
-                    ETag = "*",
-                    Properties =
-                    {
-                        { nameof(UserSessionEntity.Expiration), EntityProperty.GeneratePropertyForDateTimeOffset(DateTime.UtcNow.AddHours(1)) }
-                    }
-                }));
+                await _entityTables.UserSessions.ExecuteAsync(
+                    TableOperation.Merge(
+                        new DynamicTableEntity
+                        {
+                            PartitionKey = _session.UserId.ToEncodedKeyProperty(),
+                            RowKey = _session.SessionId.ToEncodedKeyProperty(),
+                            ETag = "*",
+                            Properties =
+                            {
+                                { nameof(UserSessionEntity.Expiration), EntityProperty.GeneratePropertyForDateTimeOffset(DateTime.UtcNow.AddHours(1)) }
+                            }
+                        }
+                    ),
+                    cancellationToken
+                );
                 return new UserSession
                 {
                     JsonWebToken = _jsonWebTokenService.GetJsonWebToken(_session.UserId, _session.SessionId)

@@ -57,8 +57,8 @@ namespace HintKeep.RequestsHandlers.Users.Commands
             };
             try
             {
-                await _entityTables.Users.ExecuteAsync(TableOperation.Insert(userEntity));
-                await _entityTables.Logins.ExecuteBatchAsync(new TableBatchOperation { TableOperation.Insert(loginEntity), TableOperation.Insert(loginTokenEntity) });
+                await _entityTables.Users.ExecuteAsync(TableOperation.Insert(userEntity), cancellationToken);
+                await _entityTables.Logins.ExecuteBatchAsync(new TableBatchOperation { TableOperation.Insert(loginEntity), TableOperation.Insert(loginTokenEntity) }, cancellationToken);
 
                 await _emailService.SendAsync(new EmailMessage
                 {

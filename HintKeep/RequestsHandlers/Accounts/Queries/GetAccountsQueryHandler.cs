@@ -47,7 +47,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
             var continuationToken = default(TableContinuationToken);
             do
             {
-                var result = await _entityTables.Accounts.ExecuteQuerySegmentedAsync(tableQuery, continuationToken);
+                var result = await _entityTables.Accounts.ExecuteQuerySegmentedAsync(tableQuery, continuationToken, cancellationToken);
                 continuationToken = result.ContinuationToken;
                 accounts.AddRange(
                     from accountEntity in result

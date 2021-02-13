@@ -25,12 +25,18 @@ namespace HintKeep.Controllers.Filters
             {
                 var userId = user.FindFirstValue(ClaimTypes.Name);
                 var sessionId = user.FindFirstValue(ClaimTypes.SerialNumber);
-                var operationResults = await Task.WhenAll(
-                    _entityTables.Users.ExecuteAsync(TableOperation.Retrieve(userId.ToEncodedKeyProperty(), "details".ToEncodedKeyProperty(), new List<string>())),
-                    _entityTables.UserSessions.ExecuteAsync(TableOperation.Retrieve<UserSessionEntity>(userId.ToEncodedKeyProperty(), sessionId.ToEncodedKeyProperty(), new List<string> { nameof(UserSessionEntity.Expiration) }))
+                var entities = await Task.WhenAll(
+                    _entityTables
+                        .Users
+                        .ExecuteAsync(TableOperation.Retrieve(userId.ToEncodedKeyProperty(), "details".ToEncodedKeyProperty(), new List<string>()))
+                        .ContinueWith(task => task.Result.Result),
+                    _entityTables
+                        .UserSessions
+                        .ExecuteAsync(TableOperation.Retrieve<UserSessionEntity>(userId.ToEncodedKeyProperty(), sessionId.ToEncodedKeyProperty(), new List<string> { nameof(UserSessionEntity.Expiration) }))
+                        .ContinueWith(task => task.Result.Result)
                 );
 
-                if (operationResults.Any(result => result.Result is null) || ((UserSessionEntity)operationResults[1].Result).Expiration < DateTime.UtcNow)
+                if (entities.Any(result => result is null) || entities.OfType<UserSessionEntity>().Single().Expiration < DateTime.UtcNow)
                     context.Result = new UnauthorizedObjectResult(string.Empty);
             }
         }
