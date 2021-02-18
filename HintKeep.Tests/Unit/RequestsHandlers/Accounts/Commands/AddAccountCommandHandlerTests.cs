@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,23 +15,23 @@ using Xunit;
 
 namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
 {
-    public class CreateAccountCommandHandlerTests
+    public class AddAccountCommandHandlerTests
     {
         private readonly IEntityTables _entityTables;
-        private readonly IRequestHandler<CreateAccountCommand, string> _createAccountCommandHandler;
+        private readonly IRequestHandler<AddAccountCommand, string> _createAccountCommandHandler;
 
-        public CreateAccountCommandHandlerTests()
+        public AddAccountCommandHandlerTests()
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
-            _createAccountCommandHandler = new CreateAccountCommandHandler(_entityTables, new Session("#user-id", "#session-id"));
+            _createAccountCommandHandler = new AddAccountCommandHandler(_entityTables, new Session("#user-id", "#session-id"));
         }
 
         [Fact]
         public async Task Handle_NewAccount_InsertsAccountEntity()
         {
             var accountId = await _createAccountCommandHandler.Handle(
-                new CreateAccountCommand
+                new AddAccountCommand
                 {
                     Name = "#Test-Name",
                     Hint = "#Test-Hint",
@@ -77,7 +76,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
 
             var exception = await Assert.ThrowsAsync<ConflictException>(
                 () => _createAccountCommandHandler.Handle(
-                    new CreateAccountCommand
+                    new AddAccountCommand
                     {
                         Name = account.Name,
                         Hint = "#Test-Hint"
@@ -101,7 +100,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
 
             var exception = await Assert.ThrowsAsync<ConflictException>(
                 () => _createAccountCommandHandler.Handle(
-                    new CreateAccountCommand
+                    new AddAccountCommand
                     {
                         Name = "#Test-Name",
                         Hint = "#Test-Hint-2"

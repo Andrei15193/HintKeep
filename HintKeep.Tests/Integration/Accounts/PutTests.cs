@@ -97,13 +97,13 @@ namespace HintKeep.Tests.Integration.Accounts
                 Name = "#Test-Name-Updated",
                 Hints = new[]
                 {
-                    account.Hints.Single(),
                     new AccountHint
                     {
                         Id = latestAccountHintEntity.HintId,
                         Hint = "#Test-Hint-Updated",
                         DateAdded = latestAccountHintEntity.DateAdded.Value
-                    }
+                    },
+                    account.Hints.Single()
                 },
                 Notes = "#Test-Notes-Updated",
                 IsPinned = true

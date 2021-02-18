@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using HintKeep.Requests.AccountsHints.Commands;
 using HintKeep.ViewModels.Accounts;
@@ -14,6 +15,18 @@ namespace HintKeep.Controllers
         public AccountsHintsController(IMediator mediator)
             => _mediator = mediator;
 
+        [HttpPost]
+        public async Task<IActionResult> PostAsync(string accountId, AccountHintCreation accountHintCreation)
+        {
+            var hintId = await _mediator.Send(new AddAccountHintCommand
+            {
+                AccountId = accountId,
+                Hint = accountHintCreation.Hint,
+                DateAdded = accountHintCreation.DateAdded
+            });
+            return Created(new Uri($"/accounts/{accountId}/hints/{hintId}", UriKind.Relative), null);
+        }
+
         [HttpPut("{hintId}")]
         public async Task<IActionResult> PutAsync(string accountId, string hintId, AccountHintUpdate accountHintUpdate)
         {
@@ -25,5 +38,6 @@ namespace HintKeep.Controllers
             });
             return NoContent();
         }
+
     }
 }

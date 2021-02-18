@@ -274,7 +274,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
                 IsDeleted = true
             });
 
-            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id-invalid", new object());
+            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id", new object());
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

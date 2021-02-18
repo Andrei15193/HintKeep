@@ -2,7 +2,7 @@ using MediatR;
 
 namespace HintKeep.Requests.Accounts.Commands
 {
-    public class CreateAccountCommand : IRequest<string>
+    public class AddAccountCommand : IRequest<string>
     {
         public string Name { get; set; }
 

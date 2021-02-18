@@ -33,7 +33,7 @@ namespace HintKeep.Tests.Data.Extensions
                         RowKey = $"id-{account.Id}".ToEncodedKeyProperty(),
                         Id = account.Id,
                         Name = account.Name,
-                        Hint = account.Hints.OrderByDescending(accountHint => accountHint.DateAdded).First().Hint,
+                        Hint = account.Hints.OrderByDescending(accountHint => accountHint.DateAdded).Select(accountHint => accountHint.Hint).FirstOrDefault(),
                         Notes = account.Notes,
                         IsPinned = account.IsPinned,
                         IsDeleted = account.IsDeleted
@@ -81,7 +81,7 @@ namespace HintKeep.Tests.Data.Extensions
                 Assert.Equal($"id-{account.Id}", accountEntity.RowKey.FromEncodedKeyProperty());
                 Assert.Equal(account.Id, accountEntity.Id);
                 Assert.Equal(account.Name, accountEntity.Name);
-                Assert.Equal(account.Hints.OrderByDescending(accountHint => accountHint.DateAdded).First().Hint, accountEntity.Hint);
+                Assert.Equal(account.Hints.Select(accountHint => accountHint.Hint).FirstOrDefault(), accountEntity.Hint);
                 Assert.Equal(account.Notes, accountEntity.Notes);
 
                 if (account.IsPinned)

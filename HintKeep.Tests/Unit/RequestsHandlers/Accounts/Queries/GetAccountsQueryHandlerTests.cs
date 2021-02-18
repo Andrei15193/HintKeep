@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,13 +5,11 @@ using System.Threading.Tasks;
 using HintKeep.Requests.Accounts.Queries;
 using HintKeep.RequestsHandlers.Accounts.Queries;
 using HintKeep.Storage;
-using HintKeep.Storage.Entities;
 using HintKeep.Tests.Data;
 using HintKeep.Tests.Data.Extensions;
 using HintKeep.Tests.Stubs;
 using HintKeep.ViewModels.Accounts;
 using MediatR;
-using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
 namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries

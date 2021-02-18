@@ -11,15 +11,15 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.Accounts.Commands
 {
-    public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, string>
+    public class AddAccountCommandHandler : IRequestHandler<AddAccountCommand, string>
     {
         private readonly IEntityTables _entityTables;
         private readonly Session _login;
 
-        public CreateAccountCommandHandler(IEntityTables entityTables, Session login)
+        public AddAccountCommandHandler(IEntityTables entityTables, Session login)
             => (_entityTables, _login) = (entityTables, login);
 
-        public async Task<string> Handle(CreateAccountCommand command, CancellationToken cancellationToken)
+        public async Task<string> Handle(AddAccountCommand command, CancellationToken cancellationToken)
         {
             var now = DateTime.UtcNow;
             var accountId = Guid.NewGuid().ToString("N");

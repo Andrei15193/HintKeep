@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -100,13 +99,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             {
                 Hints = new[]
                 {
-                    new AccountHint(account.Hints.Single()),
                     new AccountHint
                     {
                         Id = latestAccountHintEntity.HintId,
                         Hint = "#Test-Hint-Updated",
                         DateAdded = latestAccountHintEntity.DateAdded.Value
-                    }
+                    },
+                    new AccountHint(account.Hints.Single())
                 }
             });
         }

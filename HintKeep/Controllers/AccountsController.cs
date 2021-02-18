@@ -27,7 +27,7 @@ namespace HintKeep.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync(AccountCreation accountCreation)
         {
-            var accountId = await _mediator.Send(new CreateAccountCommand
+            var accountId = await _mediator.Send(new AddAccountCommand
             {
                 Name = accountCreation.Name,
                 Hint = accountCreation.Hint,

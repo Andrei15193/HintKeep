@@ -4,9 +4,9 @@ namespace HintKeep.Storage.Entities
 {
     public class AccountHintEntity : HintKeepTableEntity
     {
-        public string HintId { get; set; }
-
         public string AccountId { get; set; }
+
+        public string HintId { get; set; }
 
         public DateTime? DateAdded { get; set; }
 

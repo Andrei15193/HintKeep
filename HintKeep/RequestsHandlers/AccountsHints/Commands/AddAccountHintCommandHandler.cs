@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
@@ -11,15 +11,15 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.AccountsHints.Commands
 {
-    public class UpdateAccountHintCommandHandler : AsyncRequestHandler<UpdateAccountHintCommand>
+    public class AddAccountHintCommandHandler : IRequestHandler<AddAccountHintCommand, string>
     {
         private readonly IEntityTables _entityTables;
         private readonly Session _session;
 
-        public UpdateAccountHintCommandHandler(IEntityTables entityTables, Session session)
+        public AddAccountHintCommandHandler(IEntityTables entityTables, Session session)
             => (_entityTables, _session) = (entityTables, session);
 
-        protected override async Task Handle(UpdateAccountHintCommand command, CancellationToken cancellationToken)
+        public async Task<string> Handle(AddAccountHintCommand command, CancellationToken cancellationToken)
         {
             var account = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
                 TableOperation.Retrieve<AccountEntity>(_session.UserId.ToEncodedKeyProperty(), $"id-{command.AccountId}".ToEncodedKeyProperty(), new List<string> { nameof(AccountEntity.IsDeleted) }),
@@ -28,10 +28,17 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Commands
             if (account.IsDeleted)
                 throw new NotFoundException();
 
-            var accountHint = (AccountHintEntity)(await _entityTables.Accounts.ExecuteAsync(
-                TableOperation.Retrieve<AccountHintEntity>(_session.UserId.ToEncodedKeyProperty(), $"id-{command.AccountId}-hintId-{command.HintId}".ToEncodedKeyProperty()),
-                cancellationToken
-            )).Result ?? throw new NotFoundException();
+            var hintId = Guid.NewGuid().ToString("N");
+            var accountHint = new AccountHintEntity
+            {
+                EntityType = "AccountHintEntity",
+                PartitionKey = _session.UserId.ToEncodedKeyProperty(),
+                RowKey = $"id-{command.AccountId}-hintId-{hintId}".ToEncodedKeyProperty(),
+                AccountId = command.AccountId,
+                HintId = hintId,
+                Hint = command.Hint,
+                DateAdded = command.DateAdded
+            };
 
             accountHint.DateAdded = command.DateAdded;
             var latestHint = await _entityTables.GetLatestHint(accountHint, new[] { nameof(AccountHintEntity.Hint) }, cancellationToken);
@@ -39,7 +46,7 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Commands
             await _entityTables.Accounts.ExecuteBatchAsync(
                 new TableBatchOperation
                 {
-                    TableOperation.Replace(accountHint),
+                    TableOperation.Insert(accountHint),
                     TableOperation.Merge(new DynamicTableEntity
                     {
                         PartitionKey = account.PartitionKey,
@@ -53,6 +60,7 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Commands
                 },
                 cancellationToken
             );
+            return hintId;
         }
     }
 }

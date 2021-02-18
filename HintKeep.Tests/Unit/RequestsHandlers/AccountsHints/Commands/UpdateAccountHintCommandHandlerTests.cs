@@ -276,7 +276,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                 {
                     new AccountHint
                     {
-                        Hint = "#hint-id"
+                        Id = "#hint-id"
                     }
                 }
             });
@@ -304,11 +304,12 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                 {
                     new AccountHint
                     {
-                        Hint = "#hint-id"
+                        Id = "#hint-id"
                     }
                 },
                 IsDeleted = true
             });
+
             var exception = await Assert.ThrowsAsync<NotFoundException>(
                 () => _updateAccountHintCommandHandler.Handle(
                     new UpdateAccountHintCommand
