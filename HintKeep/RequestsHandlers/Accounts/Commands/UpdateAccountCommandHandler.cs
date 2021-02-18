@@ -61,14 +61,16 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
             if (!string.Equals(command.Hint, accountEntity.Hint, StringComparison.Ordinal))
             {
                 var now = DateTime.UtcNow;
+                var hintId = Guid.NewGuid().ToString("N");
                 tableBatchOperation.Add(TableOperation.Insert(new AccountHintEntity
                 {
                     EntityType = "AccountHintEntity",
                     PartitionKey = _login.UserId.ToEncodedKeyProperty(),
-                    RowKey = $"id-{command.Id}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}".ToEncodedKeyProperty(),
-                    Hint = command.Hint,
+                    RowKey = $"id-{command.Id}-hintId-{hintId}".ToEncodedKeyProperty(),
                     AccountId = command.Id,
-                    StartDate = now,
+                    HintId = hintId,
+                    Hint = command.Hint,
+                    DateAdded = now,
                 }));
             }
             accountEntity.Name = command.Name;

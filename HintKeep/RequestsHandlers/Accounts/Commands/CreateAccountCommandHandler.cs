@@ -23,6 +23,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
         {
             var now = DateTime.UtcNow;
             var accountId = Guid.NewGuid().ToString("N");
+            var hintId = Guid.NewGuid().ToString("N");
             try
             {
                 await _entityTables.Accounts.ExecuteBatchAsync(
@@ -56,9 +57,10 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                             {
                                 EntityType = "AccountHintEntity",
                                 PartitionKey = _login.UserId.ToEncodedKeyProperty(),
-                                RowKey = $"id-{accountId}-hintDate-{now:yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'}".ToEncodedKeyProperty(),
+                                RowKey = $"id-{accountId}-hintId-{hintId}".ToEncodedKeyProperty(),
                                 AccountId = accountId,
-                                StartDate = now,
+                                HintId = hintId,
+                                DateAdded = now,
                                 Hint = command.Hint
                             }
                         )

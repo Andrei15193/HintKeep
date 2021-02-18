@@ -84,8 +84,9 @@ namespace HintKeep.Tests.Integration.Accounts
                 {
                     new AccountHint
                     {
+                        Id = accountHintEntity.HintId,
                         Hint = "#Test-Hint",
-                        StartDate = accountHintEntity.StartDate.Value
+                        DateAdded = accountHintEntity.DateAdded.Value
                     }
                 }
             });

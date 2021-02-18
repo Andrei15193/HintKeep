@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
@@ -34,7 +33,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase()
-                .WithAuthentication(Guid.NewGuid().ToString("N"))
+                .WithAuthentication("#user-id")
                 .CreateClient();
 
             var response = await client.PutAsJsonAsync($"/accounts/account-id", new object());
@@ -48,7 +47,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase()
-                .WithAuthentication(Guid.NewGuid().ToString("N"))
+                .WithAuthentication("#user-id")
                 .CreateClient();
 
             var response = await client.PutAsJsonAsync($"/accounts/account-id", new { name = " ", hint = " ", notes = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901" });
@@ -62,7 +61,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase()
-                .WithAuthentication(Guid.NewGuid().ToString("N"))
+                .WithAuthentication("#user-id")
                 .CreateClient();
 
             var response = await client.PutAsJsonAsync($"/accounts/account-id", new { name = "#Test-Name", hint = "#Test-Hint", isPinned = true });
@@ -91,7 +90,8 @@ namespace HintKeep.Tests.Integration.Accounts
                 .ExecuteQuery(new TableQuery<AccountHintEntity>().Where(
                     TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
                 ))
-                .Last();
+                .Where(accountHintEntity => accountHintEntity.HintId != account.Hints.Single().Id)
+                .Single();
             entityTables.AssertAccounts(new Account(account)
             {
                 Name = "#Test-Name-Updated",
@@ -100,8 +100,9 @@ namespace HintKeep.Tests.Integration.Accounts
                     account.Hints.Single(),
                     new AccountHint
                     {
+                        Id = latestAccountHintEntity.HintId,
                         Hint = "#Test-Hint-Updated",
-                        StartDate = latestAccountHintEntity.StartDate.Value
+                        DateAdded = latestAccountHintEntity.DateAdded.Value
                     }
                 },
                 Notes = "#Test-Notes-Updated",

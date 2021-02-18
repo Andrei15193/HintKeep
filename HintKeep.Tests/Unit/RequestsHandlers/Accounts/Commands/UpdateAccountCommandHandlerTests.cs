@@ -94,7 +94,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             var latestAccountHintEntity = _entityTables
                 .Accounts
                 .ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(AccountHintEntity.AccountId), QueryComparisons.Equal, account.Id)))
-                .Last();
+                .Where(accountHintEntity => accountHintEntity.HintId != account.Hints.Single().Id)
+                .Single();
             _entityTables.AssertAccounts(new Account(account)
             {
                 Hints = new[]
@@ -102,8 +103,9 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     new AccountHint(account.Hints.Single()),
                     new AccountHint
                     {
+                        Id = latestAccountHintEntity.HintId,
                         Hint = "#Test-Hint-Updated",
-                        StartDate = latestAccountHintEntity.StartDate.Value
+                        DateAdded = latestAccountHintEntity.DateAdded.Value
                     }
                 }
             });
