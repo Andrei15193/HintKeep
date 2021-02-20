@@ -1,7 +1,7 @@
 using System;
 using HintKeep.ViewModels.ValidationAttributes;
 
-namespace HintKeep.ViewModels.Accounts
+namespace HintKeep.ViewModels.AccountsHints
 {
     public class AccountHintCreation
     {

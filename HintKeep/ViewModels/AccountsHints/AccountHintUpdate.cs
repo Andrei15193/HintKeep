@@ -1,6 +1,6 @@
 using System;
 
-namespace HintKeep.ViewModels.Accounts
+namespace HintKeep.ViewModels.AccountsHints
 {
     public class AccountHintUpdate
     {

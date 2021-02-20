@@ -1,7 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using HintKeep.Requests.AccountsHints.Commands;
-using HintKeep.ViewModels.Accounts;
+using HintKeep.Requests.AccountsHints.Queries;
+using HintKeep.ViewModels.AccountsHints;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,16 @@ namespace HintKeep.Controllers
 
         public AccountsHintsController(IMediator mediator)
             => _mediator = mediator;
+
+        [HttpGet]
+        public async Task<IActionResult> GetAsync(string accountId)
+        {
+            var accountHints = await _mediator.Send(new AccountHintsQuery
+            {
+                AccountId = accountId
+            });
+            return Ok(accountHints);
+        }
 
         [HttpPost]
         public async Task<IActionResult> PostAsync(string accountId, AccountHintCreation accountHintCreation)
