@@ -140,7 +140,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task Put_WhenSessionIsDeleted_ReturnsUnauthorized()
+        public async Task Put_WhenSessionDoesNotExist_ReturnsUnauthorized()
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
@@ -156,7 +156,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task Put_WhenUserIsDeleted_ReturnsUnauthorized()
+        public async Task Put_WhenUserDoesNotExist_ReturnsUnauthorized()
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
@@ -167,6 +167,30 @@ namespace HintKeep.Tests.Integration.Users
                 PartitionKey = "#user-id".ToEncodedKeyProperty(),
                 RowKey = "details".ToEncodedKeyProperty(),
                 ETag = "*"
+            }));
+
+            var response = await client.PutAsJsonAsync("/users/sessions?current", string.Empty);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Put_WhenUserIsDeleted_ReturnsUnauthorized()
+        {
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication("#user-id")
+                .CreateClient();
+            entityTables.Users.Execute(TableOperation.Merge(new DynamicTableEntity
+            {
+                PartitionKey = "#user-id".ToEncodedKeyProperty(),
+                RowKey = "details".ToEncodedKeyProperty(),
+                ETag = "*",
+                Properties =
+                {
+                    { nameof(UserEntity.IsDeleted), EntityProperty.GeneratePropertyForBool(true) }
+                }
             }));
 
             var response = await client.PutAsJsonAsync("/users/sessions?current", string.Empty);

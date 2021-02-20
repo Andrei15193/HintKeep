@@ -24,23 +24,18 @@ namespace HintKeep.RequestsHandlers.Users.Commands
 
         public async Task<UserSession> Handle(CreateUserSessionCommand command, CancellationToken cancellationToken)
         {
-            var loginResult = await _entityTables.Logins.ExecuteAsync(
-                TableOperation.Retrieve<EmailLoginEntity>(
-                    command.Email.ToLowerInvariant().ToEncodedKeyProperty(),
-                    nameof(LoginEntityType.EmailLogin).ToEncodedKeyProperty(),
-                    new List<string>
-                    {
-                        nameof(EmailLoginEntity.PasswordSalt),
-                        nameof(EmailLoginEntity.PasswordHash),
-                        nameof(EmailLoginEntity.State),
-                        nameof(EmailLoginEntity.UserId)
-                    }
-                ),
+            var loginEntity = (EmailLoginEntity)(await _entityTables.Logins.ExecuteAsync(
+                TableOperation.Retrieve<EmailLoginEntity>(command.Email.ToLowerInvariant().ToEncodedKeyProperty(), nameof(LoginEntityType.EmailLogin).ToEncodedKeyProperty(), new List<string> { nameof(EmailLoginEntity.PasswordSalt), nameof(EmailLoginEntity.PasswordHash), nameof(EmailLoginEntity.State), nameof(EmailLoginEntity.UserId) }),
                 cancellationToken
-            );
-            if (!(loginResult.Result is EmailLoginEntity loginEntity)
-                || loginEntity.PasswordHash != _cryptographicHashService.GetHash(loginEntity.PasswordSalt + command.Password)
-                || loginEntity.State != nameof(EmailLoginEntityState.Confirmed))
+            )).Result;
+            if (loginEntity is null || loginEntity.PasswordHash != _cryptographicHashService.GetHash(loginEntity.PasswordSalt + command.Password) || loginEntity.State != nameof(EmailLoginEntityState.Confirmed))
+                throw new UnauthorizedException();
+
+            var userEntity = (UserEntity)(await _entityTables.Users.ExecuteAsync(
+                TableOperation.Retrieve<UserEntity>(loginEntity.UserId.ToEncodedKeyProperty(), "details".ToEncodedKeyProperty(), new List<string> { nameof(UserEntity.IsDeleted) }),
+                cancellationToken
+            )).Result;
+            if (userEntity is null || userEntity.IsDeleted)
                 throw new UnauthorizedException();
 
             var sessionId = Guid.NewGuid().ToString("N");

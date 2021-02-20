@@ -26,6 +26,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Logins.Create();
+            _entityTables.Users.Create();
             _entityTables.UserSessions.Create();
             _cryptographicHashService = new Mock<ICryptographicHashService>();
             _jsonWebTokenService = new Mock<IJsonWebTokenService>();
@@ -74,6 +75,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 PasswordHash = "#test-hash",
                 State = "Confirmed",
                 UserId = "#user-id"
+            }));
+            _entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            {
+                EntityType = "UserEntity",
+                PartitionKey = "#user-id".ToEncodedKeyProperty(),
+                RowKey = "details".ToEncodedKeyProperty(),
+                Email = "test-email@domain.tld"
             }));
 
             var command = new CreateUserSessionCommand
@@ -139,6 +147,42 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 PasswordSalt = "#test-salt",
                 PasswordHash = "#test-hash",
                 State = "Confirmed"
+            }));
+
+            var command = new CreateUserSessionCommand
+            {
+                Email = "#test-eMail",
+                Password = "#test-password"
+            };
+
+            var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _createUserSessionCommandHandler.Handle(command, default));
+            Assert.Empty(exception.Message);
+        }
+
+        [Fact]
+        public async Task Handle_WhenUserIsDeleted_ThrowsException()
+        {
+            _cryptographicHashService
+                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt#test-password"))
+                .Returns("#test-hash")
+                .Verifiable();
+            _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
+            {
+                EntityType = "EmailLoginEntity",
+                PartitionKey = "#test-email".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
+                PasswordSalt = "#test-salt",
+                PasswordHash = "#test-hash",
+                State = "Confirmed",
+                UserId = "#user-id"
+            }));
+            _entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            {
+                EntityType = "UserEntity",
+                PartitionKey = "#user-id".ToEncodedKeyProperty(),
+                RowKey = "details".ToEncodedKeyProperty(),
+                Email = "test-email@domain.tld",
+                IsDeleted = true
             }));
 
             var command = new CreateUserSessionCommand

@@ -23,37 +23,16 @@ namespace HintKeep.RequestsHandlers.Users.Commands
         {
             try
             {
-                var userEntity = (UserEntity)(await _entityTables.Users.ExecuteAsync(
-                    TableOperation.Retrieve<UserEntity>(
-                        _session.UserId.ToEncodedKeyProperty(),
-                        "details".ToEncodedKeyProperty(),
-                        new List<string>
-                        {
-                            nameof(UserEntity.Email)
-                        }
-                    ),
-                    cancellationToken
-                )).Result;
-
-                await _entityTables.Users.ExecuteAsync(TableOperation.Delete(new TableEntity
+                await _entityTables.Users.ExecuteAsync(TableOperation.Merge(new DynamicTableEntity
                 {
                     PartitionKey = _session.UserId.ToEncodedKeyProperty(),
                     RowKey = "details".ToEncodedKeyProperty(),
-                    ETag = "*"
-                }));
-
-                try
-                {
-                    await _entityTables.Users.ExecuteAsync(TableOperation.Delete(new TableEntity
+                    ETag = "*",
+                    Properties =
                     {
-                        PartitionKey = userEntity.Email.ToLowerInvariant().ToEncodedKeyProperty(),
-                        RowKey = nameof(LoginEntityType.EmailLogin).ToEncodedKeyProperty(),
-                        ETag = "*"
-                    }));
-                }
-                catch
-                {
-                }
+                        { nameof(UserEntity.IsDeleted), EntityProperty.GeneratePropertyForBool(true) }
+                    }
+                }));
             }
             catch (StorageException storageException) when (storageException.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {

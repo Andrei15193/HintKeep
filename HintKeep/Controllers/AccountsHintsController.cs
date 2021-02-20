@@ -38,6 +38,5 @@ namespace HintKeep.Controllers
             });
             return NoContent();
         }
-
     }
 }

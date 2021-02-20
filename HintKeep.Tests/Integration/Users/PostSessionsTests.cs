@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using HintKeep.Services;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
-using HintKeep.ViewModels.Users;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
@@ -69,6 +68,13 @@ namespace HintKeep.Tests.Integration.Users
                 State = "Confirmed",
                 UserId = "#user-id"
             }));
+            entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            {
+                EntityType = "UserEntity",
+                PartitionKey = "#user-id".ToEncodedKeyProperty(),
+                RowKey = "details".ToEncodedKeyProperty(),
+                Email = "test-email@domain.tld"
+            }));
 
             var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
@@ -100,6 +106,13 @@ namespace HintKeep.Tests.Integration.Users
                 State = "PendingConfirmation",
                 UserId = Guid.NewGuid().ToString("N")
             }));
+            entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            {
+                EntityType = "UserEntity",
+                PartitionKey = "#user-id".ToEncodedKeyProperty(),
+                RowKey = "details".ToEncodedKeyProperty(),
+                Email = "test-email@domain.tld"
+            }));
 
             var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
@@ -122,6 +135,67 @@ namespace HintKeep.Tests.Integration.Users
                 PasswordSalt = "#test-salt",
                 PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
                 State = "Confirmed"
+            }));
+            entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            {
+                EntityType = "UserEntity",
+                PartitionKey = "#user-id".ToEncodedKeyProperty(),
+                RowKey = "details".ToEncodedKeyProperty(),
+                Email = "test-email@domain.tld"
+            }));
+
+            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Post_WhenUserDoesNotExist_ReturnsUnauthorized()
+        {
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase(out var entityTables)
+                .CreateClient();
+            var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
+            entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
+            {
+                EntityType = "EmailLoginEntity",
+                PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
+                PasswordSalt = "#test-salt",
+                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
+                State = "Confirmed"
+            }));
+
+            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Post_WhenUserIsDeleted_ReturnsUnauthorized()
+        {
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase(out var entityTables)
+                .CreateClient();
+            var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
+            entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
+            {
+                EntityType = "EmailLoginEntity",
+                PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
+                RowKey = "EmailLogin".ToEncodedKeyProperty(),
+                PasswordSalt = "#test-salt",
+                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
+                State = "Confirmed"
+            }));
+            entityTables.Users.Execute(TableOperation.Insert(new UserEntity
+            {
+                EntityType = "UserEntity",
+                PartitionKey = "#user-id".ToEncodedKeyProperty(),
+                RowKey = "details".ToEncodedKeyProperty(),
+                Email = "test-email@domain.tld",
+                IsDeleted = true
             }));
 
             var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });

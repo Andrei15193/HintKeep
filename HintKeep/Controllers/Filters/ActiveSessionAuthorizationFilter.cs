@@ -28,7 +28,7 @@ namespace HintKeep.Controllers.Filters
                 var entities = await Task.WhenAll(
                     _entityTables
                         .Users
-                        .ExecuteAsync(TableOperation.Retrieve(userId.ToEncodedKeyProperty(), "details".ToEncodedKeyProperty(), new List<string>()))
+                        .ExecuteAsync(TableOperation.Retrieve<UserEntity>(userId.ToEncodedKeyProperty(), "details".ToEncodedKeyProperty(), new List<string> { nameof(UserEntity.IsDeleted) }))
                         .ContinueWith(task => task.Result.Result),
                     _entityTables
                         .UserSessions
@@ -36,7 +36,7 @@ namespace HintKeep.Controllers.Filters
                         .ContinueWith(task => task.Result.Result)
                 );
 
-                if (entities.Any(result => result is null) || entities.OfType<UserSessionEntity>().Single().Expiration < DateTime.UtcNow)
+                if (entities.Any(result => result is null) || entities.OfType<UserEntity>().Single().IsDeleted || entities.OfType<UserSessionEntity>().Single().Expiration < DateTime.UtcNow)
                     context.Result = new UnauthorizedObjectResult(string.Empty);
             }
         }

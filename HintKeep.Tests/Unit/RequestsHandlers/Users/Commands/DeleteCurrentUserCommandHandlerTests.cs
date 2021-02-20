@@ -27,18 +27,23 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         }
 
         [Fact]
-        public async Task Handle_WhenUserExists_DeletesTheCurrentUser()
+        public async Task Handle_WhenUserExists_MarksTheCurrentUserAsDeleted()
         {
             _entityTables.Users.Execute(TableOperation.Insert(new UserEntity
             {
                 EntityType = "UserEntity",
                 PartitionKey = "#user-id".ToEncodedKeyProperty(),
-                RowKey = "details".ToEncodedKeyProperty()
+                RowKey = "details".ToEncodedKeyProperty(),
+                Email = "test-email@domain.tld"
             }));
 
             await _deleteCurrentUserCommandHandler.Handle(new DeleteCurrentUserCommand(), CancellationToken.None);
 
-            Assert.Empty(_entityTables.Users.ExecuteQuery(new TableQuery()));
+            var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery<UserEntity>()));
+            Assert.Equal("UserEntity", userEntity.EntityType);
+            Assert.Equal("#user-id", userEntity.PartitionKey.FromEncodedKeyProperty());
+            Assert.Equal("details", userEntity.RowKey.FromEncodedKeyProperty());
+            Assert.Equal("test-email@domain.tld", userEntity.Email);
         }
 
         [Fact]

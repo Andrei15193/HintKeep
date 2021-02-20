@@ -66,7 +66,11 @@ namespace HintKeep.Tests.Integration.Users
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
-            Assert.Empty(entityTables.Users.ExecuteQuery(new TableQuery()));
+            var userEntity = Assert.Single(entityTables.Users.ExecuteQuery(new TableQuery<UserEntity>()));
+            Assert.Equal("UserEntity", userEntity.EntityType);
+            Assert.Equal("#user-id", userEntity.PartitionKey.FromEncodedKeyProperty());
+            Assert.Equal("details", userEntity.RowKey.FromEncodedKeyProperty());
+            Assert.Equal("test-user@domain.tld", userEntity.Email);
         }
 
         [Fact]
@@ -81,7 +85,11 @@ namespace HintKeep.Tests.Integration.Users
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
-            Assert.Empty(entityTables.Users.ExecuteQuery(new TableQuery()));
+            var userEntity = Assert.Single(entityTables.Users.ExecuteQuery(new TableQuery<UserEntity>()));
+            Assert.Equal("UserEntity", userEntity.EntityType);
+            Assert.Equal("#user-id", userEntity.PartitionKey.FromEncodedKeyProperty());
+            Assert.Equal("details", userEntity.RowKey.FromEncodedKeyProperty());
+            Assert.Equal("test-user@domain.tld", userEntity.Email);
         }
 
         [Fact]
@@ -109,7 +117,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task Delete_WhenSessionIsDeleted_ReturnsUnauthorized()
+        public async Task Delete_WhenSessionDoesNotExist_ReturnsUnauthorized()
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
@@ -125,7 +133,7 @@ namespace HintKeep.Tests.Integration.Users
         }
 
         [Fact]
-        public async Task Delete_WhenUserIsDeleted_ReturnsUnauthorized()
+        public async Task Delete_WhenUserDoesNotExist_ReturnsUnauthorized()
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
@@ -136,6 +144,30 @@ namespace HintKeep.Tests.Integration.Users
                 PartitionKey = "#user-id".ToEncodedKeyProperty(),
                 RowKey = "details".ToEncodedKeyProperty(),
                 ETag = "*"
+            }));
+
+            var response = await client.DeleteAsync("/users?current");
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Delete_WhenUserIsDeleted_ReturnsUnauthorized()
+        {
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication("#user-id")
+                .CreateClient();
+            entityTables.Users.Execute(TableOperation.Merge(new DynamicTableEntity
+            {
+                PartitionKey = "#user-id".ToEncodedKeyProperty(),
+                RowKey = "details".ToEncodedKeyProperty(),
+                ETag = "*",
+                Properties =
+                {
+                    { nameof(UserEntity.IsDeleted), EntityProperty.GeneratePropertyForBool(true) }
+                }
             }));
 
             var response = await client.DeleteAsync("/users?current");
