@@ -57,14 +57,14 @@ namespace HintKeep.Tests.Integration.Users
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
-            var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
+            var passwordHashService = (IPasswordHashService)_webApplicationFactory.Services.GetService(typeof(IPasswordHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
                 PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
                 RowKey = "EmailLogin".ToEncodedKeyProperty(),
                 PasswordSalt = "#test-salt",
-                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
+                PasswordHash = passwordHashService.GetHash("#test-salt", "#test-PASSWORD-1"),
                 State = "Confirmed",
                 UserId = "#user-id"
             }));
@@ -95,14 +95,14 @@ namespace HintKeep.Tests.Integration.Users
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
-            var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
+            var passwordHashService = (IPasswordHashService)_webApplicationFactory.Services.GetService(typeof(IPasswordHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
                 PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
                 RowKey = "EmailLogin".ToEncodedKeyProperty(),
                 PasswordSalt = "#test-salt",
-                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
+                PasswordHash = passwordHashService.GetHash("#test-salt", "#test-PASSWORD-1"),
                 State = "PendingConfirmation",
                 UserId = Guid.NewGuid().ToString("N")
             }));
@@ -126,14 +126,14 @@ namespace HintKeep.Tests.Integration.Users
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
-            var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
+            var passwordHashService = (IPasswordHashService)_webApplicationFactory.Services.GetService(typeof(IPasswordHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
                 PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
                 RowKey = "EmailLogin".ToEncodedKeyProperty(),
                 PasswordSalt = "#test-salt",
-                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
+                PasswordHash = passwordHashService.GetHash("#test-salt", "#test-PASSWORD-1"),
                 State = "Confirmed"
             }));
             entityTables.Users.Execute(TableOperation.Insert(new UserEntity
@@ -156,14 +156,14 @@ namespace HintKeep.Tests.Integration.Users
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
-            var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
+            var passwordHashService = (IPasswordHashService)_webApplicationFactory.Services.GetService(typeof(IPasswordHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
                 PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
                 RowKey = "EmailLogin".ToEncodedKeyProperty(),
                 PasswordSalt = "#test-salt",
-                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
+                PasswordHash = passwordHashService.GetHash("#test-salt", "#test-PASSWORD-1"),
                 State = "Confirmed"
             }));
 
@@ -179,14 +179,14 @@ namespace HintKeep.Tests.Integration.Users
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
                 .CreateClient();
-            var cryptographicHashService = (ICryptographicHashService)_webApplicationFactory.Services.GetService(typeof(ICryptographicHashService));
+            var passwordHashService = (IPasswordHashService)_webApplicationFactory.Services.GetService(typeof(IPasswordHashService));
             entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
             {
                 EntityType = "EmailLoginEntity",
                 PartitionKey = "#email@domain.tld".ToEncodedKeyProperty(),
                 RowKey = "EmailLogin".ToEncodedKeyProperty(),
                 PasswordSalt = "#test-salt",
-                PasswordHash = cryptographicHashService.GetHash("#test-salt" + "#test-PASSWORD-1"),
+                PasswordHash = passwordHashService.GetHash("#test-salt", "#test-PASSWORD-1"),
                 State = "Confirmed"
             }));
             entityTables.Users.Execute(TableOperation.Insert(new UserEntity

@@ -19,7 +19,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         private readonly IEntityTables _entityTables;
         private readonly Mock<IRngService> _rngService;
         private readonly Mock<ISaltService> _saltService;
-        private readonly Mock<ICryptographicHashService> _cryptographicHashService;
+        private readonly Mock<IPasswordHashService> _passwordHashService;
         private readonly Mock<IEmailService> _emailService;
         private readonly IRequestHandler<UserSignUpCommand> _userSignUpCommandHandler;
 
@@ -30,9 +30,9 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             _entityTables.Users.Create();
             _rngService = new Mock<IRngService>();
             _saltService = new Mock<ISaltService>();
-            _cryptographicHashService = new Mock<ICryptographicHashService>();
+            _passwordHashService = new Mock<IPasswordHashService>();
             _emailService = new Mock<IEmailService>();
-            _userSignUpCommandHandler = new UserSignUpCommandHandler(_entityTables, _rngService.Object, _saltService.Object, _cryptographicHashService.Object, _emailService.Object);
+            _userSignUpCommandHandler = new UserSignUpCommandHandler(_entityTables, _rngService.Object, _saltService.Object, _passwordHashService.Object, _emailService.Object);
         }
 
         public void Dispose()
@@ -43,8 +43,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             _saltService.Verify();
             _saltService.VerifyNoOtherCalls();
 
-            _cryptographicHashService.Verify();
-            _cryptographicHashService.VerifyNoOtherCalls();
+            _passwordHashService.Verify();
+            _passwordHashService.VerifyNoOtherCalls();
 
             _emailService.Verify();
             _emailService.VerifyNoOtherCalls();
@@ -61,8 +61,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(saltService => saltService.GetSalt())
                 .Returns("#test-salt")
                 .Verifiable();
-            _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt#test-password"))
+            _passwordHashService
+                .Setup(passwordHashService => passwordHashService.GetHash("#test-salt", "#test-password"))
                 .Returns("#test-hash")
                 .Verifiable();
             _emailService
@@ -111,8 +111,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(saltService => saltService.GetSalt())
                 .Returns("#test-salt")
                 .Verifiable();
-            _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt#test-password"))
+            _passwordHashService
+                .Setup(passwordHashService => passwordHashService.GetHash("#test-salt", "#test-password"))
                 .Returns("#test-hash")
                 .Verifiable();
             _entityTables.Logins.Execute(TableOperation.Insert(new TableEntity("#test-email".ToEncodedKeyProperty(), "EmailLogin".ToEncodedKeyProperty())));

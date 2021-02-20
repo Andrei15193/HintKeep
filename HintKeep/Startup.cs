@@ -50,6 +50,7 @@ namespace HintKeep
             services.AddTransient(serviceProvider => new CryptographicHashServiceConfig(_configuration.GetSection(nameof(CryptographicHashService))));
             services.AddSingleton(new EmailServiceConfig(_configuration.GetSection(nameof(EmailService))));
             services.AddSingleton(new SaltServiceConfig(_configuration.GetSection(nameof(SaltService))));
+            services.AddSingleton(new PasswordHashServiceConfig(_configuration.GetSection(nameof(PasswordHashService))));
             services.AddSingleton(jsonWebTokenServiceConfig);
 
             services.AddSingleton<IRngService, RngService>();
@@ -57,6 +58,7 @@ namespace HintKeep
             services.AddTransient<ISaltService, SaltService>();
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IJsonWebTokenService, JsonWebTokenService>();
+            services.AddTransient<IPasswordHashService, PasswordHashService>();
 
             services.AddMediatR(config => config.Using<Mediator>().AsSingleton(), typeof(Startup).Assembly);
 

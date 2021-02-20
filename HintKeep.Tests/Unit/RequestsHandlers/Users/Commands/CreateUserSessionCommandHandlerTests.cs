@@ -18,7 +18,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
     public class CreateUserSessionCommandHandlerTests : IDisposable
     {
         private readonly IEntityTables _entityTables;
-        private readonly Mock<ICryptographicHashService> _cryptographicHashService;
+        private readonly Mock<IPasswordHashService> _passwordHashService;
         private readonly Mock<IJsonWebTokenService> _jsonWebTokenService;
         private readonly IRequestHandler<CreateUserSessionCommand, UserSession> _createUserSessionCommandHandler;
 
@@ -28,15 +28,15 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             _entityTables.Logins.Create();
             _entityTables.Users.Create();
             _entityTables.UserSessions.Create();
-            _cryptographicHashService = new Mock<ICryptographicHashService>();
+            _passwordHashService = new Mock<IPasswordHashService>();
             _jsonWebTokenService = new Mock<IJsonWebTokenService>();
-            _createUserSessionCommandHandler = new CreateUserSessionCommandHandler(_entityTables, _cryptographicHashService.Object, _jsonWebTokenService.Object);
+            _createUserSessionCommandHandler = new CreateUserSessionCommandHandler(_entityTables, _passwordHashService.Object, _jsonWebTokenService.Object);
         }
 
         public void Dispose()
         {
-            _cryptographicHashService.Verify();
-            _cryptographicHashService.VerifyNoOtherCalls();
+            _passwordHashService.Verify();
+            _passwordHashService.VerifyNoOtherCalls();
 
             _jsonWebTokenService.Verify();
             _jsonWebTokenService.VerifyNoOtherCalls();
@@ -58,8 +58,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenUserExistsAndPasswordsMatch_ReturnsSessionInfo()
         {
-            _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt#test-password"))
+            _passwordHashService
+                .Setup(passwordHashService => passwordHashService.GetHash("#test-salt", "#test-password"))
                 .Returns("#test-hash")
                 .Verifiable();
             _jsonWebTokenService
@@ -97,8 +97,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenUserIsNotConfirmed_ThrowsException()
         {
-            _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt" + "#test-password"))
+            _passwordHashService
+                .Setup(passwordHashService => passwordHashService.GetHash("#test-salt", "#test-password"))
                 .Returns("#test-hash")
                 .Verifiable();
             _entityTables.Logins.ExecuteBatch(new TableBatchOperation
@@ -135,8 +135,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenPasswordsDoNotMatch_ThrowsException()
         {
-            _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt#test-password"))
+            _passwordHashService
+                .Setup(passwordHashService => passwordHashService.GetHash("#test-salt", "#test-password"))
                 .Returns("#test-hash-bad")
                 .Verifiable();
             _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity
@@ -162,8 +162,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenUserIsDeleted_ThrowsException()
         {
-            _cryptographicHashService
-                .Setup(cryptographicHashService => cryptographicHashService.GetHash("#test-salt#test-password"))
+            _passwordHashService
+                .Setup(passwordHashService => passwordHashService.GetHash("#test-salt", "#test-password"))
                 .Returns("#test-hash")
                 .Verifiable();
             _entityTables.Logins.Execute(TableOperation.Insert(new EmailLoginEntity

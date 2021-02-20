@@ -17,16 +17,16 @@ namespace HintKeep.RequestsHandlers.Users.Commands
         private readonly IEntityTables _entityTables;
         private readonly IRngService _rngService;
         private readonly ISaltService _saltService;
-        private readonly ICryptographicHashService _cryptographicHashService;
+        private readonly IPasswordHashService _passwordHashService;
         private readonly IEmailService _emailService;
 
-        public UserSignUpCommandHandler(IEntityTables entityTables, IRngService rngService, ISaltService saltService, ICryptographicHashService cryptographicHashService, IEmailService emailService)
-            => (_entityTables, _rngService, _saltService, _cryptographicHashService, _emailService) = (entityTables, rngService, saltService, cryptographicHashService, emailService);
+        public UserSignUpCommandHandler(IEntityTables entityTables, IRngService rngService, ISaltService saltService, IPasswordHashService passwordHashService, IEmailService emailService)
+            => (_entityTables, _rngService, _saltService, _passwordHashService, _emailService) = (entityTables, rngService, saltService, passwordHashService, emailService);
 
         protected async override Task Handle(UserSignUpCommand command, CancellationToken cancellationToken)
         {
             var passwordSalt = _saltService.GetSalt();
-            var passwordHash = _cryptographicHashService.GetHash(passwordSalt + command.Password);
+            var passwordHash = _passwordHashService.GetHash(passwordSalt, command.Password);
             var confirmationToken = _rngService.Generate(12).ToLowerInvariant();
 
             var userId = Guid.NewGuid().ToString("N");

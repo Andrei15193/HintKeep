@@ -16,11 +16,11 @@ namespace HintKeep.RequestsHandlers.Users.Commands
     public class CreateUserSessionCommandHandler : IRequestHandler<CreateUserSessionCommand, UserSession>
     {
         private readonly IEntityTables _entityTables;
-        private readonly ICryptographicHashService _cryptographicHashService;
+        private readonly IPasswordHashService _passwordHashService;
         private readonly IJsonWebTokenService _jsonWebTokenService;
 
-        public CreateUserSessionCommandHandler(IEntityTables entityTables, ICryptographicHashService cryptographicHashService, IJsonWebTokenService jsonWebTokenService)
-            => (_entityTables, _cryptographicHashService, _jsonWebTokenService) = (entityTables, cryptographicHashService, jsonWebTokenService);
+        public CreateUserSessionCommandHandler(IEntityTables entityTables, IPasswordHashService passwordHashService, IJsonWebTokenService jsonWebTokenService)
+            => (_entityTables, _passwordHashService, _jsonWebTokenService) = (entityTables, passwordHashService, jsonWebTokenService);
 
         public async Task<UserSession> Handle(CreateUserSessionCommand command, CancellationToken cancellationToken)
         {
@@ -28,7 +28,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
                 TableOperation.Retrieve<EmailLoginEntity>(command.Email.ToLowerInvariant().ToEncodedKeyProperty(), nameof(LoginEntityType.EmailLogin).ToEncodedKeyProperty(), new List<string> { nameof(EmailLoginEntity.PasswordSalt), nameof(EmailLoginEntity.PasswordHash), nameof(EmailLoginEntity.State), nameof(EmailLoginEntity.UserId) }),
                 cancellationToken
             )).Result;
-            if (loginEntity is null || loginEntity.PasswordHash != _cryptographicHashService.GetHash(loginEntity.PasswordSalt + command.Password) || loginEntity.State != nameof(EmailLoginEntityState.Confirmed))
+            if (loginEntity is null || loginEntity.PasswordHash != _passwordHashService.GetHash(loginEntity.PasswordSalt, command.Password) || loginEntity.State != nameof(EmailLoginEntityState.Confirmed))
                 throw new UnauthorizedException();
 
             var userEntity = (UserEntity)(await _entityTables.Users.ExecuteAsync(
