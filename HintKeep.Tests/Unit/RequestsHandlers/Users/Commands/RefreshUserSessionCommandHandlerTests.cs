@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
 using HintKeep.Requests.Users.Commands;
@@ -50,7 +49,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Returns("#jwt")
                 .Verifiable();
 
-            var userSession = await _refreshUserSessionCommandHandler.Handle(new RefreshUserSessionCommand(), CancellationToken.None);
+            var userSession = await _refreshUserSessionCommandHandler.Handle(new RefreshUserSessionCommand(), default);
 
             Assert.Equal("#jwt", userSession.JsonWebToken);
             var userSessionEntity = Assert.Single(_entityTables.UserSessions.ExecuteQuery(new TableQuery<UserSessionEntity>()));
@@ -63,7 +62,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenSessionDoesNotExist_ThrowsException()
         {
-            var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _refreshUserSessionCommandHandler.Handle(new RefreshUserSessionCommand(), CancellationToken.None));
+            var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _refreshUserSessionCommandHandler.Handle(new RefreshUserSessionCommand(), default));
             Assert.Empty(exception.Message);
         }
     }

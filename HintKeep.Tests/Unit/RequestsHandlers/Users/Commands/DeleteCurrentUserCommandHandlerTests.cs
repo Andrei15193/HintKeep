@@ -1,4 +1,3 @@
-using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
 using HintKeep.Requests.Users.Commands;
@@ -37,7 +36,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 Email = "test-email@domain.tld"
             }));
 
-            await _deleteCurrentUserCommandHandler.Handle(new DeleteCurrentUserCommand(), CancellationToken.None);
+            await _deleteCurrentUserCommandHandler.Handle(new DeleteCurrentUserCommand(), default);
 
             var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery<UserEntity>()));
             Assert.Equal("UserEntity", userEntity.EntityType);
@@ -49,7 +48,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenUserDoesNotExist_ThrowsException()
         {
-            var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _deleteCurrentUserCommandHandler.Handle(new DeleteCurrentUserCommand(), CancellationToken.None));
+            var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _deleteCurrentUserCommandHandler.Handle(new DeleteCurrentUserCommand(), default));
             Assert.Empty(exception.Message);
         }
     }

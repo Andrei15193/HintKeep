@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
@@ -28,18 +27,24 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Commands
             if (account.IsDeleted)
                 throw new NotFoundException();
 
-            var accountHint = (AccountHintEntity)(await _entityTables.Accounts.ExecuteAsync(
+            var updatedAccountHint = (AccountHintEntity)(await _entityTables.Accounts.ExecuteAsync(
                 TableOperation.Retrieve<AccountHintEntity>(_session.UserId.ToEncodedKeyProperty(), $"id-{command.AccountId}-hintId-{command.HintId}".ToEncodedKeyProperty()),
                 cancellationToken
             )).Result ?? throw new NotFoundException();
 
-            accountHint.DateAdded = command.DateAdded;
-            var latestHint = await _entityTables.GetLatestHint(accountHint, new[] { nameof(AccountHintEntity.Hint) }, cancellationToken);
+            updatedAccountHint.DateAdded = command.DateAdded;
+            var latestHint = await _entityTables.GetLatestHint(
+                _session.UserId,
+                command.AccountId,
+                new[] { nameof(AccountHintEntity.HintId) },
+                accountHint => accountHint.HintId == command.HintId ? updatedAccountHint : accountHint,
+                cancellationToken
+            );
 
             await _entityTables.Accounts.ExecuteBatchAsync(
                 new TableBatchOperation
                 {
-                    TableOperation.Replace(accountHint),
+                    TableOperation.Replace(updatedAccountHint),
                     TableOperation.Merge(new DynamicTableEntity
                     {
                         PartitionKey = account.PartitionKey,

@@ -14,7 +14,7 @@ namespace HintKeep.Services.Implementations
             => _config = config;
 
         public Task SendAsync(EmailMessage emailMessage)
-            => SendAsync(emailMessage, CancellationToken.None);
+            => SendAsync(emailMessage, default);
 
         public async Task SendAsync(EmailMessage emailMessage, CancellationToken cancellationToken)
         {

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Requests.Accounts.Queries;
 using HintKeep.RequestsHandlers.Accounts.Queries;
@@ -35,7 +34,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
             };
             _entityTables.AddAccounts(account, new Account { UserId = "other-user-id" });
 
-            var accounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), CancellationToken.None);
+            var accounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), default);
 
             Assert.Equal(
                 new[]
@@ -92,7 +91,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
             };
             _entityTables.AddAccounts(expectedAccounts);
 
-            var actualAccounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), CancellationToken.None);
+            var actualAccounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), default);
 
             Assert.Equal(
                 expectedAccounts
@@ -124,7 +123,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
             var account = new Account { UserId = "#user-id" };
             _entityTables.AddAccounts(account, new Account { UserId = "#user-id", Name = "#Test-Name-Deleted", IsDeleted = true });
 
-            var accounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), CancellationToken.None);
+            var accounts = await _getAccountsQueryHandler.Handle(new GetAccountsQuery(), default);
 
             Assert.Equal(
                 new[]

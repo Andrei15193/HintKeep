@@ -17,7 +17,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
         public DeleteCurrentUserSessionCommandHandler(IEntityTables entityTables, Session session)
             => (_entityTables, _session) = (entityTables, session);
 
-        protected override async Task Handle(DeleteCurrentUserSessionCommand request, CancellationToken cancellationToken)
+        protected override async Task Handle(DeleteCurrentUserSessionCommand command, CancellationToken cancellationToken)
         {
             try
             {

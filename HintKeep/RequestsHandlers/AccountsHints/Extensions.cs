@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,29 +11,35 @@ namespace HintKeep.RequestsHandlers.AccountsHints
 {
     public static class Extensions
     {
-        public static async Task<AccountHintEntity> GetLatestHint(this IEntityTables entityTables, AccountHintEntity updatedAccountHint, IEnumerable<string> selectedColumns, CancellationToken cancellationToken)
+        public static Task<AccountHintEntity> GetLatestHint(this IEntityTables entityTables, string userId, string accountId, CancellationToken cancellationToken)
+            => entityTables.GetLatestHint(userId, accountId, Array.Empty<string>(), null, cancellationToken);
+
+        public static Task<AccountHintEntity> GetLatestHint(this IEntityTables entityTables, string userId, string accountId, IEnumerable<string> selectedColumns, CancellationToken cancellationToken)
+            => entityTables.GetLatestHint(userId, accountId, selectedColumns, null, cancellationToken);
+
+        public static async Task<AccountHintEntity> GetLatestHint(this IEntityTables entityTables, string userId, string accountId, IEnumerable<string> selectedColumns, Func<AccountHintEntity, AccountHintEntity> selector, CancellationToken cancellationToken)
         {
-            var latestAccountHint = updatedAccountHint;
+            var latestAccountHint = default(AccountHintEntity);
             var query = new TableQuery<AccountHintEntity>()
                 .Where(
                     TableQuery.CombineFilters(
-                        TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, updatedAccountHint.PartitionKey),
+                        TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, userId.ToEncodedKeyProperty()),
                         TableOperators.And,
                         TableQuery.CombineFilters(
-                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.GreaterThan, $"id-{updatedAccountHint.AccountId}-hintId-".ToEncodedKeyProperty()),
+                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.GreaterThan, $"id-{accountId}-hintId-".ToEncodedKeyProperty()),
                             TableOperators.And,
                             TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
                         )
                     )
                 )
-                .Select(selectedColumns.Concat(new[] { nameof(AccountHintEntity.HintId), nameof(AccountHintEntity.DateAdded) }).ToArray());
+                .Select(new[] { nameof(AccountHintEntity.Hint), nameof(AccountHintEntity.DateAdded) }.Concat(selectedColumns ?? Array.Empty<string>()).ToArray());
             var continuationToken = default(TableContinuationToken);
             do
             {
                 var accountHintsSegment = await entityTables.Accounts.ExecuteQuerySegmentedAsync(query, continuationToken, cancellationToken);
                 continuationToken = accountHintsSegment.ContinuationToken;
-                foreach (var accountHint in accountHintsSegment.Select(accountHint => accountHint.HintId == updatedAccountHint.HintId ? updatedAccountHint : accountHint))
-                    if (accountHint.DateAdded is object && (latestAccountHint.DateAdded is null || latestAccountHint.DateAdded < accountHint.DateAdded))
+                foreach (var accountHint in (selector is null ? accountHintsSegment : accountHintsSegment.Select(selector)))
+                    if (AccountHintEntitySortOrderComparer.Compare(accountHint, latestAccountHint) < 0)
                         latestAccountHint = accountHint;
             } while (continuationToken is object);
 

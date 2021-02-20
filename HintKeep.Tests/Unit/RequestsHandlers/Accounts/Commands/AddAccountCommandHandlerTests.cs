@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
 using HintKeep.Requests.Accounts.Commands;
@@ -38,7 +37,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Notes = "#Test-Notes",
                     IsPinned = true
                 },
-                CancellationToken.None
+                default
             );
 
             Assert.Equal(3, _entityTables.Accounts.ExecuteQuery(new TableQuery<AccountEntity>()).Count());
@@ -81,7 +80,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                         Name = account.Name,
                         Hint = "#Test-Hint"
                     },
-                    CancellationToken.None
+                    default
                 )
             );
             Assert.Empty(exception.Message);
@@ -105,7 +104,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                         Name = "#Test-Name",
                         Hint = "#Test-Hint-2"
                     },
-                    CancellationToken.None
+                    default
                 )
             );
             Assert.Empty(exception.Message);

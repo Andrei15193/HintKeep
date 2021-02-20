@@ -39,9 +39,8 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Commands
                 Hint = command.Hint,
                 DateAdded = command.DateAdded
             };
-
-            accountHint.DateAdded = command.DateAdded;
-            var latestHint = await _entityTables.GetLatestHint(accountHint, new[] { nameof(AccountHintEntity.Hint) }, cancellationToken);
+            var currentLatestHint = await _entityTables.GetLatestHint(_session.UserId, command.AccountId, cancellationToken);
+            var latestHint = AccountHintEntitySortOrderComparer.Compare(accountHint, currentLatestHint) < 0 ? accountHint : currentLatestHint;
 
             await _entityTables.Accounts.ExecuteBatchAsync(
                 new TableBatchOperation
@@ -54,7 +53,7 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Commands
                         ETag = account.ETag,
                         Properties =
                         {
-                            { nameof(AccountEntity.Hint), EntityProperty.GeneratePropertyForString(latestHint.Hint) }
+                            { nameof(AccountEntity.Hint), EntityProperty.GeneratePropertyForString(latestHint?.Hint ?? string.Empty) }
                         }
                     })
                 },

@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
 using HintKeep.Requests.AccountsHints.Commands;
@@ -52,7 +51,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                     HintId = "#hint-id",
                     DateAdded = now
                 },
-                CancellationToken.None
+                default
             );
 
             _entityTables.AssertAccounts(new Account(account)
@@ -93,7 +92,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                     HintId = "#hint-id",
                     DateAdded = now
                 },
-                CancellationToken.None
+                default
             );
 
             _entityTables.AssertAccounts(new Account(account)
@@ -139,7 +138,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                     HintId = "#hint-id-2",
                     DateAdded = now
                 },
-                CancellationToken.None
+                default
             );
 
             _entityTables.AssertAccounts(new Account(account)
@@ -186,7 +185,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                     HintId = "#hint-id-1",
                     DateAdded = now.AddDays(-2)
                 },
-                CancellationToken.None
+                default
             );
 
             _entityTables.AssertAccounts(new Account(account)
@@ -233,7 +232,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                     HintId = "#hint-id-1",
                     DateAdded = null
                 },
-                CancellationToken.None
+                default
             );
 
             _entityTables.AssertAccounts(new Account(account)
@@ -259,7 +258,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                         AccountId = "#account-id",
                         HintId = "#hint-id"
                     },
-                    CancellationToken.None
+                    default
                 )
             );
             Assert.Empty(exception.Message);
@@ -287,7 +286,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                         AccountId = "#account-id",
                         HintId = "#hint-id-not-existing"
                     },
-                    CancellationToken.None
+                    default
                 )
             );
             Assert.Empty(exception.Message);
@@ -317,7 +316,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                         AccountId = "#account-id",
                         HintId = "#hint-id"
                     },
-                    CancellationToken.None
+                    default
                 )
             );
             Assert.Empty(exception.Message);

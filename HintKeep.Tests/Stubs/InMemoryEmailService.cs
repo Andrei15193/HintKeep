@@ -13,7 +13,7 @@ namespace HintKeep.Tests.Stubs
             => _sentEmailMessages;
 
         public Task SendAsync(EmailMessage emailMessage)
-            => SendAsync(emailMessage, CancellationToken.None);
+            => SendAsync(emailMessage, default);
 
         public Task SendAsync(EmailMessage emailMessage, CancellationToken cancellationToken)
         {

@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
 using HintKeep.Requests.Users.Commands;
@@ -37,7 +36,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 Expiration = DateTime.UtcNow.AddHours(1)
             }));
 
-            await _deleteCurrentUserSessionCommandHandler.Handle(new DeleteCurrentUserSessionCommand(), CancellationToken.None);
+            await _deleteCurrentUserSessionCommandHandler.Handle(new DeleteCurrentUserSessionCommand(), default);
 
             Assert.Empty(_entityTables.UserSessions.ExecuteQuery(new TableQuery()));
         }
@@ -45,7 +44,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenThereIsNoActiveSession_ThrowsException()
         {
-            var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _deleteCurrentUserSessionCommandHandler.Handle(new DeleteCurrentUserSessionCommand(), CancellationToken.None));
+            var exception = await Assert.ThrowsAsync<UnauthorizedException>(() => _deleteCurrentUserSessionCommandHandler.Handle(new DeleteCurrentUserSessionCommand(), default));
             Assert.Empty(exception.Message);
         }
     }

@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
 using HintKeep.Requests.Accounts.Queries;
@@ -29,7 +28,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
         [Fact]
         public async Task Handle_WhenAccountDoesNotExist_ThrowsException()
         {
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _getAccountsQueryHandler.Handle(new GetAccountDetailsQuery { Id = "account-id" }, CancellationToken.None));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _getAccountsQueryHandler.Handle(new GetAccountDetailsQuery { Id = "account-id" }, default));
             Assert.Empty(exception.Message);
         }
 
@@ -43,7 +42,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
             };
             _entityTables.AddAccounts(account);
 
-            var accountDetails = await _getAccountsQueryHandler.Handle(new GetAccountDetailsQuery { Id = account.Id }, CancellationToken.None);
+            var accountDetails = await _getAccountsQueryHandler.Handle(new GetAccountDetailsQuery { Id = account.Id }, default);
 
             Assert.Equal(
                 new

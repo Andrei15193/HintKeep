@@ -81,7 +81,7 @@ namespace HintKeep.Tests.Data.Extensions
                 Assert.Equal($"id-{account.Id}", accountEntity.RowKey.FromEncodedKeyProperty());
                 Assert.Equal(account.Id, accountEntity.Id);
                 Assert.Equal(account.Name, accountEntity.Name);
-                Assert.Equal(account.Hints.Select(accountHint => accountHint.Hint).FirstOrDefault(), accountEntity.Hint);
+                Assert.Equal(account.Hints.Select(accountHint => accountHint.Hint).FirstOrDefault() ?? string.Empty, accountEntity.Hint);
                 Assert.Equal(account.Notes, accountEntity.Notes);
 
                 if (account.IsPinned)

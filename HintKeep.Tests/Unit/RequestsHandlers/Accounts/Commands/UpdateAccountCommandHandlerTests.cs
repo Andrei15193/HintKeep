@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
 using HintKeep.Requests.Accounts.Commands;
@@ -39,7 +38,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                         Hint = "#test-hint",
                         IsPinned = true
                     },
-                    CancellationToken.None
+                    default
                 )
             );
             Assert.Empty(exception.Message);
@@ -63,7 +62,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Notes = account.Notes,
                     IsPinned = account.IsPinned
                 },
-                CancellationToken.None
+                default
             );
 
             _entityTables.AssertAccounts(new Account(account) { Name = "#Test-Name-Updated" });
@@ -87,7 +86,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Notes = account.Notes,
                     IsPinned = account.IsPinned
                 },
-                CancellationToken.None
+                default
             );
 
             var latestAccountHintEntity = _entityTables
@@ -128,7 +127,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Notes = "#Test-Notes-Updated",
                     IsPinned = account.IsPinned
                 },
-                CancellationToken.None
+                default
             );
 
             _entityTables.AssertAccounts(new Account(account) { Notes = "#Test-Notes-Updated" });
@@ -152,7 +151,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Notes = account.Notes,
                     IsPinned = false
                 },
-                CancellationToken.None
+                default
             );
 
             _entityTables.AssertAccounts(new Account(account) { IsPinned = false });
@@ -176,7 +175,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
                     Hint = account.Hints.Single().Hint,
                     IsPinned = account.IsPinned
                 },
-                CancellationToken.None
+                default
             ));
             Assert.Empty(exception.Message);
             _entityTables.AssertAccounts(account);
