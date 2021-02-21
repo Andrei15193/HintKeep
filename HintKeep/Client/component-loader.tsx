@@ -9,8 +9,8 @@ enum ComponentLoaderState {
     Faulted
 }
 
-function delayAsync<TResult = undefined>(millisecondsDelay: number): Promise<TResult> {
-    return new Promise(resolve => setTimeout(() => resolve(), millisecondsDelay));
+function delayAsync(millisecondsDelay: number): Promise<undefined> {
+    return new Promise(resolve => setTimeout(() => resolve(undefined), millisecondsDelay));
 }
 
 export interface IComponentLoaderProps<TCompProps = {}> {

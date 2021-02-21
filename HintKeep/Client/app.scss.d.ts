@@ -219,7 +219,6 @@ interface CssExports {
   'flexXlShrink1': string;
   'flexXlWrap': string;
   'flexXlWrapReverse': string;
-  'focusVisible': string;
   'h1': string;
   'h100': string;
   'h2': string;

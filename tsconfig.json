@@ -9,5 +9,11 @@
         "strict": true,
         "esModuleInterop": true,
         "jsx": "react"
-    }
+    },
+    "include": [
+        "HintKeep/Client"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }
