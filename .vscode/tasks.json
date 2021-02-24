@@ -21,6 +21,18 @@
             "problemMatcher": []
         },
         {
+            "label": "watch: client",
+            "type": "npm",
+            "script": "watch",
+            "group": "build",
+            "problemMatcher": [],
+            "presentation": {
+                "clear": true,
+                "group": "watch",
+                "panel": "shared",
+            }
+        },
+        {
             "label": "watch: api",
             "command": "dotnet",
             "type": "process",

@@ -4,7 +4,8 @@
   "description": "A small application for managing password hints.",
   "main": "index.jsx",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "watch": "webpack --watch"
   },
   "repository": {
     "type": "git",

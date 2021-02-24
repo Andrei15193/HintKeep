@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import Style from './app.scss';
+import Style from './style.scss';
 
 enum ComponentLoaderState {
     Loading,

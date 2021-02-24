@@ -1,15 +1,14 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { ComponentLoader } from './component-loader';
+import classnames from 'classnames';
+import { App } from './app';
 
-import Style from './app.scss';
+import Style from './style.scss';
 
-ReactDom.render(<RootComponent />, document.getElementById('app'));
-
-function RootComponent(): JSX.Element {
-    return (
-        <div className={Style.m3}>
-            <ComponentLoader loadAsync={() => import('./app').then(module => module.App)} />
-        </div>
-    );
+const appElement = document.getElementById('app');
+if (appElement !== null) {
+    appElement.className = classnames(Style.dFlex, Style.flexFill, Style.h100);
+    ReactDom.render(<App />, appElement);
 }
+else
+    console.error("Element with id 'app' not found.");
