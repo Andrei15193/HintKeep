@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
         "sourceMap": true,
-        "target": "esnext",
+        "target": "es5",
         "moduleResolution": "node",
-        "module": "esnext",
+        "module": "es6",
         "allowJs": true,
         "resolveJsonModule": true,
         "strict": true,

@@ -1,6 +1,8 @@
-import React, { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react'
+import React from 'react';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import classnames from 'classnames';
-import { ComponentLoader } from './component-loader';
+import { Accounts, SignUp, UserConfirmation } from './pages';
 
 import Style from './style.scss';
 
@@ -9,7 +11,19 @@ export function App(): JSX.Element {
         <div className={classnames(Style.app, Style.m3, Style.border, Style.dFlex, Style.flexColumn, Style.flexFill)}>
             <AppBanner className={Style.appHeader}>- HintKeep -</AppBanner>
             <AppContent>
-                <ComponentLoader loadAsync={() => import('./home').then(({ Home }) => Home)} />
+                <BrowserRouter>
+                    <Switch>
+                        <Route path="/user-accounts/create">
+                            <SignUp />
+                        </Route>
+                        <Route path="/user-confirmations">
+                            <UserConfirmation />
+                        </Route>
+                        <Route path="/">
+                            <Accounts />
+                        </Route>
+                    </Switch>
+                </BrowserRouter>
             </AppContent>
             <AppBanner className={Style.appFooter}>HintKeep - Store hints, not passwords</AppBanner>
         </div>

@@ -22,6 +22,8 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace HintKeep
 {
@@ -137,9 +139,13 @@ namespace HintKeep
                 .UseHttpsRedirection()
                 .UseRouting()
                 .UseAuthorization()
-                .UseEndpoints(endpoints => endpoints.MapControllers())
                 .UseDefaultFiles()
-                .UseStaticFiles();
+                .UseStaticFiles()
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                    endpoints.MapFallbackToFile("/index.html");
+                });
         }
     }
 }
