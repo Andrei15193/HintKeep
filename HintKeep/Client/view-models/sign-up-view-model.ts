@@ -1,14 +1,14 @@
 import type { IObservable } from '../observer';
 import type { IFormField } from './core';
-import { InvokeObservable } from '../observer';
+import { DispatchObservable } from '../observer';
 import { FormViewModel, FormField } from './core';
 
 export class SignUpViewModel extends FormViewModel {
-    private readonly _submittedEvent: InvokeObservable;
+    private readonly _submittedEvent: DispatchObservable;
 
     constructor() {
         super();
-        this._submittedEvent = new InvokeObservable();
+        this._submittedEvent = new DispatchObservable();
         this.register(
             this.email = new FormField<string>(''),
             this.password = new FormField<string>('')
@@ -28,7 +28,7 @@ export class SignUpViewModel extends FormViewModel {
             this.touchAllFields();
             if (this.isValid) {
                 await this.delay(3000);
-                this._submittedEvent.invoke(undefined);
+                this._submittedEvent.dispatch(undefined);
             }
         });
     }

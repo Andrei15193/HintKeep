@@ -14,16 +14,7 @@ export function SignUp(): JSX.Element {
     return (
         <WithViewModel viewModelType={SignUpViewModel}>{($vm) => {
             const history = useHistory();
-            useEffect(
-                () => {
-                    const submittedObserver: IObserver = {
-                        notifyChanged: () => history.push('/user-confirmations')
-                    };
-                    $vm.submittedEvent.subscribe(submittedObserver);
-                    return () => $vm.submittedEvent.unsubscribe(submittedObserver);
-                },
-                [$vm]
-            );
+            useEffect(() => $vm.submittedEvent.subscribeWithCallback(() => history.push('/user-confirmations')), [$vm]);
 
             return <>
                 <h1 className={Style.textCenter}>Sign-Up</h1>
