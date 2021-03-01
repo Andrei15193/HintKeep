@@ -22,7 +22,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync("/accounts", string.Empty);
+            var response = await client.PostAsJsonAsync("/api/accounts", string.Empty);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -36,7 +36,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication(Guid.NewGuid().ToString("N"))
                 .CreateClient();
 
-            var response = await client.PostAsJsonAsync("/accounts", new object());
+            var response = await client.PostAsJsonAsync("/api/accounts", new object());
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""hint"":[""validation.errors.invalidRequiredMediumText""],""name"":[""validation.errors.invalidRequiredMediumText""]}", await response.Content.ReadAsStringAsync());
@@ -50,7 +50,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication(Guid.NewGuid().ToString("N"))
                 .CreateClient();
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = " ", hint = " ", notes = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901" });
+            var response = await client.PostAsJsonAsync("/api/accounts", new { name = " ", hint = " ", notes = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901" });
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""hint"":[""validation.errors.invalidRequiredMediumText""],""name"":[""validation.errors.invalidRequiredMediumText""],""notes"":[""validation.errors.invalidLongText""]}", await response.Content.ReadAsStringAsync());
@@ -65,7 +65,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication(userId)
                 .CreateClient();
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = "#Test-Name", hint = "#Test-Hint", notes = "#Test-Notes", isPinned = true });
+            var response = await client.PostAsJsonAsync("/api/accounts", new { name = "#Test-Name", hint = "#Test-Hint", notes = "#Test-Notes", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -74,7 +74,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
             )));
 
-            Assert.Equal(new Uri($"/accounts/{accountHintEntity.AccountId}", UriKind.Relative), response.Headers.Location);
+            Assert.Equal(new Uri($"/api/accounts/{accountHintEntity.AccountId}", UriKind.Relative), response.Headers.Location);
             entityTables.AssertAccounts(new Account
             {
                 UserId = userId,
@@ -102,7 +102,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = account.Name, hint = "#Test-Hint", isPinned = true });
+            var response = await client.PostAsJsonAsync("/api/accounts", new { name = account.Name, hint = "#Test-Hint", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -118,7 +118,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.PostAsJsonAsync("/accounts", new { name = account.Name, hint = "#Test-Hint", isPinned = true });
+            var response = await client.PostAsJsonAsync("/api/accounts", new { name = account.Name, hint = "#Test-Hint", isPinned = true });
 
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

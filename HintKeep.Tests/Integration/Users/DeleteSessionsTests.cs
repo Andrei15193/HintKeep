@@ -20,7 +20,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.DeleteAsync("/users/sessions");
+            var response = await client.DeleteAsync("/api/users/sessions");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -34,7 +34,7 @@ namespace HintKeep.Tests.Integration.Users
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.DeleteAsync("/users/sessions");
+            var response = await client.DeleteAsync("/api/users/sessions");
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -48,7 +48,7 @@ namespace HintKeep.Tests.Integration.Users
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.DeleteAsync("/users/sessions?current=false");
+            var response = await client.DeleteAsync("/api/users/sessions?current=false");
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -62,7 +62,7 @@ namespace HintKeep.Tests.Integration.Users
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.DeleteAsync("/users/sessions?current=true");
+            var response = await client.DeleteAsync("/api/users/sessions?current=true");
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -77,7 +77,7 @@ namespace HintKeep.Tests.Integration.Users
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.DeleteAsync("/users/sessions?current");
+            var response = await client.DeleteAsync("/api/users/sessions?current");
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -102,7 +102,7 @@ namespace HintKeep.Tests.Integration.Users
                 }
             }));
 
-            var response = await client.DeleteAsync("/users/sessions?current");
+            var response = await client.DeleteAsync("/api/users/sessions?current");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -118,7 +118,7 @@ namespace HintKeep.Tests.Integration.Users
             foreach (var sessionEntity in entityTables.UserSessions.ExecuteQuery(new TableQuery()))
                 entityTables.UserSessions.Execute(TableOperation.Delete(sessionEntity));
 
-            var response = await client.DeleteAsync("/users/sessions?current");
+            var response = await client.DeleteAsync("/api/users/sessions?current");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -138,7 +138,7 @@ namespace HintKeep.Tests.Integration.Users
                 ETag = "*"
             }));
 
-            var response = await client.DeleteAsync("/users/sessions?current");
+            var response = await client.DeleteAsync("/api/users/sessions?current");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

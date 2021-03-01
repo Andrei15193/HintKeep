@@ -24,7 +24,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id/hints/%23hint-id", string.Empty);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -50,7 +50,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
                 }
             });
 
-            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id", new object());
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id/hints/%23hint-id", new object());
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             var accountHintEntity = Assert.Single(entityTables
@@ -88,7 +88,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
                 }
             });
 
-            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id", new { dateAdded = now });
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id/hints/%23hint-id", new { dateAdded = now });
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             var accountHintEntity = Assert.Single(entityTables
@@ -133,7 +133,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
                 }
             });
 
-            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id-2", new { dateAdded = now });
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id/hints/%23hint-id-2", new { dateAdded = now });
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             var accountEntity = (AccountEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>("#user-id".ToEncodedKeyProperty(), "id-#account-id".ToEncodedKeyProperty())).Result;
@@ -187,7 +187,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
                 }
             });
 
-            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id-1", new object());
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id/hints/%23hint-id-1", new object());
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             var accountEntity = (AccountEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>("#user-id".ToEncodedKeyProperty(), "id-#account-id".ToEncodedKeyProperty())).Result;
@@ -221,7 +221,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id-1", new object());
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id/hints/%23hint-id-1", new object());
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -247,7 +247,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
                 }
             });
 
-            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id-invalid", new object());
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id/hints/%23hint-id-invalid", new object());
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -274,7 +274,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
                 IsDeleted = true
             });
 
-            var response = await client.PutAsJsonAsync("/accounts/%23account-id/hints/%23hint-id", new object());
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id/hints/%23hint-id", new object());
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

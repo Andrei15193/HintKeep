@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HintKeep.Controllers
 {
-    [ApiController, Route("accounts")]
+    [ApiController, Route("api/accounts")]
     public class AccountsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -35,7 +35,7 @@ namespace HintKeep.Controllers
                 IsPinned = accountCreation.IsPinned
             });
 
-            return Created(new Uri($"/accounts/{accountId}", UriKind.Relative), null);
+            return Created(new Uri($"/api/accounts/{accountId}", UriKind.Relative), null);
         }
 
         [HttpPut("{accountId}")]

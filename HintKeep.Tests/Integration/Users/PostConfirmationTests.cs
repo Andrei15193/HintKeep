@@ -21,7 +21,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new object());
+            var response = await client.PostAsJsonAsync("/api/users/confirmations", new object());
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""confirmationToken"":[""validation.errors.invalidConfirmationToken""]}", await response.Content.ReadAsStringAsync());
@@ -32,7 +32,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "invalid-email", confirmationToken = string.Empty });
+            var response = await client.PostAsJsonAsync("/api/users/confirmations", new { email = "invalid-email", confirmationToken = string.Empty });
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""confirmationToken"":[""validation.errors.invalidConfirmationToken""]}", await response.Content.ReadAsStringAsync());
@@ -43,7 +43,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.WithInMemoryDatabase().CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
+            var response = await client.PostAsJsonAsync("/api/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
 
             Assert.Equal(HttpStatusCode.PreconditionFailed, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -75,7 +75,7 @@ namespace HintKeep.Tests.Integration.Users
                 })
             });
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
+            var response = await client.PostAsJsonAsync("/api/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
 
             Assert.Equal(HttpStatusCode.PreconditionFailed, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -96,7 +96,7 @@ namespace HintKeep.Tests.Integration.Users
                 State = "Confirmed"
             }));
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
+            var response = await client.PostAsJsonAsync("/api/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
 
             Assert.Equal(HttpStatusCode.PreconditionFailed, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -127,11 +127,11 @@ namespace HintKeep.Tests.Integration.Users
                 })
             });
 
-            var response = await client.PostAsJsonAsync("/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
+            var response = await client.PostAsJsonAsync("/api/users/confirmations", new { email = "#eMail@DOMAIN.TLD", confirmationToken = "#token" });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
-            Assert.Equal(new Uri("/users", UriKind.Relative), response.Headers.Location);
+            Assert.Equal(new Uri("/api/users", UriKind.Relative), response.Headers.Location);
 
             var loginEntity = (EmailLoginEntity)entityTables.Logins.Execute(TableOperation.Retrieve<EmailLoginEntity>("#email@domain.tld".ToEncodedKeyProperty(), "EmailLogin".ToEncodedKeyProperty())).Result;
             Assert.Equal("Confirmed", loginEntity.State);

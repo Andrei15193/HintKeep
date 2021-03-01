@@ -20,7 +20,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.GetAsync($"/accounts/account-id");
+            var response = await client.GetAsync("/api/accounts/account-id");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -34,7 +34,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication("user-id")
                 .CreateClient();
 
-            var response = await client.GetAsync($"/accounts/account-id");
+            var response = await client.GetAsync("/api/accounts/account-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -50,7 +50,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.GetAsync($"/accounts/{account.Id}");
+            var response = await client.GetAsync($"/api/accounts/{account.Id}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var accountResult = await response.Content.ReadFromJsonAsync<AccountGetResult>();
@@ -86,7 +86,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.GetAsync($"/accounts/{account.Id}");
+            var response = await client.GetAsync($"/api/accounts/{account.Id}");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

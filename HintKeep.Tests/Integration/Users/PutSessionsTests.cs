@@ -21,7 +21,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PutAsJsonAsync("/users/sessions", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/users/sessions", string.Empty);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -35,7 +35,7 @@ namespace HintKeep.Tests.Integration.Users
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.PutAsJsonAsync("/users/sessions", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/users/sessions", string.Empty);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -49,7 +49,7 @@ namespace HintKeep.Tests.Integration.Users
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.PutAsJsonAsync("/users/sessions?current=false", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/users/sessions?current=false", string.Empty);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -73,7 +73,7 @@ namespace HintKeep.Tests.Integration.Users
                 }
             }));
 
-            var response = await client.PutAsJsonAsync("/users/sessions?current=true", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/users/sessions?current=true", string.Empty);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var result = await response.Content.ReadFromJsonAsync<UserSessionPupResult>();
@@ -103,7 +103,7 @@ namespace HintKeep.Tests.Integration.Users
                 }
             }));
 
-            var response = await client.PutAsJsonAsync("/users/sessions?current", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/users/sessions?current", string.Empty);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var result = await response.Content.ReadFromJsonAsync<UserSessionPupResult>();
@@ -133,7 +133,7 @@ namespace HintKeep.Tests.Integration.Users
                 }
             }));
 
-            var response = await client.PutAsJsonAsync("/users/sessions?current", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/users/sessions?current", string.Empty);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -149,7 +149,7 @@ namespace HintKeep.Tests.Integration.Users
             foreach (var sessionEntity in entityTables.UserSessions.ExecuteQuery(new TableQuery()))
                 entityTables.UserSessions.Execute(TableOperation.Delete(sessionEntity));
 
-            var response = await client.PutAsJsonAsync("/users/sessions?current", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/users/sessions?current", string.Empty);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -169,7 +169,7 @@ namespace HintKeep.Tests.Integration.Users
                 ETag = "*"
             }));
 
-            var response = await client.PutAsJsonAsync("/users/sessions?current", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/users/sessions?current", string.Empty);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -193,7 +193,7 @@ namespace HintKeep.Tests.Integration.Users
                 }
             }));
 
-            var response = await client.PutAsJsonAsync("/users/sessions?current", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/users/sessions?current", string.Empty);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

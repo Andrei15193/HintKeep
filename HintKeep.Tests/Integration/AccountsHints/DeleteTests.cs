@@ -20,7 +20,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.DeleteAsync("/accounts/%23account-id/hints/%23hint-id");
+            var response = await client.DeleteAsync("/api/accounts/%23account-id/hints/%23hint-id");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -56,7 +56,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
             };
             entityTables.AddAccounts(account);
 
-            var response = await client.DeleteAsync("/accounts/%23account-id/hints/%23hint-id-2");
+            var response = await client.DeleteAsync("/api/accounts/%23account-id/hints/%23hint-id-2");
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -99,7 +99,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
             };
             entityTables.AddAccounts(account);
 
-            var response = await client.DeleteAsync("/accounts/%23account-id/hints/%23hint-id-1");
+            var response = await client.DeleteAsync("/api/accounts/%23account-id/hints/%23hint-id-1");
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -136,7 +136,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
             };
             entityTables.AddAccounts(account);
 
-            var response = await client.DeleteAsync("/accounts/%23account-id/hints/%23hint-id");
+            var response = await client.DeleteAsync("/api/accounts/%23account-id/hints/%23hint-id");
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -155,7 +155,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.DeleteAsync("/accounts/%23account-id/hints/%23hint-id");
+            var response = await client.DeleteAsync("/api/accounts/%23account-id/hints/%23hint-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -184,7 +184,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
             };
             entityTables.AddAccounts(account);
 
-            var response = await client.DeleteAsync("/accounts/%23account-id/hints/%23hint-id");
+            var response = await client.DeleteAsync("/api/accounts/%23account-id/hints/%23hint-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -213,7 +213,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
             };
             entityTables.AddAccounts(account);
 
-            var response = await client.DeleteAsync("/accounts/%23account-id/hints/%23hint-id-not-existing");
+            var response = await client.DeleteAsync("/api/accounts/%23account-id/hints/%23hint-id-not-existing");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

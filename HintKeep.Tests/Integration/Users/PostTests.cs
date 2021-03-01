@@ -22,7 +22,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users", new object());
+            var response = await client.PostAsJsonAsync("/api/users", new object());
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidPassword""]}", await response.Content.ReadAsStringAsync());
@@ -33,7 +33,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users", new { email = "invalid-email", password = "invalid-password" });
+            var response = await client.PostAsJsonAsync("/api/users", new { email = "invalid-email", password = "invalid-password" });
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidPassword""]}", await response.Content.ReadAsStringAsync());
@@ -48,11 +48,11 @@ namespace HintKeep.Tests.Integration.Users
                 .WithInMemoryEmailService(actualEmailService => emailService = actualEmailService)
                 .CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/api/users", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
-            Assert.Equal(new Uri("/users/confirmations", UriKind.Relative), response.Headers.Location);
+            Assert.Equal(new Uri("/api/users/confirmations", UriKind.Relative), response.Headers.Location);
 
             var emailLoginEntity = (EmailLoginEntity)entityTables.Logins.Execute(TableOperation.Retrieve<EmailLoginEntity>("#email@domain.tld".ToEncodedKeyProperty(), "EmailLogin".ToEncodedKeyProperty())).Result;
             Assert.Equal("EmailLoginEntity", emailLoginEntity.EntityType);
@@ -100,7 +100,7 @@ namespace HintKeep.Tests.Integration.Users
                 UserId = "#user-id"
             }));
 
-            var response = await client.PostAsJsonAsync("/users", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/api/users", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

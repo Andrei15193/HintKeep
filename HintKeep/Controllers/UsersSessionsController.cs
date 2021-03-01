@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HintKeep.Controllers
 {
-    [ApiController, Route("users/sessions")]
+    [ApiController, Route("api/users/sessions")]
     public class UsersSessionsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -24,7 +24,7 @@ namespace HintKeep.Controllers
                 Email = userLogin.Email,
                 Password = userLogin.Password
             });
-            return Created(new Uri("/users/sessions", UriKind.Relative), userSession);
+            return Created(new Uri("/api/users/sessions", UriKind.Relative), userSession);
         }
 
         [HttpPut]

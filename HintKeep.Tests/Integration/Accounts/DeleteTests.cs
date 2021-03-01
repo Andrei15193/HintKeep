@@ -18,7 +18,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.DeleteAsync($"/accounts/account-id");
+            var response = await client.DeleteAsync("/api/accounts/account-id");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -32,7 +32,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication("user-id")
                 .CreateClient();
 
-            var response = await client.DeleteAsync($"/accounts/account-id");
+            var response = await client.DeleteAsync("/api/accounts/account-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -48,7 +48,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.DeleteAsync($"/accounts/{account.Id}");
+            var response = await client.DeleteAsync($"/api/accounts/{account.Id}");
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -66,7 +66,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.DeleteAsync($"/accounts/{account.Id}");
+            var response = await client.DeleteAsync($"/api/accounts/{account.Id}");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HintKeep.Controllers
 {
-    [ApiController, Route("users")]
+    [ApiController, Route("api/users")]
     public class UsersController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -24,7 +24,7 @@ namespace HintKeep.Controllers
                 Email = userSignUp.Email,
                 Password = userSignUp.Password
             });
-            return Created(new Uri("/users/confirmations", UriKind.Relative), null);
+            return Created(new Uri("/api/users/confirmations", UriKind.Relative), null);
         }
 
         [AllowAnonymous, HttpPost("confirmations")]
@@ -35,7 +35,7 @@ namespace HintKeep.Controllers
                 Email = userConfirmation.Email,
                 ConfirmationToken = userConfirmation.ConfirmationToken
             });
-            return Created(new Uri("/users", UriKind.Relative), string.Empty);
+            return Created(new Uri("/api/users", UriKind.Relative), string.Empty);
         }
 
         [HttpDelete]

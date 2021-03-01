@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HintKeep.Controllers
 {
-    [ApiController, Route("accounts/{accountId}/hints")]
+    [ApiController, Route("api/accounts/{accountId}/hints")]
     public class AccountsHintsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -35,7 +35,7 @@ namespace HintKeep.Controllers
                 Hint = accountHintCreation.Hint,
                 DateAdded = accountHintCreation.DateAdded
             });
-            return Created(new Uri($"/accounts/{accountId}/hints/{hintId}", UriKind.Relative), null);
+            return Created(new Uri($"/api/accounts/{accountId}/hints/{hintId}", UriKind.Relative), null);
         }
 
         [HttpPut("{hintId}")]

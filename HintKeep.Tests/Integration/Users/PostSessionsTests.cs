@@ -23,7 +23,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/sessions", new object());
+            var response = await client.PostAsJsonAsync("/api/users/sessions", new object());
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidPassword""]}", await response.Content.ReadAsStringAsync());
@@ -34,7 +34,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "invalid-email", password = string.Empty });
+            var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "invalid-email", password = string.Empty });
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidPassword""]}", await response.Content.ReadAsStringAsync());
@@ -45,7 +45,7 @@ namespace HintKeep.Tests.Integration.Users
         {
             var client = _webApplicationFactory.WithInMemoryDatabase().CreateClient();
 
-            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -76,7 +76,7 @@ namespace HintKeep.Tests.Integration.Users
                 Email = "test-email@domain.tld"
             }));
 
-            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             var userSession = await response.Content.ReadFromJsonAsync<UserSessionPostResult>();
@@ -114,7 +114,7 @@ namespace HintKeep.Tests.Integration.Users
                 Email = "test-email@domain.tld"
             }));
 
-            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
+            var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -144,7 +144,7 @@ namespace HintKeep.Tests.Integration.Users
                 Email = "test-email@domain.tld"
             }));
 
-            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
+            var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -167,7 +167,7 @@ namespace HintKeep.Tests.Integration.Users
                 State = "Confirmed"
             }));
 
-            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
+            var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -198,7 +198,7 @@ namespace HintKeep.Tests.Integration.Users
                 IsDeleted = true
             }));
 
-            var response = await client.PostAsJsonAsync("/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
+            var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "#eMail@DOMAIN.TLD", password = "#test-PASSWORD-1-bad" });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
