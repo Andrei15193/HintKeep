@@ -1,4 +1,4 @@
-import type { IObservable, IObserver, ObserverCallback, UnsubscribeCallback } from '../../observer';
+import type { IObservable, IObserver } from '../../observer';
 
 export class ViewModel implements IObservable {
     private readonly _aggregateObserver: IObserver;
@@ -17,12 +17,6 @@ export class ViewModel implements IObservable {
         this._observers = this._observers.concat([observer]);
         if (this._observers.length === 1)
             this._aggregateObservables.forEach(aggregateObservable => aggregateObservable.subscribe(this._aggregateObserver));
-    }
-
-    public subscribeWithCallback(callback: ObserverCallback): UnsubscribeCallback {
-        const observer: IObserver = { notifyChanged: callback };
-        this.subscribe(observer);
-        return () => this.unsubscribe(observer);
     }
 
     public unsubscribe(observer: IObserver): void {

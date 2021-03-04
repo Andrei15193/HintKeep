@@ -5,3 +5,5 @@ export { withViewModel, WithViewModel } from './with-view-model';
 
 export type { PropsWithViewModel } from './requires-view-model';
 export { requiresViewModel } from './requires-view-model';
+
+export { useEvent } from './use-event';

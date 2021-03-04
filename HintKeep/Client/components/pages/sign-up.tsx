@@ -1,10 +1,8 @@
-import type { IObserver } from '../../observer';
-import React, { useEffect } from 'react';
-import { useHistory } from "react-router-dom";
+import React from 'react';
 import classnames from 'classnames';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { BusyContent } from '../loaders';
-import { WithViewModel } from '../view-model-wrappers';
+import { WithViewModel, useEvent } from '../view-model-wrappers';
 import { SignUpViewModel } from '../../view-models/sign-up-view-model';
 import { FormInput } from './forms';
 
@@ -14,7 +12,7 @@ export function SignUp(): JSX.Element {
     return (
         <WithViewModel viewModelType={SignUpViewModel}>{($vm) => {
             const history = useHistory();
-            useEffect(() => $vm.submittedEvent.subscribeWithCallback(() => history.push('/user-confirmations')), [$vm]);
+            useEvent($vm.submittedEvent, () => history.push('/user-confirmations'));
 
             return <>
                 <h1 className={Style.textCenter}>Sign-Up</h1>
