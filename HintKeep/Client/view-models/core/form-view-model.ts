@@ -1,16 +1,15 @@
-import type { IObservable, IObserver } from '../../observer';
+import type { AxiosInstance } from 'axios';
+import type { IEventHandler, INotifyPropertyChanged } from '../../events';
 import { ViewModel } from './view-model';
-import { AsyncViewModel } from './async-view-model';
+import { ApiViewModel } from './api-view-model';
 
-export class FormViewModel extends AsyncViewModel {
-    private readonly _fieldObserver: IObserver;
+export class FormViewModel extends ApiViewModel {
+    private readonly _fieldPropertyChangedEventHandler: IEventHandler<readonly string[]>;
     protected readonly _registeredFields: IFormField[];
 
-    constructor(...aggregateObservables: IObservable[]) {
-        super(...aggregateObservables);
-        this._fieldObserver = {
-            notifyChanged: (subject: IFormField) => this.fieldChanged(subject)
-        };
+    constructor(axios: AxiosInstance, ...stores: readonly INotifyPropertyChanged[]) {
+        super(axios, ...stores);
+        this._fieldPropertyChangedEventHandler = { handle: this.fieldChanged.bind(this) };
         this._registeredFields = [];
     }
 
@@ -22,7 +21,11 @@ export class FormViewModel extends AsyncViewModel {
         return this._registeredFields.some(field => field.isInvalid);
     }
 
-    protected get registeredFields(): Readonly<IFormField[]> {
+    public get areAllFieldsTouched(): boolean {
+        return this._registeredFields.every(field => field.isTouched);
+    }
+
+    protected get registeredFields(): readonly IFormField[] {
         return this._registeredFields;
     }
 
@@ -34,28 +37,29 @@ export class FormViewModel extends AsyncViewModel {
         this._registeredFields.forEach(field => field.isTouched = false);
     }
 
-    protected register(...fields: Readonly<IFormField[]>): void {
+    protected register(...fields: readonly IFormField[]): void {
         fields.forEach(field => {
-            field.subscribe(this._fieldObserver);
+            field.propertyChanged.subscribe(this._fieldPropertyChangedEventHandler);
             this._registeredFields.push(field);
         });
     }
 
-    protected unregister(...fields: Readonly<IFormField[]>): void {
+    protected unregister(...fields: readonly IFormField[]): void {
         fields.forEach(field => {
-            field.unsubscribe(this._fieldObserver);
             const indexToRemove = this._registeredFields.indexOf(field);
-            if (indexToRemove >= 0)
+            if (indexToRemove >= 0) {
+                field.propertyChanged.unsubscribe(this._fieldPropertyChangedEventHandler);
                 this._registeredFields.splice(indexToRemove, 1);
+            }
         });
     }
 
-    protected fieldChanged(field: IFormField): void {
-        this.notifyChanged();
+    protected fieldChanged(field: object, changedProperties: readonly string[]): void {
+        this.notifyPropertyChanged('isValid', 'isInvalid', 'areAllFieldsTouched');
     }
 }
 
-export interface IFormField<TValue = any> extends IObservable {
+export interface IFormField<TValue = any> extends INotifyPropertyChanged {
     isTouched: boolean;
 
     value: TValue;
@@ -64,14 +68,14 @@ export interface IFormField<TValue = any> extends IObservable {
 
     readonly isInvalid: boolean;
 
-    readonly errors: Readonly<string[]>;
+    readonly errors: readonly string[];
 }
 
 export class FormField<TValue> extends ViewModel implements IFormField<TValue> {
     private readonly _initialValue: TValue;
     private _value: TValue;
     private _isTouched: boolean;
-    private _errors: Readonly<string[]>;
+    private _errors: readonly string[];
 
     public constructor(initalValue: TValue) {
         super();
@@ -89,14 +93,10 @@ export class FormField<TValue> extends ViewModel implements IFormField<TValue> {
         return this._value;
     }
 
-    public get hasValueChanged(): boolean {
-        return this._initialValue !== this._value;
-    }
-
     public set value(value: TValue) {
         if (this._value !== value) {
             this._value = value;
-            this.notifyChanged();
+            this.notifyPropertyChanged('value');
         }
     }
 
@@ -107,7 +107,7 @@ export class FormField<TValue> extends ViewModel implements IFormField<TValue> {
     public set isTouched(value: boolean) {
         if (this.isTouched !== value) {
             this._isTouched = value;
-            this.notifyChanged();
+            this.notifyPropertyChanged('isTouched');
         }
     }
 
@@ -119,17 +119,18 @@ export class FormField<TValue> extends ViewModel implements IFormField<TValue> {
         return this._errors.length > 0;
     }
 
-    public get errors(): Readonly<string[]> {
+    public get errors(): readonly string[] {
         return this._errors;
     }
 
-    public set errors(value: Readonly<string[]>) {
-        if (this._errors !== value
-            && (this._errors.length !== value.length
-                || this._errors.some(error => !value.includes(error))
-                || value.some(error => !this._errors.includes(error)))) {
-            this._errors = value;
-            this.notifyChanged();
+    public set errors(value: readonly string[]) {
+        const errorsValue = value || [];
+        if (this._errors !== errorsValue
+            && (this._errors.length !== errorsValue.length
+                || this._errors.some(error => !errorsValue.includes(error))
+                || errorsValue.some(error => !this._errors.includes(error)))) {
+            this._errors = errorsValue;
+            this.notifyPropertyChanged('errors', 'isValid', 'isInvalid');
         }
     }
 }

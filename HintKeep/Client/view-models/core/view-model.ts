@@ -1,35 +1,28 @@
-import type { IObservable, IObserver } from '../../observer';
+import type { IEvent, IEventHandler, INotifyPropertyChanged } from '../../events';
+import { DispatchEvent } from '../../events';
 
-export class ViewModel implements IObservable {
-    private readonly _aggregateObserver: IObserver;
-    private readonly _aggregateObservables: Readonly<IObservable[]>;
-    private _observers: IObserver[];
+export class ViewModel implements INotifyPropertyChanged {
+    private readonly _stores: readonly INotifyPropertyChanged[];
+    private readonly _storePropertyChanged: IEventHandler<readonly string[]>;
+    private readonly _propertyChangedEvent: DispatchEvent<readonly string[]>;
 
-    public constructor(...aggregateObservables: IObservable[]) {
-        this._aggregateObserver = {
-            notifyChanged: this.aggregateObservablesChanged.bind(this)
-        };
-        this._aggregateObservables = aggregateObservables ? aggregateObservables.concat() : [];
-        this._observers = [];
+    public constructor(...stores: readonly INotifyPropertyChanged[]) {
+        this._storePropertyChanged = { handle: this.storeChanged.bind(this) };
+        this._stores = stores ? stores : [];
+        this._propertyChangedEvent = new DispatchEvent<readonly string[]>(
+            () => this._stores.forEach(store => store.propertyChanged.subscribe(this._storePropertyChanged)),
+            () => this._stores.forEach(store => store.propertyChanged.unsubscribe(this._storePropertyChanged))
+        );
     }
 
-    public subscribe(observer: IObserver): void {
-        this._observers = this._observers.concat([observer]);
-        if (this._observers.length === 1)
-            this._aggregateObservables.forEach(aggregateObservable => aggregateObservable.subscribe(this._aggregateObserver));
+    public get propertyChanged(): IEvent<readonly string[]> {
+        return this._propertyChangedEvent;
     }
 
-    public unsubscribe(observer: IObserver): void {
-        this._observers = this._observers.filter(registeredObserver => registeredObserver !== observer);
-        if (this._observers.length === 0)
-            this._aggregateObservables.forEach(aggregateObservable => aggregateObservable.unsubscribe(this._aggregateObserver));
+    protected storeChanged(store: object, changedProperties: readonly string[]): void {
     }
 
-    protected aggregateObservablesChanged(): void {
-        this.notifyChanged();
-    }
-
-    protected notifyChanged(): void {
-        this._observers.forEach(observer => observer.notifyChanged(this));
+    protected notifyPropertyChanged(changedProperty: string, ...otherChangedProperties: readonly string[]): void {
+        this._propertyChangedEvent.dispatch(this, [changedProperty, ...otherChangedProperties]);
     }
 }

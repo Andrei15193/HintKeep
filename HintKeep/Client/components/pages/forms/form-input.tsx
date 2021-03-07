@@ -12,11 +12,9 @@ export interface IFormInputProps extends IInputProps {
 export function FormInput({ label, field, id, className, ...inputProps }: IFormInputProps): JSX.Element {
     return (
         <div className={className}>
-            <label htmlFor={id} className={Style.colFormLabel}>{label}</label>
+            <label htmlFor={id}>{label}</label>
             <Input field={field} id={id} {...inputProps} />
-            <div id={`${id}Feedback`} className={Style.invalidFeedback}>
-                {field.errors}
-            </div>
+            <div id={`${id}Feedback`} className={Style.invalidFeedback}>{field.errors}</div>
         </div>
     );
 }

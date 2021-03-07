@@ -1,8 +1,8 @@
 import type { ComponentType } from 'react'
 import type { ElementFactoryCallback, ElementWithPropsFactoryCallback, ViewModelType } from './common';
-import type { IObserver } from '../../Observer';
 import type { ViewModel } from '../../view-models/core/view-model';
 import { useEffect, useState } from 'react';
+import { IEventHandler } from '../../events';
 
 export interface IWithViewModelProps<TViewModel extends ViewModel> {
     viewModelType: ViewModelType<TViewModel>,
@@ -13,18 +13,13 @@ export function WithViewModel<TViewModel extends ViewModel>({ viewModelType, chi
     const [{ $vm }, setState] = useState(() => ({ $vm: new viewModelType(), lastUpdated: new Date() }));
     useEffect(
         () => {
-            let isMounted = true;
-            const viewModelObserver: IObserver = {
-                notifyChanged(): void {
-                    if (isMounted)
-                        setState({ $vm, lastUpdated: new Date() });
+            const propertyChangedEventHandler: IEventHandler<readonly string[]> = {
+                handle(): void {
+                    setState({ $vm, lastUpdated: new Date() });
                 }
             };
-            $vm.subscribe(viewModelObserver);
-            return () => {
-                $vm.unsubscribe(viewModelObserver);
-                isMounted = false;
-            }
+            $vm.propertyChanged.subscribe(propertyChangedEventHandler);
+            return () => $vm.propertyChanged.unsubscribe(propertyChangedEventHandler);
         },
         []
     );
@@ -37,18 +32,13 @@ export function withViewModel<TViewModel extends ViewModel, TComponentProps = {}
         const [{ $vm }, setState] = useState(() => ({ $vm: new ViewModelType(), lastUpdated: new Date() }));
         useEffect(
             () => {
-                let isMounted = true;
-                const viewModelObserver: IObserver = {
-                    notifyChanged(): void {
-                        if (isMounted)
-                            setState({ $vm, lastUpdated: new Date() });
+                const propertyChangedEventHandler: IEventHandler<readonly string[]> = {
+                    handle(): void {
+                        setState({ $vm, lastUpdated: new Date() });
                     }
                 };
-                $vm.subscribe(viewModelObserver);
-                return () => {
-                    $vm.unsubscribe(viewModelObserver);
-                    isMounted = false;
-                }
+                $vm.propertyChanged.subscribe(propertyChangedEventHandler);
+                return () => $vm.propertyChanged.unsubscribe(propertyChangedEventHandler);
             },
             []
         );

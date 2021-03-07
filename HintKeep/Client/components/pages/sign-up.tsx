@@ -20,7 +20,7 @@ export function SignUp(): JSX.Element {
                     <FormInput className={Style.mb3} id="email" type="text" label="Email address" field={$vm.email} placeholder="name@example.com" />
                     <FormInput className={Style.mb3} id="password" type="password" label="Password" field={$vm.password} />
                     <div>
-                        <button type="submit" disabled={$vm.isInvalid} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>Submit</button>
+                        <button type="submit" disabled={($vm.isInvalid && $vm.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>Submit</button>
                         <Link to="/" className={classnames(Style.ml2, Style.btn, Style.btnLight)}>Cancel</Link>
                     </div>
                 </BusyContent>

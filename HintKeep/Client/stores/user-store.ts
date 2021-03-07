@@ -18,11 +18,11 @@ export class UserStore extends Store {
 
     public startSession(userInfo: UserInfo): void {
         this._userInfo = userInfo;
-        this.notifyChanged();
+        this.notifyPropertyChanged('isSessionActive', 'isSessionInactive', 'userInfo');
     }
 
     public completeSession(): void {
         this._userInfo = null;
-        this.notifyChanged();
+        this.notifyPropertyChanged('isSessionActive', 'isSessionInactive', 'userInfo');
     }
 }

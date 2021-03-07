@@ -1,13 +1,14 @@
+import { Axios } from '../services';
 import { userStore } from '../stores';
 import { UserInfo } from '../stores/user-info';
-import { AsyncViewModel } from './core';
+import { ApiViewModel } from './core';
 
-export class LoginViewModel extends AsyncViewModel {
+export class LoginViewModel extends ApiViewModel {
     private _email: string = "";
     private _password: string = "";
 
     public constructor() {
-        super(userStore);
+        super(Axios, userStore);
         const { userInfo } = userStore;
         if (userInfo !== null)
             this._email = userInfo.email;
@@ -19,7 +20,7 @@ export class LoginViewModel extends AsyncViewModel {
 
     public set email(value: string) {
         this._email = value || '';
-        this.notifyChanged();
+        this.notifyPropertyChanged('email');
     }
 
     public get password() {
@@ -28,14 +29,12 @@ export class LoginViewModel extends AsyncViewModel {
 
     public set password(value: string) {
         this._password = value || '';
-        this.notifyChanged();
+        this.notifyPropertyChanged('password');
     }
 
     public async loginAsync(): Promise<void> {
-        await this.handleAsync(async () => {
-            await this.delay(3000);
-            userStore.startSession(new UserInfo(this.email));
-        });
+        await this.delay(3000);
+        userStore.startSession(new UserInfo(this.email));
     }
 
     public logOut(): void {

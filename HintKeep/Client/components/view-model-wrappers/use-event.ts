@@ -1,14 +1,14 @@
-import type { IObservable, IObserver } from '../../observer';
+import type { IEvent, IEventHandler } from '../../events';
 import { useEffect } from 'react';
 
-export type EventHandler = (subject: any) => void;
+export type EventHandler<TEventArgs> = (subject: object, args: TEventArgs) => void;
 
-export function useEvent(event: IObservable, handler: EventHandler): void {
+export function useEvent<TEventArgs>(event: IEvent<TEventArgs>, handler: EventHandler<TEventArgs>): void {
     useEffect(
         () => {
-            const observer: IObserver = { notifyChanged: handler };
-            event.subscribe(observer);
-            return () => event.unsubscribe(observer);
+            const eventHandler: IEventHandler<TEventArgs> = { handle: handler };
+            event.subscribe(eventHandler);
+            return () => event.unsubscribe(eventHandler);
         },
         [event]
     );

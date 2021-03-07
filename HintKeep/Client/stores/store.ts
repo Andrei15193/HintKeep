@@ -1,17 +1,14 @@
-import type { IObservable, IObserver } from '../observer';
+import type { IEvent, INotifyPropertyChanged } from '../events';
+import { DispatchEvent } from '../events';
 
-export class Store implements IObservable {
-    private _observers: IObserver[] = [];
+export class Store implements INotifyPropertyChanged {
+    private readonly _propertyChangedEvent: DispatchEvent<readonly string[]> = new DispatchEvent();
 
-    public subscribe(observer: IObserver): void {
-        this._observers = this._observers.concat([observer]);
+    public get propertyChanged(): IEvent<readonly string[]> {
+        return this._propertyChangedEvent;
     }
 
-    public unsubscribe(observer: IObserver): void {
-        this._observers = this._observers.filter(registeredObserver => registeredObserver !== observer);
-    }
-
-    protected notifyChanged(): void {
-        this._observers.forEach(observer => observer.notifyChanged(this));
+    protected notifyPropertyChanged(changedProperty: string, ...otherChangedProperties: readonly string[]): void {
+        this._propertyChangedEvent.dispatch(this, [changedProperty, ...otherChangedProperties]);
     }
 }
