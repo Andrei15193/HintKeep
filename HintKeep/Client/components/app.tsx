@@ -1,16 +1,19 @@
 import type { PropsWithChildren } from 'react'
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import classnames from 'classnames';
 import { Accounts, SignUp, UserConfirmation } from './pages';
 import { Alerts } from './alerts';
+import { Message } from './i18n';
 
 import Style from './style.scss';
 
 export function App(): JSX.Element {
+    const [] = useState();
+
     return (
         <div className={classnames(Style.app, Style.m3, Style.border, Style.dFlex, Style.flexColumn, Style.flexFill)}>
-            <AppBanner className={Style.appHeader}>- HintKeep -</AppBanner>
+            <AppBanner className={Style.appHeader}><Message id="pages.header.banner" /></AppBanner>
             <AppContent>
                 <>
                     <Alerts />
@@ -29,7 +32,7 @@ export function App(): JSX.Element {
                     </BrowserRouter>
                 </>
             </AppContent>
-            <AppBanner className={Style.appFooter}>HintKeep - Store hints, not passwords</AppBanner>
+            <AppBanner className={Style.appFooter}><Message id="pages.footer.banner" /></AppBanner>
         </div>
     );
 }

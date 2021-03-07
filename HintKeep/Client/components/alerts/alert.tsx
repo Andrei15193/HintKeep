@@ -1,7 +1,7 @@
 import type { PropsWithViewModel } from '../view-model-wrappers';
 import React from 'react';
 import classnames from 'classnames';
-import { AlertViewModel } from '../../view-models/alerts-view-model';
+import { AlertViewModel } from '../../view-models/alert-view-model';
 import { requiresViewModel } from '../view-model-wrappers';
 
 import Style from './../style.scss';
