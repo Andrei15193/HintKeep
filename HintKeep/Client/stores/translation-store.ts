@@ -5,7 +5,7 @@ export interface ITranslations {
 }
 
 export interface IMessages {
-    [key: string]: string | IMessages;
+    [key: string]: string;
 }
 
 export class TranslationStore extends Store {
@@ -30,32 +30,12 @@ export class TranslationStore extends Store {
     }
 
     public getMessage(id: string): string {
-        const translatedMessage = id.split('.').reduce<IMessages | string | null>(
-            (messageCollection, key) => {
-                if (isMessageCollection(messageCollection))
-                    if (key in messageCollection)
-                        return messageCollection[key];
-                    else {
-                        console.error(`Cannot find key '${key}' in translation message id '${id}'.`);
-                        return null;
-                    }
-                else
-                    return null;
-            },
-            this._messages[this._locale]
-        );
-
-        if (typeof translatedMessage === 'string')
-            return translatedMessage;
-        else if (translatedMessage !== null) {
-            console.error(`Expected string for translation message id '${id}' but found ${JSON.stringify(translatedMessage, null, '    ')}`)
+        const message = this._messages[this._locale][id];
+        if (!message) {
+            console.error(`Cannot find translation message for id '${id}'.`);
             return id;
         }
         else
-            return id;
+            return message;
     }
-}
-
-function isMessageCollection(obj: any): obj is IMessages {
-    return obj && typeof (obj) === 'object';
 }

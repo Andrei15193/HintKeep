@@ -3,7 +3,6 @@ import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessable
 import { FormViewModel, FormField } from './core';
 import { Axios } from '../services';
 import { DispatchEvent, IEvent } from '../events';
-import { translationStore } from '../stores';
 
 export class SignUpViewModel extends FormViewModel {
     private readonly _submittedEvent: DispatchEvent;
@@ -11,7 +10,7 @@ export class SignUpViewModel extends FormViewModel {
     private readonly _password: FormField<string>;
 
     constructor() {
-        super(Axios, translationStore);
+        super(Axios);
         this._submittedEvent = new DispatchEvent();
         this.register(
             this._email = new FormField<string>(''),
@@ -44,11 +43,11 @@ export class SignUpViewModel extends FormViewModel {
                     this._submittedEvent.dispatch(this);
                 })
                 .on(409, (_: AxiosResponse<IConflictResponseData>) => {
-                    this._email.errors = [translationStore.getMessage('validation.errors.emailNotUnique')];
+                    this._email.errors = ['validation.errors.emailNotUnique'];
                 })
                 .on(422, ({ data: { email: emailErrors, password: passwordErrors } }: AxiosResponse<IUnprocessableEntityResponseData>) => {
-                    this._email.errors = emailErrors.map(errorMessage => translationStore.getMessage(errorMessage));
-                    this._password.errors = passwordErrors.map(errorMessage => translationStore.getMessage(errorMessage));
+                    this._email.errors = emailErrors;
+                    this._password.errors = passwordErrors;
                 })
                 .sendAsync();
         }
@@ -56,7 +55,7 @@ export class SignUpViewModel extends FormViewModel {
 
     protected fieldChanged(field: FormField<string>, changedProperties: readonly string[]): void {
         if ((changedProperties.includes('value') || changedProperties.includes('isTouched')))
-            field.errors = field.value?.length ? [] : [translationStore.getMessage('validation.errors.required')];
+            field.errors = field.value?.length ? [] : ['validation.errors.required'];
         super.fieldChanged(field, changedProperties);
     }
 }
