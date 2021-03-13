@@ -23,7 +23,7 @@ export function App(): JSX.Element {
                                 <Route path="/user-accounts/create">
                                     <SignUp />
                                 </Route>
-                                <Route path="/user-confirmations">
+                                <Route path="/user-accounts/confirm">
                                     <UserConfirmation />
                                 </Route>
                                 <Route path="/">

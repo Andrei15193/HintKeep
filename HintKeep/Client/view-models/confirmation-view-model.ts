@@ -1,20 +1,20 @@
 import type { AxiosResponse } from 'axios';
-import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../api/users/post';
+import type { IPreconditionFailedResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../api/users/confirmations/post';
 import { FormViewModel, FormField } from './core';
 import { Axios } from '../services';
 import { DispatchEvent, IEvent } from '../events';
 
-export class SignUpViewModel extends FormViewModel {
+export class UserConfirmationViewModel extends FormViewModel {
     private readonly _submittedEvent: DispatchEvent;
     private readonly _email: FormField<string>;
-    private readonly _password: FormField<string>;
+    private readonly _confirmationToken: FormField<string>;
 
     constructor() {
         super(Axios);
         this._submittedEvent = new DispatchEvent();
         this.register(
             this._email = new FormField<string>(''),
-            this._password = new FormField<string>('')
+            this._confirmationToken = new FormField<string>('')
         );
     }
 
@@ -22,8 +22,8 @@ export class SignUpViewModel extends FormViewModel {
         return this._email;
     }
 
-    public get password(): Readonly<FormField<string>> {
-        return this._password;
+    public get confirmationToken(): Readonly<FormField<string>> {
+        return this._confirmationToken;
     }
 
     public get submittedEvent(): IEvent {
@@ -32,24 +32,23 @@ export class SignUpViewModel extends FormViewModel {
 
     public async submitAsync(): Promise<void> {
         this.touchAllFields();
-        if (this.isValid) {
+        if (this.isValid)
             await this
-                .post<IRequestData>('/api/users', {
+                .post<IRequestData>('/api/users/confirmations', {
                     email: this.email.value,
-                    password: this.password.value
+                    confirmationToken: this.confirmationToken.value
                 })
                 .on(201, (_: AxiosResponse<IResponseData>) => {
                     this._submittedEvent.dispatch(this);
                 })
-                .on(409, (_: AxiosResponse<IConflictResponseData>) => {
-                    this._email.errors = ['validation.errors.emailNotUnique'];
+                .on(412, (_: AxiosResponse<IPreconditionFailedResponseData>) => {
+                    this._confirmationToken.errors = ['validation.errors.invalidSignUpConfirmationToken'];
                 })
-                .on(422, ({ data: { email: emailErrors, password: passwordErrors } }: AxiosResponse<IUnprocessableEntityResponseData>) => {
+                .on(422, ({ data: { email: emailErrors, confirmationToken: confirmationTokenErrors } }: AxiosResponse<IUnprocessableEntityResponseData>) => {
                     this._email.errors = emailErrors;
-                    this._password.errors = passwordErrors;
+                    this._confirmationToken.errors = confirmationTokenErrors;
                 })
                 .sendAsync();
-        }
     }
 
     protected fieldChanged(field: FormField<string>, changedProperties: readonly string[]): void {

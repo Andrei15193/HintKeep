@@ -34,11 +34,11 @@ export class ApiViewModel extends ViewModel {
         return this.request({ method: "GET", url });
     }
 
-    protected post(url: string, data: any): RequestHandlerBuilder {
+    protected post<TRequest>(url: string, data: TRequest): RequestHandlerBuilder {
         return this.request({ method: "POST", url, data });
     }
 
-    protected put(url: string, data: any): RequestHandlerBuilder {
+    protected put<TRequest>(url: string, data: TRequest): RequestHandlerBuilder {
         return this.request({ method: "PUT", url, data });
     }
 

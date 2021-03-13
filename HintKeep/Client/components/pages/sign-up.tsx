@@ -11,9 +11,9 @@ import Style from '../style.scss';
 
 export function SignUp(): JSX.Element {
     return (
-        <WithViewModel viewModelType={SignUpViewModel}>{($vm) => {
+        <WithViewModel viewModelType={SignUpViewModel}>{$vm => {
             const history = useHistory();
-            useEvent($vm.submittedEvent, () => history.push('/user-confirmations'));
+            useEvent($vm.submittedEvent, () => history.push('/user-accounts/confirm'));
 
             return <>
                 <h1 className={Style.textCenter}><Message id="pages.signUp.pageTitle" /></h1>
