@@ -1,15 +1,10 @@
 import React from 'react';
-import { WithViewModel } from '../view-model-wrappers';
-import { TranslationViewModel } from '../../view-models/translation-view-model';
+import { I18nConsumer } from './i18n-consumer';
 
 export interface IMessageProps {
-    readonly id: string | undefined
+    readonly id: string
 }
 
 export function Message({ id }: IMessageProps): JSX.Element {
-    return (
-        <WithViewModel viewModelType={TranslationViewModel}>{$vm =>
-            <>{$vm.getMessage(id)}</>
-        }</WithViewModel>
-    );
+    return <I18nConsumer>{messageResolver => messageResolver.resolve(id)}</I18nConsumer>;
 }

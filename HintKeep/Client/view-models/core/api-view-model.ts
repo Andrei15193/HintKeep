@@ -52,7 +52,7 @@ export class ApiViewModel extends ViewModel {
                 this._setState(ApiViewModelState.Busy);
                 next(request);
             })
-            .on(500, () => alertsStore.addAlert('Something went wrong with the server. Please refresh the page and try again.'))
+            .on(500, () => alertsStore.addAlert('errors.internalServerError'))
             .onCompleted(() => {
                 this._setState(ApiViewModelState.Ready);
             })
