@@ -26,7 +26,7 @@ namespace HintKeep.Tests.Integration.Users
             var response = await client.PostAsJsonAsync("/api/users/sessions", new object());
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-            Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidPassword""]}", await response.Content.ReadAsStringAsync());
+            Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidRequiredMediumText""]}", await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace HintKeep.Tests.Integration.Users
             var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "invalid-email", password = string.Empty });
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-            Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidPassword""]}", await response.Content.ReadAsStringAsync());
+            Assert.Equal(@"{""email"":[""validation.errors.invalidEmail""],""password"":[""validation.errors.invalidRequiredMediumText""]}", await response.Content.ReadAsStringAsync());
         }
 
         [Fact]

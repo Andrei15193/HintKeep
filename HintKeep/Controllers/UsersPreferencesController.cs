@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using HintKeep.ViewModels.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +11,10 @@ namespace HintKeep.Controllers
     [ApiController, Route("api/users/preferences")]
     public class UsersPreferencesController : ControllerBase
     {
-        [AllowAnonymous, HttpGet()]
+        /// <summary>
+        /// Gets the user preferences
+        /// </summary>
+        [AllowAnonymous, HttpGet]
         public IActionResult Get()
             => Ok(new UserPreferences
             {

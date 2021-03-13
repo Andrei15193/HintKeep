@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import classnames from 'classnames';
 import { useEvent, WithViewModel } from '../view-model-wrappers';
-import { UserConfirmationViewModel } from '../../view-models/confirmation-view-model';
+import { UserConfirmationViewModel } from '../../view-models/users/confirmation-view-model';
 import { Message } from '../i18n';
 import { BusyContent } from '../loaders';
 import { FormInput } from './forms';

@@ -3,9 +3,11 @@ import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { WithViewModel } from '../view-model-wrappers';
-import { LoginViewModel } from '../../view-models/login-view-model';
-import { UserViewModel } from '../../view-models/user-view-model';
+import { LoginViewModel } from '../../view-models/users/login-view-model';
+import { UserViewModel } from '../../view-models/users/user-view-model';
 import { BusyContent } from '../loaders';
+import { FormInput } from './forms';
+import { Message } from '../i18n';
 
 import Style from '../style.scss';
 
@@ -22,23 +24,20 @@ export const LoginGuard: ComponentType<PropsWithChildren<{}>> = memo(
 export function Login(): JSX.Element {
     return (
         <WithViewModel viewModelType={LoginViewModel}>{($vm) => <>
-            <h1 className={Style.textCenter}>Login</h1>
+            <h1 className={Style.textCenter}><Message id="pages.login.pageTitle" /></h1>
             <BusyContent $vm={$vm}>
+                <FormInput className={Style.mb3} id="email" type="text" label="pages.login.email.label" field={$vm.email} placeholder="pages.login.email.placeholder" />
+                <FormInput className={Style.mb3} id="password" type="password" label="pages.login.password.label" field={$vm.password} />
+
                 <div className={Style.mb3}>
-                    <label htmlFor="e-mail" className={Style.colFormLabel}>Email address</label>
-                    <input type="email" className={Style.formControl} id="e-mail" placeholder="name@example.com" value={$vm.email} onChange={ev => $vm.email = ev.target.value} />
-                </div>
-                <div className={Style.mb3}>
-                    <label htmlFor="password" className={Style.colFormLabel}>Password</label>
-                    <input type="password" className={Style.formControl} id="password" value={$vm.password} onChange={ev => $vm.password = ev.target.value} />
-                </div>
-                <div className={Style.mb3}>
-                    <button type="submit" className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.loginAsync()}>Login</button>
+                    <button type="submit" disabled={($vm.isInvalid && $vm.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.loginAsync()}>
+                        <Message id="pages.login.submit.label" />
+                    </button>
                 </div>
 
                 <ul>
-                    <li><Link to="/user-accounts/create">Sign-Up</Link></li>
-                    <li><a href="#">Recover account</a></li>
+                    <li><Link to="/user-accounts/create"><Message id="pages.login.signUp.label" /></Link></li>
+                    <li><a href="#"><Message id="pages.login.recoverUserAccount.label" /></a></li>
                 </ul>
             </BusyContent>
         </>}</WithViewModel>

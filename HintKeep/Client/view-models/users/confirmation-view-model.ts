@@ -1,8 +1,9 @@
 import type { AxiosResponse } from 'axios';
-import type { IPreconditionFailedResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../api/users/confirmations/post';
-import { FormViewModel, FormField } from './core';
-import { Axios } from '../services';
-import { DispatchEvent, IEvent } from '../events';
+import type { IFormField } from '../core';
+import type { IPreconditionFailedResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../../api/users/confirmations/post';
+import { FormViewModel, FormField } from '../core';
+import { Axios } from '../../services';
+import { DispatchEvent, IEvent } from '../../events';
 
 export class UserConfirmationViewModel extends FormViewModel {
     private readonly _submittedEvent: DispatchEvent;
@@ -18,11 +19,11 @@ export class UserConfirmationViewModel extends FormViewModel {
         );
     }
 
-    public get email(): Readonly<FormField<string>> {
+    public get email(): IFormField<string> {
         return this._email;
     }
 
-    public get confirmationToken(): Readonly<FormField<string>> {
+    public get confirmationToken(): IFormField<string> {
         return this._confirmationToken;
     }
 

@@ -1,8 +1,9 @@
 import type { AxiosResponse } from 'axios';
-import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../api/users/post';
-import { FormViewModel, FormField } from './core';
-import { Axios } from '../services';
-import { DispatchEvent, IEvent } from '../events';
+import type { IFormField } from '../core';
+import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../../api/users/post';
+import { FormViewModel, FormField } from '../core';
+import { Axios } from '../../services';
+import { DispatchEvent, IEvent } from '../../events';
 
 export class SignUpViewModel extends FormViewModel {
     private readonly _submittedEvent: DispatchEvent;
@@ -18,11 +19,11 @@ export class SignUpViewModel extends FormViewModel {
         );
     }
 
-    public get email(): Readonly<FormField<string>> {
+    public get email(): IFormField<string> {
         return this._email;
     }
 
-    public get password(): Readonly<FormField<string>> {
+    public get password(): IFormField<string> {
         return this._password;
     }
 

@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { Message } from '../i18n';
 import { BusyContent } from '../loaders';
 import { WithViewModel, useEvent } from '../view-model-wrappers';
-import { SignUpViewModel } from '../../view-models/sign-up-view-model';
+import { SignUpViewModel } from '../../view-models/users/sign-up-view-model';
 import { FormInput } from './forms';
 
 import Style from '../style.scss';

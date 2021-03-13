@@ -1,28 +1,23 @@
 import { Store } from './store';
-import { UserInfo } from './user-info';
 
 export class UserStore extends Store {
-    private _userInfo: UserInfo | null = null;
+    private _isSessionStarted: boolean = false;
 
     public get isSessionActive(): boolean {
-        return this._userInfo !== null;
+        return this._isSessionStarted;
     }
 
     public get isSessionInactive(): boolean {
-        return this._userInfo === null;
+        return !this._isSessionStarted;
     }
 
-    public get userInfo(): UserInfo | null {
-        return this._userInfo;
-    }
-
-    public startSession(userInfo: UserInfo): void {
-        this._userInfo = userInfo;
-        this.notifyPropertyChanged('isSessionActive', 'isSessionInactive', 'userInfo');
+    public startSession(): void {
+        this._isSessionStarted = true;
+        this.notifyPropertyChanged('isSessionActive', 'isSessionInactive');
     }
 
     public completeSession(): void {
-        this._userInfo = null;
-        this.notifyPropertyChanged('isSessionActive', 'isSessionInactive', 'userInfo');
+        this._isSessionStarted = false;
+        this.notifyPropertyChanged('isSessionActive', 'isSessionInactive');
     }
 }

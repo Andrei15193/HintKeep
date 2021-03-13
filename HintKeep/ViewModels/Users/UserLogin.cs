@@ -7,7 +7,7 @@ namespace HintKeep.ViewModels.Users
         [Email]
         public string Email { get; set; }
 
-        [Password]
+        [RequiredMediumText]
         public string Password { get; set; }
     }
 }
