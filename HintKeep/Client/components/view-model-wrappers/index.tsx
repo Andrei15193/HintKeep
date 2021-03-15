@@ -1,9 +1,7 @@
 export type { ElementFactoryCallback, ElementWithPropsFactoryCallback, ViewModelType } from './common';
 
-export type { IWithViewModelProps } from './with-view-model';
-export { withViewModel, WithViewModel } from './with-view-model';
-
-export type { PropsWithViewModel } from './requires-view-model';
-export { requiresViewModel } from './requires-view-model';
-
+export { useViewModel } from './use-view-model';
 export { useEvent } from './use-event';
+
+export type { PropsWithViewModel } from './watch-view-model';
+export { watchViewModel } from './watch-view-model';

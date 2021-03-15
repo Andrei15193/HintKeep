@@ -34,8 +34,7 @@ export class LoginViewModel extends FormViewModel {
                     password: this.password.value
                 })
                 .on(201, ({ data: { jsonWebToken } }: AxiosResponse<IResponseData>) => {
-                    Axios.defaults.headers.Authentication = `Bearer ${jsonWebToken}`;
-                    userStore.startSession();
+                    userStore.startSession(jsonWebToken);
                 })
                 .on(401, (_: AxiosResponse<IUnauthorizedResponseData>) => {
                     this._email.errors = ['validation.errors.invalidCredentials'];

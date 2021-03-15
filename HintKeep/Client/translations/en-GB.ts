@@ -28,12 +28,28 @@ export const enGB: IMessages = {
     'pages.login.signUp.label': 'Sign-Up',
     'pages.login.recoverUserAccount.label': 'Recover account',
 
+    'pages.accounts.pageTitle': 'Accounts',
+    'pages.accounts.noAccounts': 'You do not currently have any accounts :(',
+    'pages.accounts.add.label': 'Add',
+
+    'pages.addAccount.pageTitle': 'Add account',
+    'pages.addAccount.name.label': 'Name',
+    'pages.addAccount.name.placeholder': 'HintKeep',
+    'pages.addAccount.hint.label': 'Hint',
+    'pages.addAccount.hint.placeholder': 'Crazy person in a box',
+    'pages.addAccount.isPinned.label': 'Is pinned',
+    'pages.addAccount.isPinned.description': 'Pinned accounts are shown at the top for more visibility.',
+    'pages.addAccount.add.label': 'Add',
+    'pages.addAccount.cancel.label': 'Cancel',
+
     'validation.errors.required': 'Please provide a value.',
     'validation.errors.emailNotUnique': 'The provided e-mail cannot be used to create an account (already in use).',
+    'validation.errors.nameNotUnique': 'An account with the same name already exists.',
     'validation.errors.invalidCredentials': 'The provided e-mail/password are not valid.',
     'validation.errors.invalidEmail': 'The provided value is not a valid e-mail address.',
     'validation.errors.invalidPassword': 'The provided password does not meet the security constraints.',
     'validation.errors.invalidSignUpConfirmationToken': 'The provided token is no longer valid. Please sign-up again.',
 
-    'errors.internalServerError': 'Something went wrong with the server. Please refresh the page and try again.'
+    'errors.internalServerError': 'Something went wrong with the server. Please refresh the page and try again.',
+    'errors.sessionExpired': 'Your session has expired, login again to continue using the application.'
 };

@@ -1,6 +1,6 @@
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import type { INotifyPropertyChanged } from '../../events';
-import { alertsStore } from '../../stores';
+import { alertsStore, userStore } from '../../stores';
 import { RequestHandlerBuilder } from './request-handler-builder';
 import { ViewModel } from './view-model';
 
@@ -52,7 +52,20 @@ export class ApiViewModel extends ViewModel {
                 this._setState(ApiViewModelState.Busy);
                 next(request);
             })
-            .on(500, () => alertsStore.addAlert('errors.internalServerError'))
+            .on(401, () => {
+                switch (request.url) {
+                    case '/api/users/sessions':
+                        break;
+
+                    default:
+                        alertsStore.addAlert('errors.sessionExpired');
+                        userStore.completeSession();
+                        break;
+                }
+            })
+            .on(500, () => {
+                alertsStore.addAlert('errors.internalServerError');
+            })
             .onCompleted(() => {
                 this._setState(ApiViewModelState.Ready);
             })
@@ -60,13 +73,5 @@ export class ApiViewModel extends ViewModel {
                 this._setState(ApiViewModelState.Faulted);
                 console.error(error);
             });
-    }
-
-    protected async delay(millisecondsDelay: number): Promise<void> {
-        return new Promise(resolve => setTimeout(() => resolve(), millisecondsDelay));
-    }
-
-    protected async delayWithResult<TResult>(millisecondsDelay: number, result: TResult): Promise<TResult> {
-        return new Promise(resolve => setTimeout(() => resolve(result), millisecondsDelay));
     }
 }

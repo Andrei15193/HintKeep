@@ -1,37 +1,44 @@
 import type { PropsWithChildren } from 'react'
-import React, { useState } from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import classnames from 'classnames';
-import { Accounts, SignUp, UserConfirmation } from './pages';
+import { Accounts, AddAccount, Login, SignUp, UserConfirmation } from './pages';
 import { Alerts } from './alerts';
 import { I18nProvider, Message } from './i18n';
+import { useViewModel } from './view-model-wrappers';
+import { UserViewModel } from '../view-models/users/user-view-model';
 
 import Style from './style.scss';
 
 export function App(): JSX.Element {
-    const [] = useState();
+    const $vm = useViewModel(UserViewModel);
 
     return (
         <I18nProvider>
             <div className={classnames(Style.app, Style.m3, Style.border, Style.dFlex, Style.flexColumn, Style.flexFill)}>
                 <AppBanner className={Style.appHeader}><Message id="pages.header.banner" /></AppBanner>
                 <AppContent>
-                    <>
-                        <Alerts />
-                        <BrowserRouter>
-                            <Switch>
-                                <Route path="/user-accounts/create">
-                                    <SignUp />
-                                </Route>
-                                <Route path="/user-accounts/confirm">
-                                    <UserConfirmation />
-                                </Route>
-                                <Route path="/">
-                                    <Accounts />
-                                </Route>
-                            </Switch>
-                        </BrowserRouter>
-                    </>
+                    <Alerts />
+                    <BrowserRouter>
+                        <Switch>
+                            {$vm.isAuthenticated ? <Redirect to="/accounts" from="/" exact /> : <Redirect to="/" from="/accounts" exact />}
+                            <Route path="/user-accounts/create" exact>
+                                <SignUp />
+                            </Route>
+                            <Route path="/user-accounts/confirm" exact>
+                                <UserConfirmation />
+                            </Route>
+                            <Route path="/accounts" exact>
+                                <Accounts />
+                            </Route>
+                            <Route path="/accounts/add" exact>
+                                <AddAccount />
+                            </Route>
+                            <Route path="/">
+                                <Login />
+                            </Route>
+                        </Switch>
+                    </BrowserRouter>
                 </AppContent>
                 <AppBanner className={Style.appFooter}><Message id="pages.footer.banner" /></AppBanner>
             </div>
@@ -57,8 +64,8 @@ function AppBanner({ className, children }: PropsWithChildren<IAppBannerProps>):
 
 function AppContent({ children }: PropsWithChildren<{}>): JSX.Element {
     return (
-        <div className={classnames(Style.appContent, Style.flexFill, Style.textJustify)}>
-            <div className={Style.m2}>
+        <div className={classnames(Style.appContent, Style.dFlex, Style.flexFill, Style.textJustify)}>
+            <div className={classnames(Style.dFlex, Style.flexColumn, Style.flexFill)}>
                 {children}
             </div>
         </div>

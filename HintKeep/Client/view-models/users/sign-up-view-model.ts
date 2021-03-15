@@ -54,7 +54,7 @@ export class SignUpViewModel extends FormViewModel {
     }
 
     protected fieldChanged(field: FormField<string>, changedProperties: readonly string[]): void {
-        if ((changedProperties.includes('value') || changedProperties.includes('isTouched')))
+        if (changedProperties.includes('value') || changedProperties.includes('isTouched'))
             field.errors = field.value?.length ? [] : ['validation.errors.required'];
         super.fieldChanged(field, changedProperties);
     }

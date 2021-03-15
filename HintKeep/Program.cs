@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Threading.Tasks;
 using HintKeep.Storage;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.Cosmos.Table;

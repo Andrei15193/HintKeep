@@ -1,6 +1,7 @@
 export interface IRequestData {
-    readonly email: string;
-    readonly password: string;
+    readonly name: string;
+    readonly hint: string;
+    readonly isPinned: boolean;
 }
 
 export interface IResponseData {
@@ -10,6 +11,6 @@ export interface IConflictResponseData {
 }
 
 export interface IUnprocessableEntityResponseData {
-    readonly email: readonly string[];
-    readonly password: readonly string[];
+    readonly name: readonly string[];
+    readonly hint: readonly string[];
 }

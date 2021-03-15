@@ -22,8 +22,6 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 
 namespace HintKeep
 {
@@ -62,7 +60,7 @@ namespace HintKeep
             services.AddTransient<IJsonWebTokenService, JsonWebTokenService>();
             services.AddTransient<IPasswordHashService, PasswordHashService>();
 
-            services.AddMediatR(config => config.Using<Mediator>().AsSingleton(), typeof(Startup).Assembly);
+            services.AddMediatR(typeof(Startup));
 
             services
                 .AddControllers(options =>
