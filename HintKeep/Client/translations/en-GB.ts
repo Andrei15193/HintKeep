@@ -32,6 +32,12 @@ export const enGB: IMessages = {
     'pages.accounts.noAccounts': 'You do not currently have any accounts :(',
     'pages.accounts.add.label': 'Add',
     'pages.accounts.edit.label': 'Edit',
+    'pages.accounts.viewAccountsBin.labels': 'View accounts (bin)',
+
+    'pages.deletedAccounts.pageTitle': 'Accounts (bin)',
+    'pages.deletedAccounts.noAccounts': 'There are no account in the bin',
+    'pages.deletedAccounts.view.label': 'View',
+    'pages.deletedAccounts.viewAccounts.labels': 'View accounts',
 
     'pages.addAccount.pageTitle': 'Add account',
     'pages.addAccount.name.label': 'Name',
@@ -56,6 +62,14 @@ export const enGB: IMessages = {
     'pages.editAccount.delete.confirmationModalTitle': 'Confirm deletion',
     'pages.editAccount.delete.confirmation': 'The account will be moved to the bin where it can still be viewed and restored. To completely remove the account you need to delete it from there as well.',
     'pages.editAccount.cancel.label': 'Cancel',
+
+    'pages.deletedAccountDetails.pageTitle': 'Account',
+    'pages.deletedAccountDetails.name.label': 'Name',
+    'pages.deletedAccountDetails.hint.label': 'Hint',
+    'pages.deletedAccountDetails.isPinned.label': 'Is pinned',
+    'pages.deletedAccountDetails.isPinned.description': 'Pinned accounts are shown at the top for more visibility.',
+    'pages.deletedAccountDetails.restore.label': 'Restore',
+    'pages.deletedAccountDetails.cancel.label': 'Cancel',
 
     'validation.errors.required': 'Please provide a value.',
     'validation.errors.emailNotUnique': 'The provided e-mail cannot be used to create an account (already in use).',

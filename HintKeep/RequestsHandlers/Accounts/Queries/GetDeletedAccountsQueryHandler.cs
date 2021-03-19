@@ -12,15 +12,15 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.Accounts.Queries
 {
-    public class GetAccountsQueryHandler : IRequestHandler<GetAccountsQuery, IReadOnlyList<AccountSummary>>
+    public class GetDeletedAccountsQueryHandler : IRequestHandler<GetDeletedAccountsQuery, IReadOnlyList<AccountSummary>>
     {
         private readonly IEntityTables _entityTables;
         private readonly Session _login;
 
-        public GetAccountsQueryHandler(IEntityTables entityTables, Session login)
+        public GetDeletedAccountsQueryHandler(IEntityTables entityTables, Session login)
             => (_entityTables, _login) = (entityTables, login);
 
-        public async Task<IReadOnlyList<AccountSummary>> Handle(GetAccountsQuery query, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<AccountSummary>> Handle(GetDeletedAccountsQuery query, CancellationToken cancellationToken)
         {
             var tableQuery = new TableQuery<AccountEntity>()
                 .Where(
@@ -31,7 +31,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
                             TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountEntity")
                         ),
                         TableOperators.And,
-                        TableQuery.GenerateFilterConditionForBool(nameof(AccountEntity.IsDeleted), QueryComparisons.Equal, false)
+                        TableQuery.GenerateFilterConditionForBool(nameof(AccountEntity.IsDeleted), QueryComparisons.Equal, true)
                     )
                 )
                 .Select(

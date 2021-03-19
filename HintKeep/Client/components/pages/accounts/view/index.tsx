@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../../i18n';
 import { useViewModel } from '../../../view-model-wrappers';
@@ -31,15 +31,23 @@ export function Accounts(): JSX.Element {
                         </div>
                     </div>
                 </h1>
-                <hr className={Style.w100} />
+                <hr />
             </div>
-            <BusyContent $vm={$vm}>
-                {
-                    $vm.accounts.length === 0
-                        ? <NoAccountsMessage />
-                        : <AccountsDisplayList accounts={$vm.accounts} />
-                }
-            </BusyContent>
+            <div className={classnames(Style.dFlex, Style.flexFill, Style.flexColumn)}>
+                <div className={Style.flexFill}>
+                    <BusyContent $vm={$vm}>
+                        {
+                            $vm.accounts.length === 0
+                                ? <NoAccountsMessage />
+                                : <AccountsDisplayList accounts={$vm.accounts} />
+                        }
+                    </BusyContent>
+                </div>
+                <div className={classnames(Style.mb2, Style.mx3, Style.textCenter)}>
+                    <hr className={Style.my2} />
+                    <Link to="/accounts/bin"><Message id="pages.accounts.viewAccountsBin.labels" /></Link>
+                </div>
+            </div>
         </>
     );
 }

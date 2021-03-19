@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react'
 import React from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import classnames from 'classnames';
-import { Accounts, AddAccount, EditAccount, Login, SignUp, UserConfirmation } from './pages';
+import { Accounts, AddAccount, DeletedAccountDetails, DeletedAccounts, EditAccount, Login, SignUp, UserConfirmation } from './pages';
 import { Alerts } from './alerts';
 import { I18nProvider, Message } from './i18n';
 import { useViewModel } from './view-model-wrappers';
@@ -37,6 +37,16 @@ export function App(): JSX.Element {
                             <Route path="/accounts/add" exact>
                                 <LoginGuard>
                                     <AddAccount />
+                                </LoginGuard>
+                            </Route>
+                            <Route path="/accounts/bin" exact>
+                                <LoginGuard>
+                                    <DeletedAccounts />
+                                </LoginGuard>
+                            </Route>
+                            <Route path="/accounts/bin/:id" exact>
+                                <LoginGuard>
+                                    <DeletedAccountDetails />
                                 </LoginGuard>
                             </Route>
                             <Route path="/accounts/:id" exact>
