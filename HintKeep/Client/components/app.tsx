@@ -9,7 +9,6 @@ import { useViewModel } from './view-model-wrappers';
 import { UserViewModel } from '../view-models/users/user-view-model';
 import { LoginGuard } from './pages/login';
 
-import 'bootstrap';
 import Style from './style.scss';
 
 export function App(): JSX.Element {
