@@ -31,6 +31,7 @@ export const enGB: IMessages = {
     'pages.accounts.pageTitle': 'Accounts',
     'pages.accounts.noAccounts': 'You do not currently have any accounts :(',
     'pages.accounts.add.label': 'Add',
+    'pages.accounts.edit.label': 'Edit',
 
     'pages.addAccount.pageTitle': 'Add account',
     'pages.addAccount.name.label': 'Name',
@@ -42,6 +43,20 @@ export const enGB: IMessages = {
     'pages.addAccount.add.label': 'Add',
     'pages.addAccount.cancel.label': 'Cancel',
 
+    'pages.editAccount.pageTitle': 'Edit account',
+    'pages.editAccount.name.label': 'Name',
+    'pages.editAccount.name.placeholder': 'HintKeep',
+    'pages.editAccount.hint.label': 'Hint',
+    'pages.editAccount.hint.placeholder': 'Crazy person in a box',
+    'pages.editAccount.isPinned.label': 'Is pinned',
+    'pages.editAccount.isPinned.description': 'Pinned accounts are shown at the top for more visibility.',
+    'pages.editAccount.edit.label': 'Edit',
+    'pages.editAccount.delete.label': 'Delete',
+    'pages.editAccount.moveToBin.label': 'Move to bin',
+    'pages.editAccount.delete.confirmationModalTitle': 'Confirm deletion',
+    'pages.editAccount.delete.confirmation': 'The account will be moved to the bin where it can still be viewed and restored. To completely remove the account you need to delete it from there as well.',
+    'pages.editAccount.cancel.label': 'Cancel',
+
     'validation.errors.required': 'Please provide a value.',
     'validation.errors.emailNotUnique': 'The provided e-mail cannot be used to create an account (already in use).',
     'validation.errors.nameNotUnique': 'An account with the same name already exists.',
@@ -51,5 +66,6 @@ export const enGB: IMessages = {
     'validation.errors.invalidSignUpConfirmationToken': 'The provided token is no longer valid. Please sign-up again.',
 
     'errors.internalServerError': 'Something went wrong with the server. Please refresh the page and try again.',
-    'errors.sessionExpired': 'Your session has expired, login again to continue using the application.'
+    'errors.sessionExpired': 'Your session has expired, login again to continue using the application.',
+    'errors.accountNotFound': 'The account you are looking for does not exist.'
 };

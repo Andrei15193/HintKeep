@@ -31,7 +31,7 @@ export function Login(): JSX.Element {
                 <FormInput className={Style.mb3} id="password" type="password" label="pages.login.password.label" field={$vm.password} />
 
                 <div className={Style.mb3}>
-                    <button type="submit" disabled={($vm.isInvalid && $vm.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.loginAsync()}>
+                    <button type="button" disabled={($vm.isInvalid && $vm.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.loginAsync()}>
                         <Message id="pages.login.submit.label" />
                     </button>
                 </div>

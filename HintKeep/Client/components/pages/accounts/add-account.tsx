@@ -1,18 +1,18 @@
 import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import classnames from 'classnames';
-import { Message } from '../i18n';
-import { BusyContent } from '../loaders';
-import { useEvent, useViewModel } from '../view-model-wrappers';
-import { AddAccountViewModel } from '../../view-models/add-account-view-model';
-import { FormInput, CheckboxFormInput } from './forms';
+import { Message } from '../../i18n';
+import { BusyContent } from '../../loaders';
+import { watchEvent, useViewModel } from '../../view-model-wrappers';
+import { AddAccountViewModel } from '../../../view-models/add-account-view-model';
+import { FormInput, CheckboxFormInput } from '../forms';
 
-import Style from '../style.scss';
+import Style from '../../style.scss';
 
 export function AddAccount(): JSX.Element {
-    const history = useHistory();
+    const { push } = useHistory();
     const $vm = useViewModel(AddAccountViewModel);
-    useEvent($vm.submittedEvent, () => history.push('/'));
+    watchEvent($vm.submittedEvent, () => push('/'));
 
     return (
         <div className={Style.m2}>
@@ -23,7 +23,7 @@ export function AddAccount(): JSX.Element {
                 <CheckboxFormInput className={Style.mb3} id="isPinned" label="pages.addAccount.isPinned.label" field={$vm.isPinned} description="pages.addAccount.isPinned.description" />
 
                 <div>
-                    <button type="submit" disabled={($vm.isInvalid && $vm.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>
+                    <button type="button" disabled={($vm.isInvalid && $vm.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>
                         <Message id="pages.addAccount.add.label" />
                     </button>
                     <Link to="/" className={classnames(Style.ml2, Style.btn, Style.btnLight)}>

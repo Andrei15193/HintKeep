@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 export type EventHandler<TEventArgs> = (subject: object, args: TEventArgs) => void;
 
-export function useEvent<TEventArgs>(event: IEvent<TEventArgs>, handler: EventHandler<TEventArgs>): void {
+export function watchEvent<TEventArgs>(event: IEvent<TEventArgs>, handler: EventHandler<TEventArgs>): void {
     useEffect(
         () => {
             const eventHandler: IEventHandler<TEventArgs> = { handle: handler };

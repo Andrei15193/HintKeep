@@ -2,12 +2,14 @@ import type { PropsWithChildren } from 'react'
 import React from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import classnames from 'classnames';
-import { Accounts, AddAccount, Login, SignUp, UserConfirmation } from './pages';
+import { Accounts, AddAccount, EditAccount, Login, SignUp, UserConfirmation } from './pages';
 import { Alerts } from './alerts';
 import { I18nProvider, Message } from './i18n';
 import { useViewModel } from './view-model-wrappers';
 import { UserViewModel } from '../view-models/users/user-view-model';
+import { LoginGuard } from './pages/login';
 
+import 'bootstrap';
 import Style from './style.scss';
 
 export function App(): JSX.Element {
@@ -29,10 +31,19 @@ export function App(): JSX.Element {
                                 <UserConfirmation />
                             </Route>
                             <Route path="/accounts" exact>
-                                <Accounts />
+                                <LoginGuard>
+                                    <Accounts />
+                                </LoginGuard>
                             </Route>
                             <Route path="/accounts/add" exact>
-                                <AddAccount />
+                                <LoginGuard>
+                                    <AddAccount />
+                                </LoginGuard>
+                            </Route>
+                            <Route path="/accounts/:id" exact>
+                                <LoginGuard>
+                                    <EditAccount />
+                                </LoginGuard>
                             </Route>
                             <Route path="/">
                                 <Login />
