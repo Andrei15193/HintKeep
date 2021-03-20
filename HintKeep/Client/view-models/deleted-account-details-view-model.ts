@@ -1,6 +1,7 @@
 import type { AxiosResponse } from 'axios';
 import type { IFormField } from './core';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/accounts/get-by-id';
+import type { INotFoundResponseData as INotFoundPutResponseData, IResponseData as IPutResponseData, IRequestData as IPutRequestData } from '../api/deleted-accounts/put';
 import { FormViewModel, FormField } from './core';
 import { Axios } from '../services';
 import { DispatchEvent, IEvent } from '../events';
@@ -58,5 +59,18 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
                 alertsStore.addAlert('errors.accountNotFound');
             })
             .sendAsync();
+    }
+
+    public async restoreAsync(): Promise<void> {
+        if (this.isLoaded)
+            await this
+                .put<IPutRequestData>(`/api/deleted-accounts/${this._id}`, { isDeleted: false })
+                .on(204, (_: AxiosResponse<IPutResponseData>) => {
+                    this._restoredEvent.dispatch(this);
+                })
+                .on(404, (_: AxiosResponse<INotFoundPutResponseData>) => {
+                    alertsStore.addAlert('errors.accountNotFound');
+                })
+                .sendAsync();
     }
 }

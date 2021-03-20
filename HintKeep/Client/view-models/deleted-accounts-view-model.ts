@@ -1,5 +1,5 @@
 import type { AxiosResponse } from 'axios';
-import type { IResponseData } from '../api/accounts/get';
+import type { IResponseData } from '../api/deleted-accounts/get';
 import { Axios } from '../services';
 import { ApiViewModel } from './core';
 

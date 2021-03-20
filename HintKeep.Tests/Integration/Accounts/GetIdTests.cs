@@ -20,7 +20,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.GetAsync("/api/accounts/account-id");
+            var response = await client.GetAsync("/api/accounts/%23account-id");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -31,10 +31,10 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase()
-                .WithAuthentication("user-id")
+                .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.GetAsync("/api/accounts/account-id");
+            var response = await client.GetAsync("/api/accounts/%23account-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -43,14 +43,18 @@ namespace HintKeep.Tests.Integration.Accounts
         [Fact]
         public async Task Get_WhenAccountExist_ReturnsOk()
         {
-            var account = new Account();
+            var account = new Account
+            {
+                UserId = "#user-id",
+                Id = "#account-id"
+            };
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
-                .WithAuthentication(account.UserId)
+                .WithAuthentication("#user-id")
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.GetAsync($"/api/accounts/{account.Id}");
+            var response = await client.GetAsync($"/api/accounts/%23account-id");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var accountResult = await response.Content.ReadFromJsonAsync<AccountGetResult>();
@@ -79,14 +83,18 @@ namespace HintKeep.Tests.Integration.Accounts
         [Fact]
         public async Task Get_WhenAccountExistForDifferentUser_ReturnsNotFound()
         {
-            var account = new Account();
+            var account = new Account
+            {
+                UserId = "#other-user-id",
+                Id = "#account-id"
+            };
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
-                .WithAuthentication("user-id")
+                .WithAuthentication("#user-id")
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.GetAsync($"/api/accounts/{account.Id}");
+            var response = await client.GetAsync($"/api/accounts/%23account-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

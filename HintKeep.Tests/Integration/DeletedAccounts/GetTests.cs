@@ -8,13 +8,13 @@ using HintKeep.Tests.Data;
 using HintKeep.Tests.Data.Extensions;
 using Xunit;
 
-namespace HintKeep.Tests.Integration.Accounts
+namespace HintKeep.Tests.Integration.DeletedAccounts
 {
-    public class GetDeletedTests : IClassFixture<HintKeepWebApplicationFactory>
+    public class GetTests : IClassFixture<HintKeepWebApplicationFactory>
     {
         private readonly HintKeepWebApplicationFactory _webApplicationFactory;
 
-        public GetDeletedTests(HintKeepWebApplicationFactory webApplicationFactory)
+        public GetTests(HintKeepWebApplicationFactory webApplicationFactory)
             => _webApplicationFactory = webApplicationFactory;
 
         [Fact]

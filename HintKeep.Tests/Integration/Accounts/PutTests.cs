@@ -22,7 +22,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.PutAsJsonAsync("/api/accounts/account-id", string.Empty);
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id", string.Empty);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -36,7 +36,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.PutAsJsonAsync("/api/accounts/account-id", new object());
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id", new object());
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""hint"":[""validation.errors.invalidRequiredMediumText""],""name"":[""validation.errors.invalidRequiredMediumText""]}", await response.Content.ReadAsStringAsync());
@@ -50,7 +50,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.PutAsJsonAsync("/api/accounts/account-id", new { name = " ", hint = " ", notes = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901" });
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id", new { name = " ", hint = " ", notes = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901" });
 
             Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
             Assert.Equal(@"{""hint"":[""validation.errors.invalidRequiredMediumText""],""name"":[""validation.errors.invalidRequiredMediumText""],""notes"":[""validation.errors.invalidLongText""]}", await response.Content.ReadAsStringAsync());
@@ -64,7 +64,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.PutAsJsonAsync("/api/accounts/account-id", new { name = "#Test-Name", hint = "#Test-Hint", isPinned = true });
+            var response = await client.PutAsJsonAsync("/api/accounts/%23account-id", new { name = "#Test-Name", hint = "#Test-Hint", isPinned = true });
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -73,14 +73,19 @@ namespace HintKeep.Tests.Integration.Accounts
         [Fact]
         public async Task Put_WithValidNameHintAndNotes_ReturnsNoContent()
         {
-            var account = new Account { IsPinned = false };
+            var account = new Account
+            {
+                UserId = "#user-id",
+                Id = "#account-id",
+                IsPinned = false
+            };
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
-                .WithAuthentication(account.UserId)
+                .WithAuthentication("#user-id")
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.PutAsJsonAsync($"/api/accounts/{account.Id}", new { name = "#Test-Name-Updated", hint = "#Test-Hint-Updated", notes = "#Test-Notes-Updated", isPinned = true });
+            var response = await client.PutAsJsonAsync($"/api/accounts/%23account-id", new { name = "#Test-Name-Updated", hint = "#Test-Hint-Updated", notes = "#Test-Notes-Updated", isPinned = true });
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -113,14 +118,19 @@ namespace HintKeep.Tests.Integration.Accounts
         [Fact]
         public async Task Put_WhenAccountIsDeleted_ReturnsNotFound()
         {
-            var account = new Account { IsDeleted = true };
+            var account = new Account
+            {
+                UserId = "#user-id",
+                Id = "#account-id",
+                IsDeleted = true
+            };
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
-                .WithAuthentication(account.UserId)
+                .WithAuthentication("#user-id")
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.PutAsJsonAsync($"/api/accounts/{account.Id}", new { name = "#Test-Name-Updated", hint = "#Test-Hint-Updated", isPinned = true });
+            var response = await client.PutAsJsonAsync($"/api/accounts/%23account-id", new { name = "#Test-Name-Updated", hint = "#Test-Hint-Updated", isPinned = true });
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());

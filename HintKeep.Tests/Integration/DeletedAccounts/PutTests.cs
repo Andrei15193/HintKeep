@@ -1,24 +1,25 @@
 using System.Net;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using HintKeep.Tests.Data;
 using HintKeep.Tests.Data.Extensions;
 using Xunit;
 
-namespace HintKeep.Tests.Integration.Accounts
+namespace HintKeep.Tests.Integration.DeletedAccounts
 {
-    public class DeleteTests : IClassFixture<HintKeepWebApplicationFactory>
+    public class PutTests : IClassFixture<HintKeepWebApplicationFactory>
     {
         private readonly HintKeepWebApplicationFactory _webApplicationFactory;
 
-        public DeleteTests(HintKeepWebApplicationFactory webApplicationFactory)
+        public PutTests(HintKeepWebApplicationFactory webApplicationFactory)
             => _webApplicationFactory = webApplicationFactory;
 
         [Fact]
-        public async Task Delete_WithoutAuthentication_ReturnsUnauthorized()
+        public async Task Put_WithoutAuthentication_ReturnsUnauthorized()
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.DeleteAsync("/api/accounts/account-id");
+            var response = await client.PutAsJsonAsync("/api/deleted-accounts/%23account-id", new { isDeleted = false });
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -32,36 +33,14 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.DeleteAsync("/api/accounts/%23account-id");
+            var response = await client.PutAsJsonAsync("/api/deleted-accounts/%23account-id", new { isDeleted = false });
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
-        public async Task Delete_WhenAuthenticatedAndAccountExists_ReturnsNoContent()
-        {
-            var account = new Account
-            {
-                UserId = "#user-id",
-                Id = "#account-id"
-            };
-            var client = _webApplicationFactory
-                .WithInMemoryDatabase(out var entityTables)
-                .WithAuthentication("#user-id")
-                .CreateClient();
-            entityTables.AddAccounts(account);
-
-            var response = await client.DeleteAsync($"/api/accounts/%23account-id");
-
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-            Assert.Empty(await response.Content.ReadAsStringAsync());
-
-            entityTables.AssertAccounts(new Account(account) { IsDeleted = true });
-        }
-
-        [Fact]
-        public async Task Delete_WhenAuthenticatedAndAccountIsDeleted_ReturnsNotFound()
+        public async Task Delete_WhenAuthenticatedAndAccountExistsAndIsDeleted_ReturnsNoContent()
         {
             var account = new Account
             {
@@ -75,7 +54,30 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.DeleteAsync($"/api/accounts/%23account-id");
+            var response = await client.PutAsJsonAsync($"/api/deleted-accounts/%23account-id", new { isDeleted = false });
+
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            Assert.Empty(await response.Content.ReadAsStringAsync());
+
+            entityTables.AssertAccounts(new Account(account) { IsDeleted = false });
+        }
+
+        [Fact]
+        public async Task Delete_WhenAuthenticatedAndAccountIsNotDeleted_ReturnsNotFound()
+        {
+            var account = new Account
+            {
+                UserId = "#user-id",
+                Id = "#account-id",
+                IsDeleted = false
+            };
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication("#user-id")
+                .CreateClient();
+            entityTables.AddAccounts(account);
+
+            var response = await client.PutAsJsonAsync($"/api/deleted-accounts/%23account-id", new { isDeleted = false });
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
