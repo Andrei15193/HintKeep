@@ -1,6 +1,6 @@
 import type { AxiosResponse } from 'axios';
 import type { IFormField } from './core';
-import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/accounts/get-by-id';
+import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/deleted-accounts/get-by-id';
 import type { INotFoundResponseData as INotFoundPutResponseData, IResponseData as IPutResponseData, IRequestData as IPutRequestData } from '../api/deleted-accounts/put';
 import { FormViewModel, FormField } from './core';
 import { Axios } from '../services';
@@ -47,7 +47,7 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
 
     public async loadAsync(id: string): Promise<void> {
         return this
-            .get(`/api/accounts/${id}`)
+            .get(`/api/deleted-accounts/${id}`)
             .on(200, ({ data: { name, hint, isPinned } }: AxiosResponse<IGetResponseData>) => {
                 this._id = id;
                 this._name.value = name;

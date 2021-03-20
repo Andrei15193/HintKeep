@@ -11,15 +11,15 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.Accounts.Queries
 {
-    public class GetAccountDetailsQueryHandler : IRequestHandler<GetAccountDetailsQuery, AccountDetails>
+    public class GetDeletedAccountDetailsQueryHandler : IRequestHandler<GetDeletedAccountDetailsQuery, AccountDetails>
     {
         private readonly IEntityTables _entityTables;
         private readonly Session _login;
 
-        public GetAccountDetailsQueryHandler(IEntityTables entityTables, Session login)
+        public GetDeletedAccountDetailsQueryHandler(IEntityTables entityTables, Session login)
             => (_entityTables, _login) = (entityTables, login);
 
-        public async Task<AccountDetails> Handle(GetAccountDetailsQuery query, CancellationToken cancellationToken)
+        public async Task<AccountDetails> Handle(GetDeletedAccountDetailsQuery query, CancellationToken cancellationToken)
         {
             var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
                 TableOperation.Retrieve<AccountEntity>(
@@ -37,7 +37,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
                 ),
                 cancellationToken
             )).Result;
-            if (accountEntity is null || accountEntity.IsDeleted)
+            if (accountEntity is null || !accountEntity.IsDeleted)
                 throw new NotFoundException();
 
             return new AccountDetails

@@ -6,7 +6,7 @@ using HintKeep.Tests.Data;
 using HintKeep.Tests.Data.Extensions;
 using Xunit;
 
-namespace HintKeep.Tests.Integration.Accounts
+namespace HintKeep.Tests.Integration.DeletedAccounts
 {
     public class GetIdTests : IClassFixture<HintKeepWebApplicationFactory>
     {
@@ -20,7 +20,7 @@ namespace HintKeep.Tests.Integration.Accounts
         {
             var client = _webApplicationFactory.CreateClient();
 
-            var response = await client.GetAsync("/api/accounts/%23account-id");
+            var response = await client.GetAsync("/api/deleted-accounts/%23account-id");
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -34,54 +34,14 @@ namespace HintKeep.Tests.Integration.Accounts
                 .WithAuthentication("#user-id")
                 .CreateClient();
 
-            var response = await client.GetAsync("/api/accounts/%23account-id");
+            var response = await client.GetAsync("/api/deleted-accounts/%23account-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
-        public async Task Get_WhenAccountExist_ReturnsOk()
-        {
-            var account = new Account
-            {
-                UserId = "#user-id",
-                Id = "#account-id"
-            };
-            var client = _webApplicationFactory
-                .WithInMemoryDatabase(out var entityTables)
-                .WithAuthentication("#user-id")
-                .CreateClient();
-            entityTables.AddAccounts(account);
-
-            var response = await client.GetAsync($"/api/accounts/%23account-id");
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var accountResult = await response.Content.ReadFromJsonAsync<AccountGetResult>();
-            Assert.Equal(
-                new
-                {
-                    Id = account.Id,
-                    Name = account.Name,
-                    account.Hints.Single().Hint,
-                    Notes = account.Notes,
-                    IsPinned = account.IsPinned,
-                    IsDeleted = account.IsDeleted
-                },
-                new
-                {
-                    accountResult.Id,
-                    accountResult.Name,
-                    accountResult.Hint,
-                    accountResult.Notes,
-                    accountResult.IsPinned,
-                    accountResult.IsDeleted
-                }
-            );
-        }
-
-        [Fact]
-        public async Task Get_WhenAccountExistAndIsDeleted_ReturnsNotFound()
+        public async Task Get_WhenAccountExistAndIsDeleted_ReturnsOk()
         {
             var account = new Account
             {
@@ -95,7 +55,46 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.GetAsync($"/api/accounts/%23account-id");
+            var response = await client.GetAsync($"/api/deleted-accounts/%23account-id");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var accountResult = await response.Content.ReadFromJsonAsync<AccountGetResult>();
+            Assert.Equal(
+                new
+                {
+                    Id = account.Id,
+                    Name = account.Name,
+                    account.Hints.Single().Hint,
+                    Notes = account.Notes,
+                    IsPinned = account.IsPinned
+                },
+                new
+                {
+                    accountResult.Id,
+                    accountResult.Name,
+                    accountResult.Hint,
+                    accountResult.Notes,
+                    accountResult.IsPinned
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Get_WhenAccountExistAndIsNotDeleted_ReturnsNotFound()
+        {
+            var account = new Account
+            {
+                UserId = "#user-id",
+                Id = "#account-id",
+                IsDeleted = false
+            };
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication("#user-id")
+                .CreateClient();
+            entityTables.AddAccounts(account);
+
+            var response = await client.GetAsync($"/api/deleted-accounts/%23account-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -107,7 +106,8 @@ namespace HintKeep.Tests.Integration.Accounts
             var account = new Account
             {
                 UserId = "#other-user-id",
-                Id = "#account-id"
+                Id = "#account-id",
+                IsDeleted = true
             };
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
@@ -115,7 +115,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 .CreateClient();
             entityTables.AddAccounts(account);
 
-            var response = await client.GetAsync($"/api/accounts/%23account-id");
+            var response = await client.GetAsync($"/api/deleted-accounts/%23account-id");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
@@ -132,8 +132,6 @@ namespace HintKeep.Tests.Integration.Accounts
             public string Notes { get; set; }
 
             public bool IsPinned { get; set; }
-
-            public bool IsDeleted { get; set; }
         }
     }
 }

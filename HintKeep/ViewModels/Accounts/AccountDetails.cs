@@ -11,7 +11,5 @@ namespace HintKeep.ViewModels.Accounts
         public string Notes { get; set; }
 
         public bool IsPinned { get; set; }
-
-        public bool IsDeleted { get; set; }
     }
 }

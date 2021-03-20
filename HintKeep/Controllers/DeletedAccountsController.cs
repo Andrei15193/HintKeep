@@ -19,6 +19,10 @@ namespace HintKeep.Controllers
         public async Task<IActionResult> GetAsync()
             => Ok(await _mediator.Send(new GetDeletedAccountsQuery()));
 
+        [HttpGet("{accountId}")]
+        public async Task<IActionResult> GetAsync(string accountId)
+            => Ok(await _mediator.Send(new GetDeletedAccountDetailsQuery { Id = accountId }));
+
         [HttpPut("{accountId}")]
         public async Task<IActionResult> PutAsync(string accountId, DeletedAccountUpdate deletedAccountUpdate)
         {
