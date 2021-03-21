@@ -69,6 +69,9 @@ export const enGB: IMessages = {
     'pages.deletedAccountDetails.isPinned.label': 'Is pinned',
     'pages.deletedAccountDetails.isPinned.description': 'Pinned accounts are shown at the top for more visibility.',
     'pages.deletedAccountDetails.restore.label': 'Restore',
+    'pages.deletedAccountDetails.delete.label': 'Delete',
+    'pages.deletedAccountDetails.delete.confirmationModalTitle': 'Confirm deletion',
+    'pages.deletedAccountDetails.delete.confirmation': 'The account will be permanently deleted and you will no longer be able to recover it! Please confirm your operation.',
     'pages.deletedAccountDetails.cancel.label': 'Cancel',
 
     'validation.errors.required': 'Please provide a value.',

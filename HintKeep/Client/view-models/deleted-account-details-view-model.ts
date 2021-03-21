@@ -10,6 +10,7 @@ import { alertsStore } from '../stores';
 export class DeletedAccountDetailsViewModel extends FormViewModel {
     private _id: string | null;
     private readonly _restoredEvent: DispatchEvent;
+    private readonly _deletedEvent: DispatchEvent;
     private readonly _name: FormField<string>;
     private readonly _hint: FormField<string>;
     private readonly _isPinned: FormField<boolean>;
@@ -17,6 +18,7 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
     constructor() {
         super(Axios);
         this._restoredEvent = new DispatchEvent();
+        this._deletedEvent = new DispatchEvent();
         this._id = null;
         this.register(
             this._name = new FormField<string>(''),
@@ -45,6 +47,10 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
         return this._restoredEvent;
     }
 
+    public get deletedEvent(): IEvent {
+        return this._deletedEvent;
+    }
+
     public async loadAsync(id: string): Promise<void> {
         return this
             .get(`/api/deleted-accounts/${id}`)
@@ -70,6 +76,19 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
                 })
                 .on(404, (_: AxiosResponse<INotFoundPutResponseData>) => {
                     alertsStore.addAlert('errors.accountNotFound');
+                })
+                .sendAsync();
+    }
+
+    public async deleteAsync(): Promise<any> {
+        if (this._id !== null)
+            await this
+                .delete(`/api/deleted-accounts/${this._id}`)
+                .on(204, (_: AxiosResponse<IPutResponseData>) => {
+                    this._deletedEvent.dispatch(this);
+                })
+                .on(404, (_: AxiosResponse<INotFoundPutResponseData>) => {
+                    this._deletedEvent.dispatch(this);
                 })
                 .sendAsync();
     }

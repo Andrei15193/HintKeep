@@ -34,5 +34,16 @@ namespace HintKeep.Controllers
 
             return NoContent();
         }
+
+        [HttpDelete("{accountId}")]
+        public async Task<IActionResult> DeleteAsync(string accountId)
+        {
+            await _mediator.Send(new DeleteAccountCommand
+            {
+                Id = accountId
+            });
+
+            return NoContent();
+        }
     }
 }

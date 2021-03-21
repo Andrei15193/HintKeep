@@ -35,11 +35,12 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var account = new Account
             {
-                UserId = "#user-id"
+                UserId = "#user-id",
+                Id = "#account-id"
             };
             _entityTables.AddAccounts(account);
 
-            await _moveAccountToBinCommandHandler.Handle(new MoveAccountToBinCommand { Id = account.Id }, default);
+            await _moveAccountToBinCommandHandler.Handle(new MoveAccountToBinCommand { Id = "#account-id" }, default);
 
             _entityTables.AssertAccounts(new Account(account) { IsDeleted = true });
         }
@@ -50,6 +51,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             var account = new Account
             {
                 UserId = "#user-id",
+                Id = "#account-id",
                 IsDeleted = true
             };
             _entityTables.AddAccounts(account);
