@@ -11,6 +11,7 @@ export const enGB: IMessages = {
     'pages.signUp.password.description': 'The password must be at least 8 characters long, contain upper case and lower case letters, at least one digit and at least one non alphanumeric character.',
     'pages.signUp.submit.label': 'Sign-Up',
     'pages.signUp.cancel.label': 'Cancel',
+    'pages.signUp.confirm.label': 'Confirm user account',
 
     'pages.userConfirmation.pageTitle': 'User Confirmation',
     'pages.userConfirmation.email.label': 'E-Mail address',

@@ -77,7 +77,7 @@ namespace HintKeep.Tests.Integration.Users
             var confirmationEmail = Assert.Single(emailService.SentEmailMessages);
             Assert.Equal("Welcome to HintKeep!", confirmationEmail.Title);
             Assert.Equal("#eMail@DOMAIN.TLD", confirmationEmail.To);
-            Assert.Contains(tokenEntity.Token, confirmationEmail.Content);
+            Assert.Contains(tokenEntity.Token, confirmationEmail.Content, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]

@@ -14,6 +14,48 @@ namespace HintKeep.RequestsHandlers.Users.Commands
 {
     public class UserSignUpCommandHandler : AsyncRequestHandler<UserSignUpCommand>
     {
+        private const string _confirmationEmail = @"<!doctype html>
+<head>
+    <meta name="" charset"" content="" utf-8"">
+    <title>Welcome to HintKeep!</title>
+    <style>
+        html {{
+            font-family: Arial, Helvetica, sans-serif;
+        }}
+
+        body {{
+            margin: 0;
+        }}
+
+        h1 {{
+            margin: 0 0 15px 0;
+            padding: 5px 10px;
+            background-color: black;
+            color: white;
+        }}
+
+        p {{
+            padding: 0 10px;
+            margin: 0 0 10px 0;
+        }}
+
+        p.footer {{
+            margin: 0;
+            padding: 3px 10px;
+            background-color: black;
+            color: white;
+        }}
+    </style>
+</head>
+<body>
+    <h1>Welcome to HintKeep!</h1>
+    <p>Hello,</p>
+    <p>Thank you for using HintKeep! Even if you are just trying this application out or intend to use it long-term, we hope it is useful to you!</p>
+    <p>To complete the registration please confirm your account using the following code: {0}.</p>
+    <p class=""footer"">HintKeep - Store hints not passwords.</p>
+</body>
+</html>";
+
         private readonly IEntityTables _entityTables;
         private readonly IRngService _rngService;
         private readonly ISaltService _saltService;
@@ -64,7 +106,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
                 {
                     Title = "Welcome to HintKeep!",
                     To = command.Email,
-                    Content = $"Welcome to HintKeep, use the following token to confirm your account. Confirmation token {confirmationToken}."
+                    Content = string.Format(_confirmationEmail, confirmationToken.ToUpper())
                 });
             }
             catch (StorageException storageException) when (storageException.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)

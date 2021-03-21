@@ -66,7 +66,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Returns("#test-hash")
                 .Verifiable();
             _emailService
-                .Setup(emailService => emailService.SendAsync(It.Is<EmailMessage>(emailMessage => emailMessage.Title == "Welcome to HintKeep!" && emailMessage.To == "#test-eMail" && emailMessage.Content.Contains("#test-confirmation-token"))))
+                .Setup(emailService => emailService.SendAsync(It.Is<EmailMessage>(emailMessage => emailMessage.Title == "Welcome to HintKeep!" && emailMessage.To == "#test-eMail" && emailMessage.Content.Contains("#test-confirmation-token", StringComparison.OrdinalIgnoreCase))))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 

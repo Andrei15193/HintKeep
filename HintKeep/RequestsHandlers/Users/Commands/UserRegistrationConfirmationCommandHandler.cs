@@ -43,7 +43,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
             if (loginEntity is object
                 && loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue == nameof(EmailLoginEntityState.PendingConfirmation)
                 && tokenEntity is object
-                && tokenEntity.Properties[nameof(EmailLoginTokenEntity.Token)].StringValue == command.ConfirmationToken
+                && string.Equals(tokenEntity.Properties[nameof(EmailLoginTokenEntity.Token)].StringValue, command.ConfirmationToken, StringComparison.OrdinalIgnoreCase)
                 && (DateTime.UtcNow - tokenEntity.Properties[nameof(EmailLoginTokenEntity.Created)].DateTime.Value).TotalDays < 1)
             {
                 loginEntity.Properties[nameof(EmailLoginEntity.State)].StringValue = nameof(EmailLoginEntityState.Confirmed);
