@@ -15,7 +15,7 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
     private readonly _hint: FormField<string>;
     private readonly _isPinned: FormField<boolean>;
 
-    constructor() {
+    public constructor() {
         super(Axios);
         this._restoredEvent = new DispatchEvent();
         this._deletedEvent = new DispatchEvent();

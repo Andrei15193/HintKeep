@@ -1,5 +1,6 @@
 import type { IInputProps } from './input';
 import React from 'react';
+import { watchViewModel } from '../../view-model-wrappers';
 import { Input } from './input';
 import { Message } from '../../i18n';
 
@@ -12,6 +13,8 @@ export interface IFormInputProps extends IInputProps {
 }
 
 export function FormInput({ label, description, field, id, className, ...inputProps }: IFormInputProps): JSX.Element {
+    watchViewModel(field, ['errors']);
+
     return (
         <div className={className}>
             <label htmlFor={id}><Message id={label} /></label>

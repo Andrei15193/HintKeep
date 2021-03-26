@@ -1,6 +1,7 @@
 import type { IInputProps } from './input';
 import React from 'react';
 import classnames from 'classnames';
+import { watchViewModel } from '../../view-model-wrappers';
 import { Input } from './input';
 import { Message } from '../../i18n';
 
@@ -13,6 +14,8 @@ export interface ICheckboxFormInputProps extends IInputProps {
 }
 
 export function CheckboxFormInput({ label, description, field, id, className, type, ...inputProps }: ICheckboxFormInputProps): JSX.Element {
+    watchViewModel(field, ['value', 'errors']);
+
     return (
         <div className={classnames(className, Style.formGroup, Style.formCheck)}>
             <Input field={field} id={id} type="checkbox" className={Style.formCheckInput} checked={field.value} onChange={ev => field.value = ev.target.checked} {...inputProps} />

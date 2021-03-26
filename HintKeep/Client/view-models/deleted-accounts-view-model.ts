@@ -6,7 +6,7 @@ import { ApiViewModel } from './core';
 export class DeletedAccountsViewModel extends ApiViewModel {
     private _accounts: readonly Account[];
 
-    constructor() {
+    public constructor() {
         super(Axios);
         this._accounts = [];
     }

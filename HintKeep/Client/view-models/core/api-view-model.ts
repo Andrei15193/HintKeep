@@ -10,7 +10,7 @@ export enum ApiViewModelState {
     Faulted
 }
 
-export class ApiViewModel extends ViewModel {
+export abstract class ApiViewModel extends ViewModel {
     private readonly _axios: AxiosInstance;
     private _state: ApiViewModelState = ApiViewModelState.Ready;
 

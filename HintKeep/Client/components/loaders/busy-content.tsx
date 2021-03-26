@@ -5,7 +5,7 @@ import { Spinner } from './spinner';
 import { ApiViewModel, ApiViewModelState } from '../../view-models/core/';
 
 export function BusyContent({ $vm, children }: PropsWithChildren<PropsWithViewModel<ApiViewModel>>): JSX.Element {
-    watchViewModel($vm);
+    watchViewModel($vm, ['state']);
 
     return $vm.state === ApiViewModelState.Busy ? <Spinner /> : <>{children}</>
 }

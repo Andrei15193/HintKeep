@@ -2,6 +2,7 @@ import type { InputHTMLAttributes } from 'react'
 import type { IFormField } from '../../../view-models/core';
 import React, { useContext } from 'react';
 import classnames from 'classnames';
+import { watchViewModel } from '../../view-model-wrappers';
 import { getValidationClasses } from './get-validation-classes';
 import { I18nContext } from '../../i18n';
 
@@ -13,6 +14,7 @@ export interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export function Input({ field, placeholder, ...inputProps }: IInputProps): JSX.Element {
     const messageResolver = useContext(I18nContext);
+    watchViewModel(field, ['value']);
 
     return (
         <input

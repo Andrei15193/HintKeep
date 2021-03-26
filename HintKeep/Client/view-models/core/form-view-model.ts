@@ -7,7 +7,7 @@ export class FormViewModel extends ApiViewModel {
     private readonly _fieldPropertyChangedEventHandler: IEventHandler<readonly string[]>;
     protected readonly _registeredFields: IFormField[];
 
-    constructor(axios: AxiosInstance, ...stores: readonly INotifyPropertyChanged[]) {
+    public constructor(axios: AxiosInstance, ...stores: readonly INotifyPropertyChanged[]) {
         super(axios, ...stores);
         this._fieldPropertyChangedEventHandler = { handle: this.fieldChanged.bind(this) };
         this._registeredFields = [];

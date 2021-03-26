@@ -10,7 +10,7 @@ export class UserConfirmationViewModel extends FormViewModel {
     private readonly _email: FormField<string>;
     private readonly _confirmationToken: FormField<string>;
 
-    constructor() {
+    public constructor() {
         super(Axios);
         this._submittedEvent = new DispatchEvent();
         this.register(

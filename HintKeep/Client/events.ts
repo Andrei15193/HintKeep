@@ -1,7 +1,7 @@
-export interface IEvent<IEventArgs = void> {
-    subscribe(eventHandler: IEventHandler<IEventArgs>): void;
+export interface IEvent<TEventArgs = void> {
+    subscribe(eventHandler: IEventHandler<TEventArgs>): void;
 
-    unsubscribe(eventHandler: IEventHandler<IEventArgs>): void;
+    unsubscribe(eventHandler: IEventHandler<TEventArgs>): void;
 }
 
 export interface IEventHandler<TEventArgs = void> {
@@ -15,7 +15,7 @@ export class DispatchEvent<TEventArgs = void> implements IEvent<TEventArgs> {
     private readonly _lastUnsubscribeCallback?: SubscriptionCallback;
     private _eventHandlers: readonly IEventHandler<TEventArgs>[] = [];
 
-    constructor(firstSubscribeCallback?: SubscriptionCallback, lastUnsubscribeCallback?: SubscriptionCallback) {
+    public constructor(firstSubscribeCallback?: SubscriptionCallback, lastUnsubscribeCallback?: SubscriptionCallback) {
         this._firstSubscribeCallback = firstSubscribeCallback;
         this._lastUnsubscribeCallback = lastUnsubscribeCallback;
     }

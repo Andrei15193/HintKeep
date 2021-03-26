@@ -1,74 +1,65 @@
 import type { AxiosResponse } from 'axios';
-import type { IFormField } from './core';
 import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../api/accounts/post';
-import { FormViewModel, FormField } from './core';
+import type { FormFieldViewModel } from './core'
+import { ApiViewModel, FormFieldCollectionViewModel, combineValidators, required } from './core';
 import { Axios } from '../services';
 import { DispatchEvent, IEvent } from '../events';
 
-export class AddAccountViewModel extends FormViewModel {
-    private readonly _submittedEvent: DispatchEvent;
-    private readonly _name: FormField<string>;
-    private readonly _hint: FormField<string>;
-    private readonly _isPinned: FormField<boolean>;
+export class AddAccountViewModel extends ApiViewModel {
+    private readonly _submittedEvent: DispatchEvent = new DispatchEvent();
 
-    constructor() {
+    public constructor() {
         super(Axios);
-        this._submittedEvent = new DispatchEvent();
-        this.register(
-            this._name = new FormField<string>(''),
-            this._hint = new FormField<string>(''),
-            this._isPinned = new FormField<boolean>(false)
-        );
     }
 
-    public get name(): IFormField<string> {
-        return this._name;
-    }
-
-    public get hint(): IFormField<string> {
-        return this._hint;
-    }
-
-    public get isPinned(): IFormField<boolean> {
-        return this._isPinned;
-    }
+    public readonly form: AddAccountForm = new AddAccountForm();
 
     public get submittedEvent(): IEvent {
         return this._submittedEvent;
     }
 
     public async submitAsync(): Promise<void> {
-        this.touchAllFields();
-        if (this.isValid) {
+        this.form.fields.forEach(field => field.isTouched = true);
+        if (this.form.isValid) {
             await this
                 .post<IRequestData>('/api/accounts', {
-                    name: this.name.value,
-                    hint: this.hint.value,
-                    isPinned: this.isPinned.value
+                    name: this.form.name.value,
+                    hint: this.form.hint.value,
+                    isPinned: this.form.isPinned.value
                 })
                 .on(201, (_: AxiosResponse<IResponseData>) => {
                     this._submittedEvent.dispatch(this);
                 })
                 .on(409, (_: AxiosResponse<IConflictResponseData>) => {
-                    this._name.errors = ['validation.errors.nameNotUnique'];
+                    this.form.name.errors = ['validation.errors.nameNotUnique'];
                 })
                 .on(422, ({ data: { name: nameErrors, hint: hintErrors } }: AxiosResponse<IUnprocessableEntityResponseData>) => {
-                    this._name.errors = nameErrors;
-                    this._hint.errors = hintErrors;
+                    this.form.name.errors = nameErrors;
+                    this.form.hint.errors = hintErrors;
                 })
                 .sendAsync();
         }
     }
+}
 
-    protected fieldChanged(field: FormField<string>, changedProperties: readonly string[]): void {
-        if (changedProperties.includes('value') || changedProperties.includes('isTouched'))
-            switch (field) {
-                case this._name:
-                case this._hint:
-                    field.errors = field.value?.length ? [] : ['validation.errors.required'];
-                    break;
-            }
+class AddAccountForm extends FormFieldCollectionViewModel {
+    public constructor() {
+        super();
+        this.name = this.addField('', combineValidators(required), this._fieldChanged);
+        this.hint = this.addField('', combineValidators(required), this._fieldChanged);
+        this.isPinned = this.addField(false, this._fieldChanged);
+    }
 
-        super.fieldChanged(field, changedProperties);
+    public readonly name: FormFieldViewModel<string>;
+    public readonly hint: FormFieldViewModel<string>;
+    public readonly isPinned: FormFieldViewModel<boolean>;
+
+    public get areAllFieldsTouched(): boolean {
+        return this.fields.every(field => field.isTouched);
+    }
+
+    private _fieldChanged(field: FormFieldViewModel<any>, changedProperties: readonly string[]): void {
+        if (changedProperties.includes('isTouched'))
+            this.notifyPropertyChanged('areAllFieldsTouched');
     }
 }
