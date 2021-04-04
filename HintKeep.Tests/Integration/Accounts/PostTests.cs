@@ -32,7 +32,6 @@ namespace HintKeep.Tests.Integration.Accounts
         public async Task Post_WithEmptyObject_ReturnsUnprocessableEntity()
         {
             var client = _webApplicationFactory
-                .WithInMemoryDatabase()
                 .WithAuthentication(Guid.NewGuid().ToString("N"))
                 .CreateClient();
 
@@ -46,7 +45,6 @@ namespace HintKeep.Tests.Integration.Accounts
         public async Task Post_WithInvalidNameHintAndNotes_ReturnsUnprocessableEntity()
         {
             var client = _webApplicationFactory
-                .WithInMemoryDatabase()
                 .WithAuthentication(Guid.NewGuid().ToString("N"))
                 .CreateClient();
 

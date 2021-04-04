@@ -1,6 +1,5 @@
-export { Login } from './login';
-export { SignUp } from './sign-up';
-export { UserConfirmation } from './user-confirmation';
+export { AuthenticationGuard } from './authentication-guard';
+export { Authentication } from './authentication';
 export { Accounts } from './accounts/view';
 export { DeletedAccounts } from './accounts/view-deleted';
 export { AddAccount } from './accounts/add-account';

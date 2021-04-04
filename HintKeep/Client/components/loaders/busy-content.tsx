@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react'
-import { PropsWithViewModel, watchViewModel } from './../view-model-wrappers';
+import { PropsWithViewModel, watchViewModel } from '../view-model-hooks';
 import React from 'react';
 import { Spinner } from './spinner';
 import { ApiViewModel, ApiViewModelState } from '../../view-models/core/';

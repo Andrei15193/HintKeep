@@ -23,7 +23,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
-            _updateAccountCommandHandler = new UpdateAccountCommandHandler(_entityTables, new Session("#user-id", "#session-id"));
+            _updateAccountCommandHandler = new UpdateAccountCommandHandler(_entityTables, new Session("#user-id"));
         }
 
         [Fact]

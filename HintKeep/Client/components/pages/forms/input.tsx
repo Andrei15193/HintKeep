@@ -2,7 +2,7 @@ import type { InputHTMLAttributes } from 'react'
 import type { IFormField } from '../../../view-models/core';
 import React, { useContext } from 'react';
 import classnames from 'classnames';
-import { watchViewModel } from '../../view-model-wrappers';
+import { watchViewModel } from '../../view-model-hooks';
 import { getValidationClasses } from './get-validation-classes';
 import { I18nContext } from '../../i18n';
 
@@ -23,6 +23,7 @@ export function Input({ field, placeholder, ...inputProps }: IInputProps): JSX.E
             value={field.value}
             onChange={ev => field.value = ev.target.value}
             placeholder={placeholder ? messageResolver.resolve(placeholder) : undefined}
+            autoComplete="off"
             {...inputProps} />
     );
 }

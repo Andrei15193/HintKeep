@@ -22,7 +22,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
-            _moveAccountToBinCommandHandler = new DeleteAccountCommandHandler(_entityTables, new Session("#user-id", "#session-id"));
+            _moveAccountToBinCommandHandler = new DeleteAccountCommandHandler(_entityTables, new Session("#user-id"));
         }
 
         [Fact]

@@ -3,7 +3,7 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
-import { watchEvent, useViewModel } from '../../view-model-wrappers';
+import { watchEvent, useViewModel } from '../../view-model-hooks';
 import { EditAccountViewModel } from '../../../view-models/edit-account-view-model';
 import { FormInput, CheckboxFormInput } from '../forms';
 import { Else, If, Then } from '../../conditionals';

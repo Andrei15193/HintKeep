@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert } from './alert';
 import { AlertsViewModel } from '../../view-models/alerts-view-model';
-import { useViewModel } from '../view-model-wrappers';
+import { useViewModel } from '../view-model-hooks';
 
 export function Alerts(): JSX.Element {
     const $vm = useViewModel(AlertsViewModel);

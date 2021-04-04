@@ -1,6 +1,6 @@
 import type { IInputProps } from './input';
 import React from 'react';
-import { watchViewModel } from '../../view-model-wrappers';
+import { watchViewModel } from '../../view-model-hooks';
 import { Input } from './input';
 import { Message } from '../../i18n';
 

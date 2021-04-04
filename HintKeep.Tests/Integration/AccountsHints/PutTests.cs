@@ -217,7 +217,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
         public async Task Put_WhenAccountDoesNotExist_ReturnsNotFound()
         {
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(out var entityTables)
+                .WithInMemoryDatabase()
                 .WithAuthentication("#user-id")
                 .CreateClient();
 

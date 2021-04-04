@@ -2,17 +2,16 @@ import type { PropsWithChildren } from 'react'
 import React from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import classnames from 'classnames';
-import { Accounts, AddAccount, DeletedAccountDetails, DeletedAccounts, EditAccount, Login, SignUp, UserConfirmation } from './pages';
-import { Alerts } from './alerts';
+import { AuthenticationGuardViewModel } from '../view-models/authentication-guard-view-model';
+import { useViewModel } from './view-model-hooks';
 import { I18nProvider, Message } from './i18n';
-import { useViewModel } from './view-model-wrappers';
-import { UserViewModel } from '../view-models/users/user-view-model';
-import { LoginGuard } from './pages/login';
+import { Alerts } from './alerts';
+import { Accounts, AddAccount, Authentication, AuthenticationGuard, DeletedAccountDetails, DeletedAccounts, EditAccount } from './pages';
 
 import Style from './style.scss';
 
 export function App(): JSX.Element {
-    const $vm = useViewModel(UserViewModel);
+    const $vm = useViewModel(AuthenticationGuardViewModel);
 
     return (
         <I18nProvider>
@@ -22,40 +21,34 @@ export function App(): JSX.Element {
                     <Alerts />
                     <BrowserRouter>
                         <Switch>
-                            {$vm.isAuthenticated ? <Redirect to="/accounts" from="/" exact /> : <Redirect to="/" from="/accounts" exact />}
-                            <Route path="/user-accounts/create" exact>
-                                <SignUp />
-                            </Route>
-                            <Route path="/user-accounts/confirm" exact>
-                                <UserConfirmation />
-                            </Route>
+                            <Redirect from="/" to="/accounts" exact />
                             <Route path="/accounts" exact>
-                                <LoginGuard>
+                                <AuthenticationGuard $vm={$vm}>
                                     <Accounts />
-                                </LoginGuard>
+                                </AuthenticationGuard>
+                            </Route>
+                            <Route path="/authentications" exact>
+                                <Authentication />
                             </Route>
                             <Route path="/accounts/add" exact>
-                                <LoginGuard>
+                                <AuthenticationGuard $vm={$vm}>
                                     <AddAccount />
-                                </LoginGuard>
+                                </AuthenticationGuard>
                             </Route>
                             <Route path="/accounts/bin" exact>
-                                <LoginGuard>
+                                <AuthenticationGuard $vm={$vm}>
                                     <DeletedAccounts />
-                                </LoginGuard>
+                                </AuthenticationGuard>
                             </Route>
                             <Route path="/accounts/bin/:id" exact>
-                                <LoginGuard>
+                                <AuthenticationGuard $vm={$vm}>
                                     <DeletedAccountDetails />
-                                </LoginGuard>
+                                </AuthenticationGuard>
                             </Route>
                             <Route path="/accounts/:id" exact>
-                                <LoginGuard>
+                                <AuthenticationGuard $vm={$vm}>
                                     <EditAccount />
-                                </LoginGuard>
-                            </Route>
-                            <Route path="/">
-                                <Login />
+                                </AuthenticationGuard>
                             </Route>
                         </Switch>
                     </BrowserRouter>

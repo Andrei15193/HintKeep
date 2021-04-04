@@ -11,9 +11,6 @@ namespace HintKeep.Controllers
     [ApiController, Route("api/users/preferences")]
     public class UsersPreferencesController : ControllerBase
     {
-        /// <summary>
-        /// Gets the user preferences
-        /// </summary>
         [AllowAnonymous, HttpGet]
         public IActionResult Get()
             => Ok(new UserPreferences

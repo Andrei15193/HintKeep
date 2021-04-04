@@ -2,9 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using HintKeep.Storage;
 using HintKeep.Storage.Azure;
-using HintKeep.Services;
-using HintKeep.Services.Implementations;
-using HintKeep.Services.Implementations.Configs;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,14 +16,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace HintKeep
 {
     public class Startup
     {
+        private const string ObjectIdClaimType = "http://schemas.microsoft.com/identity/claims/objectidentifier";
         private readonly IConfiguration _configuration;
 
         public Startup(IConfiguration configuration)
@@ -34,8 +33,6 @@ namespace HintKeep
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var jsonWebTokenServiceConfig = new JsonWebTokenServiceConfig(_configuration.GetSection(nameof(JsonWebTokenService)));
-
             services.AddSingleton<IEntityTables>(new AzureEntityTables(CloudStorageAccount.Parse(_configuration.GetConnectionString("AZURE_STORAGE")).CreateCloudTableClient()));
 
             services.AddHttpContextAccessor();
@@ -43,22 +40,9 @@ namespace HintKeep
             {
                 var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
                 return httpContext.User.Identity.IsAuthenticated
-                    ? new Session(httpContext.User.FindFirstValue(ClaimTypes.Name), httpContext.User.FindFirstValue(ClaimTypes.SerialNumber))
+                    ? new Session(httpContext.User.FindFirstValue(ObjectIdClaimType))
                     : null;
             });
-
-            services.AddTransient(serviceProvider => new CryptographicHashServiceConfig(_configuration.GetSection(nameof(CryptographicHashService))));
-            services.AddSingleton(new EmailServiceConfig(_configuration.GetSection(nameof(EmailService))));
-            services.AddSingleton(new SaltServiceConfig(_configuration.GetSection(nameof(SaltService))));
-            services.AddSingleton(new PasswordHashServiceConfig(_configuration.GetSection(nameof(PasswordHashService))));
-            services.AddSingleton(jsonWebTokenServiceConfig);
-
-            services.AddSingleton<IRngService, RngService>();
-            services.AddTransient<ICryptographicHashService, CryptographicHashService>();
-            services.AddTransient<ISaltService, SaltService>();
-            services.AddTransient<IEmailService, EmailService>();
-            services.AddTransient<IJsonWebTokenService, JsonWebTokenService>();
-            services.AddTransient<IPasswordHashService, PasswordHashService>();
 
             services.AddMediatR(typeof(Startup));
 
@@ -66,7 +50,6 @@ namespace HintKeep
                 .AddControllers(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter());
-                    options.Filters.Add<ActiveSessionAuthorizationFilter>();
                     options.Filters.Add<ExceptionFilter>();
                 })
                 .AddJsonOptions(options =>
@@ -92,8 +75,7 @@ namespace HintKeep
                         options.DefaultPolicy = new AuthorizationPolicyBuilder()
                             .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                             .RequireAuthenticatedUser()
-                            .RequireClaim(ClaimTypes.Name)
-                            .RequireClaim(ClaimTypes.SerialNumber)
+                            .RequireClaim(ObjectIdClaimType)
                             .Build();
                     }
                 )
@@ -107,18 +89,45 @@ namespace HintKeep
                 .AddJwtBearer(
                     options =>
                     {
-                        options.RequireHttpsMetadata = true;
+                        var authenticationConfiguration = _configuration.GetSection("Authentication");
+                        var tenantName = authenticationConfiguration.GetValue<string>("TenantName");
+                        var tenantId = authenticationConfiguration.GetValue<string>("TenantId");
+                        var applicationId = authenticationConfiguration.GetValue<string>("ApplicationId");
+                        var policy = authenticationConfiguration.GetValue<string>("Policy");
+
                         options.SaveToken = false;
+                        options.RequireHttpsMetadata = true;
+                        options.MetadataAddress = $"https://{tenantName}.b2clogin.com/{tenantName}.onmicrosoft.com/{policy}/v2.0/.well-known/openid-configuration";
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnChallenge = context =>
+                            {
+                                _SetLoginHeader(context.Request, context.Response);
+                                return Task.CompletedTask;
+                            },
+                            OnAuthenticationFailed = context =>
+                            {
+                                _SetLoginHeader(context.Request, context.Response);
+                                return Task.CompletedTask;
+                            }
+                        };
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             ValidateIssuerSigningKey = true,
-                            IssuerSigningKey = jsonWebTokenServiceConfig.SigningKey,
-                            ValidateIssuer = false,
-                            ValidateAudience = false,
+                            ValidateIssuer = true,
+                            ValidIssuer = $"https://{tenantName}.b2clogin.com/tfp/{tenantId}/v2.0/",
+                            ValidateAudience = true,
+                            ValidAudience = applicationId,
                             ValidateLifetime = true,
                             LifetimeValidator = (notBefore, expires, securityToken, validationParameters)
-                                => notBefore != null && expires != null && notBefore.Value.ToUniversalTime() <= DateTime.UtcNow && DateTime.UtcNow < expires.Value.ToUniversalTime()
+                                => notBefore != null && expires != null && notBefore.Value.ToUniversalTime() <= DateTime.UtcNow && DateTime.UtcNow < expires.Value.ToUniversalTime(),
                         };
+
+                        void _SetLoginHeader(HttpRequest request, HttpResponse response)
+                        {
+                            var returnUrl = Uri.EscapeDataString(request.Scheme + "://" + request.Host + "/authentications");
+                            response.Headers["x-login"] = $"https://{tenantName}.b2clogin.com/{tenantName}.onmicrosoft.com/oauth2/v2.0/authorize?p={policy}&client_id={applicationId}&nonce=defaultNonce&redirect_uri={returnUrl}&scope=openid&response_type=id_token&prompt=login";
+                        }
                     }
                 );
 

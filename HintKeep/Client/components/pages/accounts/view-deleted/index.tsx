@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import classnames from 'classnames';
 import { Message } from '../../../i18n';
-import { useViewModel } from '../../../view-model-wrappers';
+import { useViewModel } from '../../../view-model-hooks';
 import { DeletedAccountsViewModel } from '../../../../view-models/deleted-accounts-view-model';
 import { BusyContent } from '../../../loaders';
 import { NoAccountsMessage } from './no-accounts-message';

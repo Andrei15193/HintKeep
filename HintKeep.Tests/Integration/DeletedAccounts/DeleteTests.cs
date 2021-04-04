@@ -30,7 +30,7 @@ namespace HintKeep.Tests.Integration.DeletedAccounts
         public async Task Delete_WhenAuthenticatedAndAccountDoesNotExist_ReturnsNotFound()
         {
             var client = _webApplicationFactory
-                .WithInMemoryDatabase(out var entityTables)
+                .WithInMemoryDatabase()
                 .WithAuthentication("#user-id")
                 .CreateClient();
 

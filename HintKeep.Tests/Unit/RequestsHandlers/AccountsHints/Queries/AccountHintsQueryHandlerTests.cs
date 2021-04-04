@@ -24,7 +24,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Queries
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
-            _accountHintsQueryHandler = new AccountHintsQueryHandler(_entityTables, new Session("#user-id", "#session-id"));
+            _accountHintsQueryHandler = new AccountHintsQueryHandler(_entityTables, new Session("#user-id"));
         }
 
         [Fact]

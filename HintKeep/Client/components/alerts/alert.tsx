@@ -1,4 +1,4 @@
-import { PropsWithViewModel, watchViewModel } from '../view-model-wrappers';
+import { PropsWithViewModel, watchViewModel } from '../view-model-hooks';
 import React from 'react';
 import classnames from 'classnames';
 import { AlertViewModel } from '../../view-models/alert-view-model';

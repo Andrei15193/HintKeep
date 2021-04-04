@@ -1,6 +1,6 @@
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import type { INotifyPropertyChanged } from '../../events';
-import { alertsStore, userStore } from '../../stores';
+import { alertsStore } from '../../stores';
 import { RequestHandlerBuilder } from './request-handler-builder';
 import { ViewModel } from './view-model';
 
@@ -51,17 +51,6 @@ export abstract class ApiViewModel extends ViewModel {
             .onRequest((request, next) => {
                 this._setState(ApiViewModelState.Busy);
                 next(request);
-            })
-            .on(401, () => {
-                switch (request.url) {
-                    case '/api/users/sessions':
-                        break;
-
-                    default:
-                        alertsStore.addAlert('errors.sessionExpired');
-                        userStore.completeSession();
-                        break;
-                }
             })
             .on(500, () => {
                 alertsStore.addAlert('errors.internalServerError');

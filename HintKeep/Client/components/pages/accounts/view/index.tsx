@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../../i18n';
-import { useViewModel } from '../../../view-model-wrappers';
+import { useViewModel } from '../../../view-model-hooks';
 import { AccountsViewModel } from '../../../../view-models/accounts-view-model';
 import { ApiViewModelState } from '../../../../view-models/core';
 import { BusyContent } from '../../../loaders';
