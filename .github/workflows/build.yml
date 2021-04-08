@@ -3,6 +3,7 @@ on:
   push:
     branches: 
       - dev
+      - release
   pull_request:
     branches:
       - dev
@@ -21,10 +22,40 @@ jobs:
         dotnet-version: 5.0.100
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: |
+        npm install
+        dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore
+      run: |
+        npm run build -- --mode production
+        dotnet build --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration Release --no-build --verbosity normal
+
+    - name: Generate Publish Output
+      if: endsWith(github.ref, 'release')
+      run: dotnet publish ./HintKeep/HintKeep.csproj --configuration Release --output ./Publish/HintKeep
+
+    - name: Generate Deployment Package
+      if: endsWith(github.ref, 'release')
+      shell: pwsh
+      working-directory: ./Publish/HintKeep
+      run: |
+        rm appsettings.Development.json
+        zip -r ../HintKeep.zip .
+
+    - name: Azure Authentication
+      if: endsWith(github.ref, 'release')
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy Application
+      if: endsWith(github.ref, 'release')
+      shell: pwsh
+      run: |
+        az webapp stop --resource-group HintKeep --name HintKeep
+        az webapp deployment source config-zip --resource-group HintKeep --name HintKeep --src ./Publish/HintKeep.zip
+        az webapp start --resource-group HintKeep --name HintKeep

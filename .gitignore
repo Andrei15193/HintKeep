@@ -350,6 +350,6 @@ MigrationBackup/
 .ionide/
 
 # Webpack build result files
-*.html
-*.css
-*.js
+HintKeep/wwwroot/**/*.html
+HintKeep/wwwroot/**/*.css
+HintKeep/wwwroot/**/*.js
