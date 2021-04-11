@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-const isProduction = (process.env.WEBPACK_MODE || process.argv[process.argv.indexOf('--mode') + 1]) === 'production';
+const isProduction = ((process.argv.find(arg => arg.startsWith('--mode=')) || '--mode=').substring('--mode='.length) || process.env.WEBPACK_MODE) === 'production';
 
 module.exports = {
     mode: isProduction ? 'production' : 'development',
@@ -65,6 +65,7 @@ module.exports = {
             title: 'HintKeep',
             hash: true,
             inject: false,
+            scriptLoading: 'blocking',
             publicPath: '/',
             meta: {
                 charset: 'utf-8',
