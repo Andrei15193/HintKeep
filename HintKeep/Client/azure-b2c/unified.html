@@ -71,16 +71,26 @@
             .find('button[type="submit"]')
             .addClass('btn btn-primary')
             .click(function () {
-                if (usernameError.attr('style').indexOf('none') >= 0)
-                    usernameInput.addClass('is-valid');
-                else
-                    usernameInput.addClass('is-invalid');
+                setTimeout(
+                    function () {
+                        if (usernameError.attr('style').indexOf('none') >= 0)
+                            usernameInput.addClass('is-valid');
+                        else
+                            usernameInput.addClass('is-invalid');
+                    },
+                    0
+                );
             })
             .click(function () {
-                if (passwordError.attr('style').indexOf('none') >= 0)
-                    passwordInput.addClass('is-valid');
-                else
-                    passwordInput.addClass('is-invalid');
+                setTimeout(
+                    function () {
+                        if (passwordError.attr('style').indexOf('none') >= 0)
+                            passwordInput.addClass('is-valid');
+                        else
+                            passwordInput.addClass('is-invalid');
+                    },
+                    0
+                );
             });
 
         root
