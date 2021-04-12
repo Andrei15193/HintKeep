@@ -28,7 +28,7 @@ jobs:
 
     - name: Build
       run: |
-        npm run build -- --mode production
+        npm run build -- --mode=production
         dotnet build --configuration Release --no-restore
 
     - name: Test
