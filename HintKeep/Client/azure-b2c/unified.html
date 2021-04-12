@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <div id="app" class="d-flex flex-fill h-100">
+    <div class="d-flex flex-fill h-100">
         <div class="app m-3 border d-flex flex-column flex-fill">
             <div class="app-banner">
                 <div class="d-flex flex-row align-items-center app-banner-content">
@@ -26,7 +26,7 @@
                         <hr>
                     </div>
                     <div class="flex-fill">
-                        <div id="api"></div>
+                        <div id="api" class="mx-3"></div>
                     </div>
                 </div>
             </div>
@@ -37,6 +37,59 @@
             </div>
         </div>
     </div>
+
+    <script>
+        var root = $('#api');
+        root.find('.intro').remove();
+        root.find('.divider').remove();
+        root.find('.buttons').addClass('mt-3');
+
+        var entryItems = root.find('.entry-item');
+
+        entryItems.find('label').addClass('form-label');
+        entryItems.find('input').addClass('form-control');
+        entryItems.find('.error.itemLevel').addClass('invalid-feedback');
+
+        var usernameElement = entryItems.eq(0);
+        usernameElement.append(usernameElement.children().eq(1));
+        var usernameInput = usernameElement.find('input');
+        var usernameError = usernameElement.find('.error.itemLevel');
+        usernameInput
+            .keypress(function () { usernameInput.removeClass('is-invalid').removeClass('is-valid'); })
+            .change(function () { usernameInput.removeClass('is-invalid').removeClass('is-valid'); });
+
+        var passwordElement = entryItems.eq(1);
+        passwordElement.addClass('mt-3');
+        passwordElement.append(passwordElement.children().eq(1));
+        var passwordInput = passwordElement.find('input');
+        var passwordError = passwordElement.find('.error.itemLevel');
+        passwordInput
+            .keypress(function () { passwordInput.removeClass('is-invalid').removeClass('is-valid'); })
+            .change(function () { passwordInput.removeClass('is-invalid').removeClass('is-valid'); });
+
+        root
+            .find('button[type="submit"]')
+            .addClass('btn btn-primary')
+            .click(function () {
+                if (usernameError.attr('style').indexOf('none') >= 0)
+                    usernameInput.addClass('is-valid');
+                else
+                    usernameInput.addClass('is-invalid');
+            })
+            .click(function () {
+                if (passwordError.attr('style').indexOf('none') >= 0)
+                    passwordInput.addClass('is-valid');
+                else
+                    passwordInput.addClass('is-invalid');
+            });
+
+        root
+            .append($(document.createElement('ul')).addClass('mt-3')
+                .append($(document.createElement('li'))
+                    .append(root.find('.create a').text('Create an account'))));
+
+        root.find('.create').remove();
+    </script>
 </body>
 
 </html>
