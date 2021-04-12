@@ -3,7 +3,27 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
+const applicationUrl = 'https://hintkeep.azurewebsites.net/';
 const isProduction = ((process.argv.find(arg => arg.startsWith('--mode=')) || '--mode=').substring('--mode='.length) || process.env.WEBPACK_MODE) === 'production';
+
+const baseHtmlWebpackPluginOptions = {
+    title: 'HintKeep',
+    hash: true,
+    inject: false,
+    scriptLoading: 'blocking',
+    meta: {
+        charset: 'utf-8',
+        viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'
+    },
+    minify: {
+        collapseWhitespace: isProduction,
+        removeComments: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true
+    },
+};
 
 module.exports = {
     mode: isProduction ? 'production' : 'development',
@@ -35,7 +55,7 @@ module.exports = {
                                     mode: 'local',
                                     exportGlobals: true,
                                     exportLocalsConvention: 'camelCaseOnly',
-                                    localIdentName: isProduction ? '[path][name]--[hash:base64]' : '[path][name]__[local]--[hash:base64:5]'
+                                    localIdentName: '[local]'
                                 }
                             },
                         },
@@ -61,27 +81,14 @@ module.exports = {
             ]
         }),
         new MiniCssExtractPlugin(),
-        new HtmlWebpackPlugin({
-            title: 'HintKeep',
-            hash: true,
-            inject: false,
-            scriptLoading: 'blocking',
+        new HtmlWebpackPlugin(Object.assign({}, baseHtmlWebpackPluginOptions, {
             publicPath: '/',
-            meta: {
-                charset: 'utf-8',
-                viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'
-            },
-            minify: {
-                collapseWhitespace: isProduction,
-                removeComments: true,
-                removeRedundantAttributes: true,
-                removeScriptTypeAttributes: true,
-                removeStyleLinkTypeAttributes: true,
-                useShortDoctype: true
-            },
             templateContent: ({ htmlWebpackPlugin }) => `<!DOCTYPE html>
                 <html>
                     <head>
+                        <meta http-equiv="Pragma" content="no-cache">
+                        <meta http-equiv="Cache-Control" content="no-cache">
+                        <meta http-equiv="Expires" content="0">
                         ${htmlWebpackPlugin.tags.headTags}
                         <title>${htmlWebpackPlugin.options.title}</title>
                     </head>
@@ -94,7 +101,12 @@ module.exports = {
                         ${htmlWebpackPlugin.tags.bodyTags}
                     </body>
                 </html>`
-        })
+        })),
+        new HtmlWebpackPlugin(Object.assign({}, baseHtmlWebpackPluginOptions, {
+            publicPath: applicationUrl,
+            filename: 'unified.html',
+            template: './HintKeep/Client/azure-b2c/unified.html'
+        }))
     ],
     externals: {
         'react': 'React',

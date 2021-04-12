@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <%= htmlWebpackPlugin.tags.headTags %>
+        <title>
+            <%= htmlWebpackPlugin.options.title %>
+        </title>
+</head>
+
+<body>
+    <div id="app" class="d-flex flex-fill h-100">
+        <div class="app m-3 border d-flex flex-column flex-fill">
+            <div class="app-banner">
+                <div class="d-flex flex-row align-items-center app-banner-content">
+                    <div class="mx-auto app-header">- HintKeep -</div>
+                </div>
+            </div>
+            <div class="app-content d-flex flex-fill text-justify">
+                <div class="d-flex flex-column flex-fill">
+                    <div class="mx-3">
+                        <h1 class="text-center">Sign in</h1>
+                        <hr>
+                    </div>
+                    <div class="flex-fill">
+                        <div id="api"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-banner">
+                <div class="d-flex flex-row align-items-center app-banner-content">
+                    <div class="mx-auto app-footer">HintKeep - Store hints, not passwords.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
