@@ -34,7 +34,7 @@ export function DeletedAccountDetails(): JSX.Element {
 
                 <If condition={isConfirmationHidden}>
                     <Then>
-                        <div className={classnames(Style.dFlex, Style.flexRow)}>
+                        <div className={classnames(Style.dFlex, Style.flexRow, Style.mb3)}>
                             <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.restoreAsync()}>
                                 <Message id="pages.deletedAccountDetails.restore.label" />
                             </button>
@@ -47,7 +47,7 @@ export function DeletedAccountDetails(): JSX.Element {
                         </div>
                     </Then>
                     <Else>
-                        <div className={Style.card}>
+                        <div className={classnames(Style.card, Style.mb3)}>
                             <div className={Style.cardBody}>
                                 <h5 className={Style.cardTitle}>
                                     <Message id="pages.deletedAccountDetails.delete.confirmationModalTitle" />

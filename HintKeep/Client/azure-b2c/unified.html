@@ -43,55 +43,20 @@
         root.find('.intro').remove();
         root.find('.divider').remove();
         root.find('.buttons').addClass('mt-3');
+        root.find('.error').addClass('invalid-feedback');
 
         var entryItems = root.find('.entry-item');
-
         entryItems.find('label').addClass('form-label');
         entryItems.find('input').addClass('form-control');
-        entryItems.find('.error.itemLevel').addClass('invalid-feedback');
 
         var usernameElement = entryItems.eq(0);
         usernameElement.append(usernameElement.children().eq(1));
-        var usernameInput = usernameElement.find('input');
-        var usernameError = usernameElement.find('.error.itemLevel');
-        usernameInput
-            .keypress(function () { usernameInput.removeClass('is-invalid').removeClass('is-valid'); })
-            .change(function () { usernameInput.removeClass('is-invalid').removeClass('is-valid'); });
 
         var passwordElement = entryItems.eq(1);
         passwordElement.addClass('mt-3');
         passwordElement.append(passwordElement.children().eq(1));
-        var passwordInput = passwordElement.find('input');
-        var passwordError = passwordElement.find('.error.itemLevel');
-        passwordInput
-            .keypress(function () { passwordInput.removeClass('is-invalid').removeClass('is-valid'); })
-            .change(function () { passwordInput.removeClass('is-invalid').removeClass('is-valid'); });
 
-        root
-            .find('button[type="submit"]')
-            .addClass('btn btn-primary')
-            .click(function () {
-                setTimeout(
-                    function () {
-                        if (usernameError.attr('style').indexOf('none') >= 0)
-                            usernameInput.addClass('is-valid');
-                        else
-                            usernameInput.addClass('is-invalid');
-                    },
-                    0
-                );
-            })
-            .click(function () {
-                setTimeout(
-                    function () {
-                        if (passwordError.attr('style').indexOf('none') >= 0)
-                            passwordInput.addClass('is-valid');
-                        else
-                            passwordInput.addClass('is-invalid');
-                    },
-                    0
-                );
-            });
+        root.find('button[type="submit"]').addClass('btn btn-primary');
 
         root
             .append($(document.createElement('ul')).addClass('mt-3')

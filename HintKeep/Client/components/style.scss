@@ -104,5 +104,19 @@ html {
                 }
             }
         }
+
+    }
+}
+
+@media screen and (max-width: 600px) {
+    html body > div {
+        width: 100%;
+
+        .app {
+            width: 100%;
+            margin: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+        }
     }
 }

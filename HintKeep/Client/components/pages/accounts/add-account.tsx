@@ -23,7 +23,7 @@ export function AddAccount(): JSX.Element {
                 <FormInput className={Style.mb3} id="hint" type="text" label="pages.addAccount.hint.label" field={$vm.form.hint} placeholder="pages.addAccount.hint.placeholder" />
                 <CheckboxFormInput className={Style.mb3} id="isPinned" label="pages.addAccount.isPinned.label" field={$vm.form.isPinned} description="pages.addAccount.isPinned.description" />
 
-                <div>
+                <div className={Style.mb3}>
                     <button type="button" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>
                         <Message id="pages.addAccount.add.label" />
                     </button>

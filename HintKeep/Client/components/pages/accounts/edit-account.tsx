@@ -34,9 +34,9 @@ export function EditAccount(): JSX.Element {
 
                 <If condition={isConfirmationHidden}>
                     <Then>
-                        <div className={classnames(Style.dFlex, Style.flexRow)}>
+                        <div className={classnames(Style.dFlex, Style.flexRow, Style.mb3)}>
                             <button type="button" disabled={(!$vm.isLoaded || ($vm.isInvalid && $vm.areAllFieldsTouched))} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>
-                                <Message id="pages.editAccount.edit.label" />
+                                <Message id="pages.editAccount.save.label" />
                             </button>
                             <Link to="/" className={classnames(Style.ml2, Style.btn, Style.btnLight)}>
                                 <Message id="pages.editAccount.cancel.label" />
@@ -47,7 +47,7 @@ export function EditAccount(): JSX.Element {
                         </div>
                     </Then>
                     <Else>
-                        <div className={Style.card}>
+                        <div className={classnames(Style.card, Style.mb3)}>
                             <div className={Style.cardBody}>
                                 <h5 className={Style.cardTitle}>
                                     <Message id="pages.editAccount.delete.confirmationModalTitle" />
