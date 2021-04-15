@@ -26,6 +26,11 @@
                         <hr>
                     </div>
                     <div class="flex-fill">
+                        <div id="spinner" style="display: none;">
+                            <div class="d-flex justify-content-center">
+                                <div class="spinner-border my-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                            </div>
+                        </div>
                         <div id="api" class="mx-3"></div>
                     </div>
                 </div>
@@ -39,6 +44,8 @@
     </div>
 
     <script>
+        var spinner = $('#spinner');
+
         var root = $('#api');
         root.find('.intro').remove();
         root.find('.divider').remove();
@@ -56,14 +63,31 @@
         passwordElement.addClass('mt-3');
         passwordElement.append(passwordElement.children().eq(1));
 
-        root.find('button[type="submit"]').addClass('btn btn-primary');
-
         root
             .append($(document.createElement('ul')).addClass('mt-3')
                 .append($(document.createElement('li'))
                     .append(root.find('.create a').text('Create an account'))));
 
         root.find('.create').remove();
+
+        root
+            .find('button[type="submit"]')
+            .addClass('btn btn-primary')
+            .click(function () {
+                setInterval(
+                    function () {
+                        if (root.find('.working[style*=block]').length > 0) {
+                            spinner.attr('style', 'display: block;');
+                            root.attr('style', 'display: none;');
+                        }
+                        else if (root.find('.error[style*=block]').length > 0) {
+                            spinner.attr('style', 'display: none;');
+                            root.attr('style', 'display: block;');
+                        }
+                    },
+                    10
+                );
+            });
     </script>
 </body>
 
