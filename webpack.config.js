@@ -106,6 +106,11 @@ module.exports = {
             publicPath: applicationUrl,
             filename: 'unified.html',
             template: './HintKeep/Client/azure-b2c/unified.html'
+        })),
+        new HtmlWebpackPlugin(Object.assign({}, baseHtmlWebpackPluginOptions, {
+            publicPath: applicationUrl,
+            filename: 'selfAsserted.html',
+            template: './HintKeep/Client/azure-b2c/selfAsserted.html'
         }))
     ],
     externals: {
