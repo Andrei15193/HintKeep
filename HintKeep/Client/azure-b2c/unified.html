@@ -64,6 +64,7 @@
         root.find('.error').addClass('invalid-feedback');
 
         var entryItems = root.find('.entry-item');
+        entryItems.addClass('form-group');
         entryItems.find('label').addClass('form-label');
         entryItems.find('input').addClass('form-control');
 
@@ -71,7 +72,6 @@
         usernameElement.append(usernameElement.children().eq(1));
 
         var passwordElement = entryItems.eq(1);
-        passwordElement.addClass('mt-3');
         passwordElement.append(passwordElement.children().eq(1));
 
         root
