@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>
+        <%= htmlWebpackPlugin.options.title %>
+    </title>
+    <style>
+        ul,
+        ol,
+        dl {
+            list-style: none;
+        }
+    </style>
+    <%= htmlWebpackPlugin.tags.headTags %>
+</head>
+
+<body>
+    <div class="d-flex flex-fill h-100">
+        <div class="app m-3 border d-flex flex-column flex-fill">
+            <div class="app-banner">
+                <div class="d-flex flex-row align-items-center app-banner-content">
+                    <div class="mx-auto app-header">- HintKeep -</div>
+                </div>
+            </div>
+            <div class="app-content d-flex flex-fill text-justify">
+                <div class="d-flex flex-column flex-fill">
+                    <div class="mx-3">
+                        <h1 class="text-center">Create account</h1>
+                        <hr>
+                    </div>
+                    <div class="flex-fill">
+                        <div id="spinner" style="display: none;">
+                            <div class="d-flex justify-content-center">
+                                <div class="spinner-border my-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                            </div>
+                        </div>
+                        <div id="api" class="mx-3"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-banner">
+                <div class="d-flex flex-row align-items-center app-banner-content">
+                    <div class="mx-auto app-footer">HintKeep - Store hints, not passwords.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var spinner = $('#spinner');
+        var root = $('#api');
+
+        function checkBusyState() {
+            if (root.find('.working[aria-hidden=false]').length > 0) {
+                spinner.attr('style', 'display: block;');
+                root.attr('style', 'display: none;');
+            }
+            else {
+                spinner.attr('style', 'display: none;');
+                root.attr('style', 'display: block;');
+            }
+
+            if (root.find('button#emailVerificationControl_but_change_claims[aria-hidden=true]').length > 0)
+                root.find('button#continue').attr('disabled', 'disabled');
+            else
+                root.find('button#continue').removeAttr('disabled');
+        }
+
+        root.find('.intro').remove();
+        root.find('a.helpLink').remove();
+        root.find('ul, ol, dl').addClass('m-0 p-0');
+
+        root.find('label#emailVerificationControl_label').addClass('d-none');
+        root.find('label').parent().addClass('form-group');
+        root.find('label').addClass('form-label');
+        root.find('input').addClass('form-control');
+        root.find('.error').addClass('invalid-feedback');
+
+        root.find('div#attributeList .buttons').addClass('mt-3 text-center');
+        root.find('button#emailVerificationControl_but_send_code')
+            .addClass('btn btn-primary')
+            .click(checkBusyState);
+        root.find('button#emailVerificationControl_but_verify_code')
+            .addClass('btn btn-primary')
+            .click(checkBusyState);
+        root.find('button#emailVerificationControl_but_send_new_code')
+            .addClass('btn btn-light ml-3')
+            .click(checkBusyState);
+        root.find('button#emailVerificationControl_but_change_claims')
+            .addClass('btn btn-primary')
+            .click(checkBusyState);
+        root.find('div#emailVerificationControl_success_message').addClass('valid-feedback d-block');
+
+        root.find('form#attributeVerification > .buttons').addClass('my-3');
+        root.find('button#continue')
+            .addClass('btn btn-primary')
+            .attr('disabled', 'disabled');
+        root.find('button#cancel').addClass('btn btn-light ml-3');
+
+        setInterval(checkBusyState, 10);
+    </script>
+</body>
+
+</html>

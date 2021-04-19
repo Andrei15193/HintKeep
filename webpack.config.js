@@ -111,6 +111,11 @@ module.exports = {
             publicPath: applicationUrl,
             filename: 'selfAsserted.html',
             template: './HintKeep/Client/azure-b2c/selfAsserted.html'
+        })),
+        new HtmlWebpackPlugin(Object.assign({}, baseHtmlWebpackPluginOptions, {
+            publicPath: applicationUrl,
+            filename: 'register.html',
+            template: './HintKeep/Client/azure-b2c/register.html'
         }))
     ],
     externals: {
