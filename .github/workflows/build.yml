@@ -3,7 +3,6 @@ on:
   push:
     branches: 
       - dev
-      - release
   pull_request:
     branches:
       - dev
@@ -35,11 +34,11 @@ jobs:
       run: dotnet test --configuration Release --no-build --verbosity normal
 
     - name: Generate Publish Output
-      if: endsWith(github.ref, 'release')
+      if: github.event_name == 'push' && contains(toJSON(github.event.commits.*.message), '[release]')
       run: dotnet publish ./HintKeep/HintKeep.csproj --configuration Release --output ./Publish/HintKeep
 
     - name: Generate Deployment Package
-      if: endsWith(github.ref, 'release')
+      if: github.event_name == 'push' && contains(toJSON(github.event.commits.*.message), '[release]')
       shell: pwsh
       working-directory: ./Publish/HintKeep
       run: |
@@ -47,13 +46,13 @@ jobs:
         zip -r ../HintKeep.zip .
 
     - name: Azure Authentication
-      if: endsWith(github.ref, 'release')
+      if: github.event_name == 'push' && contains(toJSON(github.event.commits.*.message), '[release]')
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Deploy Application
-      if: endsWith(github.ref, 'release')
+      if: github.event_name == 'push' && contains(toJSON(github.event.commits.*.message), '[release]')
       shell: pwsh
       run: |
         az webapp stop --resource-group HintKeep --name HintKeep

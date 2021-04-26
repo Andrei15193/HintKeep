@@ -35,7 +35,9 @@ module.exports = {
         path: path.resolve(__dirname, 'HintKeep', 'wwwroot')
     },
     resolve: {
-        extensions: ['.ts', '.tsx']
+        extensions: isProduction
+            ? ['.ts', '.tsx']
+            : ['.development.ts', '.ts', '.tsx']
     },
     module: {
         rules: [

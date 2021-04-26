@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import classnames from 'classnames';
-import { Message } from '../../../i18n';
+import { I18nContext, Message } from '../../../i18n';
 import { useViewModel } from '../../../view-model-hooks';
 import { AccountsViewModel } from '../../../../view-models/accounts-view-model';
 import { ApiViewModelState } from '../../../../view-models/core';
@@ -13,6 +13,7 @@ import Style from '../../../style.scss';
 
 export function Accounts(): JSX.Element {
     const { push } = useHistory();
+    const messageResolver = useContext(I18nContext);
     const $vm = useViewModel(AccountsViewModel);
     useEffect(() => { $vm.loadAsync(); }, [$vm]);
 
@@ -37,9 +38,22 @@ export function Accounts(): JSX.Element {
                 <div className={Style.flexFill}>
                     <BusyContent $vm={$vm}>
                         {
-                            $vm.accounts.length === 0
-                                ? <NoAccountsMessage />
-                                : <AccountsDisplayList accounts={$vm.accounts} />
+                            !$vm.hasAccounts ? <NoAccountsMessage /> : <>
+                                <div className={Style.mx3}>
+                                    <div className={classnames(Style.inputGroup, Style.inputGroupSm, Style.mb3)}>
+                                        <input
+                                            type="text"
+                                            inputMode="search"
+                                            className={Style.formControl}
+                                            value={$vm.searchText}
+                                            onChange={event => $vm.searchText = event.target.value}
+                                            placeholder={messageResolver.resolve('pages.accounts.search.placeholder')}
+                                        />
+                                    </div>
+                                </div>
+
+                                <AccountsDisplayList accounts={$vm.accounts} />
+                            </>
                         }
                     </BusyContent>
                 </div>

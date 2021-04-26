@@ -248,6 +248,7 @@ interface CssExports {
   'customControl': string;
   'customControlInput': string;
   'customControlLabel': string;
+  'customFile': string;
   'customFileInput': string;
   'customFileLabel': string;
   'customSelect': string;
@@ -403,8 +404,14 @@ interface CssExports {
   'h6': string;
   'h75': string;
   'hAuto': string;
+  'hasValidation': string;
   'initialism': string;
   'inputGroup': string;
+  'inputGroupAppend': string;
+  'inputGroupLg': string;
+  'inputGroupPrepend': string;
+  'inputGroupSm': string;
+  'inputGroupText': string;
   'invalidFeedback': string;
   'invalidTooltip': string;
   'isInvalid': string;

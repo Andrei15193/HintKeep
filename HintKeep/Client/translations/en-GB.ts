@@ -6,6 +6,7 @@ export const enGB: IMessages = {
 
     'pages.accounts.pageTitle': 'Accounts',
     'pages.accounts.noAccounts': 'You do not currently have any accounts :(',
+    'pages.accounts.search.placeholder': 'Search',
     'pages.accounts.add.label': 'Add',
     'pages.accounts.edit.label': 'Edit',
     'pages.accounts.viewAccountsBin.labels': 'View accounts (bin)',
