@@ -7,8 +7,14 @@ Axios.interceptors.request.use(
             request.headers.Authorization = localStorage.getItem('authorization');
         else if (request.headers.Authorization)
             localStorage.setItem('authorization', request.headers.Authorization);
-        else
-            localStorage.removeItem('authorization');
         return request;
+    }
+);
+
+Axios.interceptors.response.use(
+    response => {
+        if (response.status === 401)
+            localStorage.removeItem('authorization');
+        return response;
     }
 );
