@@ -1,4 +1,4 @@
-export type { ElementFactoryCallback, ElementWithPropsFactoryCallback, ViewModelType } from './common';
+export type { ViewModelType } from './common';
 
 export { useViewModel } from './use-view-model';
 export type { EventHandler } from './watch-event';

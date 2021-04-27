@@ -6,9 +6,11 @@ export type EventHandler<TEventArgs> = (subject: object, args: TEventArgs) => vo
 export function watchEvent<TEventArgs>(event: IEvent<TEventArgs>, handler: EventHandler<TEventArgs>): void {
     useEffect(
         () => {
-            const eventHandler: IEventHandler<TEventArgs> = { handle: handler };
-            event.subscribe(eventHandler);
-            return () => event.unsubscribe(eventHandler);
+            if (event) {
+                const eventHandler: IEventHandler<TEventArgs> = { handle: handler };
+                event.subscribe(eventHandler);
+                return () => event.unsubscribe(eventHandler);
+            }
         },
         [event]
     );

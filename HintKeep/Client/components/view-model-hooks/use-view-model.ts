@@ -13,21 +13,25 @@ export function useViewModel<TViewModel extends ViewModel>(viewModelType: ViewMo
                 const propertyChangedEventHandler: IEventHandler<readonly string[]> = watchedProperties
                     ? {
                         handle(subject: any, changedProperties: readonly string[]): void {
-                            const watchedChangedProperties = changedProperties.filter(changedProperty => watchedProperties.includes(changedProperty as keyof TViewModel));
-                            if (watchedChangedProperties.length > 0) {
-                                vmProps = Object.assign({}, vmProps, changedProperties.reduce((result, propertyName) => Object.assign(result, { [propertyName]: subject[propertyName] }), {}));
-                                setState({ $vm, vmProps });
-                            }
+                            setVmProps(subject, changedProperties.filter(changedProperty => watchedProperties.includes(changedProperty as keyof TViewModel)));
                         }
                     }
                     : {
-                        handle(subject: any, changedProperties: readonly string[]): void {
-                            vmProps = Object.assign({}, vmProps, changedProperties.reduce((result, propertyName) => Object.assign(result, { [propertyName]: subject[propertyName] }), {}));
-                            setState({ $vm, vmProps });
-                        }
+                        handle: setVmProps
                     };
                 $vm.propertyChanged.subscribe(propertyChangedEventHandler);
                 return () => $vm.propertyChanged.unsubscribe(propertyChangedEventHandler);
+
+                function setVmProps(subject: any, properties: readonly string[]): void {
+                    vmProps = properties.reduce(
+                        (result, propertyName) => {
+                            result[propertyName] = subject[propertyName];
+                            return result;
+                        },
+                        Object.assign({}, vmProps)
+                    );
+                    setState({ $vm, vmProps });
+                }
             },
             watchedProperties ? [...watchedProperties] : []
         );
