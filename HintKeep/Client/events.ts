@@ -43,3 +43,12 @@ export class DispatchEvent<TEventArgs = void> implements IEvent<TEventArgs> {
 export interface INotifyPropertyChanged {
     readonly propertyChanged: IEvent<readonly string[]>;
 }
+
+export interface INotifyCollectionChanged<TItem> {
+    readonly colllectionChanged: IEvent<ICollectionChange<TItem>>;
+}
+
+export interface ICollectionChange<TItem> {
+    readonly addedItems: readonly TItem[];
+    readonly removedItems: readonly TItem[];
+}

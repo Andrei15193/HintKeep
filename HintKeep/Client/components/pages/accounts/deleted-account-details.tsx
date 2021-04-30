@@ -6,9 +6,9 @@ import { BusyContent } from '../../loaders';
 import { watchEvent, useViewModel } from '../../view-model-hooks';
 import { DeletedAccountDetailsViewModel } from '../../../view-models/deleted-account-details-view-model';
 import { FormInput, CheckboxFormInput } from '../forms';
+import { Else, If, Then } from '../../conditionals';
 
 import Style from '../../style.scss';
-import { Else, If, Then } from '../../conditionals';
 
 export interface IDeletedAccountDetailsRouteParams {
     readonly id: string
