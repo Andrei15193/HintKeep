@@ -25,7 +25,8 @@ export class AddAccountViewModel extends ApiViewModel {
                 .post<IRequestData>('/api/accounts', {
                     name: this.form.name.value,
                     hint: this.form.hint.value,
-                    isPinned: this.form.isPinned.value
+                    isPinned: this.form.isPinned.value,
+                    notes: this.form.notes.value
                 })
                 .on(201, (_: AxiosResponse<IResponseData>) => {
                     this._submittedEvent.dispatch(this);
@@ -48,11 +49,13 @@ class AddAccountForm extends FormFieldCollectionViewModel {
         this.name = this.addField('', combineValidators(required), this._fieldChanged);
         this.hint = this.addField('', combineValidators(required), this._fieldChanged);
         this.isPinned = this.addField(false, this._fieldChanged);
+        this.notes = this.addField('', this._fieldChanged);
     }
 
     public readonly name: FormFieldViewModel<string>;
     public readonly hint: FormFieldViewModel<string>;
     public readonly isPinned: FormFieldViewModel<boolean>;
+    public readonly notes: FormFieldViewModel<string>;
 
     public get areAllFieldsTouched(): boolean {
         return this.fields.every(field => field.isTouched);

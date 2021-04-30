@@ -5,7 +5,7 @@ import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
 import { watchEvent, useViewModel, watchViewModel } from '../../view-model-hooks';
 import { AddAccountViewModel } from '../../../view-models/add-account-view-model';
-import { FormInput, CheckboxFormInput } from '../forms';
+import { FormInput, FormCheckboxInput, FormTextArea } from '../forms';
 
 import Style from '../../style.scss';
 
@@ -21,7 +21,8 @@ export function AddAccount(): JSX.Element {
             <BusyContent $vm={$vm}>
                 <FormInput className={Style.mb3} id="name" type="text" label="pages.addAccount.name.label" field={$vm.form.name} placeholder="pages.addAccount.name.placeholder" />
                 <FormInput className={Style.mb3} id="hint" type="text" label="pages.addAccount.hint.label" field={$vm.form.hint} placeholder="pages.addAccount.hint.placeholder" />
-                <CheckboxFormInput className={Style.mb3} id="isPinned" label="pages.addAccount.isPinned.label" field={$vm.form.isPinned} description="pages.addAccount.isPinned.description" />
+                <FormCheckboxInput className={Style.mb3} id="isPinned" label="pages.addAccount.isPinned.label" field={$vm.form.isPinned} description="pages.addAccount.isPinned.description" />
+                <FormTextArea className={Style.mb3} id="notes" label="pages.addAccount.notes.label" field={$vm.form.notes} />
 
                 <div className={Style.mb3}>
                     <button type="button" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>

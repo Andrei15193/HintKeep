@@ -40,6 +40,7 @@ export const enGB: IMessages = {
     'pages.addAccount.hint.placeholder': 'Crazy person in a box',
     'pages.addAccount.isPinned.label': 'Is pinned',
     'pages.addAccount.isPinned.description': 'Pinned accounts are shown at the top for more visibility.',
+    'pages.addAccount.notes.label': 'Notes',
     'pages.addAccount.add.label': 'Add',
     'pages.addAccount.cancel.label': 'Cancel',
 
@@ -50,6 +51,7 @@ export const enGB: IMessages = {
     'pages.editAccount.hint.placeholder': 'Crazy person in a box',
     'pages.editAccount.isPinned.label': 'Is pinned',
     'pages.editAccount.isPinned.description': 'Pinned accounts are shown at the top for more visibility.',
+    'pages.editAccount.notes.label': 'Notes',
     'pages.editAccount.save.label': 'Save',
     'pages.editAccount.delete.label': 'Delete',
     'pages.editAccount.moveToBin.label': 'Move to bin',
@@ -61,6 +63,7 @@ export const enGB: IMessages = {
     'pages.deletedAccountDetails.name.label': 'Name',
     'pages.deletedAccountDetails.hint.label': 'Hint',
     'pages.deletedAccountDetails.isPinned.label': 'Is pinned',
+    'pages.deletedAccountDetails.notes.label': 'Notes',
     'pages.deletedAccountDetails.isPinned.description': 'Pinned accounts are shown at the top for more visibility.',
     'pages.deletedAccountDetails.restore.label': 'Restore',
     'pages.deletedAccountDetails.delete.label': 'Delete',

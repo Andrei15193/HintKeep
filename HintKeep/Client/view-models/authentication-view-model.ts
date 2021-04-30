@@ -1,7 +1,7 @@
 import type { AxiosInstance } from 'axios';
-import type { IEvent } from "../events";
-import { DispatchEvent } from "../events";
-import { Axios } from "../services";
+import type { IEvent } from '../events';
+import { DispatchEvent } from '../events';
+import { Axios } from '../services';
 import { ViewModel } from './core';
 
 export class AuthenticationViewModel extends ViewModel {

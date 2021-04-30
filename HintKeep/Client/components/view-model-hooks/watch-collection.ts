@@ -1,5 +1,5 @@
-import type { ICollectionChange, IEventHandler } from "../../events";
-import type { IReadOnlyObservableCollection } from "../../view-models/core";
+import type { ICollectionChange, IEventHandler } from '../../events';
+import type { IReadOnlyObservableCollection } from '../../view-models/core';
 import { useState, useEffect } from 'react';
 
 export type ItemChangeHandler<TItem> = (item: TItem) => void;

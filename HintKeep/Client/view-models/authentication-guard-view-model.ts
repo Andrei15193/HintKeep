@@ -1,7 +1,7 @@
-import type { AxiosResponse } from "axios";
-import type { IResponseData } from "../api/users/details/get";
-import { Axios } from "../services";
-import { ApiViewModel } from "./core";
+import type { AxiosResponse } from 'axios';
+import type { IResponseData } from '../api/users/details/get';
+import { Axios } from '../services';
+import { ApiViewModel } from './core';
 
 export class AuthenticationGuardViewModel extends ApiViewModel {
     private _isAuthenticationEnsured: boolean = false;

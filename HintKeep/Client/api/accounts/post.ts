@@ -2,6 +2,7 @@ export interface IRequestData {
     readonly name: string;
     readonly hint: string;
     readonly isPinned: boolean;
+    readonly notes: string;
 }
 
 export interface IResponseData {

@@ -1,10 +1,10 @@
-import type { ComponentType } from "react";
-import type { AccountsListViewModel, Account } from "../../../../view-models/accounts-list-view-model";
+import type { ComponentType } from 'react';
+import type { AccountsListViewModel, Account } from '../../../../view-models/accounts-list-view-model';
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
-import { I18nContext, Message } from "../../../i18n";
-import { watchCollection, watchViewModel } from "../../../view-model-hooks";
+import { I18nContext, Message } from '../../../i18n';
+import { watchCollection, watchViewModel } from '../../../view-model-hooks';
 
 import Style from '../../../style.scss';
 

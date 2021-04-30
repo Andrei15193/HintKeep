@@ -1217,6 +1217,7 @@ interface CssExports {
   'pyXl3': string;
   'pyXl4': string;
   'pyXl5': string;
+  'resizeNone': string;
   'rounded': string;
   'rounded0': string;
   'roundedBottom': string;

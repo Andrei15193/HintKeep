@@ -1,6 +1,6 @@
-import { IEventHandler, INotifyPropertyChanged } from "../../events";
-import { ViewModel } from "./view-model";
-import { FormFieldViewModel } from "./form-field-view-model";
+import { IEventHandler, INotifyPropertyChanged } from '../../events';
+import { ViewModel } from './view-model';
+import { FormFieldViewModel } from './form-field-view-model';
 
 export type FieldChangedCallback<TValue> = (field: FormFieldViewModel<TValue>, changedProperties: readonly string[]) => void;
 export type FieldCollectionChangedCallback = (fieldCollection: FormFieldCollectionViewModel, changedProperties: readonly string[]) => void;

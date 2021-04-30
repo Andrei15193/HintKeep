@@ -7,13 +7,13 @@ import { Message } from '../../i18n';
 
 import Style from '../../style.scss';
 
-export interface ICheckboxFormInputProps extends IInputProps {
+export interface IFormCheckboxInputProps extends IInputProps {
     readonly label: string;
     readonly description?: string;
     readonly className?: string;
 }
 
-export function CheckboxFormInput({ label, description, field, id, className, type, ...inputProps }: ICheckboxFormInputProps): JSX.Element {
+export function FormCheckboxInput({ label, description, field, id, className, type, ...inputProps }: IFormCheckboxInputProps): JSX.Element {
     watchViewModel(field, ['value', 'errors']);
 
     return (

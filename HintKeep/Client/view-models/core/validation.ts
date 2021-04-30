@@ -1,5 +1,5 @@
-import { FieldChangedCallback } from "./form-field-collection-view-model";
-import { FormFieldViewModel } from "./form-field-view-model";
+import { FieldChangedCallback } from './form-field-collection-view-model';
+import { FormFieldViewModel } from './form-field-view-model';
 
 export type FieldValidationCallback<TValue> = (field: FormFieldViewModel<TValue>) => readonly string[];
 

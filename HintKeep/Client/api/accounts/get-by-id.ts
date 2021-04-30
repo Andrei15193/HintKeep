@@ -3,6 +3,7 @@ export interface IResponseData {
     readonly name: string;
     readonly hint: string;
     readonly isPinned: boolean;
+    readonly notes: string;
 }
 
 export interface INotFoundResponseData {

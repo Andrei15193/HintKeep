@@ -1,5 +1,5 @@
-import type { ICollectionChange, IEvent, INotifyCollectionChanged, INotifyPropertyChanged } from "../../events";
-import { DispatchEvent } from "../../events";
+import type { ICollectionChange, IEvent, INotifyCollectionChanged, INotifyPropertyChanged } from '../../events';
+import { DispatchEvent } from '../../events';
 
 export interface IReadOnlyObservableCollection<TItem> extends Readonly<Array<TItem>>, INotifyPropertyChanged, INotifyCollectionChanged<TItem> {
 }

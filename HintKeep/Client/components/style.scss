@@ -99,12 +99,19 @@ html {
             .app-content {
                 overflow: auto;
 
+                textarea {
+                    height: 100px;
+                }
+
+                .resize-none {
+                    resize: none;
+                }
+
                 .list-view {
                     overflow: auto;
                 }
             }
         }
-
     }
 }
 

@@ -5,7 +5,7 @@ import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
 import { watchEvent, useViewModel } from '../../view-model-hooks';
 import { EditAccountViewModel } from '../../../view-models/edit-account-view-model';
-import { FormInput, CheckboxFormInput } from '../forms';
+import { FormInput, FormCheckboxInput, FormTextArea } from '../forms';
 import { Else, If, Then } from '../../conditionals';
 
 import Style from '../../style.scss';
@@ -30,7 +30,8 @@ export function EditAccount(): JSX.Element {
             <BusyContent $vm={$vm}>
                 <FormInput className={Style.mb3} id="name" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.name.label" field={$vm.name} placeholder="pages.editAccount.name.placeholder" />
                 <FormInput className={Style.mb3} id="hint" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.hint.label" field={$vm.hint} placeholder="pages.editAccount.hint.placeholder" />
-                <CheckboxFormInput className={Style.mb3} id="isPinned" disabled={!isConfirmationHidden} label="pages.editAccount.isPinned.label" field={$vm.isPinned} description="pages.editAccount.isPinned.description" />
+                <FormCheckboxInput className={Style.mb3} id="isPinned" disabled={!isConfirmationHidden} label="pages.editAccount.isPinned.label" field={$vm.isPinned} description="pages.editAccount.isPinned.description" />
+                <FormTextArea className={Style.mb3} id="notes" label="pages.editAccount.notes.label" field={$vm.notes} />
 
                 <If condition={isConfirmationHidden}>
                     <Then>

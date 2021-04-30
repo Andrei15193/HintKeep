@@ -5,7 +5,7 @@ import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
 import { watchEvent, useViewModel } from '../../view-model-hooks';
 import { DeletedAccountDetailsViewModel } from '../../../view-models/deleted-account-details-view-model';
-import { FormInput, CheckboxFormInput } from '../forms';
+import { FormInput, FormCheckboxInput, FormTextArea } from '../forms';
 import { Else, If, Then } from '../../conditionals';
 
 import Style from '../../style.scss';
@@ -30,7 +30,8 @@ export function DeletedAccountDetails(): JSX.Element {
             <BusyContent $vm={$vm}>
                 <FormInput className={Style.mb3} id="name" type="text" disabled label="pages.deletedAccountDetails.name.label" field={$vm.name} />
                 <FormInput className={Style.mb3} id="hint" type="text" disabled label="pages.deletedAccountDetails.hint.label" field={$vm.hint} />
-                <CheckboxFormInput className={Style.mb3} id="isPinned" disabled label="pages.deletedAccountDetails.isPinned.label" field={$vm.isPinned} />
+                <FormCheckboxInput className={Style.mb3} id="isPinned" disabled label="pages.deletedAccountDetails.isPinned.label" field={$vm.isPinned} />
+                <FormTextArea className={Style.mb3} id="notes" disabled label="pages.deletedAccountDetails.notes.label" field={$vm.notes} />
 
                 <If condition={isConfirmationHidden}>
                     <Then>
