@@ -96,6 +96,13 @@
         root.find('div#emailVerificationControl_success_message').addClass('valid-feedback d-block');
 
         root.find('form#attributeVerification > .buttons').addClass('my-3');
+
+        $(document.createElement('p'))
+            .append('By creating an account you agree to ')
+            .append($(document.createElement('a')).attr('href', SETTINGS.remoteResource.substring(0, SETTINGS.remoteResource.lastIndexOf('/')) + '/terms').attr('target', '_blank').append('terms of service'))
+            .append('.')
+            .insertBefore(root.find('form#attributeVerification > .buttons').children().first());
+
         root.find('button#continue')
             .addClass('btn btn-primary')
             .attr('disabled', 'disabled');

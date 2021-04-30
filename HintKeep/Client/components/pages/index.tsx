@@ -1,3 +1,4 @@
+export { TermsOfService } from './terms-of-service';
 export { AuthenticationGuard } from './authentication-guard';
 export { Authentication } from './authentication';
 export { Accounts } from './accounts/view';
