@@ -1,12 +1,20 @@
-import { Axios } from './axios.default';
-export { Axios };
+import axios from 'axios';
+import { configureDefaultListeners } from './axios.common';
+
+export const Axios = configureDefaultListeners(
+    axios.create({
+        validateStatus() {
+            return true;
+        }
+    })
+);
 
 Axios.interceptors.request.use(
     request => {
-        if (localStorage.getItem('authorization'))
-            request.headers.Authorization = localStorage.getItem('authorization');
-        else if (request.headers.Authorization)
-            localStorage.setItem('authorization', request.headers.Authorization);
+        // if (localStorage.getItem('authorization'))
+        //     request.headers.Authorization = localStorage.getItem('authorization');
+        // else if (request.headers.Authorization)
+        //     localStorage.setItem('authorization', request.headers.Authorization);
         return request;
     }
 );

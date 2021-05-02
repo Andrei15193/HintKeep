@@ -36,7 +36,7 @@ module.exports = {
     },
     resolve: {
         extensions: isProduction
-            ? ['.ts', '.tsx']
+            ? ['.production.ts', '.ts', '.tsx']
             : ['.development.ts', '.ts', '.tsx']
     },
     module: {

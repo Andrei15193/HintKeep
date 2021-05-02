@@ -20,11 +20,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Headers;
 
 namespace HintKeep
 {
     public class Startup
     {
+        private const string LoginUrlHeaderName = "x-login";
         private const string ObjectIdClaimType = "http://schemas.microsoft.com/identity/claims/objectidentifier";
         private readonly IConfiguration _configuration;
 
@@ -94,6 +96,7 @@ namespace HintKeep
                         var tenantId = authenticationConfiguration.GetValue<string>("TenantId");
                         var applicationId = authenticationConfiguration.GetValue<string>("ApplicationId");
                         var policy = authenticationConfiguration.GetValue<string>("Policy");
+                        var returnUrl = authenticationConfiguration.GetValue<string>("ReturnUrl");
 
                         options.SaveToken = false;
                         options.RequireHttpsMetadata = true;
@@ -125,8 +128,9 @@ namespace HintKeep
 
                         void _SetLoginHeader(HttpRequest request, HttpResponse response)
                         {
-                            var returnUrl = Uri.EscapeDataString(request.Scheme + "://" + request.Host + "/authentications");
-                            response.Headers["x-login"] = $"https://{tenantName}.b2clogin.com/{tenantName}.onmicrosoft.com/oauth2/v2.0/authorize?p={policy}&client_id={applicationId}&nonce=defaultNonce&redirect_uri={returnUrl}&scope=openid&response_type=id_token&prompt=login";
+                            var actualReturnUrl = Uri.EscapeDataString(string.IsNullOrWhiteSpace(returnUrl) ? request.Scheme + "://" + request.Host + "/authentications" : returnUrl);
+                            response.Headers.Append(HeaderNames.AccessControlExposeHeaders, LoginUrlHeaderName);
+                            response.Headers[LoginUrlHeaderName] = $"https://{tenantName}.b2clogin.com/{tenantName}.onmicrosoft.com/oauth2/v2.0/authorize?p={policy}&client_id={applicationId}&nonce=defaultNonce&redirect_uri={actualReturnUrl}&scope=openid&response_type=id_token&prompt=login";
                         }
                     }
                 );
