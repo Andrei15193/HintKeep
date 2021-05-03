@@ -1,8 +1,9 @@
 export { TermsOfService } from './terms-of-service';
 export { AuthenticationGuard } from './authentication-guard';
 export { Authentication } from './authentication';
-export { Accounts } from './accounts/view';
-export { DeletedAccounts } from './accounts/view-bin';
+export { Accounts } from './accounts/list-view';
+export { AccountHints } from './accounts-hints/list-view';
+export { DeletedAccounts } from './accounts/list-view-deleted';
 export { AddAccount } from './accounts/add-account';
 export { EditAccount } from './accounts/edit-account';
 export { DeletedAccountDetails } from './accounts/deleted-account-details';

@@ -32,6 +32,7 @@ export const enGB: IMessages = {
     'pages.deletedAccounts.noAccounts': 'There are no account in the bin',
     'pages.deletedAccounts.view.label': 'View',
     'pages.deletedAccounts.viewAccounts.labels': 'View accounts',
+    'pages.deletedAccounts.back.label': 'Back',
 
     'pages.addAccount.pageTitle': 'Add account',
     'pages.addAccount.name.label': 'Name',
@@ -43,6 +44,7 @@ export const enGB: IMessages = {
     'pages.addAccount.notes.label': 'Notes',
     'pages.addAccount.add.label': 'Add',
     'pages.addAccount.cancel.label': 'Cancel',
+    'pages.addAccount.back.label': 'Back',
 
     'pages.editAccount.pageTitle': 'Edit account',
     'pages.editAccount.name.label': 'Name',
@@ -52,12 +54,23 @@ export const enGB: IMessages = {
     'pages.editAccount.isPinned.label': 'Is pinned',
     'pages.editAccount.isPinned.description': 'Pinned accounts are shown at the top for more visibility.',
     'pages.editAccount.notes.label': 'Notes',
+    'pages.editAccount.viewAllHints.label': 'View all hints',
     'pages.editAccount.save.label': 'Save',
     'pages.editAccount.delete.label': 'Delete',
     'pages.editAccount.moveToBin.label': 'Move to bin',
     'pages.editAccount.delete.confirmationModalTitle': 'Confirm deletion',
     'pages.editAccount.delete.confirmation': 'The account will be moved to the bin where it can still be viewed and restored. To completely remove the account you need to delete it from there as well.',
     'pages.editAccount.cancel.label': 'Cancel',
+    'pages.editAccount.back.label': 'Back',
+
+    'pages.accountHints.pageTitle': 'Hints',
+    'pages.accountHints.back.label': 'Back',
+    'pages.accountHints.delete.label': 'Delete',
+    'pages.accountHints.dateAdded': 'Date added {dateAdded}',
+    'pages.accountHints.noAccountHints': 'There are currently no hints for this account :(',
+    'pages.accountHints.delete.confirmationModalTitle': 'Confirm deletion',
+    'pages.accountHints.delete.confirmation': 'The hint will be permanently deleted, please confirm your action.',
+    'pages.accountHints.cancel.label': 'Cancel',
 
     'pages.deletedAccountDetails.pageTitle': 'Account',
     'pages.deletedAccountDetails.name.label': 'Name',
@@ -70,6 +83,7 @@ export const enGB: IMessages = {
     'pages.deletedAccountDetails.delete.confirmationModalTitle': 'Confirm deletion',
     'pages.deletedAccountDetails.delete.confirmation': 'The account will be permanently deleted and you will no longer be able to recover it! Please confirm your operation.',
     'pages.deletedAccountDetails.cancel.label': 'Cancel',
+    'pages.deletedAccountDetails.back.label': 'Back',
 
     'validation.errors.required': 'Please provide a value.',
     'validation.errors.nameNotUnique': 'An account with the same name already exists.',

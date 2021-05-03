@@ -25,8 +25,20 @@ export function EditAccount(): JSX.Element {
     watchEvent($vm.deletedEvent, () => push('/'));
 
     return (
-        <div className={Style.m2}>
-            <h1 className={Style.textCenter}><Message id="pages.editAccount.pageTitle" /></h1>
+        <div className={Style.mx3}>
+            <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
+                <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
+                    <div className={classnames(Style.col2, Style.textLeft)}>
+                        <button type="button" onClick={() => push('/')} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
+                            <Message id="pages.editAccount.back.label" />
+                        </button>
+                    </div>
+                    <div className={classnames(Style.col8, Style.textCenter)}>
+                        <Message id="pages.editAccount.pageTitle" />
+                    </div>
+                </div>
+            </h1>
+
             <BusyContent $vm={$vm}>
                 <FormInput className={Style.mb3} id="name" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.name.label" field={$vm.name} placeholder="pages.editAccount.name.placeholder" />
                 <FormInput className={Style.mb3} id="hint" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.hint.label" field={$vm.hint} placeholder="pages.editAccount.hint.placeholder" />
@@ -39,6 +51,9 @@ export function EditAccount(): JSX.Element {
                             <button type="button" disabled={(!$vm.isLoaded || ($vm.isInvalid && $vm.areAllFieldsTouched))} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>
                                 <Message id="pages.editAccount.save.label" />
                             </button>
+                            <Link to={`/accounts/${id}/hints`} className={classnames(Style.ml2, Style.btn, Style.btnLight)}>
+                                <Message id="pages.editAccount.viewAllHints.label" />
+                            </Link>
                             <Link to="/" className={classnames(Style.ml2, Style.btn, Style.btnLight)}>
                                 <Message id="pages.editAccount.cancel.label" />
                             </Link>

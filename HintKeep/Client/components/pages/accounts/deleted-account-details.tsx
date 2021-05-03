@@ -25,8 +25,20 @@ export function DeletedAccountDetails(): JSX.Element {
     watchEvent($vm.deletedEvent, () => push('/accounts/bin'));
 
     return (
-        <div className={Style.m2}>
-            <h1 className={Style.textCenter}><Message id="pages.deletedAccountDetails.pageTitle" /></h1>
+        <div className={Style.mx3}>
+            <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
+                <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
+                    <div className={classnames(Style.col2, Style.textLeft)}>
+                        <button type="button" onClick={() => push('/accounts/bin')} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
+                            <Message id="pages.deletedAccountDetails.back.label" />
+                        </button>
+                    </div>
+                    <div className={classnames(Style.col8, Style.textCenter)}>
+                        <Message id="pages.deletedAccountDetails.pageTitle" />
+                    </div>
+                </div>
+            </h1>
+
             <BusyContent $vm={$vm}>
                 <FormInput className={Style.mb3} id="name" type="text" disabled label="pages.deletedAccountDetails.name.label" field={$vm.name} />
                 <FormInput className={Style.mb3} id="hint" type="text" disabled label="pages.deletedAccountDetails.hint.label" field={$vm.hint} />

@@ -1,7 +1,8 @@
 import type { AxiosResponse } from 'axios';
 import type { IFormField } from './core';
-import type { IConflictResponseData, INotFoundResponseData as INotFoundPutResponseData, IRequestData, IResponseData as IPutResponseData, IUnprocessableEntityResponseData } from '../api/accounts/put';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/accounts/get-by-id';
+import type { IConflictResponseData, INotFoundResponseData as INotFoundPutResponseData, IRequestData, IResponseData as IPutResponseData, IUnprocessableEntityResponseData } from '../api/accounts/put';
+import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/accounts/delete';
 import { FormViewModel, FormField } from './core';
 import { Axios } from '../services';
 import { DispatchEvent, IEvent } from '../events';
@@ -106,10 +107,10 @@ export class EditAccountViewModel extends FormViewModel {
         if (this._id !== null)
             await this
                 .delete(`/api/accounts/${this._id}`)
-                .on(204, (_: AxiosResponse<IPutResponseData>) => {
+                .on(204, (_: AxiosResponse<IDeleteResponseData>) => {
                     this._deletedEvent.dispatch(this);
                 })
-                .on(404, (_: AxiosResponse<INotFoundPutResponseData>) => {
+                .on(404, (_: AxiosResponse<INotFoundDeleteResponseData>) => {
                     this._deletedEvent.dispatch(this);
                 })
                 .sendAsync();

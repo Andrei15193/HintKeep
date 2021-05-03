@@ -11,10 +11,10 @@ export const Axios = configureDefaultListeners(
 
 Axios.interceptors.request.use(
     request => {
-        // if (localStorage.getItem('authorization'))
-        //     request.headers.Authorization = localStorage.getItem('authorization');
-        // else if (request.headers.Authorization)
-        //     localStorage.setItem('authorization', request.headers.Authorization);
+        if (localStorage.getItem('authorization'))
+            request.headers.Authorization = localStorage.getItem('authorization');
+        else if (request.headers.Authorization)
+            localStorage.setItem('authorization', request.headers.Authorization);
         return request;
     }
 );

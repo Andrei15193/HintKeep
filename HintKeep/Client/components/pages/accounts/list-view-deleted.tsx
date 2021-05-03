@@ -1,23 +1,33 @@
 import React, { useEffect } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
 import { useViewModel } from '../../view-model-hooks';
 import { DeletedAccountsViewModel } from '../../../view-models/deleted-accounts-view-model';
 import { BusyContent } from '../../loaders';
-import { Link } from 'react-router-dom';
 import { AccountsSearchList } from './common/accounts-search-list';
 
 import Style from '../../style.scss';
 
 export function DeletedAccounts(): JSX.Element {
+    const { push } = useHistory();
     const $vm = useViewModel(DeletedAccountsViewModel);
     useEffect(() => { $vm.loadAsync(); }, [$vm]);
 
     return (
         <>
             <div className={Style.mx3}>
-                <h1 className={classnames(Style.container, Style.textCenter)}>
-                    <Message id="pages.deletedAccounts.pageTitle" />
+                <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
+                    <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
+                        <div className={classnames(Style.col2, Style.textLeft)}>
+                            <button type="button" onClick={() => push('/')} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
+                                <Message id="pages.deletedAccounts.back.label" />
+                            </button>
+                        </div>
+                        <div className={classnames(Style.col8, Style.textCenter)}>
+                            <Message id="pages.deletedAccounts.pageTitle" />
+                        </div>
+                    </div>
                 </h1>
                 <hr className={Style.w100} />
             </div>

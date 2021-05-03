@@ -2,6 +2,7 @@ import type { AxiosResponse } from 'axios';
 import type { IFormField } from './core';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/deleted-accounts/get-by-id';
 import type { INotFoundResponseData as INotFoundPutResponseData, IResponseData as IPutResponseData, IRequestData as IPutRequestData } from '../api/deleted-accounts/put';
+import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/deleted-accounts/delete';
 import { FormViewModel, FormField } from './core';
 import { Axios } from '../services';
 import { DispatchEvent, IEvent } from '../events';
@@ -91,10 +92,10 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
         if (this._id !== null)
             await this
                 .delete(`/api/deleted-accounts/${this._id}`)
-                .on(204, (_: AxiosResponse<IPutResponseData>) => {
+                .on(204, (_: AxiosResponse<IDeleteResponseData>) => {
                     this._deletedEvent.dispatch(this);
                 })
-                .on(404, (_: AxiosResponse<INotFoundPutResponseData>) => {
+                .on(404, (_: AxiosResponse<INotFoundDeleteResponseData>) => {
                     this._deletedEvent.dispatch(this);
                 })
                 .sendAsync();

@@ -16,8 +16,21 @@ export function AddAccount(): JSX.Element {
     watchEvent($vm.submittedEvent, () => push('/'));
 
     return (
-        <div className={Style.m2}>
-            <h1 className={Style.textCenter}><Message id="pages.addAccount.pageTitle" /></h1>
+        <div className={Style.mx3}>
+            <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
+                <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
+                    <div className={classnames(Style.col2, Style.textLeft)}>
+                        <button type="button" onClick={() => push('/')} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
+                            <Message id="pages.addAccount.back.label" />
+                        </button>
+                    </div>
+                    <div className={classnames(Style.col8, Style.textCenter)}>
+                        <Message id="pages.addAccount.pageTitle" />
+                    </div>
+                </div>
+            </h1>
+
+
             <BusyContent $vm={$vm}>
                 <FormInput className={Style.mb3} id="name" type="text" label="pages.addAccount.name.label" field={$vm.form.name} placeholder="pages.addAccount.name.placeholder" />
                 <FormInput className={Style.mb3} id="hint" type="text" label="pages.addAccount.hint.label" field={$vm.form.hint} placeholder="pages.addAccount.hint.placeholder" />

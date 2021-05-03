@@ -20,11 +20,11 @@ export function Accounts(): JSX.Element {
             <div className={Style.mx3}>
                 <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
                     <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
-                        <div className={classnames(Style.col6, Style.offset3, Style.textCenter)}>
+                        <div className={classnames(Style.col8, Style.offset2, Style.textCenter)}>
                             <Message id="pages.accounts.pageTitle" />
                         </div>
-                        <div className={classnames(Style.col3, Style.textRight)}>
-                            <button type="button" disabled={$vm.state === ApiViewModelState.Busy} onClick={() => push('/accounts/add')} className={classnames(Style.btn, Style.btnPrimary)}>
+                        <div className={classnames(Style.col2, Style.textRight)}>
+                            <button type="button" disabled={$vm.state === ApiViewModelState.Busy} onClick={() => push('/accounts/add')} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                                 <Message id="pages.accounts.add.label" />
                             </button>
                         </div>
