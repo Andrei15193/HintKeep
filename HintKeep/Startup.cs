@@ -92,7 +92,6 @@ namespace HintKeep
                     options =>
                     {
                         var authenticationConfiguration = _configuration.GetSection("Authentication");
-                        var tenantName = authenticationConfiguration.GetValue<string>("TenantName");
                         var tenantId = authenticationConfiguration.GetValue<string>("TenantId");
                         var applicationId = authenticationConfiguration.GetValue<string>("ApplicationId");
                         var policy = authenticationConfiguration.GetValue<string>("Policy");
@@ -100,7 +99,7 @@ namespace HintKeep
 
                         options.SaveToken = false;
                         options.RequireHttpsMetadata = true;
-                        options.MetadataAddress = $"https://{tenantName}.b2clogin.com/{tenantName}.onmicrosoft.com/{policy}/v2.0/.well-known/openid-configuration";
+                        options.MetadataAddress = $"https://login.hintkeep.net/{tenantId}/{policy}/v2.0/.well-known/openid-configuration";
                         options.Events = new JwtBearerEvents
                         {
                             OnChallenge = context =>
@@ -118,7 +117,7 @@ namespace HintKeep
                         {
                             ValidateIssuerSigningKey = true,
                             ValidateIssuer = true,
-                            ValidIssuer = $"https://{tenantName}.b2clogin.com/tfp/{tenantId}/v2.0/",
+                            ValidIssuer = $"https://login.hintkeep.net/tfp/{tenantId}/v2.0/",
                             ValidateAudience = true,
                             ValidAudience = applicationId,
                             ValidateLifetime = true,
@@ -130,7 +129,7 @@ namespace HintKeep
                         {
                             var actualReturnUrl = Uri.EscapeDataString(string.IsNullOrWhiteSpace(returnUrl) ? request.Scheme + "://" + request.Host + "/authentications" : returnUrl);
                             response.Headers.Append(HeaderNames.AccessControlExposeHeaders, LoginUrlHeaderName);
-                            response.Headers[LoginUrlHeaderName] = $"https://{tenantName}.b2clogin.com/{tenantName}.onmicrosoft.com/oauth2/v2.0/authorize?p={policy}&client_id={applicationId}&nonce=defaultNonce&redirect_uri={actualReturnUrl}&scope=openid&response_type=id_token&prompt=login";
+                            response.Headers[LoginUrlHeaderName] = $"https://login.hintkeep.net/{tenantId}/oauth2/v2.0/authorize?p={policy}&client_id={applicationId}&nonce=defaultNonce&redirect_uri={actualReturnUrl}&scope=openid&response_type=id_token&prompt=login";
                         }
                     }
                 );
