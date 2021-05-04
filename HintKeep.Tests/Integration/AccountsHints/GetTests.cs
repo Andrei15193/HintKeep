@@ -171,6 +171,63 @@ namespace HintKeep.Tests.Integration.AccountsHints
             entityTables.AssertAccounts(account);
         }
 
+        [Fact]
+        public async Task Handle_WhenThereAreMultipleAccounts_ReturnsHintsForQueriedAccountOnly()
+        {
+            var now = DateTime.UtcNow;
+            var client = _webApplicationFactory
+                .WithInMemoryDatabase(out var entityTables)
+                .WithAuthentication("#user-id")
+                .CreateClient();
+
+            var accounts = new[]
+                {
+                    new Account
+                    {
+                        UserId = "#user-id",
+                        Id = "#account-id",
+                        Name = "#account-name",
+                        Hints = new[]
+                        {
+                            new AccountHint
+                            {
+                                Id = "#hint-id",
+                                Hint = "#hint",
+                                DateAdded = now
+                            }
+                        }
+                    }
+                }
+                .Concat(Enumerable.Range(1, 100).Select(accountNumber => new Account { UserId = "#user-id", Id = $"#account-id-{accountNumber}", Name = $"#account-name-{accountNumber}" }))
+                .ToArray();
+            entityTables.AddAccounts(accounts);
+
+            var response = await client.GetAsync("/api/accounts/%23account-id/hints");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var accountHintsResult = await response.Content.ReadFromJsonAsync<IEnumerable<AccountHintGetResult>>();
+            Assert.Equal(
+                new[]
+                {
+                    new
+                    {
+                        Id = "#hint-id",
+                        Hint = "#hint",
+                        DateAdded = (DateTime?)now
+                    }
+                },
+                accountHintsResult
+                    .Select(accountHint => new
+                    {
+                        accountHint.Id,
+                        accountHint.Hint,
+                        accountHint.DateAdded
+                    })
+                    .ToArray()
+            );
+            entityTables.AssertAccounts(accounts);
+        }
+
         private class AccountHintGetResult
         {
             public string Id { get; set; }

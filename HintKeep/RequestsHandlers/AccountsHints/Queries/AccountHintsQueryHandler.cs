@@ -36,9 +36,17 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Queries
                         TableQuery.GenerateFilterCondition(nameof(ITableEntity.PartitionKey), QueryComparisons.Equal, _session.UserId.ToEncodedKeyProperty()),
                         TableOperators.And,
                         TableQuery.CombineFilters(
-                            TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.GreaterThan, $"id-{query.AccountId}-hintId-".ToEncodedKeyProperty()),
+                            TableQuery.CombineFilters(
+                                TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.GreaterThan, $"id-{query.AccountId}-hintId-".ToEncodedKeyProperty()),
+                                TableOperators.And,
+                                TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
+                            ),
                             TableOperators.And,
-                            TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
+                            TableQuery.CombineFilters(
+                                TableQuery.GenerateFilterCondition(nameof(ITableEntity.RowKey), QueryComparisons.LessThan, $"id-{query.AccountId}-hintId-z".ToEncodedKeyProperty()),
+                                TableOperators.And,
+                                TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
+                            )
                         )
                     )
                 )

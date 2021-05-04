@@ -137,5 +137,49 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Queries
             var exception = await Assert.ThrowsAsync<NotFoundException>(() => _accountHintsQueryHandler.Handle(new AccountHintsQuery { AccountId = "#account-id" }, default));
             Assert.Empty(exception.Message);
         }
+
+        [Fact]
+        public async Task Handle_WhenThereAreMultipleAccounts_ReturnsHintsForQueriedAccountOnly()
+        {
+            var now = DateTime.UtcNow;
+            _entityTables.AddAccounts(new Account
+            {
+                UserId = "#user-id",
+                Id = "#account-id",
+                Name = "#account-name",
+                Hints = new[]
+                {
+                    new AccountHint
+                    {
+                        Id = "#hint-id",
+                        Hint = "#hint",
+                        DateAdded = now
+                    }
+                }
+            });
+            _entityTables.AddAccounts(Enumerable.Range(1, 100).Select(accountNumber => new Account { UserId = "#user-id", Id = $"#account-id-{accountNumber}", Name = $"#account-name-{accountNumber}" }).ToArray());
+
+            var accountHints = await _accountHintsQueryHandler.Handle(new AccountHintsQuery { AccountId = "#account-id" }, default);
+
+            Assert.Equal(
+                new[]
+                {
+                    new
+                    {
+                        Id = "#hint-id",
+                        Hint = "#hint",
+                        DateAdded = (DateTime?)now
+                    }
+                },
+                accountHints
+                    .Select(accountHint => new
+                    {
+                        accountHint.Id,
+                        accountHint.Hint,
+                        accountHint.DateAdded
+                    })
+                    .ToArray()
+            );
+        }
     }
 }
