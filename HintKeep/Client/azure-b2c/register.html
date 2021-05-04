@@ -80,6 +80,12 @@
         root.find('input').addClass('form-control');
         root.find('.error').addClass('invalid-feedback');
 
+        root.find("input#email").attr("placeholder", "user@example.com");
+        root.find("label#newPassword_label").text("Password");
+        root.find("input#newPassword").attr("placeholder", "pa$$w00rd");
+        root.find("label#reenterPassword_label").text("Confirm Password");
+        root.find("input#reenterPassword").attr("placeholder", "pa$$w00rd");
+
         root.find('div#attributeList .buttons').addClass('mt-3 text-center');
         root.find('button#emailVerificationControl_but_send_code')
             .addClass('btn btn-primary')
@@ -88,7 +94,7 @@
             .addClass('btn btn-primary')
             .click(checkBusyState);
         root.find('button#emailVerificationControl_but_send_new_code')
-            .addClass('btn btn-light ml-3')
+            .addClass('btn btn-light ml-2')
             .click(checkBusyState);
         root.find('button#emailVerificationControl_but_change_claims')
             .addClass('btn btn-primary')
@@ -106,7 +112,7 @@
         root.find('button#continue')
             .addClass('btn btn-primary')
             .attr('disabled', 'disabled');
-        root.find('button#cancel').addClass('btn btn-light ml-3');
+        root.find('button#cancel').addClass('btn btn-light ml-2');
 
         setInterval(checkBusyState, 10);
     </script>

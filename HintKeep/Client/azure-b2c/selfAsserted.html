@@ -88,7 +88,7 @@
             .addClass('btn btn-primary')
             .click(checkBusyState);
         root.find('button#emailVerificationControl_but_send_new_code')
-            .addClass('btn btn-light ml-3')
+            .addClass('btn btn-light ml-2')
             .click(checkBusyState);
         root.find('button#emailVerificationControl_but_change_claims')
             .addClass('btn btn-primary')
@@ -99,7 +99,7 @@
         root.find('button#continue')
             .addClass('btn btn-primary')
             .attr('disabled', 'disabled');
-        root.find('button#cancel').addClass('btn btn-light ml-3');
+        root.find('button#cancel').addClass('btn btn-light ml-2');
 
         setInterval(checkBusyState, 10);
     </script>

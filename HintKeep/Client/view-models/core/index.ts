@@ -15,4 +15,4 @@ export type { IFormField } from './form-view-model';
 export { FormViewModel, FormField } from './form-view-model';
 
 export type { IObservableCollection, IReadOnlyObservableCollection } from './observable-collection';
-export { createObservableCollection } from './observable-collection';
+export { observableCollection } from './observable-collection';

@@ -12,10 +12,10 @@ export function watchCollection<TItem>($collection: IReadOnlyObservableCollectio
             if ($collection) {
                 const propertyChangedEventHandler: IEventHandler<any> = {
                     handle(subject: IReadOnlyObservableCollection<TItem>, collectionChange: ICollectionChange<TItem>): void {
-                        if (collectionChange.addedItems && itemAddedCallback)
-                            collectionChange.addedItems.forEach(item => itemAddedCallback(item));
                         if (collectionChange.removedItems && itemRemovedCallback)
                             collectionChange.removedItems.forEach(item => itemRemovedCallback(item));
+                        if (collectionChange.addedItems && itemAddedCallback)
+                            collectionChange.addedItems.forEach(item => itemAddedCallback(item));
 
                         setState(subject.concat([]));
                     }

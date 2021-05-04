@@ -20,7 +20,7 @@ export interface IObservableCollection<TItem> extends IReadOnlyObservableCollect
     reset(items: readonly TItem[]): void;
 }
 
-export function createObservableCollection<TItem>(...items: readonly TItem[]): IObservableCollection<TItem> {
+export function observableCollection<TItem>(...items: readonly TItem[]): IObservableCollection<TItem> {
     return new ObservableCollection<TItem>(...items);
 }
 

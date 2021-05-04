@@ -1,11 +1,11 @@
 import type { IObservableCollection, IReadOnlyObservableCollection } from './core';
 import { ViewModel } from './core';
-import { createObservableCollection } from './core';
+import { observableCollection } from './core';
 
 export class AccountsListViewModel extends ViewModel {
     private _accounts: readonly Account[] = [];
     private _searchText: string = '';
-    private readonly _filteredAccounts: IObservableCollection<Account> = createObservableCollection();
+    private readonly _filteredAccounts: IObservableCollection<Account> = observableCollection();
 
     public get accounts(): readonly Account[] {
         return this._accounts;
