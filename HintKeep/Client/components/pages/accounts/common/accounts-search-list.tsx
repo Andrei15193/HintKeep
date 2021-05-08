@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import type { AccountsListViewModel, Account } from '../../../../view-models/accounts-list-view-model';
-import React, { useContext } from 'react';
+import React, { useContext, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { I18nContext, Message } from '../../../i18n';
@@ -39,15 +39,41 @@ export function AccountsSearchList({ $vm, noItemsComponent: NoItemsComponent, ge
                 </div>
 
                 <div className={classnames(Style.px3, Style.pt2, Style.listView, Style.flexFill)}>
-                    {$vm.filteredAccounts.map(account => <AccountDisplay key={account.id} detailsRoute={getDetailsRoute(account)} account={account} />)}
+                    <AccountsListDisplay accounts={$vm.filteredAccounts} getDetailsRoute={getDetailsRoute} />
                 </div>
             </>
         );
 }
 
+export interface IAccountsListDisplayProps {
+    readonly accounts: readonly Account[];
+
+    getDetailsRoute(account: Account): string;
+}
+
+export function AccountsListDisplay({ accounts, getDetailsRoute }: IAccountsListDisplayProps): JSX.Element {
+    let previousIsPinned: boolean | null = null;
+    return (
+        <>
+            {
+                accounts.map(account => {
+                    const showSeparator = account.isPinned !== previousIsPinned && previousIsPinned !== null;
+                    previousIsPinned = account.isPinned;
+                    return (
+                        <Fragment key={account.id}>
+                            <AccountDisplay detailsRoute={getDetailsRoute(account)} account={account} />
+                            {showSeparator && <hr className={Style.mt0} />}
+                        </Fragment>
+                    );
+                })
+            }
+        </>
+    );
+}
+
 export interface IAccountDisplayProps {
     readonly account: Account;
-    readonly detailsRoute: string
+    readonly detailsRoute: string;
 }
 
 export function AccountDisplay({ account, detailsRoute: detailsPapth }: IAccountDisplayProps): JSX.Element {
