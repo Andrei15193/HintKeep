@@ -6,7 +6,7 @@ import { AuthenticationGuardViewModel } from '../view-models/authentication-guar
 import { useViewModel } from './view-model-hooks';
 import { I18nProvider, Message } from './i18n';
 import { Alerts } from './alerts';
-import { AccountHints, Accounts, AddAccount, Authentication, AuthenticationGuard, DeletedAccountDetails, DeletedAccounts, EditAccount, TermsOfService } from './pages';
+import { AccountHints, Accounts, AddAccount, Authentication, AuthenticationGuard, DeletedAccountDetails, DeletedAccounts, Extra, EditAccount, TermsOfService } from './pages';
 
 import Style from './style.scss';
 
@@ -56,6 +56,11 @@ export function App(): JSX.Element {
                             <Route path="/accounts/:id/hints" exact>
                                 <AuthenticationGuard $vm={$vm}>
                                     <AccountHints />
+                                </AuthenticationGuard>
+                            </Route>
+                            <Route path="/extra" exact>
+                                <AuthenticationGuard $vm={$vm}>
+                                    <Extra $vm={$vm} />
                                 </AuthenticationGuard>
                             </Route>
                             <Redirect to="/" />

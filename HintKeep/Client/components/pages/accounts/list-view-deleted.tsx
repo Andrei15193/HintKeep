@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
 import { useViewModel } from '../../view-model-hooks';
@@ -10,7 +10,6 @@ import { AccountsSearchList } from './common/accounts-search-list';
 import Style from '../../style.scss';
 
 export function DeletedAccounts(): JSX.Element {
-    const { push } = useHistory();
     const $vm = useViewModel(DeletedAccountsViewModel);
     useEffect(() => { $vm.loadAsync(); }, [$vm]);
 
@@ -20,9 +19,9 @@ export function DeletedAccounts(): JSX.Element {
                 <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
                     <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
                         <div className={classnames(Style.col2, Style.textLeft)}>
-                            <button type="button" onClick={() => push('/')} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
+                            <Link to="/extra" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                                 <Message id="pages.deletedAccounts.back.label" />
-                            </button>
+                            </Link>
                         </div>
                         <div className={classnames(Style.col8, Style.textCenter)}>
                             <Message id="pages.deletedAccounts.pageTitle" />
@@ -31,16 +30,11 @@ export function DeletedAccounts(): JSX.Element {
                 </h1>
                 <hr className={Style.w100} />
             </div>
+
             <div className={classnames(Style.dFlex, Style.flexFill, Style.flexColumn)}>
-                <div className={Style.flexFill}>
-                    <BusyContent $vm={$vm}>
-                        <AccountsSearchList $vm={$vm.accounts} noItemsComponent={NoAccountsMessage} getDetailsRoute={account => `/accounts/bin/${account.id}`} />
-                    </BusyContent>
-                </div>
-                <div className={classnames(Style.mb2, Style.mx3, Style.textCenter)}>
-                    <hr className={Style.my2} />
-                    <Link to="/accounts"><Message id="pages.deletedAccounts.viewAccounts.labels" /></Link>
-                </div>
+                <BusyContent $vm={$vm}>
+                    <AccountsSearchList $vm={$vm.accounts} noItemsComponent={NoAccountsMessage} getDetailsRoute={account => `/accounts/bin/${account.id}`} />
+                </BusyContent>
             </div>
         </>
     );

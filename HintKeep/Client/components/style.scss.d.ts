@@ -1267,6 +1267,7 @@ interface CssExports {
   'spinnerGrowSm': string;
   'textBlack50': string;
   'textBody': string;
+  'textBold': string;
   'textBreak': string;
   'textCapitalize': string;
   'textCenter': string;

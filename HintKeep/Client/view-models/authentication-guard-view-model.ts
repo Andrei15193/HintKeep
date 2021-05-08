@@ -26,4 +26,9 @@ export class AuthenticationGuardViewModel extends ApiViewModel {
         else
             return Promise.resolve();
     }
+
+    public reset(): void {
+        this._isAuthenticationEnsured = false;
+        this.notifyPropertyChanged('isAuthenticationEnsured');
+    }
 }

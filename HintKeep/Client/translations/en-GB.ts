@@ -26,6 +26,7 @@ export const enGB: IMessages = {
     'pages.accounts.search.placeholder': 'Search',
     'pages.accounts.add.label': 'Add',
     'pages.accounts.edit.label': 'Edit',
+    'pages.accounts.extra.label': '. . .',
     'pages.accounts.viewAccountsBin.labels': 'View accounts (bin)',
 
     'pages.deletedAccounts.pageTitle': 'Accounts (bin)',
@@ -84,6 +85,11 @@ export const enGB: IMessages = {
     'pages.deletedAccountDetails.delete.confirmation': 'The account will be permanently deleted and you will no longer be able to recover it! Please confirm your operation.',
     'pages.deletedAccountDetails.cancel.label': 'Cancel',
     'pages.deletedAccountDetails.back.label': 'Back',
+
+    'pages.extra.pageTitle': 'Extra',
+    'pages.extra.back.label': 'Back',
+    'pages.extra.accountsBin.label': 'View deleted accounts (bin)',
+    'pages.extra.logOut.label': 'Log out of your account',
 
     'validation.errors.required': 'Please provide a value.',
     'validation.errors.nameNotUnique': 'An account with the same name already exists.',

@@ -20,16 +20,15 @@ export function AddAccount(): JSX.Element {
             <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
                 <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
                     <div className={classnames(Style.col2, Style.textLeft)}>
-                        <button type="button" onClick={() => push('/')} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
+                        <Link to="/" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                             <Message id="pages.addAccount.back.label" />
-                        </button>
+                        </Link>
                     </div>
                     <div className={classnames(Style.col8, Style.textCenter)}>
                         <Message id="pages.addAccount.pageTitle" />
                     </div>
                 </div>
             </h1>
-
 
             <BusyContent $vm={$vm}>
                 <FormInput className={Style.mb3} id="name" type="text" label="pages.addAccount.name.label" field={$vm.form.name} placeholder="pages.addAccount.name.placeholder" />

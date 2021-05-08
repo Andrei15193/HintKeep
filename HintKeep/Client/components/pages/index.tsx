@@ -7,3 +7,4 @@ export { DeletedAccounts } from './accounts/list-view-deleted';
 export { AddAccount } from './accounts/add-account';
 export { EditAccount } from './accounts/edit-account';
 export { DeletedAccountDetails } from './accounts/deleted-account-details';
+export { Extra } from './extra';

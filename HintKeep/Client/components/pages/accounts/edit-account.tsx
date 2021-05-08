@@ -29,9 +29,9 @@ export function EditAccount(): JSX.Element {
             <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
                 <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
                     <div className={classnames(Style.col2, Style.textLeft)}>
-                        <button type="button" onClick={() => push('/')} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
+                        <Link to="/" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                             <Message id="pages.editAccount.back.label" />
-                        </button>
+                        </Link>
                     </div>
                     <div className={classnames(Style.col8, Style.textCenter)}>
                         <Message id="pages.editAccount.pageTitle" />
