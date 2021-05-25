@@ -92,7 +92,7 @@ function AppBanner({ className, children }: PropsWithChildren<IAppBannerProps>):
 function AppContent({ children }: PropsWithChildren<{}>): JSX.Element {
     return (
         <div className={classnames(Style.appContent, Style.dFlex, Style.flexFill, Style.textJustify)}>
-            <div className={classnames(Style.dFlex, Style.flexColumn, Style.flexFill)}>
+            <div className={classnames(Style.dFlex, Style.flexColumn, Style.flexFill, Style.w100)}>
                 {children}
             </div>
         </div>

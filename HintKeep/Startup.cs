@@ -53,6 +53,7 @@ namespace HintKeep
                 {
                     options.Filters.Add(new AuthorizeFilter());
                     options.Filters.Add<ExceptionFilter>();
+                    options.Filters.Add(new ResponseCacheAttribute { NoStore = true });
                 })
                 .AddJsonOptions(options =>
                 {
@@ -155,7 +156,8 @@ namespace HintKeep
                 {
                     endpoints.MapControllers();
                     endpoints.MapFallbackToFile("/index.html");
-                });
+                })
+                .UseResponseCaching();
         }
     }
 }

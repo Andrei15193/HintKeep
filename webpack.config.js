@@ -28,6 +28,7 @@ const baseHtmlWebpackPluginOptions = {
 module.exports = {
     mode: isProduction ? 'production' : 'development',
     devtool: isProduction ? false : 'eval-source-map',
+    target: ['web', 'es5'],
     entry: {
         app: path.resolve(__dirname, 'HintKeep', 'Client', 'components', 'index.tsx')
     },
@@ -96,6 +97,7 @@ module.exports = {
                     </head>
                     <body>
                         <div id="app"></div>
+                        <script crossorigin src="https://unpkg.com/core-js-bundle@3.13.0/minified.js"></script>
                         <script crossorigin src="https://unpkg.com/react@17/umd/react.${isProduction ? 'production.min' : 'development'}.js"></script>
                         <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.${isProduction ? 'production.min' : 'development'}.js"></script>
                         <script crossorigin src="https://unpkg.com/react-router-dom/umd/react-router-dom.min.js"></script>

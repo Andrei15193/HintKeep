@@ -61,8 +61,8 @@ export function AccountsListDisplay({ accounts, getDetailsRoute }: IAccountsList
                     previousIsPinned = account.isPinned;
                     return (
                         <Fragment key={account.id}>
-                            <AccountDisplay detailsRoute={getDetailsRoute(account)} account={account} />
                             {showSeparator && <hr className={Style.mt0} />}
+                            <AccountDisplay detailsRoute={getDetailsRoute(account)} account={account} />
                         </Fragment>
                     );
                 })
