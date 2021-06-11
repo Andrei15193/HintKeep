@@ -1,15 +1,15 @@
 import type { TextareaHTMLAttributes } from 'react';
-import type { IFormField } from '../../../view-models/core';
+import type { IFormFieldViewModel } from 'react-model-view-viewmodel';
 import React, { useContext } from 'react';
+import { watchViewModel } from 'react-model-view-viewmodel';
 import classnames from 'classnames';
 import { I18nContext } from '../../i18n';
 import { getValidationClasses } from './get-validation-classes';
-import { watchViewModel } from '../../view-model-hooks';
 
 import Style from '../../style.scss';
 
 export interface ITextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-    field: IFormField
+    field: IFormFieldViewModel<string | undefined>
 }
 
 export function TextArea({ field, placeholder, ...textAreaProps }: ITextAreaProps): JSX.Element {

@@ -1,6 +1,6 @@
 import type { ITextAreaProps } from './text-area';
 import React from 'react';
-import { watchViewModel } from '../../view-model-hooks';
+import { watchViewModel } from 'react-model-view-viewmodel';
 import { TextArea } from './text-area';
 import { Message } from '../../i18n';
 
@@ -13,13 +13,13 @@ export interface IFormInputProps extends ITextAreaProps {
 }
 
 export function FormTextArea({ label, description, field, id, className, ...textAreaProps }: IFormInputProps): JSX.Element {
-    watchViewModel(field, ['errors']);
+    watchViewModel(field, ['error']);
 
     return (
         <div className={className}>
             <label htmlFor={id}><Message id={label} /></label>
             <TextArea field={field} {...textAreaProps} />
-            <div id={`${id}Feedback`} className={Style.invalidFeedback}>{field.errors.map(error => <Message key={error} id={error} />)}</div>
+            <div id={`${id}Feedback`} className={Style.invalidFeedback}>{field.error !== undefined && <Message id={field.error} />}</div>
             {description && <div className={Style.mt2}><Message id={description} /></div>}
         </div>
     );

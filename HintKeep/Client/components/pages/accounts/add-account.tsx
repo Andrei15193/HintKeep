@@ -1,17 +1,18 @@
 import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import classnames from 'classnames';
+import { watchEvent, watchViewModel } from 'react-model-view-viewmodel';
 import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
-import { watchEvent, useViewModel, watchViewModel } from '../../view-model-hooks';
 import { AddAccountViewModel } from '../../../view-models/add-account-view-model';
 import { FormInput, FormCheckboxInput, FormTextArea } from '../forms';
+import { useViewModel } from '../../use-view-model';
 
 import Style from '../../style.scss';
 
 export function AddAccount(): JSX.Element {
     const { push } = useHistory();
-    const $vm = useViewModel(AddAccountViewModel, []);
+    const $vm = useViewModel(({ alertsViewModel }) => new AddAccountViewModel(alertsViewModel));
     watchViewModel($vm.form, ['isInvalid', 'areAllFieldsTouched']);
     watchEvent($vm.submittedEvent, () => push('/'));
 

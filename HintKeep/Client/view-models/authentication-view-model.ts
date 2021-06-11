@@ -1,8 +1,7 @@
 import type { AxiosInstance } from 'axios';
-import type { IEvent } from '../events';
-import { DispatchEvent } from '../events';
+import type { IEvent } from 'react-model-view-viewmodel';
+import { ViewModel, DispatchEvent } from 'react-model-view-viewmodel';
 import { Axios } from '../services';
-import { ViewModel } from './core';
 
 export class AuthenticationViewModel extends ViewModel {
     private readonly _authenticated: DispatchEvent = new DispatchEvent();

@@ -1,15 +1,17 @@
 import type { AxiosResponse } from 'axios';
+import type { IEvent } from 'react-model-view-viewmodel'
+import type { AlertsViewModel } from './alerts-view-model';
 import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../api/accounts/post';
-import type { FormFieldViewModel } from './core'
-import { ApiViewModel, FormFieldCollectionViewModel, combineValidators, required } from './core';
+import { FormFieldViewModel, FormFieldCollectionViewModel, registerValidators, DispatchEvent } from 'react-model-view-viewmodel'
+import { ApiViewModel } from './api-view-model';
+import { required } from './validation';
 import { Axios } from '../services';
-import { DispatchEvent, IEvent } from '../events';
 
 export class AddAccountViewModel extends ApiViewModel {
     private readonly _submittedEvent: DispatchEvent = new DispatchEvent();
 
-    public constructor() {
-        super(Axios);
+    public constructor(alertsViewModel: AlertsViewModel) {
+        super(Axios, alertsViewModel);
     }
 
     public readonly form: AddAccountForm = new AddAccountForm();
@@ -32,11 +34,11 @@ export class AddAccountViewModel extends ApiViewModel {
                     this._submittedEvent.dispatch(this);
                 })
                 .on(409, (_: AxiosResponse<IConflictResponseData>) => {
-                    this.form.name.errors = ['validation.errors.nameNotUnique'];
+                    this.form.name.error = 'validation.errors.nameNotUnique';
                 })
                 .on(422, ({ data: { name: nameErrors, hint: hintErrors } }: AxiosResponse<IUnprocessableEntityResponseData>) => {
-                    this.form.name.errors = nameErrors;
-                    this.form.hint.errors = hintErrors;
+                    this.form.name.error = nameErrors[0];
+                    this.form.hint.error = hintErrors[0];
                 })
                 .sendAsync();
         }
@@ -46,10 +48,12 @@ export class AddAccountViewModel extends ApiViewModel {
 class AddAccountForm extends FormFieldCollectionViewModel {
     public constructor() {
         super();
-        this.name = this.addField('', combineValidators(required), this._fieldChanged);
-        this.hint = this.addField('', combineValidators(required), this._fieldChanged);
-        this.isPinned = this.addField(false, this._fieldChanged);
-        this.notes = this.addField('', this._fieldChanged);
+        registerValidators(this.name = this.addField(''), [required]);
+        registerValidators(this.hint = this.addField(''), [required]);
+        this.isPinned = this.addField(false);
+        this.notes = this.addField('');
+
+        this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
     }
 
     public readonly name: FormFieldViewModel<string>;
@@ -61,8 +65,8 @@ class AddAccountForm extends FormFieldCollectionViewModel {
         return this.fields.every(field => field.isTouched);
     }
 
-    private _fieldChanged(field: FormFieldViewModel<any>, changedProperties: readonly string[]): void {
+    private _fieldChanged = (field: FormFieldViewModel<any>, changedProperties: readonly string[]): void => {
         if (changedProperties.includes('isTouched'))
-            this.notifyPropertyChanged('areAllFieldsTouched');
+            this.notifyPropertiesChanged('areAllFieldsTouched');
     }
 }

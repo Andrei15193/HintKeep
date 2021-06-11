@@ -1,49 +1,29 @@
 import type { AxiosResponse } from 'axios';
-import type { IFormField } from './core';
+import type { IEvent } from 'react-model-view-viewmodel';
+import type { AlertsViewModel } from './alerts-view-model';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/deleted-accounts/get-by-id';
 import type { INotFoundResponseData as INotFoundPutResponseData, IResponseData as IPutResponseData, IRequestData as IPutRequestData } from '../api/deleted-accounts/put';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/deleted-accounts/delete';
-import { FormViewModel, FormField } from './core';
+import { FormFieldCollectionViewModel, FormFieldViewModel, DispatchEvent } from 'react-model-view-viewmodel';
 import { Axios } from '../services';
-import { DispatchEvent, IEvent } from '../events';
-import { alertsStore } from '../stores';
+import { ApiViewModel } from './api-view-model';
 
-export class DeletedAccountDetailsViewModel extends FormViewModel {
+export class DeletedAccountDetailsViewModel extends ApiViewModel {
     private _id: string | null;
     private readonly _restoredEvent: DispatchEvent;
     private readonly _deletedEvent: DispatchEvent;
-    private readonly _name: FormField<string>;
-    private readonly _hint: FormField<string>;
-    private readonly _isPinned: FormField<boolean>;
-    private readonly _notes: FormField<string>;
+    private _form: DeletedAccountFormViewModel;
 
-    public constructor() {
-        super(Axios);
+    public constructor(alertsViewModel: AlertsViewModel) {
+        super(Axios, alertsViewModel);
         this._restoredEvent = new DispatchEvent();
         this._deletedEvent = new DispatchEvent();
         this._id = null;
-        this.register(
-            this._name = new FormField<string>(''),
-            this._hint = new FormField<string>(''),
-            this._isPinned = new FormField<boolean>(false),
-            this._notes = new FormField<string>('')
-        );
+        this._form = new DeletedAccountFormViewModel();
     }
 
-    public get name(): IFormField<string> {
-        return this._name;
-    }
-
-    public get hint(): IFormField<string> {
-        return this._hint;
-    }
-
-    public get isPinned(): IFormField<boolean> {
-        return this._isPinned;
-    }
-
-    public get notes(): IFormField<string> {
-        return this._notes;
+    public get form(): DeletedAccountFormViewModel {
+        return this._form;
     }
 
     public get isLoaded(): boolean {
@@ -63,14 +43,11 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
             .get(`/api/deleted-accounts/${id}`)
             .on(200, ({ data: { name, hint, isPinned, notes } }: AxiosResponse<IGetResponseData>) => {
                 this._id = id;
-                this._name.value = name;
-                this._hint.value = hint;
-                this._isPinned.value = isPinned;
-                this._notes.value = notes;
-                this.notifyPropertyChanged('isLoaded');
+                this._form = new DeletedAccountFormViewModel({ name, hint, isPinned, notes });
+                this.notifyPropertiesChanged('isLoaded');
             })
             .on(404, (_: AxiosResponse<INotFoundGetResponseData>) => {
-                alertsStore.addAlert('errors.accountNotFound');
+                this.alertsViewModel.addAlert('errors.accountNotFound');
             })
             .sendAsync();
     }
@@ -83,7 +60,7 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
                     this._restoredEvent.dispatch(this);
                 })
                 .on(404, (_: AxiosResponse<INotFoundPutResponseData>) => {
-                    alertsStore.addAlert('errors.accountNotFound');
+                    this.alertsViewModel.addAlert('errors.accountNotFound');
                 })
                 .sendAsync();
     }
@@ -100,4 +77,29 @@ export class DeletedAccountDetailsViewModel extends FormViewModel {
                 })
                 .sendAsync();
     }
+}
+
+export interface IDeleteAccountFormFieldValues {
+    readonly name: string;
+    readonly hint: string;
+    readonly isPinned: boolean;
+    readonly notes: string;
+}
+
+export class DeletedAccountFormViewModel extends FormFieldCollectionViewModel {
+    public constructor(fields?: IDeleteAccountFormFieldValues) {
+        super();
+        this.name = this.addField(fields && fields.name || '');
+        this.hint = this.addField(fields && fields.hint || '');
+        this.isPinned = this.addField(fields && fields.isPinned || false);
+        this.notes = this.addField(fields && fields.notes || '');
+    }
+
+    public name: FormFieldViewModel<string>;
+
+    public hint: FormFieldViewModel<string>;
+
+    public isPinned: FormFieldViewModel<boolean>;
+
+    public notes: FormFieldViewModel<string>;
 }

@@ -1,11 +1,14 @@
 import type { PropsWithChildren } from 'react';
-import type { PropsWithViewModel } from '../view-model-hooks';
 import type { AuthenticationGuardViewModel } from '../../view-models/authentication-guard-view-model';
 import React, { useEffect } from 'react';
+import { watchViewModel } from 'react-model-view-viewmodel';
 import { Spinner } from '../loaders';
-import { watchViewModel } from '../view-model-hooks';
 
-export function AuthenticationGuard({ $vm, children }: PropsWithChildren<PropsWithViewModel<AuthenticationGuardViewModel>>): JSX.Element {
+export interface IAuthenticationGuardProps {
+    readonly $vm: AuthenticationGuardViewModel;
+}
+
+export function AuthenticationGuard({ $vm, children }: PropsWithChildren<IAuthenticationGuardProps>): JSX.Element {
     watchViewModel($vm);
 
     useEffect(() => { $vm.ensureAuthenticatedAsync() }, []);

@@ -3,8 +3,8 @@ import type { AccountsListViewModel, Account } from '../../../../view-models/acc
 import React, { useContext, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
+import { watchCollection, watchViewModel } from 'react-model-view-viewmodel';
 import { I18nContext, Message } from '../../../i18n';
-import { watchCollection, watchViewModel } from '../../../view-model-hooks';
 
 import Style from '../../../style.scss';
 

@@ -1,12 +1,16 @@
-import { PropsWithViewModel, watchViewModel } from '../view-model-hooks';
+import type { AlertViewModel } from '../../view-models/alerts-view-model';
 import React from 'react';
 import classnames from 'classnames';
-import { AlertViewModel } from '../../view-models/alert-view-model';
+import { watchViewModel } from 'react-model-view-viewmodel';
 import { Message } from '../i18n';
 
 import Style from './../style.scss';
 
-export function Alert({ $vm }: PropsWithViewModel<AlertViewModel>): JSX.Element {
+export interface IAlertProps {
+    readonly $vm: AlertViewModel;
+};
+
+export function Alert({ $vm }: IAlertProps): JSX.Element {
     watchViewModel($vm);
 
     return (

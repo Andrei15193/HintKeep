@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
-import { useViewModel } from '../../view-model-hooks';
+import { useViewModel } from '../../use-view-model';
 import { AccountsViewModel } from '../../../view-models/accounts-view-model';
 import { BusyContent } from '../../loaders';
 import { AccountsSearchList } from './common/accounts-search-list';
@@ -10,7 +10,7 @@ import { AccountsSearchList } from './common/accounts-search-list';
 import Style from '../../style.scss';
 
 export function Accounts(): JSX.Element {
-    const $vm = useViewModel(AccountsViewModel);
+    const $vm = useViewModel(({ alertsViewModel }) => new AccountsViewModel(alertsViewModel));
     useEffect(() => { $vm.loadAsync(); }, [$vm]);
 
     return (

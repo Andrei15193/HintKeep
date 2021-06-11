@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
-import { Message } from '../../i18n';
-import { useViewModel } from '../../view-model-hooks';
+import { Message } from '../../i18n'
+import { useViewModel } from '../../use-view-model';
 import { DeletedAccountsViewModel } from '../../../view-models/deleted-accounts-view-model';
 import { BusyContent } from '../../loaders';
 import { AccountsSearchList } from './common/accounts-search-list';
@@ -10,7 +10,7 @@ import { AccountsSearchList } from './common/accounts-search-list';
 import Style from '../../style.scss';
 
 export function DeletedAccounts(): JSX.Element {
-    const $vm = useViewModel(DeletedAccountsViewModel);
+    const $vm = useViewModel(({ alertsViewModel }) => new DeletedAccountsViewModel(alertsViewModel));
     useEffect(() => { $vm.loadAsync(); }, [$vm]);
 
     return (

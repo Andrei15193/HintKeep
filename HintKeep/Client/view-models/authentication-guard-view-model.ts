@@ -1,13 +1,14 @@
 import type { AxiosResponse } from 'axios';
+import type { AlertsViewModel } from './alerts-view-model';
 import type { IResponseData } from '../api/users/details/get';
 import { Axios } from '../services';
-import { ApiViewModel } from './core';
+import { ApiViewModel } from './api-view-model';
 
 export class AuthenticationGuardViewModel extends ApiViewModel {
     private _isAuthenticationEnsured: boolean = false;
 
-    public constructor() {
-        super(Axios);
+    public constructor(alertsViewModel: AlertsViewModel) {
+        super(Axios, alertsViewModel);
     }
 
     public get isAuthenticationEnsured(): boolean {
@@ -20,7 +21,7 @@ export class AuthenticationGuardViewModel extends ApiViewModel {
                 .get('/api/users/details')
                 .on(204, (_: AxiosResponse<IResponseData>) => {
                     this._isAuthenticationEnsured = true;
-                    this.notifyPropertyChanged('isAuthenticationEnsured');
+                    this.notifyPropertiesChanged('isAuthenticationEnsured');
                 })
                 .sendAsync();
         else
@@ -29,6 +30,6 @@ export class AuthenticationGuardViewModel extends ApiViewModel {
 
     public reset(): void {
         this._isAuthenticationEnsured = false;
-        this.notifyPropertyChanged('isAuthenticationEnsured');
+        this.notifyPropertiesChanged('isAuthenticationEnsured');
     }
 }

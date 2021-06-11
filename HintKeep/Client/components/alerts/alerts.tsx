@@ -1,10 +1,9 @@
 import React from 'react';
 import { Alert } from './alert';
-import { AlertsViewModel } from '../../view-models/alerts-view-model';
-import { useViewModel } from '../view-model-hooks';
+import { useViewModel } from '../use-view-model';
 
 export function Alerts(): JSX.Element {
-    const $vm = useViewModel(AlertsViewModel);
+    const $vm = useViewModel(({ alertsViewModel }) => alertsViewModel);
 
     return (
         <>

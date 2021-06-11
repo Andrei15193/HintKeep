@@ -4,13 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
-import { useViewModel } from '../../view-model-hooks';
-import { ApiViewModelState } from '../../../view-models/core';
 import { BusyContent } from '../../loaders';
 import { AccountHintsViewModel } from '../../../view-models/account-hints-view-model';
 import { If, Then } from '../../conditionals';
 
 import Style from '../../style.scss';
+import { useViewModel } from '../../use-view-model';
 
 export interface IAccountHintsRouteParams {
     readonly id: string
@@ -19,7 +18,7 @@ export interface IAccountHintsRouteParams {
 export function AccountHints(): JSX.Element {
     const { push } = useHistory();
     const { id } = useParams<IAccountHintsRouteParams>();
-    const $vm = useViewModel(AccountHintsViewModel);
+    const $vm = useViewModel(({ alertsViewModel }) => new AccountHintsViewModel(alertsViewModel));
     useEffect(() => { $vm.loadAsync(id); }, [$vm]);
     const [deleteConfirmationIndex, setDeleteConfirmationIndex] = useState<number | undefined>(undefined);
 

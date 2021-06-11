@@ -1,15 +1,16 @@
 import type { AxiosResponse } from 'axios';
+import type { AlertsViewModel } from './alerts-view-model';
 import type { IResponseData as IGetResponseData } from '../api/accounts-hints/get';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/accounts-hints/delete';
 import { Axios } from '../services';
-import { ApiViewModel } from './core';
+import { ApiViewModel } from './api-view-model';
 
 export class AccountHintsViewModel extends ApiViewModel {
     private _accountId: string | null = null;
     private _accountHints: readonly AccountHint[];
 
-    public constructor() {
-        super(Axios);
+    public constructor(alertsViewModel: AlertsViewModel) {
+        super(Axios, alertsViewModel);
         this._accountHints = [];
     }
 
@@ -23,7 +24,7 @@ export class AccountHintsViewModel extends ApiViewModel {
             .on(200, (response: AxiosResponse<IGetResponseData>) => {
                 this._accountId = accountId;
                 this._accountHints = response.data.map(account => new AccountHint(account.id, account.hint, new Date(account.dateAdded)));
-                this.notifyPropertyChanged('accountHints');
+                this.notifyPropertiesChanged('accountHints');
             })
             .sendAsync();
     }
@@ -34,7 +35,7 @@ export class AccountHintsViewModel extends ApiViewModel {
                 .delete(`/api/accounts/${this._accountId}/hints/${hintId}`)
                 .on(204, (_: AxiosResponse<IDeleteResponseData>) => {
                     this._accountHints = this._accountHints.filter(accountHint => accountHint.id !== hintId);
-                    this.notifyPropertyChanged('accountHints');
+                    this.notifyPropertiesChanged('accountHints');
                 })
                 .on(404, (_: AxiosResponse<INotFoundDeleteResponseData>) => {
                 })

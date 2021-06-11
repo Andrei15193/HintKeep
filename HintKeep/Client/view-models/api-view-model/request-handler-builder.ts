@@ -1,4 +1,4 @@
-import type { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export type RequestHandlerCallback = (request: AxiosRequestConfig) => void;
 export type RequestMiddlewareCallback = (request: AxiosRequestConfig, next: RequestHandlerCallback) => void;

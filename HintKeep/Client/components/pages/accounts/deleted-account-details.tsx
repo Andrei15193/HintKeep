@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import { watchEvent } from 'react-model-view-viewmodel';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
-import { watchEvent, useViewModel } from '../../view-model-hooks';
 import { DeletedAccountDetailsViewModel } from '../../../view-models/deleted-account-details-view-model';
 import { FormInput, FormCheckboxInput, FormTextArea } from '../forms';
 import { Else, If, Then } from '../../conditionals';
+import { useViewModel } from '../../use-view-model';
 
 import Style from '../../style.scss';
 
@@ -16,7 +17,7 @@ export interface IDeletedAccountDetailsRouteParams {
 
 export function DeletedAccountDetails(): JSX.Element {
     const { push } = useHistory();
-    const $vm = useViewModel(DeletedAccountDetailsViewModel);
+    const $vm = useViewModel(({ alertsViewModel }) => new DeletedAccountDetailsViewModel(alertsViewModel));
     const { id } = useParams<IDeletedAccountDetailsRouteParams>();
 
     const [isConfirmationHidden, setIsConfirmationHidden] = useState(true);
@@ -40,10 +41,10 @@ export function DeletedAccountDetails(): JSX.Element {
             </h1>
 
             <BusyContent $vm={$vm}>
-                <FormInput className={Style.mb3} id="name" type="text" disabled label="pages.deletedAccountDetails.name.label" field={$vm.name} />
-                <FormInput className={Style.mb3} id="hint" type="text" disabled label="pages.deletedAccountDetails.hint.label" field={$vm.hint} />
-                <FormCheckboxInput className={Style.mb3} id="isPinned" disabled label="pages.deletedAccountDetails.isPinned.label" field={$vm.isPinned} />
-                <FormTextArea className={Style.mb3} id="notes" disabled label="pages.deletedAccountDetails.notes.label" field={$vm.notes} />
+                <FormInput className={Style.mb3} id="name" type="text" disabled label="pages.deletedAccountDetails.name.label" field={$vm.form.name} />
+                <FormInput className={Style.mb3} id="hint" type="text" disabled label="pages.deletedAccountDetails.hint.label" field={$vm.form.hint} />
+                <FormCheckboxInput className={Style.mb3} id="isPinned" disabled label="pages.deletedAccountDetails.isPinned.label" field={$vm.form.isPinned} />
+                <FormTextArea className={Style.mb3} id="notes" disabled label="pages.deletedAccountDetails.notes.label" field={$vm.form.notes} />
 
                 <If condition={isConfirmationHidden}>
                     <Then>

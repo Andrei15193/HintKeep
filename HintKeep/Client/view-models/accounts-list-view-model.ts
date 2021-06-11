@@ -1,6 +1,5 @@
-import type { IObservableCollection, IReadOnlyObservableCollection } from './core';
-import { ViewModel } from './core';
-import { observableCollection } from './core';
+import type { IObservableCollection, IReadOnlyObservableCollection } from 'react-model-view-viewmodel';
+import { ViewModel, observableCollection } from 'react-model-view-viewmodel';
 
 export class AccountsListViewModel extends ViewModel {
     private _accounts: readonly Account[] = [];
@@ -23,7 +22,7 @@ export class AccountsListViewModel extends ViewModel {
         if (this._searchText !== value) {
             this._searchText = value;
             this._filterAccounts();
-            this.notifyPropertyChanged('searchText');
+            this.notifyPropertiesChanged('searchText');
         }
     }
 
@@ -31,7 +30,7 @@ export class AccountsListViewModel extends ViewModel {
         if (this._accounts !== accounts) {
             this._accounts = accounts;
             this._filterAccounts();
-            this.notifyPropertyChanged('accounts');
+            this.notifyPropertiesChanged('accounts');
         }
     }
 
@@ -43,7 +42,7 @@ export class AccountsListViewModel extends ViewModel {
                 const accountName = account.name.toLocaleLowerCase();
                 return searchTerms.some(searchTerm => accountName.includes(searchTerm));
             });
-        this._filteredAccounts.reset(filteredAccounts);
+        this._filteredAccounts.reset(...filteredAccounts);
     }
 }
 

@@ -1,26 +1,41 @@
-import { ViewModel } from './core';
-import { alertsStore } from '../stores';
-import { Alert } from '../stores/alert';
-import { AlertViewModel } from './alert-view-model';
+import { ViewModel } from 'react-model-view-viewmodel';
 
 export class AlertsViewModel extends ViewModel {
-    private _alerts: readonly AlertViewModel[];
-
-    public constructor() {
-        super(alertsStore);
-        this._alerts = this._mapAlerts(alertsStore.alerts);
-    }
+    private readonly _alerts: AlertViewModel[] = [];
 
     public get alerts(): readonly AlertViewModel[] {
         return this._alerts;
     }
 
-    protected storeChanged(): void {
-        this._alerts = this._mapAlerts(alertsStore.alerts);
-        this.notifyPropertyChanged('alerts');
+    public addAlert(message: string): void {
+        this._alerts.push(new AlertViewModel(message, this));
+        this.notifyPropertiesChanged('alerts');
     }
 
-    private _mapAlerts(alerts: readonly Alert[]): readonly AlertViewModel[] {
-        return alerts.map(alert => new AlertViewModel(alert));
+    public remove(alert: AlertViewModel): void {
+        const alertIndex = this._alerts.indexOf(alert);
+        if (alertIndex >= 0) {
+            this._alerts.splice(alertIndex, 1);
+            this.notifyPropertiesChanged('alerts');
+        }
+    }
+}
+
+export class AlertViewModel extends ViewModel {
+    private readonly _message: string;
+    private readonly _alertsViewModel: AlertsViewModel;
+
+    public constructor(message: string, alertsViewModel: AlertsViewModel) {
+        super();
+        this._message = message;
+        this._alertsViewModel = alertsViewModel;
+    }
+
+    public get message(): string {
+        return this._message;
+    }
+
+    public dismiss(): void {
+        this._alertsViewModel.remove(this);
     }
 }

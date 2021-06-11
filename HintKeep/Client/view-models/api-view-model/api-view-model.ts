@@ -1,8 +1,7 @@
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
-import type { INotifyPropertyChanged } from '../../events';
-import { alertsStore } from '../../stores';
+import type { AlertsViewModel } from '../alerts-view-model';
+import { ViewModel } from 'react-model-view-viewmodel';
 import { RequestHandlerBuilder } from './request-handler-builder';
-import { ViewModel } from './view-model';
 
 export enum ApiViewModelState {
     Ready,
@@ -12,21 +11,27 @@ export enum ApiViewModelState {
 
 export abstract class ApiViewModel extends ViewModel {
     private readonly _axios: AxiosInstance;
+    private readonly _alertsViewModel: AlertsViewModel;
     private _state: ApiViewModelState = ApiViewModelState.Ready;
 
-    public constructor(axios: AxiosInstance, ...stores: readonly INotifyPropertyChanged[]) {
-        super(...stores);
+    public constructor(axios: AxiosInstance, alertsViewModel: AlertsViewModel) {
+        super();
         this._axios = axios;
+        this._alertsViewModel = alertsViewModel;
     }
 
     public get state(): ApiViewModelState {
         return this._state;
     }
 
+    protected get alertsViewModel(): AlertsViewModel {
+        return this._alertsViewModel;
+    }
+
     private _setState(value: ApiViewModelState): void {
         if (this._state !== value) {
             this._state = value;
-            this.notifyPropertyChanged('state');
+            this.notifyPropertiesChanged('state');
         }
     }
 
@@ -53,7 +58,7 @@ export abstract class ApiViewModel extends ViewModel {
                 next(request);
             })
             .on(500, () => {
-                alertsStore.addAlert('errors.internalServerError');
+                this._alertsViewModel.addAlert('errors.internalServerError');
             })
             .onCompleted(() => {
                 this._setState(ApiViewModelState.Ready);

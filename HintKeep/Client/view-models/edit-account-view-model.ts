@@ -1,49 +1,30 @@
 import type { AxiosResponse } from 'axios';
-import type { IFormField } from './core';
+import type { IEvent } from 'react-model-view-viewmodel';
+import type { AlertsViewModel } from './alerts-view-model';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/accounts/get-by-id';
 import type { IConflictResponseData, INotFoundResponseData as INotFoundPutResponseData, IRequestData, IResponseData as IPutResponseData, IUnprocessableEntityResponseData } from '../api/accounts/put';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/accounts/delete';
-import { FormViewModel, FormField } from './core';
+import { DispatchEvent, FormFieldCollectionViewModel, FormFieldViewModel, registerValidators } from 'react-model-view-viewmodel';
 import { Axios } from '../services';
-import { DispatchEvent, IEvent } from '../events';
-import { alertsStore } from '../stores';
+import { ApiViewModel } from './api-view-model';
+import { required } from './validation';
 
-export class EditAccountViewModel extends FormViewModel {
+export class EditAccountViewModel extends ApiViewModel {
     private _id: string | null;
     private readonly _editedEvent: DispatchEvent;
     private readonly _deletedEvent: DispatchEvent;
-    private readonly _name: FormField<string>;
-    private readonly _hint: FormField<string>;
-    private readonly _isPinned: FormField<boolean>;
-    private readonly _notes: FormField<string>;
+    private _form: EditAccountFormViewModel;
 
-    public constructor() {
-        super(Axios);
+    public constructor(alertsViewModel: AlertsViewModel) {
+        super(Axios, alertsViewModel);
         this._editedEvent = new DispatchEvent();
         this._deletedEvent = new DispatchEvent();
         this._id = null;
-        this.register(
-            this._name = new FormField<string>(''),
-            this._hint = new FormField<string>(''),
-            this._isPinned = new FormField<boolean>(false),
-            this._notes = new FormField<string>('')
-        );
+        this._form = new EditAccountFormViewModel();
     }
 
-    public get name(): IFormField<string> {
-        return this._name;
-    }
-
-    public get hint(): IFormField<string> {
-        return this._hint;
-    }
-
-    public get isPinned(): IFormField<boolean> {
-        return this._isPinned;
-    }
-
-    public get notes(): IFormField<string> {
-        return this._notes;
+    public get form(): EditAccountFormViewModel {
+        return this._form;
     }
 
     public get isLoaded(): boolean {
@@ -63,28 +44,25 @@ export class EditAccountViewModel extends FormViewModel {
             .get(`/api/accounts/${id}`)
             .on(200, ({ data: { name, hint, isPinned, notes } }: AxiosResponse<IGetResponseData>) => {
                 this._id = id;
-                this._name.value = name;
-                this._hint.value = hint;
-                this._isPinned.value = isPinned;
-                this._notes.value = notes;
-                this.notifyPropertyChanged('isLoaded');
+                this._form = new EditAccountFormViewModel({ name, hint, isPinned, notes });
+                this.notifyPropertiesChanged('isLoaded', 'form');
             })
             .on(404, (_: AxiosResponse<INotFoundGetResponseData>) => {
-                alertsStore.addAlert('errors.accountNotFound');
+                this.alertsViewModel.addAlert('errors.accountNotFound');
             })
             .sendAsync();
     }
 
     public async submitAsync(): Promise<void> {
         if (this._id !== null) {
-            this.touchAllFields();
-            if (this.isValid) {
+            this._form.fields.forEach(field => field.isTouched = true);
+            if (this._form.isValid) {
                 await this
                     .put<IRequestData>(`/api/accounts/${this._id}`, {
-                        name: this.name.value,
-                        hint: this.hint.value,
-                        isPinned: this.isPinned.value,
-                        notes: this.notes.value
+                        name: this._form.name.value,
+                        hint: this._form.hint.value,
+                        isPinned: this._form.isPinned.value,
+                        notes: this._form.notes.value
                     })
                     .on(204, (_: AxiosResponse<IPutResponseData>) => {
                         this._editedEvent.dispatch(this);
@@ -92,11 +70,11 @@ export class EditAccountViewModel extends FormViewModel {
                     .on(404, (_: AxiosResponse<INotFoundPutResponseData>) => {
                     })
                     .on(409, (_: AxiosResponse<IConflictResponseData>) => {
-                        this._name.errors = ['validation.errors.nameNotUnique'];
+                        this._form.name.error = 'validation.errors.nameNotUnique';
                     })
                     .on(422, ({ data: { name: nameErrors, hint: hintErrors } }: AxiosResponse<IUnprocessableEntityResponseData>) => {
-                        this._name.errors = nameErrors;
-                        this._hint.errors = hintErrors;
+                        this._form.name.error = nameErrors[0];
+                        this._form.hint.error = hintErrors[0];
                     })
                     .sendAsync();
             }
@@ -115,16 +93,29 @@ export class EditAccountViewModel extends FormViewModel {
                 })
                 .sendAsync();
     }
+}
 
-    protected fieldChanged(field: FormField<string>, changedProperties: readonly string[]): void {
-        if (changedProperties.includes('value') || changedProperties.includes('isTouched'))
-            switch (field) {
-                case this._name:
-                case this._hint:
-                    field.errors = field.value?.length ? [] : ['validation.errors.required'];
-                    break;
-            }
+export interface IEditAccountFormFieldValues {
+    readonly name: string;
+    readonly hint: string;
+    readonly isPinned: boolean;
+    readonly notes: string;
+}
 
-        super.fieldChanged(field, changedProperties);
+export class EditAccountFormViewModel extends FormFieldCollectionViewModel {
+    public constructor(fields?: IEditAccountFormFieldValues) {
+        super();
+        registerValidators(this.name = this.addField(fields && fields.name || ''), [required]);
+        registerValidators(this.hint = this.addField(fields && fields.hint || ''), [required]);
+        this.isPinned = this.addField(fields && fields.isPinned || false);
+        this.notes = this.addField(fields && fields.notes || '');
     }
+
+    public name: FormFieldViewModel<string>;
+
+    public hint: FormFieldViewModel<string>;
+
+    public isPinned: FormFieldViewModel<boolean>;
+
+    public notes: FormFieldViewModel<string>;
 }
