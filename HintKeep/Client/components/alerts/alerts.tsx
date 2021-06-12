@@ -1,9 +1,11 @@
 import React from 'react';
 import { Alert } from './alert';
-import { useViewModel } from '../use-view-model';
+import { requireViewModel } from '../use-view-model';
+import { watchCollection } from 'react-model-view-viewmodel';
 
 export function Alerts(): JSX.Element {
-    const $vm = useViewModel(({ alertsViewModel }) => alertsViewModel);
+    const $vm = requireViewModel(({ alertsViewModel }) => alertsViewModel);
+    watchCollection($vm.alerts);
 
     return (
         <>
