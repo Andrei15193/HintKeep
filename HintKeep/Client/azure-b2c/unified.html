@@ -40,16 +40,23 @@
                                 passwords rather than the passwords themselves.
                             </p>
                             <p>
-                                The hints themselves can be something very personal which make sense only to you. In that
-                                case, even if someone gets access to them, it will most likely mean nothing to them as they
-                                may not have the necessary context to guess the password. Adding a few special characters,
+                                The hints themselves can be something very personal which make sense only to you. In
+                                that
+                                case, even if someone gets access to them, it will most likely mean nothing to them as
+                                they
+                                may not have the necessary context to guess the password. Adding a few special
+                                characters,
                                 or some digits will make password guessing even more difficult.
                             </p>
                             <p>
-                                HintKeep is designed exactly for that. A store for password hints rather than passwords. You
-                                can create different accounts, pin them at the top to have easy access to them and for each
-                                have an associated hint and, if needed, some notes. You can always view your previously used
-                                password hints for each account. A simple application designed to cover something critical.
+                                HintKeep is designed exactly for that. A store for password hints rather than passwords.
+                                You
+                                can create different accounts, pin them at the top to have easy access to them and for
+                                each
+                                have an associated hint and, if needed, some notes. You can always view your previously
+                                used
+                                password hints for each account. A simple application designed to cover something
+                                critical.
                             </p>
                             <p>
                                 Store hints, not passwords.
@@ -67,50 +74,52 @@
     </div>
 
     <script>
-        var spinner = $('#spinner');
-        var root = $('#api');
+        $(function () {
+            var spinner = $('#spinner');
+            var root = $('#api');
 
-        function checkBusyState() {
-            if (root.find('.working[style*=block]').length > 0) {
-                spinner.attr('style', 'display: block;');
-                root.attr('style', 'display: none;');
+            function checkBusyState() {
+                if (root.find('.working[style*=block]').length > 0) {
+                    spinner.attr('style', 'display: block;');
+                    root.attr('style', 'display: none;');
+                }
+                else if (root.find('.error[style*=block]').length > 0) {
+                    spinner.attr('style', 'display: none;');
+                    root.attr('style', 'display: block;');
+                }
             }
-            else if (root.find('.error[style*=block]').length > 0) {
-                spinner.attr('style', 'display: none;');
-                root.attr('style', 'display: block;');
-            }
-        }
 
-        root.find('.intro').remove();
-        root.find('.divider').remove();
-        root.find('.buttons').addClass('mt-3');
-        root.find('.error').addClass('invalid-feedback');
+            root.find('.intro').remove();
+            root.find('.divider').remove();
+            root.find('.buttons').addClass('mt-3');
+            root.find('.error').addClass('invalid-feedback');
 
-        var entryItems = root.find('.entry-item');
-        entryItems.addClass('form-group');
-        entryItems.find('label').addClass('form-label');
-        entryItems.find('input').addClass('form-control');
+            var entryItems = root.find('.entry-item');
+            entryItems.addClass('form-group');
+            entryItems.find('label').addClass('form-label');
+            entryItems.find('input').addClass('form-control');
 
-        var usernameElement = entryItems.eq(0);
-        usernameElement.append(usernameElement.children().eq(1));
+            var usernameElement = entryItems.eq(0);
+            usernameElement.append(usernameElement.children().eq(1));
 
-        var passwordElement = entryItems.eq(1);
-        passwordElement.append(passwordElement.children().eq(1));
+            var passwordElement = entryItems.eq(1);
+            passwordElement.append(passwordElement.children().eq(1));
 
-        root
-            .append($(document.createElement('ul')).addClass('mt-3')
-                .append($(document.createElement('li'))
-                    .append(root.find('.create a').text('Create an account'))));
+            root
+                .append($(document.createElement('ul')).addClass('mt-3')
+                    .append($(document.createElement('li'))
+                        .append(root.find('.create a').text('Create an account'))));
 
-        root.find('.create').remove();
+            root.find('.create').remove();
 
-        root
-            .find('button[type="submit"]')
-            .addClass('btn btn-primary')
-            .click(function () {
-                checkBusyState();
-                setInterval(checkBusyState, 10);
-            });
+            root
+                .find('button[type="submit"]')
+                .addClass('btn btn-primary')
+                .click(function () {
+                    checkBusyState();
+                    setInterval(checkBusyState, 10);
+                });
+        });
     </script>
 </body>
 
