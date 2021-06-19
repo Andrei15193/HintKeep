@@ -48,10 +48,10 @@ export class AddAccountViewModel extends ApiViewModel {
 class AddAccountForm extends FormFieldCollectionViewModel {
     public constructor() {
         super();
-        registerValidators(this.name = this.addField(''), [required]);
-        registerValidators(this.hint = this.addField(''), [required]);
-        this.isPinned = this.addField(false);
-        this.notes = this.addField('');
+        registerValidators(this.name = this.addField('name', ''), [required]);
+        registerValidators(this.hint = this.addField('hint', ''), [required]);
+        this.isPinned = this.addField('isPinned', false);
+        this.notes = this.addField('notes', '');
 
         this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
     }

@@ -43,7 +43,11 @@ export class DeletedAccountDetailsViewModel extends ApiViewModel {
             .get(`/api/deleted-accounts/${id}`)
             .on(200, ({ data: { name, hint, isPinned, notes } }: AxiosResponse<IGetResponseData>) => {
                 this._id = id;
-                this._form = new DeletedAccountFormViewModel({ name, hint, isPinned, notes });
+                this._form = new DeletedAccountFormViewModel();
+                this._form.name.initialValue = this._form.name.value = name;
+                this._form.hint.initialValue = this._form.hint.value = hint;
+                this._form.isPinned.initialValue = this._form.isPinned.value = isPinned;
+                this._form.notes.initialValue = this._form.notes.value = notes;
                 this.notifyPropertiesChanged('isLoaded');
             })
             .on(404, (_: AxiosResponse<INotFoundGetResponseData>) => {
@@ -79,20 +83,13 @@ export class DeletedAccountDetailsViewModel extends ApiViewModel {
     }
 }
 
-export interface IDeleteAccountFormFieldValues {
-    readonly name: string;
-    readonly hint: string;
-    readonly isPinned: boolean;
-    readonly notes: string;
-}
-
 export class DeletedAccountFormViewModel extends FormFieldCollectionViewModel {
-    public constructor(fields?: IDeleteAccountFormFieldValues) {
+    public constructor() {
         super();
-        this.name = this.addField(fields && fields.name || '');
-        this.hint = this.addField(fields && fields.hint || '');
-        this.isPinned = this.addField(fields && fields.isPinned || false);
-        this.notes = this.addField(fields && fields.notes || '');
+        this.name = this.addField('name', '');
+        this.hint = this.addField('hint', '');
+        this.isPinned = this.addField('isPinned', false);
+        this.notes = this.addField('notes', '');
     }
 
     public name: FormFieldViewModel<string>;

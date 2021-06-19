@@ -44,7 +44,11 @@ export class EditAccountViewModel extends ApiViewModel {
             .get(`/api/accounts/${id}`)
             .on(200, ({ data: { name, hint, isPinned, notes } }: AxiosResponse<IGetResponseData>) => {
                 this._id = id;
-                this._form = new EditAccountFormViewModel({ name, hint, isPinned, notes });
+                this._form = new EditAccountFormViewModel();
+                this._form.name.value = this._form.name.initialValue = name;
+                this._form.hint.value = this._form.hint.initialValue = hint;
+                this._form.isPinned.value = this._form.isPinned.initialValue = isPinned;
+                this._form.notes.value = this._form.notes.initialValue = notes;
                 this.notifyPropertiesChanged('isLoaded', 'form');
             })
             .on(404, (_: AxiosResponse<INotFoundGetResponseData>) => {
@@ -95,20 +99,13 @@ export class EditAccountViewModel extends ApiViewModel {
     }
 }
 
-export interface IEditAccountFormFieldValues {
-    readonly name: string;
-    readonly hint: string;
-    readonly isPinned: boolean;
-    readonly notes: string;
-}
-
 export class EditAccountFormViewModel extends FormFieldCollectionViewModel {
-    public constructor(fields?: IEditAccountFormFieldValues) {
+    public constructor() {
         super();
-        registerValidators(this.name = this.addField(fields && fields.name || ''), [required]);
-        registerValidators(this.hint = this.addField(fields && fields.hint || ''), [required]);
-        this.isPinned = this.addField(fields && fields.isPinned || false);
-        this.notes = this.addField(fields && fields.notes || '');
+        registerValidators(this.name = this.addField('name', ''), [required]);
+        registerValidators(this.hint = this.addField('hint', ''), [required]);
+        this.isPinned = this.addField('isPinned', false);
+        this.notes = this.addField('nodes', '');
     }
 
     public name: FormFieldViewModel<string>;
