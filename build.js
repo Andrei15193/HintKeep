@@ -162,6 +162,8 @@ function getWebpackConfig() {
         <meta http-equiv="Pragma" content="no-cache">
         <meta http-equiv="Cache-Control" content="no-cache">
         <meta http-equiv="Expires" content="0">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta charset="utf-8">
         ${htmlWebpackPlugin.tags.headTags}
         <title>${htmlWebpackPlugin.options.title}</title>
     </head>
