@@ -17,7 +17,7 @@ export interface IDeletedAccountDetailsRouteParams {
 
 export function DeletedAccountDetails(): JSX.Element {
     const { push } = useHistory();
-    const $vm = useViewModel(({ alertsViewModel }) => new DeletedAccountDetailsViewModel(alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel }) => new DeletedAccountDetailsViewModel(axios, alertsViewModel));
     const { id } = useParams<IDeletedAccountDetailsRouteParams>();
 
     const [isConfirmationHidden, setIsConfirmationHidden] = useState(true);

@@ -11,7 +11,7 @@ import { AccountHints, Accounts, AddAccount, Authentication, AuthenticationGuard
 import Style from './style.scss';
 
 export function App(): JSX.Element {
-    const $vm = useViewModel(({ alertsViewModel }) => new AuthenticationGuardViewModel(alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel }) => new AuthenticationGuardViewModel(axios, alertsViewModel));
 
     return (
         <div className={classnames(Style.app, Style.m3, Style.border, Style.dFlex, Style.flexColumn, Style.flexFill)}>

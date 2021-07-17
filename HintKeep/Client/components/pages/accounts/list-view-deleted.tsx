@@ -10,7 +10,7 @@ import { AccountsSearchList } from './common/accounts-search-list';
 import Style from '../../style.scss';
 
 export function DeletedAccounts(): JSX.Element {
-    const $vm = useViewModel(({ alertsViewModel }) => new DeletedAccountsViewModel(alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel }) => new DeletedAccountsViewModel(axios, alertsViewModel));
     useEffect(() => { $vm.loadAsync(); }, [$vm]);
 
     return (

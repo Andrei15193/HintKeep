@@ -1,26 +1,16 @@
 import type { AxiosResponse } from 'axios';
 import type { IEvent } from 'react-model-view-viewmodel';
-import type { AlertsViewModel } from './alerts-view-model';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/deleted-accounts/get-by-id';
 import type { INotFoundResponseData as INotFoundPutResponseData, IResponseData as IPutResponseData, IRequestData as IPutRequestData } from '../api/deleted-accounts/put';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/deleted-accounts/delete';
 import { FormFieldCollectionViewModel, FormFieldViewModel, DispatchEvent } from 'react-model-view-viewmodel';
-import { Axios } from '../services';
 import { ApiViewModel } from './api-view-model';
 
 export class DeletedAccountDetailsViewModel extends ApiViewModel {
-    private _id: string | null;
-    private readonly _restoredEvent: DispatchEvent;
-    private readonly _deletedEvent: DispatchEvent;
-    private _form: DeletedAccountFormViewModel;
-
-    public constructor(alertsViewModel: AlertsViewModel) {
-        super(Axios, alertsViewModel);
-        this._restoredEvent = new DispatchEvent();
-        this._deletedEvent = new DispatchEvent();
-        this._id = null;
-        this._form = new DeletedAccountFormViewModel();
-    }
+    private _id: string | null = null;
+    private _form: DeletedAccountFormViewModel = new DeletedAccountFormViewModel();
+    private readonly _restoredEvent: DispatchEvent= new DispatchEvent();
+    private readonly _deletedEvent: DispatchEvent= new DispatchEvent();
 
     public get form(): DeletedAccountFormViewModel {
         return this._form;

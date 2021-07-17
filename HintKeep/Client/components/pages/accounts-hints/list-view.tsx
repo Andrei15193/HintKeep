@@ -18,7 +18,7 @@ export interface IAccountHintsRouteParams {
 export function AccountHints(): JSX.Element {
     const { push } = useHistory();
     const { id } = useParams<IAccountHintsRouteParams>();
-    const $vm = useViewModel(({ alertsViewModel }) => new AccountHintsViewModel(alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel }) => new AccountHintsViewModel(axios, alertsViewModel));
     useEffect(() => { $vm.loadAsync(id); }, [$vm]);
     const [deleteConfirmationIndex, setDeleteConfirmationIndex] = useState<number | undefined>(undefined);
 

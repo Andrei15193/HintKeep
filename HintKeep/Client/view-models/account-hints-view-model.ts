@@ -1,18 +1,11 @@
 import type { AxiosResponse } from 'axios';
-import type { AlertsViewModel } from './alerts-view-model';
 import type { IResponseData as IGetResponseData } from '../api/accounts-hints/get';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/accounts-hints/delete';
-import { Axios } from '../services';
 import { ApiViewModel } from './api-view-model';
 
 export class AccountHintsViewModel extends ApiViewModel {
     private _accountId: string | null = null;
-    private _accountHints: readonly AccountHint[];
-
-    public constructor(alertsViewModel: AlertsViewModel) {
-        super(Axios, alertsViewModel);
-        this._accountHints = [];
-    }
+    private _accountHints: readonly AccountHint[] = [];
 
     public get accountHints(): readonly AccountHint[] {
         return this._accountHints;

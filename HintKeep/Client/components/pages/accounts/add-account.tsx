@@ -12,7 +12,7 @@ import Style from '../../style.scss';
 
 export function AddAccount(): JSX.Element {
     const { push } = useHistory();
-    const $vm = useViewModel(({ alertsViewModel }) => new AddAccountViewModel(alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel }) => new AddAccountViewModel(axios, alertsViewModel));
     watchViewModel($vm.form, ['isInvalid', 'areAllFieldsTouched']);
     watchEvent($vm.submittedEvent, () => push('/'));
 

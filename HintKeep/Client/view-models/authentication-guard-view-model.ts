@@ -1,15 +1,9 @@
 import type { AxiosResponse } from 'axios';
-import type { AlertsViewModel } from './alerts-view-model';
 import type { IResponseData } from '../api/users/details/get';
-import { Axios } from '../services';
 import { ApiViewModel } from './api-view-model';
 
 export class AuthenticationGuardViewModel extends ApiViewModel {
     private _isAuthenticationEnsured: boolean = false;
-
-    public constructor(alertsViewModel: AlertsViewModel) {
-        super(Axios, alertsViewModel);
-    }
 
     public get isAuthenticationEnsured(): boolean {
         return this._isAuthenticationEnsured;

@@ -1,18 +1,12 @@
 import type { AxiosResponse } from 'axios';
 import type { IEvent } from 'react-model-view-viewmodel'
-import type { AlertsViewModel } from './alerts-view-model';
 import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../api/accounts/post';
 import { FormFieldViewModel, FormFieldCollectionViewModel, registerValidators, DispatchEvent } from 'react-model-view-viewmodel'
 import { ApiViewModel } from './api-view-model';
 import { required } from './validation';
-import { Axios } from '../services';
 
 export class AddAccountViewModel extends ApiViewModel {
     private readonly _submittedEvent: DispatchEvent = new DispatchEvent();
-
-    public constructor(alertsViewModel: AlertsViewModel) {
-        super(Axios, alertsViewModel);
-    }
 
     public readonly form: AddAccountForm = new AddAccountForm();
 

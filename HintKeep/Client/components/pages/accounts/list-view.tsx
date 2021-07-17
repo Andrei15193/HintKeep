@@ -10,7 +10,7 @@ import { AccountsSearchList } from './common/accounts-search-list';
 import Style from '../../style.scss';
 
 export function Accounts(): JSX.Element {
-    const $vm = useViewModel(({ alertsViewModel }) => new AccountsViewModel(alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel }) => new AccountsViewModel(axios, alertsViewModel));
     useEffect(() => { $vm.loadAsync(); }, [$vm]);
 
     return (

@@ -1,17 +1,10 @@
 import type { AxiosResponse } from 'axios';
-import type { AlertsViewModel } from './alerts-view-model';
 import type { IResponseData } from '../api/deleted-accounts/get';
-import { Axios } from '../services';
 import { Account, AccountsListViewModel } from './accounts-list-view-model';
 import { ApiViewModel } from './api-view-model';
 
 export class DeletedAccountsViewModel extends ApiViewModel {
-    private readonly _accounts: AccountsListViewModel;
-
-    public constructor(alertsViewModel: AlertsViewModel) {
-        super(Axios, alertsViewModel);
-        this._accounts = new AccountsListViewModel();
-    }
+    private readonly _accounts: AccountsListViewModel = new AccountsListViewModel();
 
     public get accounts(): AccountsListViewModel {
         return this._accounts;

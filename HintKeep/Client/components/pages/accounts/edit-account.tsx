@@ -17,7 +17,7 @@ export interface IEditAccountRouteParams {
 
 export function EditAccount(): JSX.Element {
     const { push } = useHistory();
-    const $vm = useViewModel(({ alertsViewModel }) => new EditAccountViewModel(alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel }) => new EditAccountViewModel(axios, alertsViewModel));
     const { id } = useParams<IEditAccountRouteParams>();
 
     const [isConfirmationHidden, setIsConfirmationHidden] = useState(true);

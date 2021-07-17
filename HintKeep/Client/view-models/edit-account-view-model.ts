@@ -1,27 +1,17 @@
 import type { AxiosResponse } from 'axios';
 import type { IEvent } from 'react-model-view-viewmodel';
-import type { AlertsViewModel } from './alerts-view-model';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/accounts/get-by-id';
 import type { IConflictResponseData, INotFoundResponseData as INotFoundPutResponseData, IRequestData, IResponseData as IPutResponseData, IUnprocessableEntityResponseData } from '../api/accounts/put';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/accounts/delete';
 import { DispatchEvent, FormFieldCollectionViewModel, FormFieldViewModel, registerValidators } from 'react-model-view-viewmodel';
-import { Axios } from '../services';
 import { ApiViewModel } from './api-view-model';
 import { required } from './validation';
 
 export class EditAccountViewModel extends ApiViewModel {
-    private _id: string | null;
-    private readonly _editedEvent: DispatchEvent;
-    private readonly _deletedEvent: DispatchEvent;
-    private _form: EditAccountFormViewModel;
-
-    public constructor(alertsViewModel: AlertsViewModel) {
-        super(Axios, alertsViewModel);
-        this._editedEvent = new DispatchEvent();
-        this._deletedEvent = new DispatchEvent();
-        this._id = null;
-        this._form = new EditAccountFormViewModel();
-    }
+    private _id: string | null = null;
+    private _form: EditAccountFormViewModel = new EditAccountFormViewModel();
+    private readonly _editedEvent: DispatchEvent = new DispatchEvent();
+    private readonly _deletedEvent: DispatchEvent = new DispatchEvent();
 
     public get form(): EditAccountFormViewModel {
         return this._form;
