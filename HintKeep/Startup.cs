@@ -1,26 +1,27 @@
+using System;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using HintKeep.Controllers.Filters;
 using HintKeep.Storage;
 using HintKeep.Storage.Azure;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using HintKeep.Controllers.Filters;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Threading.Tasks;
 using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi.Models;
 
 namespace HintKeep
 {
@@ -140,6 +141,10 @@ namespace HintKeep
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var rewriteOptions = new RewriteOptions()
+                .AddRedirect(@"http://hintkeep\.net", "https://www.hintkeep.net")
+                .AddRedirect(@"https://hintkeep\.net", "https://www.hintkeep.net");
+
             if (env.IsDevelopment())
                 app
                     .UseDeveloperExceptionPage()
@@ -147,6 +152,13 @@ namespace HintKeep
                     .UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HintKeep v1"));
 
             app
+                .Use(async (context, next) =>
+                {
+                    if (context.Request.Host.Host == "hintkeep.net")
+                        context.Response.Redirect("https://www.hintkeep.net");
+                    else
+                        await next();
+                })
                 .UseHttpsRedirection()
                 .UseRouting()
                 .UseAuthorization()
