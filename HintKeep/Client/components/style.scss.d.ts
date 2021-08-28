@@ -176,6 +176,7 @@ interface CssExports {
   'btn': string;
   'btnCheck': string;
   'btnClose': string;
+  'btnCloseWhite': string;
   'btnDanger': string;
   'btnDark': string;
   'btnInfo': string;
@@ -1444,6 +1445,9 @@ interface CssExports {
   'shadowSm': string;
   'show': string;
   'spinnerBorder': string;
+  'spinnerBorderSm': string;
+  'spinnerGrow': string;
+  'spinnerGrowSm': string;
   'start0': string;
   'start100': string;
   'start50': string;
