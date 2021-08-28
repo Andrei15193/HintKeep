@@ -19,8 +19,8 @@ export function AddAccount(): JSX.Element {
     return (
         <div className={Style.mx3}>
             <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
-                <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
-                    <div className={classnames(Style.col2, Style.textLeft)}>
+                <div className={classnames(Style.row, Style.g0, Style.dFlex, Style.alignItemsCenter)}>
+                    <div className={classnames(Style.col2, Style.textStart)}>
                         <Link to="/" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                             <Message id="pages.addAccount.back.label" />
                         </Link>
@@ -41,7 +41,7 @@ export function AddAccount(): JSX.Element {
                     <button type="button" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>
                         <Message id="pages.addAccount.add.label" />
                     </button>
-                    <Link to="/" className={classnames(Style.ml2, Style.btn, Style.btnLight)}>
+                    <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
                         <Message id="pages.addAccount.cancel.label" />
                     </Link>
                 </div>

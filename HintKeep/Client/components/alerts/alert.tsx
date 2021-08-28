@@ -16,9 +16,7 @@ export function Alert({ $vm }: IAlertProps): JSX.Element {
     return (
         <div className={classnames(Style.m2, Style.alert, Style.alertDanger, Style.alertDismissible)} role="alert">
             <Message id={$vm.message} />
-            <button type="button" className={Style.close} onClick={() => $vm.dismiss()}>
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" className={Style.btnClose} onClick={() => $vm.dismiss()} />
         </div>
     );
 }

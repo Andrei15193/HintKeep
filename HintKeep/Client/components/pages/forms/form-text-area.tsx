@@ -13,7 +13,7 @@ export interface IFormInputProps extends ITextAreaProps {
 }
 
 export function FormTextArea({ label, description, field, id, className, ...textAreaProps }: IFormInputProps): JSX.Element {
-    watchViewModel(field, ['error']);
+    watchViewModel(field, ['isTouched', 'error']);
 
     return (
         <div className={className}>

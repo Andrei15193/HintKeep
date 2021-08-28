@@ -17,8 +17,8 @@ export function Accounts(): JSX.Element {
         <>
             <div className={Style.mx3}>
                 <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
-                    <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
-                        <div className={classnames(Style.col2, Style.textLeft)}>
+                    <div className={classnames(Style.row, Style.g0, Style.dFlex, Style.alignItemsCenter)}>
+                        <div className={classnames(Style.col2, Style.textStart)}>
                             <Link to="/extra" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary, Style.px2, Style.textBold)}>
                                 <Message id="pages.accounts.extra.label" />
                             </Link>
@@ -26,7 +26,7 @@ export function Accounts(): JSX.Element {
                         <div className={classnames(Style.col8, Style.textCenter)}>
                             <Message id="pages.accounts.pageTitle" />
                         </div>
-                        <div className={classnames(Style.col2, Style.textRight)}>
+                        <div className={classnames(Style.col2, Style.textEnd)}>
                             <Link to="/accounts/add" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                                 <Message id="pages.accounts.add.label" />
                             </Link>

@@ -17,9 +17,11 @@ export function FormCheckboxInput({ label, description, field, id, className, ty
     watchViewModel(field, ['value', 'error']);
 
     return (
-        <div className={classnames(className, Style.formGroup, Style.formCheck)}>
+        <div className={classnames(className, Style.formCheck)}>
             <Input field={field} id={id} type="checkbox" className={Style.formCheckInput} checked={field.value} onChange={ev => field.value = ev.target.checked} {...inputProps} />
-            <label htmlFor={id} className={Style.formCheckLabel}><Message id={label} /></label>
+            <label htmlFor={id} className={Style.formCheckLabel}>
+                <Message id={label} />
+            </label>
             <div id={`${id}Feedback`} className={Style.invalidFeedback}>{field.error !== undefined && <Message id={field.error} />}</div>
             {description && <div className={Style.mt2}><Message id={description} /></div>}
         </div>

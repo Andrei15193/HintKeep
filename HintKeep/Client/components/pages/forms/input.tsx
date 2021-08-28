@@ -14,7 +14,7 @@ export interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export function Input({ field, placeholder, ...inputProps }: IInputProps): JSX.Element {
     const messageResolver = useContext(I18nContext);
-    watchViewModel(field, ['value']);
+    watchViewModel(field, ['value', 'isTouched']);
 
     return (
         <input

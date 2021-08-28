@@ -28,8 +28,8 @@ export function EditAccount(): JSX.Element {
     return (
         <div className={Style.mx3}>
             <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
-                <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
-                    <div className={classnames(Style.col2, Style.textLeft)}>
+                <div className={classnames(Style.row, Style.g0, Style.dFlex, Style.alignItemsCenter)}>
+                    <div className={classnames(Style.col2, Style.textStart)}>
                         <Link to="/" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                             <Message id="pages.editAccount.back.label" />
                         </Link>
@@ -52,13 +52,13 @@ export function EditAccount(): JSX.Element {
                             <button type="button" disabled={(!$vm.isLoaded || ($vm.form.isInvalid && $vm.form.fields.every(field => field.isTouched)))} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>
                                 <Message id="pages.editAccount.save.label" />
                             </button>
-                            <Link to={`/accounts/${id}/hints`} className={classnames(Style.ml2, Style.btn, Style.btnLight)}>
+                            <Link to={`/accounts/${id}/hints`} className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
                                 <Message id="pages.editAccount.viewAllHints.label" />
                             </Link>
-                            <Link to="/" className={classnames(Style.ml2, Style.btn, Style.btnLight)}>
+                            <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
                                 <Message id="pages.editAccount.cancel.label" />
                             </Link>
-                            <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.mlAuto)} onClick={() => setIsConfirmationHidden(false)}>
+                            <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.msAuto)} onClick={() => setIsConfirmationHidden(false)}>
                                 <Message id="pages.editAccount.delete.label" />
                             </button>
                         </div>
@@ -77,7 +77,7 @@ export function EditAccount(): JSX.Element {
                                     <button type="button" className={classnames(Style.btn, Style.btnDanger)} onClick={() => { setIsConfirmationHidden(true); $vm.deleteAsync(); }}>
                                         <Message id="pages.editAccount.moveToBin.label" />
                                     </button>
-                                    <button type="button" className={classnames(Style.mlAuto, Style.btn, Style.btnSecondary)} onClick={() => setIsConfirmationHidden(true)}>
+                                    <button type="button" className={classnames(Style.msAuto, Style.btn, Style.btnSecondary)} onClick={() => setIsConfirmationHidden(true)}>
                                         <Message id="pages.editAccount.cancel.label" />
                                     </button>
                                 </div>

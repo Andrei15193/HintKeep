@@ -71,7 +71,6 @@
             root.find('ul, ol, dl').addClass('m-0 p-0');
 
             root.find('label#emailVerificationControl_label').addClass('d-none');
-            root.find('label').parent().addClass('form-group');
             root.find('label').addClass('form-label');
             root.find('input').addClass('form-control');
             root.find('.error').addClass('invalid-feedback');
@@ -84,7 +83,7 @@
                 .addClass('btn btn-primary')
                 .click(checkBusyState);
             root.find('button#emailVerificationControl_but_send_new_code')
-                .addClass('btn btn-light ml-2')
+                .addClass('btn btn-light ms-2')
                 .click(checkBusyState);
             root.find('button#emailVerificationControl_but_change_claims')
                 .addClass('btn btn-primary')
@@ -95,7 +94,7 @@
             root.find('button#continue')
                 .addClass('btn btn-primary')
                 .attr('disabled', 'disabled');
-            root.find('button#cancel').addClass('btn btn-light ml-2');
+            root.find('button#cancel').addClass('btn btn-light ms-2');
 
             setInterval(checkBusyState, 10);
         });

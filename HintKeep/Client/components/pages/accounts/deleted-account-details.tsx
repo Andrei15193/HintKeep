@@ -28,8 +28,8 @@ export function DeletedAccountDetails(): JSX.Element {
     return (
         <div className={Style.mx3}>
             <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
-                <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
-                    <div className={classnames(Style.col2, Style.textLeft)}>
+                <div className={classnames(Style.row, Style.g0, Style.dFlex, Style.alignItemsCenter)}>
+                    <div className={classnames(Style.col2, Style.textStart)}>
                         <Link to="/accounts/bin" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                             <Message id="pages.deletedAccountDetails.back.label" />
                         </Link>
@@ -52,10 +52,10 @@ export function DeletedAccountDetails(): JSX.Element {
                             <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.restoreAsync()}>
                                 <Message id="pages.deletedAccountDetails.restore.label" />
                             </button>
-                            <Link to="/accounts/bin" className={classnames(Style.ml2, Style.btn, Style.btnLight)}>
+                            <Link to="/accounts/bin" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
                                 <Message id="pages.deletedAccountDetails.cancel.label" />
                             </Link>
-                            <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.mlAuto)} onClick={() => setIsConfirmationHidden(false)}>
+                            <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.msAuto)} onClick={() => setIsConfirmationHidden(false)}>
                                 <Message id="pages.deletedAccountDetails.delete.label" />
                             </button>
                         </div>
@@ -74,7 +74,7 @@ export function DeletedAccountDetails(): JSX.Element {
                                     <button type="button" className={classnames(Style.btn, Style.btnDanger)} onClick={() => { setIsConfirmationHidden(true); $vm.deleteAsync(); }}>
                                         <Message id="pages.deletedAccountDetails.delete.label" />
                                     </button>
-                                    <button type="button" className={classnames(Style.mlAuto, Style.btn, Style.btnSecondary)} onClick={() => setIsConfirmationHidden(true)}>
+                                    <button type="button" className={classnames(Style.msAuto, Style.btn, Style.btnSecondary)} onClick={() => setIsConfirmationHidden(true)}>
                                         <Message id="pages.deletedAccountDetails.cancel.label" />
                                     </button>
                                 </div>

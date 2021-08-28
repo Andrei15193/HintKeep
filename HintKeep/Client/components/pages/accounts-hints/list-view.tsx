@@ -26,8 +26,8 @@ export function AccountHints(): JSX.Element {
         <>
             <div className={Style.mx3}>
                 <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
-                    <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
-                        <div className={classnames(Style.col2, Style.textLeft)}>
+                    <div className={classnames(Style.row, Style.g0, Style.dFlex, Style.alignItemsCenter)}>
+                        <div className={classnames(Style.col2, Style.textStart)}>
                             <button type="button" onClick={() => push(`/accounts/${id}`)} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                                 <Message id="pages.accountHints.back.label" />
                             </button>
@@ -98,7 +98,7 @@ function AccountHintDisplay({ accountHint, onDeleteButtonClick }: IAccountHintDi
                 <h6 className={Style.m0}>{accountHint.hint}</h6>
                 <p className={Style.m0}><Message id="pages.accountHints.dateAdded" values={{ dateAdded: accountHint.dateAdded.toLocaleDateString() }} /></p>
             </div>
-            <button className={classnames(Style.ml2, Style.btn, Style.btnSm, Style.btnDanger)} onClick={onDeleteButtonClick}>
+            <button className={classnames(Style.ms2, Style.btn, Style.btnSm, Style.btnDanger)} onClick={onDeleteButtonClick}>
                 <Message id="pages.accountHints.delete.label" />
             </button>
         </div>
@@ -125,7 +125,7 @@ function ConfirmAccountHintDeletetion({ onDeleteButtonClick, onCancelButtonClick
                     <button type="button" className={classnames(Style.btn, Style.btnDanger)} onClick={onDeleteButtonClick}>
                         <Message id="pages.accountHints.delete.label" />
                     </button>
-                    <button type="button" className={classnames(Style.mlAuto, Style.btn, Style.btnSecondary)} onClick={onCancelButtonClick}>
+                    <button type="button" className={classnames(Style.msAuto, Style.btn, Style.btnSecondary)} onClick={onCancelButtonClick}>
                         <Message id="pages.accountHints.cancel.label" />
                     </button>
                 </div>

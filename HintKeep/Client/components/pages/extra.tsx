@@ -21,8 +21,8 @@ export function Extra({ $vm: $ensureAuthenticationViewModel }: IExtraProps): JSX
         <>
             <div className={Style.mx3}>
                 <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
-                    <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
-                        <div className={classnames(Style.col2, Style.textLeft)}>
+                    <div className={classnames(Style.row, Style.g0, Style.dFlex, Style.alignItemsCenter)}>
+                        <div className={classnames(Style.col2, Style.textStart)}>
                             <Link to="/" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary, Style.px2)}>
                                 <Message id="pages.extra.back.label" />
                             </Link>

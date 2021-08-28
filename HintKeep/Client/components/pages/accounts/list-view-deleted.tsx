@@ -17,8 +17,8 @@ export function DeletedAccounts(): JSX.Element {
         <>
             <div className={Style.mx3}>
                 <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
-                    <div className={classnames(Style.row, Style.noGutters, Style.dFlex, Style.alignItemsCenter)}>
-                        <div className={classnames(Style.col2, Style.textLeft)}>
+                    <div className={classnames(Style.row, Style.g0, Style.dFlex, Style.alignItemsCenter)}>
+                        <div className={classnames(Style.col2, Style.textStart)}>
                             <Link to="/" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                                 <Message id="pages.deletedAccounts.back.label" />
                             </Link>

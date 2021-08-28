@@ -83,7 +83,7 @@ export function AccountDisplay({ account, detailsRoute: detailsPapth }: IAccount
                 <h6 className={Style.m0}>{account.name}</h6>
                 <p className={Style.mb3}>{account.hint}</p>
             </div>
-            <Link to={detailsPapth} className={classnames(Style.ml2, Style.btn, Style.btnSm, Style.btnPrimary)}><Message id="pages.accounts.edit.label" /></Link>
+            <Link to={detailsPapth} className={classnames(Style.ms2, Style.btn, Style.btnSm, Style.btnPrimary)}><Message id="pages.accounts.edit.label" /></Link>
         </div>
     );
 }
