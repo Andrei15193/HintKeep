@@ -5,7 +5,7 @@ export function configureDefaultListeners(axios: AxiosInstance): AxiosInstance {
         response => {
             const loginUrl = response.headers['x-login'];
             if (response.status === 401 && loginUrl)
-                window.location = loginUrl;
+                window.location.assign(loginUrl);
             return response;
         }
     );

@@ -3,17 +3,17 @@ import type { IEvent } from 'react-model-view-viewmodel';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/accounts/get-by-id';
 import type { IConflictResponseData, INotFoundResponseData as INotFoundPutResponseData, IRequestData, IResponseData as IPutResponseData, IUnprocessableEntityResponseData } from '../api/accounts/put';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/accounts/delete';
-import { DispatchEvent, FormFieldCollectionViewModel, FormFieldViewModel, registerValidators } from 'react-model-view-viewmodel';
+import { DispatchEvent } from 'react-model-view-viewmodel';
 import { ApiViewModel } from './api-view-model';
-import { required } from './validation';
+import { AccountForm } from './account-form';
 
 export class EditAccountViewModel extends ApiViewModel {
     private _id: string | null = null;
-    private _form: EditAccountFormViewModel = new EditAccountFormViewModel();
+    private _form: AccountForm = new AccountForm();
     private readonly _editedEvent: DispatchEvent = new DispatchEvent();
     private readonly _deletedEvent: DispatchEvent = new DispatchEvent();
 
-    public get form(): EditAccountFormViewModel {
+    public get form(): AccountForm {
         return this._form;
     }
 
@@ -34,7 +34,7 @@ export class EditAccountViewModel extends ApiViewModel {
             .get(`/api/accounts/${id}`)
             .on(200, ({ data: { name, hint, isPinned, notes } }: AxiosResponse<IGetResponseData>) => {
                 this._id = id;
-                this._form = new EditAccountFormViewModel();
+                this._form = new AccountForm();
                 this._form.name.value = this._form.name.initialValue = name;
                 this._form.hint.value = this._form.hint.initialValue = hint;
                 this._form.isPinned.value = this._form.isPinned.initialValue = isPinned;
@@ -87,22 +87,4 @@ export class EditAccountViewModel extends ApiViewModel {
                 })
                 .sendAsync();
     }
-}
-
-export class EditAccountFormViewModel extends FormFieldCollectionViewModel {
-    public constructor() {
-        super();
-        registerValidators(this.name = this.addField('name', ''), [required]);
-        registerValidators(this.hint = this.addField('hint', ''), [required]);
-        this.isPinned = this.addField('isPinned', false);
-        this.notes = this.addField('nodes', '');
-    }
-
-    public name: FormFieldViewModel<string>;
-
-    public hint: FormFieldViewModel<string>;
-
-    public isPinned: FormFieldViewModel<boolean>;
-
-    public notes: FormFieldViewModel<string>;
 }

@@ -22,12 +22,12 @@ export class AuthenticationViewModel extends ViewModel {
     }
 
     public authenticate(jsonWebToken: string): void {
-        this._axios.defaults.headers.Authorization = `Bearer ${jsonWebToken}`;
+        Object.assign(this._axios.defaults.headers, { Authorization: `Bearer ${jsonWebToken}` });
         this._authenticated.dispatch(this);
     }
 
     public logOut(): void {
-        this._axios.defaults.headers.Authorization = 'Bearer invalid';
+        Object.assign(this._axios.defaults.headers, { Authorization: 'Bearer invalid' });
         this._loggedOut.dispatch(this);
     }
 }

@@ -3,8 +3,8 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 export type RequestHandlerCallback = (request: AxiosRequestConfig) => void;
 export type RequestMiddlewareCallback = (request: AxiosRequestConfig, next: RequestHandlerCallback) => void;
 
-export type ResponseHandlerCallback = (response: AxiosResponse) => void;
-export type ResponseMiddlewareCallback = (response: AxiosResponse, next: ResponseHandlerCallback) => void;
+export type ResponseHandlerCallback = (response: AxiosResponse<any>) => void;
+export type ResponseMiddlewareCallback = (response: AxiosResponse<any>, next: ResponseHandlerCallback) => void;
 
 export type ErrorHandlerCallback = (error: any) => void;
 export type ErrorMiddlewareCallback = (error: any, next: ErrorHandlerCallback) => void;
@@ -52,7 +52,7 @@ export class RequestHandlerBuilder {
     }
 
     public sendAsync(): Promise<void> {
-        return new Promise<AxiosResponse>(
+        return new Promise<AxiosResponse<any>>(
             (resolve, reject) => {
                 const requestHandler = this._requestMiddleware.reduceRight<RequestHandlerCallback>(
                     (nextCallback, currentCallback) => (request => currentCallback(request, nextCallback)),

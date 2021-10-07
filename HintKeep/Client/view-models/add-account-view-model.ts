@@ -1,14 +1,14 @@
 import type { AxiosResponse } from 'axios';
 import type { IEvent } from 'react-model-view-viewmodel'
 import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../api/accounts/post';
-import { FormFieldViewModel, FormFieldCollectionViewModel, registerValidators, DispatchEvent } from 'react-model-view-viewmodel'
+import { DispatchEvent } from 'react-model-view-viewmodel'
 import { ApiViewModel } from './api-view-model';
-import { required } from './validation';
+import { AccountForm } from './account-form';
 
 export class AddAccountViewModel extends ApiViewModel {
     private readonly _submittedEvent: DispatchEvent = new DispatchEvent();
 
-    public readonly form: AddAccountForm = new AddAccountForm();
+    public readonly form: AccountForm = new AccountForm();
 
     public get submittedEvent(): IEvent {
         return this._submittedEvent;
@@ -36,31 +36,5 @@ export class AddAccountViewModel extends ApiViewModel {
                 })
                 .sendAsync();
         }
-    }
-}
-
-class AddAccountForm extends FormFieldCollectionViewModel {
-    public constructor() {
-        super();
-        registerValidators(this.name = this.addField('name', ''), [required]);
-        registerValidators(this.hint = this.addField('hint', ''), [required]);
-        this.isPinned = this.addField('isPinned', false);
-        this.notes = this.addField('notes', '');
-
-        this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
-    }
-
-    public readonly name: FormFieldViewModel<string>;
-    public readonly hint: FormFieldViewModel<string>;
-    public readonly isPinned: FormFieldViewModel<boolean>;
-    public readonly notes: FormFieldViewModel<string>;
-
-    public get areAllFieldsTouched(): boolean {
-        return this.fields.every(field => field.isTouched);
-    }
-
-    private _fieldChanged = (field: FormFieldViewModel<any>, changedProperties: readonly string[]): void => {
-        if (changedProperties.includes('isTouched'))
-            this.notifyPropertiesChanged('areAllFieldsTouched');
     }
 }

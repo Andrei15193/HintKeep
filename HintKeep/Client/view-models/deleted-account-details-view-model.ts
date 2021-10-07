@@ -3,16 +3,17 @@ import type { IEvent } from 'react-model-view-viewmodel';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../api/deleted-accounts/get-by-id';
 import type { INotFoundResponseData as INotFoundPutResponseData, IResponseData as IPutResponseData, IRequestData as IPutRequestData } from '../api/deleted-accounts/put';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../api/deleted-accounts/delete';
-import { FormFieldCollectionViewModel, FormFieldViewModel, DispatchEvent } from 'react-model-view-viewmodel';
+import { DispatchEvent } from 'react-model-view-viewmodel';
 import { ApiViewModel } from './api-view-model';
+import { AccountForm } from './account-form';
 
 export class DeletedAccountDetailsViewModel extends ApiViewModel {
     private _id: string | null = null;
-    private _form: DeletedAccountFormViewModel = new DeletedAccountFormViewModel();
+    private _form: AccountForm = new AccountForm();
     private readonly _restoredEvent: DispatchEvent= new DispatchEvent();
     private readonly _deletedEvent: DispatchEvent= new DispatchEvent();
 
-    public get form(): DeletedAccountFormViewModel {
+    public get form(): AccountForm {
         return this._form;
     }
 
@@ -33,7 +34,7 @@ export class DeletedAccountDetailsViewModel extends ApiViewModel {
             .get(`/api/deleted-accounts/${id}`)
             .on(200, ({ data: { name, hint, isPinned, notes } }: AxiosResponse<IGetResponseData>) => {
                 this._id = id;
-                this._form = new DeletedAccountFormViewModel();
+                this._form = new AccountForm();
                 this._form.name.initialValue = this._form.name.value = name;
                 this._form.hint.initialValue = this._form.hint.value = hint;
                 this._form.isPinned.initialValue = this._form.isPinned.value = isPinned;
@@ -71,22 +72,4 @@ export class DeletedAccountDetailsViewModel extends ApiViewModel {
                 })
                 .sendAsync();
     }
-}
-
-export class DeletedAccountFormViewModel extends FormFieldCollectionViewModel {
-    public constructor() {
-        super();
-        this.name = this.addField('name', '');
-        this.hint = this.addField('hint', '');
-        this.isPinned = this.addField('isPinned', false);
-        this.notes = this.addField('notes', '');
-    }
-
-    public name: FormFieldViewModel<string>;
-
-    public hint: FormFieldViewModel<string>;
-
-    public isPinned: FormFieldViewModel<boolean>;
-
-    public notes: FormFieldViewModel<string>;
 }
