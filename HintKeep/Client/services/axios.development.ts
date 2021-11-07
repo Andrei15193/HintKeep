@@ -1,13 +1,10 @@
 import axios from 'axios';
-import { configureDefaultListeners } from './axios.common';
 
-export const Axios = configureDefaultListeners(
-    axios.create({
-        validateStatus() {
-            return true;
-        }
-    })
-);
+export const Axios = axios.create({
+    validateStatus() {
+        return true;
+    }
+});
 
 Axios.interceptors.request.use(
     request => {

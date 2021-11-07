@@ -1,5 +1,6 @@
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import type { AlertsViewModel } from '../alerts-view-model';
+import type { SessionViewModel } from '../session-view-model';
 import { ViewModel } from 'react-model-view-viewmodel';
 import { RequestHandlerBuilder } from './request-handler-builder';
 
@@ -10,23 +11,24 @@ export enum ApiViewModelState {
 }
 
 export abstract class ApiViewModel extends ViewModel {
+    private _state: ApiViewModelState;
     private readonly _axios: AxiosInstance;
-    private readonly _alertsViewModel: AlertsViewModel;
-    private _state: ApiViewModelState = ApiViewModelState.Ready;
 
-    public constructor(axios: AxiosInstance, alertsViewModel: AlertsViewModel) {
+    public constructor(axios: AxiosInstance, alertsViewModel: AlertsViewModel, sessionViewModel: SessionViewModel) {
         super();
+        this._state = ApiViewModelState.Ready;
         this._axios = axios;
-        this._alertsViewModel = alertsViewModel;
+        this.alertsViewModel = alertsViewModel;
+        this.sessionViewModel = sessionViewModel;
     }
 
     public get state(): ApiViewModelState {
         return this._state;
     }
 
-    protected get alertsViewModel(): AlertsViewModel {
-        return this._alertsViewModel;
-    }
+    protected readonly alertsViewModel: AlertsViewModel;
+
+    protected readonly sessionViewModel: SessionViewModel;
 
     private _setState(value: ApiViewModelState): void {
         if (this._state !== value) {
@@ -57,8 +59,11 @@ export abstract class ApiViewModel extends ViewModel {
                 this._setState(ApiViewModelState.Busy);
                 next(request);
             })
+            .on(401, () => {
+                this.sessionViewModel.endSession();
+            })
             .on(500, () => {
-                this._alertsViewModel.addAlert('errors.internalServerError');
+                this.alertsViewModel.addAlert('errors.internalServerError');
             })
             .onCompleted(() => {
                 this._setState(ApiViewModelState.Ready);

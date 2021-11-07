@@ -4,8 +4,8 @@ namespace HintKeep.Requests.Accounts.Commands
 {
     public class UpdateDeletedAccountCommand : IRequest
     {
-        public string Id { get; set; }
+        public string Id { get; init; }
 
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; init; }
     }
 }

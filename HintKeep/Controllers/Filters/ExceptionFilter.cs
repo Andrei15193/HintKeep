@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
 using HintKeep.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace HintKeep.Controllers.Filters
 {
@@ -41,6 +44,15 @@ namespace HintKeep.Controllers.Filters
                         StatusCode = (int)HttpStatusCode.PreconditionFailed,
                         Content = string.IsNullOrWhiteSpace(preconditionFailedException.Message) ? null : preconditionFailedException.Message
                     };
+                    break;
+
+                case ValidationException validationException:
+                    if (validationException.ValidationResult.MemberNames.Any())
+                        foreach (var validationResultMemberName in validationException.ValidationResult.MemberNames)
+                            context.ModelState.AddModelError(validationResultMemberName, validationException.ValidationResult.ErrorMessage);
+                    else
+                        context.ModelState.AddModelError("*", validationException.ValidationResult.ErrorMessage);
+                    context.Result = new UnprocessableEntityObjectResult(context.ModelState);
                     break;
 
                 default:

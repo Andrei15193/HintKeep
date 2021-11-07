@@ -353,3 +353,4 @@ MigrationBackup/
 HintKeep/wwwroot/**/*.html
 HintKeep/wwwroot/**/*.css
 HintKeep/wwwroot/**/*.js
+HintKeep/.appData/

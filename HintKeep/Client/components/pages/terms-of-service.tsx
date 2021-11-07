@@ -1,14 +1,25 @@
 import React from 'react';
 import classnames from 'classnames';
 import { Message } from '../i18n';
+import { Link } from 'react-router-dom';
 
 import Style from '../style.scss';
 
 export function TermsOfService(): JSX.Element {
     return (
         <div className={Style.mx3}>
-            <h1 className={classnames(Style.container, Style.textCenter)}>
-                <Message id="pages.terms.pageTitle" />
+
+            <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
+                <div className={classnames(Style.row, Style.g0, Style.dFlex, Style.alignItemsCenter)}>
+                    <div className={classnames(Style.col2, Style.textStart)}>
+                        <Link to="/register" className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
+                            <Message id="pages.terms.back.label" />
+                        </Link>
+                    </div>
+                    <div className={classnames(Style.col8, Style.textCenter)}>
+                        <Message id="pages.terms.pageTitle" />
+                    </div>
+                </div>
             </h1>
             <p className={Style.textCenter}><small><Message id="pages.terms.lastModified" /></small></p>
             <hr className={Style.w100} />

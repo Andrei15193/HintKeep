@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
 import { useViewModel } from '../../use-view-model';
-import { AccountsViewModel } from '../../../view-models/accounts-view-model';
+import { AccountsViewModel } from '../../../view-models/accounts/accounts-view-model';
 import { BusyContent } from '../../loaders';
 import { AccountsSearchList } from './common/accounts-search-list';
 
 import Style from '../../style.scss';
 
 export function Accounts(): JSX.Element {
-    const $vm = useViewModel(({ axios, alertsViewModel }) => new AccountsViewModel(axios, alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new AccountsViewModel(axios, alertsViewModel, sessionViewModel));
     useEffect(() => { $vm.loadAsync(); }, [$vm]);
 
     return (

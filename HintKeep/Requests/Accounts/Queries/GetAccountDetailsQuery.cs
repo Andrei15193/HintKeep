@@ -5,6 +5,6 @@ namespace HintKeep.Requests.Accounts.Queries
 {
     public class GetAccountDetailsQuery : IRequest<AccountDetails>
     {
-        public string Id { get; set; }
+        public string Id { get; init; }
     }
 }

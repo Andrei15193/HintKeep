@@ -19,7 +19,7 @@ namespace HintKeep.Storage
                 return value;
 
             static bool IsReservedCharacter(char @char)
-                => @char == '%' || @char == '/' || @char == '\\' || @char == '#' || @char == '?' || (0x00 <= @char && @char <= 0x1F) || (0x7F <= @char && @char <= 0x9F);
+                => @char == '%' || @char == '/' || @char == '\\' || @char == '#' || @char == '?' || (0x00 <= @char && @char <= 0x1F) || (0x7F <= @char && @char <= 0x9F) || char.IsWhiteSpace(@char);
         }
 
         public static string FromEncodedKeyProperty(this string value)

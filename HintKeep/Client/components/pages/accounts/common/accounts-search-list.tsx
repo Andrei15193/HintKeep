@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import type { AccountsListViewModel, Account } from '../../../../view-models/accounts-list-view-model';
+import type { AccountsListViewModel, Account } from '../../../../view-models/accounts/accounts-list-view-model';
 import React, { useContext, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';

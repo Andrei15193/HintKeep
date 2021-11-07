@@ -5,8 +5,8 @@ import { watchEvent } from 'react-model-view-viewmodel';
 import { useViewModel } from '../../use-view-model';
 import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
-import { EditAccountViewModel } from '../../../view-models/edit-account-view-model';
-import { FormInput, FormCheckboxInput, FormTextArea } from '../forms';
+import { EditAccountViewModel } from '../../../view-models/accounts/edit-account-view-model';
+import { FormInput, FormCheckboxInput, FormTextArea } from '../../forms';
 import { Else, If, Then } from '../../conditionals';
 
 import Style from '../../style.scss';
@@ -17,7 +17,7 @@ export interface IEditAccountRouteParams {
 
 export function EditAccount(): JSX.Element {
     const { push } = useHistory();
-    const $vm = useViewModel(({ axios, alertsViewModel }) => new EditAccountViewModel(axios, alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new EditAccountViewModel(axios, alertsViewModel, sessionViewModel));
     const { id } = useParams<IEditAccountRouteParams>();
 
     const [isConfirmationHidden, setIsConfirmationHidden] = useState(true);

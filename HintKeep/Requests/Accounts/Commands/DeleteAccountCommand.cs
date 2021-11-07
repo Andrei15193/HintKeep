@@ -4,6 +4,6 @@ namespace HintKeep.Requests.Accounts.Commands
 {
     public class DeleteAccountCommand : IRequest
     {
-        public string Id { get; set; }
+        public string Id { get; init; }
     }
 }

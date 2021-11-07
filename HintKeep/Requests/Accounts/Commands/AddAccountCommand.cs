@@ -4,12 +4,12 @@ namespace HintKeep.Requests.Accounts.Commands
 {
     public class AddAccountCommand : IRequest<string>
     {
-        public string Name { get; set; }
+        public string Name { get; init; }
 
-        public string Hint { get; set; }
+        public string Hint { get; init; }
 
-        public string Notes { get; set; }
+        public string Notes { get; init; }
 
-        public bool IsPinned { get; set; }
+        public bool IsPinned { get; init; }
     }
 }

@@ -1,11 +1,11 @@
 import type { MouseEvent } from 'react';
-import type { AccountHint } from '../../../view-models/account-hints-view-model';
+import type { AccountHint } from '../../../view-models/accounts-hints/account-hints-view-model';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
-import { AccountHintsViewModel } from '../../../view-models/account-hints-view-model';
+import { AccountHintsViewModel } from '../../../view-models/accounts-hints/account-hints-view-model';
 import { If, Then } from '../../conditionals';
 
 import Style from '../../style.scss';
@@ -18,7 +18,7 @@ export interface IAccountHintsRouteParams {
 export function AccountHints(): JSX.Element {
     const { push } = useHistory();
     const { id } = useParams<IAccountHintsRouteParams>();
-    const $vm = useViewModel(({ axios, alertsViewModel }) => new AccountHintsViewModel(axios, alertsViewModel));
+    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new AccountHintsViewModel(axios, alertsViewModel, sessionViewModel));
     useEffect(() => { $vm.loadAsync(id); }, [$vm]);
     const [deleteConfirmationIndex, setDeleteConfirmationIndex] = useState<number | undefined>(undefined);
 

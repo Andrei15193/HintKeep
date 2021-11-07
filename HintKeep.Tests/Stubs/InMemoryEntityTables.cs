@@ -1,4 +1,6 @@
 using CloudStub;
+using CloudStub.Core;
+using CloudStub.Core.StorageHandlers;
 using HintKeep.Storage;
 using Microsoft.Azure.Cosmos.Table;
 
@@ -6,6 +8,12 @@ namespace HintKeep.Tests.Stubs
 {
     public class InMemoryEntityTables : IEntityTables
     {
-        public CloudTable Accounts { get; } = new InMemoryCloudTable(nameof(Accounts));
+        private readonly ITableStorageHandler _tableStorageHandler = new InMemoryTableStorageHandler();
+
+        public CloudTable Users
+            => new StubCloudTable(new StubTable(nameof(Users), _tableStorageHandler));
+
+        public CloudTable Accounts
+            => new StubCloudTable(new StubTable(nameof(Accounts), _tableStorageHandler));
     }
 }

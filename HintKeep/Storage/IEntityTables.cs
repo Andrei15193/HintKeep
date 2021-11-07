@@ -4,6 +4,8 @@ namespace HintKeep.Storage
 {
     public interface IEntityTables
     {
+        CloudTable Users { get; }
+
         CloudTable Accounts { get; }
     }
 }

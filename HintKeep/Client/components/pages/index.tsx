@@ -1,10 +1,13 @@
+export { Login } from './users/login';
+export { Register } from './users/register';
+export { Confirmation } from './users/confirm';
+export { Recovery } from "./users/recovery";
+export { PasswordReset } from './users/password-reset';
 export { TermsOfService } from './terms-of-service';
-export { AuthenticationGuard } from './authentication-guard';
-export { Authentication } from './authentication';
 export { Accounts } from './accounts/list-view';
 export { AccountHints } from './accounts-hints/list-view';
-export { DeletedAccounts } from './accounts/list-view-deleted';
+export { DeletedAccounts } from './accounts/deleted/list-view-deleted';
 export { AddAccount } from './accounts/add-account';
 export { EditAccount } from './accounts/edit-account';
-export { DeletedAccountDetails } from './accounts/deleted-account-details';
+export { DeletedAccountDetails } from './accounts/deleted/deleted-account-details';
 export { Extra } from './extra';

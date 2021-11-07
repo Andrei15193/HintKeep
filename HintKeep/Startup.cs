@@ -1,11 +1,19 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Reflection;
+using System.Security;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using HintKeep.Controllers.Filters;
+using HintKeep.Services;
+using HintKeep.Services.Implementations;
 using HintKeep.Storage;
 using HintKeep.Storage.Azure;
+using HintKeep.Storage.CloudStub;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -28,28 +36,88 @@ namespace HintKeep
     public class Startup
     {
         private const string LoginUrlHeaderName = "x-login";
-        private const string ObjectIdClaimType = "http://schemas.microsoft.com/identity/claims/objectidentifier";
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public Startup(IConfiguration configuration)
-            => _configuration = configuration;
+        public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+            => (_configuration, _webHostEnvironment) = (configuration, webHostEnvironment);
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IEntityTables>(new AzureEntityTables(CloudStorageAccount.Parse(_configuration.GetConnectionString("AZURE_STORAGE")).CreateCloudTableClient()));
-
-            services.AddHttpContextAccessor();
-            services.AddScoped(serviceProvider =>
-            {
-                var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                return httpContext.User.Identity.IsAuthenticated
-                    ? new Session(httpContext.User.FindFirstValue(ObjectIdClaimType))
-                    : null;
-            });
-
-            services.AddMediatR(typeof(Startup));
+            if (_webHostEnvironment.IsDevelopment())
+                services.AddSingleton<IEntityTables>(new CloudStubEntityTables(new FileTableStorageHandler()));
+            else
+                services.AddSingleton<IEntityTables>(new AzureEntityTables(CloudStorageAccount.Parse(_configuration.GetConnectionString("AZURE_STORAGE")).CreateCloudTableClient()));
 
             services
+                .AddHttpContextAccessor()
+                .AddScoped(serviceProvider =>
+                {
+                    var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
+                    return httpContext.User.Identity.IsAuthenticated
+                        ? new Session(httpContext.User.FindFirstValue(ClaimTypes.Name))
+                        : null;
+                });
+
+            services
+                .AddTransient(serviceProvider =>
+                {
+                    var emailServiceConfigSection = serviceProvider.GetService<IConfiguration>().GetSection(nameof(EmailService));
+
+                    var serverCredentialsConfigSection = emailServiceConfigSection.GetSection(nameof(EmailServiceConfig.ServerCredentials));
+                    var password = new SecureString();
+                    foreach (var @char in serverCredentialsConfigSection.GetValue<string>(nameof(NetworkCredential.Password)))
+                        password.AppendChar(@char);
+
+                    return new EmailServiceConfig
+                    {
+                        SenderEmailAddress = emailServiceConfigSection.GetValue<string>(nameof(EmailServiceConfig.SenderEmailAddress)),
+                        SenderDisplayNameAddress = emailServiceConfigSection.GetValue<string>(nameof(EmailServiceConfig.SenderDisplayNameAddress)),
+                        ServerAddress = emailServiceConfigSection.GetValue<string>(nameof(EmailServiceConfig.ServerAddress)),
+                        ServerPort = emailServiceConfigSection.GetValue<int>(nameof(EmailServiceConfig.ServerPort)),
+                        ServerCredentials = new NetworkCredential(serverCredentialsConfigSection.GetValue<string>(nameof(NetworkCredential.UserName)), password)
+                    };
+                })
+                .AddTransient(serviceProvider =>
+                {
+                    var sessionServiceConfigSection = serviceProvider.GetService<IConfiguration>().GetSection(nameof(SessionService));
+
+                    return new SessionServiceConfig
+                    {
+                        ApplicationId = sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.ApplicationId)),
+                        Audience = sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.Audience)),
+                        SigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.SigningKey)))),
+                        SingingAlgorithm = (string)typeof(SecurityAlgorithms)
+                            .GetField(
+                                sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.SingingAlgorithm)),
+                                BindingFlags.Public | BindingFlags.Static | BindingFlags.GetField
+                            )
+                            .GetValue(default)
+                    };
+                })
+                .AddTransient(serviceProvider =>
+                {
+                    var securityServiceConfigSection = serviceProvider.GetService<IConfiguration>().GetSection(nameof(SecurityService));
+
+                    return new SecurityServiceConfig
+                    {
+                        HashAlgorithm = securityServiceConfigSection.GetValue<string>(nameof(SecurityServiceConfig.HashAlgorithm)),
+                        SaltLength = securityServiceConfigSection.GetValue<int>(nameof(SecurityServiceConfig.SaltLength)),
+                        PasswordFormat = securityServiceConfigSection.GetValue<string>(nameof(SecurityServiceConfig.PasswordFormat)),
+                        ActivationTokenLength = securityServiceConfigSection.GetValue<int>(nameof(SecurityServiceConfig.ActivationTokenLength)),
+                        ActivationTokenExpirationMinutes = securityServiceConfigSection.GetValue<int>(nameof(SecurityServiceConfig.ActivationTokenExpirationMinutes))
+                    };
+                });
+
+            if (_webHostEnvironment.IsDevelopment())
+                services.AddTransient<IEmailService, EmailServiceMock>();
+            else
+                services.AddTransient<IEmailService, EmailService>();
+
+            services
+                .AddTransient<ISecurityService, SecurityService>()
+                .AddTransient<ISessionService, SessionService>()
+                .AddMediatR(typeof(Startup))
                 .AddControllers(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter());
@@ -79,7 +147,9 @@ namespace HintKeep
                         options.DefaultPolicy = new AuthorizationPolicyBuilder()
                             .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                             .RequireAuthenticatedUser()
-                            .RequireClaim(ObjectIdClaimType)
+                            .RequireClaim(ClaimTypes.Name)
+                            .RequireClaim(ClaimTypes.Role)
+                            .RequireClaim(JwtRegisteredClaimNames.Jti)
                             .Build();
                     }
                 )
@@ -93,46 +163,20 @@ namespace HintKeep
                 .AddJwtBearer(
                     options =>
                     {
-                        var authenticationConfiguration = _configuration.GetSection("Authentication");
-                        var tenantId = authenticationConfiguration.GetValue<string>("TenantId");
-                        var applicationId = authenticationConfiguration.GetValue<string>("ApplicationId");
-                        var policy = authenticationConfiguration.GetValue<string>("Policy");
-                        var returnUrl = authenticationConfiguration.GetValue<string>("ReturnUrl");
+                        var sessionServiceConfigSection = _configuration.GetSection(nameof(SessionService));
 
-                        options.SaveToken = false;
-                        options.RequireHttpsMetadata = true;
-                        options.MetadataAddress = $"https://login.hintkeep.net/{tenantId}/{policy}/v2.0/.well-known/openid-configuration";
-                        options.Events = new JwtBearerEvents
-                        {
-                            OnChallenge = context =>
-                            {
-                                _SetLoginHeader(context.Request, context.Response);
-                                return Task.CompletedTask;
-                            },
-                            OnAuthenticationFailed = context =>
-                            {
-                                _SetLoginHeader(context.Request, context.Response);
-                                return Task.CompletedTask;
-                            }
-                        };
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.SigningKey)))),
+                            ValidIssuer = sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.ApplicationId)),
                             ValidateIssuer = true,
-                            ValidIssuer = $"https://login.hintkeep.net/tfp/{tenantId}/v2.0/",
+                            ValidAudience = sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.Audience)),
                             ValidateAudience = true,
-                            ValidAudience = applicationId,
                             ValidateLifetime = true,
                             LifetimeValidator = (notBefore, expires, securityToken, validationParameters)
                                 => notBefore != null && expires != null && notBefore.Value.ToUniversalTime() <= DateTime.UtcNow && DateTime.UtcNow < expires.Value.ToUniversalTime(),
                         };
-
-                        void _SetLoginHeader(HttpRequest request, HttpResponse response)
-                        {
-                            var actualReturnUrl = Uri.EscapeDataString(string.IsNullOrWhiteSpace(returnUrl) ? request.Scheme + "://" + request.Host + "/authentications" : returnUrl);
-                            response.Headers.Append(HeaderNames.AccessControlExposeHeaders, LoginUrlHeaderName);
-                            response.Headers[LoginUrlHeaderName] = $"https://login.hintkeep.net/{tenantId}/oauth2/v2.0/authorize?p={policy}&client_id={applicationId}&nonce=defaultNonce&redirect_uri={actualReturnUrl}&scope=openid&response_type=id_token&prompt=login";
-                        }
                     }
                 );
 

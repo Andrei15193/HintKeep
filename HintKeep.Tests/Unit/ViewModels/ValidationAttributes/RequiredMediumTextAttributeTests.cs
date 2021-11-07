@@ -27,7 +27,7 @@ namespace HintKeep.Tests.Unit.ViewModels.ValidationAttributes
         [Theory]
         [InlineData("1234567890")]
         [InlineData("123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345")]
-        public void ValidText(string invalidText)
-            => Assert.Null(_requiredMediumTextAttribute.GetValidationResult(invalidText, new ValidationContext(new object()) { MemberName = "TestMemberName" }));
+        public void ValidText(string validText)
+            => Assert.Null(_requiredMediumTextAttribute.GetValidationResult(validText, new ValidationContext(new object()) { MemberName = "TestMemberName" }));
     }
 }

@@ -6,6 +6,6 @@ namespace HintKeep.Requests.AccountsHints.Queries
 {
     public class AccountHintsQuery : IRequest<IEnumerable<AccountHintDetails>>
     {
-        public string AccountId { get; set; }
+        public string AccountId { get; init; }
     }
 }

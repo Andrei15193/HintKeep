@@ -1,21 +1,13 @@
-import type { AuthenticationGuardViewModel } from '../../view-models/authentication-guard-view-model';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
-import { watchEvent } from 'react-model-view-viewmodel';
 import { useViewModel } from '../use-view-model';
 import { Message } from '../i18n';
-import { AuthenticationViewModel } from '../../view-models/authentication-view-model';
 
 import Style from '../style.scss';
 
-export interface IExtraProps {
-    readonly $vm: AuthenticationGuardViewModel;
-}
-
-export function Extra({ $vm: $ensureAuthenticationViewModel }: IExtraProps): JSX.Element {
-    const $authenticationViewModel = useViewModel(({ axios }) => new AuthenticationViewModel(axios));
-    watchEvent($authenticationViewModel.loggedOut, () => $ensureAuthenticationViewModel.reset());
+export function Extra(): JSX.Element {
+    const $vm = useViewModel(({ sessionViewModel }) => sessionViewModel);
 
     return (
         <>
@@ -38,7 +30,7 @@ export function Extra({ $vm: $ensureAuthenticationViewModel }: IExtraProps): JSX
                     <div className={Style.flexFill}>
                         <ul>
                             <li><Link to="/accounts/bin"><Message id="pages.extra.accountsBin.label" /></Link></li>
-                            <li><Link to="/" onClick={() => $authenticationViewModel.logOut()}><Message id="pages.extra.logOut.label" /></Link></li>
+                            <li><Link to="/" onClick={() => $vm.endSession()}><Message id="pages.extra.logOut.label" /></Link></li>
                         </ul>
                     </div>
                 </div>
