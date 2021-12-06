@@ -41,50 +41,52 @@ export function EditAccount(): JSX.Element {
             </h1>
 
             <BusyContent $vm={$vm}>
-                <FormInput className={Style.mb3} id="name" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.name.label" field={$vm.form.name} placeholder="pages.editAccount.name.placeholder" />
-                <FormInput className={Style.mb3} id="hint" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.hint.label" field={$vm.form.hint} placeholder="pages.editAccount.hint.placeholder" />
-                <FormCheckboxInput className={Style.mb3} id="isPinned" disabled={!isConfirmationHidden} label="pages.editAccount.isPinned.label" field={$vm.form.isPinned} description="pages.editAccount.isPinned.description" />
-                <FormTextArea className={Style.mb3} id="notes" label="pages.editAccount.notes.label" field={$vm.form.notes} />
+                <form onSubmit={() => $vm.submitAsync()}>
+                    <FormInput className={Style.mb3} id="name" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.name.label" field={$vm.form.name} placeholder="pages.editAccount.name.placeholder" />
+                    <FormInput className={Style.mb3} id="hint" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.hint.label" field={$vm.form.hint} placeholder="pages.editAccount.hint.placeholder" />
+                    <FormCheckboxInput className={Style.mb3} id="isPinned" disabled={!isConfirmationHidden} label="pages.editAccount.isPinned.label" field={$vm.form.isPinned} description="pages.editAccount.isPinned.description" />
+                    <FormTextArea className={Style.mb3} id="notes" label="pages.editAccount.notes.label" field={$vm.form.notes} />
 
-                <If condition={isConfirmationHidden}>
-                    <Then>
-                        <div className={classnames(Style.dFlex, Style.flexRow, Style.mb3)}>
-                            <button type="button" disabled={(!$vm.isLoaded || ($vm.form.isInvalid && $vm.form.fields.every(field => field.isTouched)))} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>
-                                <Message id="pages.editAccount.save.label" />
-                            </button>
-                            <Link to={`/accounts/${id}/hints`} className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
-                                <Message id="pages.editAccount.viewAllHints.label" />
-                            </Link>
-                            <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
-                                <Message id="pages.editAccount.cancel.label" />
-                            </Link>
-                            <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.msAuto)} onClick={() => setIsConfirmationHidden(false)}>
-                                <Message id="pages.editAccount.delete.label" />
-                            </button>
-                        </div>
-                    </Then>
-                    <Else>
-                        <div className={classnames(Style.card, Style.mb3)}>
-                            <div className={Style.cardBody}>
-                                <h5 className={Style.cardTitle}>
-                                    <Message id="pages.editAccount.delete.confirmationModalTitle" />
-                                </h5>
-                                <p className={Style.cardText}>
-                                    <Message id="pages.editAccount.delete.confirmation" />
-                                </p>
+                    <If condition={isConfirmationHidden}>
+                        <Then>
+                            <div className={classnames(Style.dFlex, Style.flexRow, Style.mb3)}>
+                                <button type="submit" disabled={(!$vm.isLoaded || ($vm.form.isInvalid && $vm.form.fields.every(field => field.isTouched)))} className={classnames(Style.btn, Style.btnPrimary)}>
+                                    <Message id="pages.editAccount.save.label" />
+                                </button>
+                                <Link to={`/accounts/${id}/hints`} className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
+                                    <Message id="pages.editAccount.viewAllHints.label" />
+                                </Link>
+                                <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
+                                    <Message id="pages.editAccount.cancel.label" />
+                                </Link>
+                                <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.msAuto)} onClick={() => setIsConfirmationHidden(false)}>
+                                    <Message id="pages.editAccount.delete.label" />
+                                </button>
+                            </div>
+                        </Then>
+                        <Else>
+                            <div className={classnames(Style.card, Style.mb3)}>
+                                <div className={Style.cardBody}>
+                                    <h5 className={Style.cardTitle}>
+                                        <Message id="pages.editAccount.delete.confirmationModalTitle" />
+                                    </h5>
+                                    <p className={Style.cardText}>
+                                        <Message id="pages.editAccount.delete.confirmation" />
+                                    </p>
 
-                                <div className={classnames(Style.dFlex, Style.flexRow)}>
-                                    <button type="button" className={classnames(Style.btn, Style.btnDanger)} onClick={() => { setIsConfirmationHidden(true); $vm.deleteAsync(); }}>
-                                        <Message id="pages.editAccount.moveToBin.label" />
-                                    </button>
-                                    <button type="button" className={classnames(Style.msAuto, Style.btn, Style.btnSecondary)} onClick={() => setIsConfirmationHidden(true)}>
-                                        <Message id="pages.editAccount.cancel.label" />
-                                    </button>
+                                    <div className={classnames(Style.dFlex, Style.flexRow)}>
+                                        <button type="button" className={classnames(Style.btn, Style.btnDanger)} onClick={() => { setIsConfirmationHidden(true); $vm.deleteAsync(); }}>
+                                            <Message id="pages.editAccount.moveToBin.label" />
+                                        </button>
+                                        <button type="button" className={classnames(Style.msAuto, Style.btn, Style.btnSecondary)} onClick={() => setIsConfirmationHidden(true)}>
+                                            <Message id="pages.editAccount.cancel.label" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </Else>
-                </If>
+                        </Else>
+                    </If>
+                </form>
             </BusyContent>
         </div>
     );

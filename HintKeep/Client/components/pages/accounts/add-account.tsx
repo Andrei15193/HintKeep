@@ -32,19 +32,21 @@ export function AddAccount(): JSX.Element {
             </h1>
 
             <BusyContent $vm={$vm}>
-                <FormInput className={Style.mb3} id="name" type="text" label="pages.addAccount.name.label" field={$vm.form.name} placeholder="pages.addAccount.name.placeholder" />
-                <FormInput className={Style.mb3} id="hint" type="text" label="pages.addAccount.hint.label" field={$vm.form.hint} placeholder="pages.addAccount.hint.placeholder" />
-                <FormCheckboxInput className={Style.mb3} id="isPinned" label="pages.addAccount.isPinned.label" field={$vm.form.isPinned} description="pages.addAccount.isPinned.description" />
-                <FormTextArea className={Style.mb3} id="notes" label="pages.addAccount.notes.label" field={$vm.form.notes} />
+                <form onSubmit={() => $vm.submitAsync()}>
+                    <FormInput className={Style.mb3} id="name" type="text" label="pages.addAccount.name.label" field={$vm.form.name} placeholder="pages.addAccount.name.placeholder" />
+                    <FormInput className={Style.mb3} id="hint" type="text" label="pages.addAccount.hint.label" field={$vm.form.hint} placeholder="pages.addAccount.hint.placeholder" />
+                    <FormCheckboxInput className={Style.mb3} id="isPinned" label="pages.addAccount.isPinned.label" field={$vm.form.isPinned} description="pages.addAccount.isPinned.description" />
+                    <FormTextArea className={Style.mb3} id="notes" label="pages.addAccount.notes.label" field={$vm.form.notes} />
 
-                <div className={Style.mb3}>
-                    <button type="button" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.submitAsync()}>
-                        <Message id="pages.addAccount.add.label" />
-                    </button>
-                    <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
-                        <Message id="pages.addAccount.cancel.label" />
-                    </Link>
-                </div>
+                    <div className={Style.mb3}>
+                        <button type="submit" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)}>
+                            <Message id="pages.addAccount.add.label" />
+                        </button>
+                        <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
+                            <Message id="pages.addAccount.cancel.label" />
+                        </Link>
+                    </div>
+                </form>
             </BusyContent>
         </div>
     );

@@ -24,14 +24,16 @@ export function Login(): JSX.Element {
             </h1>
 
             <BusyContent $vm={$vm}>
-                <FormInput className={Style.mb3} id="email" type="email" label="pages.login.email.label" field={$vm.form.email} placeholder="pages.login.email.placeholder" />
-                <FormInput className={Style.mb3} id="password" type="password" label="pages.login.password.label" field={$vm.form.password} placeholder="pages.login.password.placeholder" />
+                <form onSubmit={() => $vm.authenticateAsync()}>
+                    <FormInput className={Style.mb3} id="email" type="email" label="pages.login.email.label" field={$vm.form.email} placeholder="pages.login.email.placeholder" />
+                    <FormInput className={Style.mb3} id="password" type="password" label="pages.login.password.label" field={$vm.form.password} placeholder="pages.login.password.placeholder" />
 
-                <div className={Style.mb3}>
-                    <button type="button" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.authenticateAsync()}>
-                        <Message id="pages.login.login.label" />
-                    </button>
-                </div>
+                    <div className={Style.mb3}>
+                        <button type="submit" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)}>
+                            <Message id="pages.login.login.label" />
+                        </button>
+                    </div>
+                </form>
             </BusyContent>
 
             <ul>

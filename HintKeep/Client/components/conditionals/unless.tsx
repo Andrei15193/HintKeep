@@ -1,13 +1,13 @@
-import type { ReactElement, PropsWithChildren } from 'react';
-import React, { Children, Fragment } from 'react';
-import { Else } from './else';
-import { Then } from './then';
+import type { PropsWithChildren, ReactElement } from "react";
+import React, { Children, Fragment } from "react";
+import { Else } from "./else";
+import { Then } from "./then";
 
-export interface IIfProps {
+export interface IUnlessProps {
     readonly condition: boolean;
 }
 
-export function If({ condition, children }: PropsWithChildren<IIfProps>): JSX.Element {
+export function Unless({ condition, children }: PropsWithChildren<IUnlessProps>): JSX.Element {
     const thenChildren: ReactElement[] = [];
     const elseChildren: ReactElement[] = [];
 
@@ -22,7 +22,7 @@ export function If({ condition, children }: PropsWithChildren<IIfProps>): JSX.El
         }
     );
 
-    if (condition)
+    if (!condition)
         if (thenChildren.length === 0 && elseChildren.length === 0)
             return <>{children}</>;
         else if (thenChildren.length === 1)

@@ -48,9 +48,7 @@ export function AccountHints(): JSX.Element {
                                 <div key={accountHint.id} className={Style.mb3}>
                                     <AccountHintDisplay accountHint={accountHint} onDeleteButtonClick={() => toggleConfirmation(accountHintIndex)} />
                                     <If condition={deleteConfirmationIndex === accountHintIndex}>
-                                        <Then>
-                                            <ConfirmAccountHintDeletetion onDeleteButtonClick={() => confirmDeletion(accountHint.id)} onCancelButtonClick={dismissConfimation} />
-                                        </Then>
+                                        <ConfirmAccountHintDeletetion onDeleteButtonClick={() => confirmDeletion(accountHint.id)} onCancelButtonClick={dismissConfimation} />
                                     </If>
                                 </div>
                             ))

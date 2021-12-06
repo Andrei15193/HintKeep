@@ -31,18 +31,20 @@ export function PasswordReset(): JSX.Element {
             }
 
             <BusyContent $vm={$vm}>
-                <FormInput className={Style.mb3} id="token" type="text" label="pages.passwordReset.token.label" field={$vm.form.token} placeholder="pages.passwordReset.token.placeholder" />
-                <FormInput className={Style.mb3} id="password" type="password" label="pages.passwordReset.password.label" field={$vm.form.password} placeholder="pages.passwordReset.password.placeholder" />
-                <FormInput className={Style.mb3} id="passwordConfirmation" type="password" label="pages.passwordReset.passwordConfirmation.label" field={$vm.form.passwordConfirmation} placeholder="pages.passwordReset.passwordConfirmation.placeholder" />
+                <form onSubmit={() => $vm.resetPasswordAsync()}>
+                    <FormInput className={Style.mb3} id="token" type="text" label="pages.passwordReset.token.label" field={$vm.form.token} placeholder="pages.passwordReset.token.placeholder" />
+                    <FormInput className={Style.mb3} id="password" type="password" label="pages.passwordReset.password.label" field={$vm.form.password} placeholder="pages.passwordReset.password.placeholder" />
+                    <FormInput className={Style.mb3} id="passwordConfirmation" type="password" label="pages.passwordReset.passwordConfirmation.label" field={$vm.form.passwordConfirmation} placeholder="pages.passwordReset.passwordConfirmation.placeholder" />
 
-                <div className={Style.mb3}>
-                    <button type="button" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.resetPasswordAsync()}>
-                        <Message id="pages.passwordReset.resetPassword.label" />
-                    </button>
-                    <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
-                        <Message id="pages.passwordReset.cancel.label" />
-                    </Link>
-                </div>
+                    <div className={Style.mb3}>
+                        <button type="submit" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)}>
+                            <Message id="pages.passwordReset.resetPassword.label" />
+                        </button>
+                        <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
+                            <Message id="pages.passwordReset.cancel.label" />
+                        </Link>
+                    </div>
+                </form>
             </BusyContent>
         </div>
     );

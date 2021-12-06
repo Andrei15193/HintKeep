@@ -28,16 +28,18 @@ export function Confirmation(): JSX.Element {
             </p>
 
             <BusyContent $vm={$vm}>
-                <FormInput className={Style.mb3} id="token" type="text" label="pages.confirmation.token.label" field={$vm.form.token} placeholder="pages.confirmation.token.placeholder" />
+                <form onSubmit={() => $vm.confirmAsync()}>
+                    <FormInput className={Style.mb3} id="token" type="text" label="pages.confirmation.token.label" field={$vm.form.token} placeholder="pages.confirmation.token.placeholder" />
 
-                <div className={Style.mb3}>
-                    <button type="button" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.confirmAsync()}>
-                        <Message id="pages.confirmation.confirm.label" />
-                    </button>
-                    <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
-                        <Message id="pages.confirmation.cancel.label" />
-                    </Link>
-                </div>
+                    <div className={Style.mb3}>
+                        <button type="submit" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)}>
+                            <Message id="pages.confirmation.confirm.label" />
+                        </button>
+                        <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
+                            <Message id="pages.confirmation.cancel.label" />
+                        </Link>
+                    </div>
+                </form>
             </BusyContent>
         </div>
     );

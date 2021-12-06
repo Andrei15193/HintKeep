@@ -8,7 +8,6 @@ const isProduction = ((process.argv.find(function (arg) { return arg.startsWith(
 module.exports = {
     mode: isProduction ? 'production' : 'development',
     devtool: isProduction ? false : 'eval-source-map',
-    watch: process.argv.includes('--watch'),
     target: ['web', 'es5'],
     entry: {
         app: path.resolve(__dirname, 'HintKeep', 'Client', 'components', 'index.tsx')
