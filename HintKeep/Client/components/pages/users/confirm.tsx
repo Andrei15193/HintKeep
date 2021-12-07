@@ -28,7 +28,7 @@ export function Confirmation(): JSX.Element {
             </p>
 
             <BusyContent $vm={$vm}>
-                <form onSubmit={() => $vm.confirmAsync()}>
+                <form onSubmit={event => { event.preventDefault(); $vm.confirmAsync(); }}>
                     <FormInput className={Style.mb3} id="token" type="text" label="pages.confirmation.token.label" field={$vm.form.token} placeholder="pages.confirmation.token.placeholder" />
 
                     <div className={Style.mb3}>

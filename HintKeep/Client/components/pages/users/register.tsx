@@ -25,7 +25,7 @@ export function Register(): JSX.Element {
             </h1>
 
             <BusyContent $vm={$vm}>
-                <form onSubmit={() => $vm.submitAsync()}>
+                <form onSubmit={event => { event.preventDefault(); $vm.submitAsync(); }}>
                     <FormInput className={Style.mb3} id="email" type="email" label="pages.register.email.label" field={$vm.form.email} placeholder="pages.register.email.placeholder" />
                     <FormInput className={Style.mb3} id="hint" type="text" label="pages.register.hint.label" field={$vm.form.hint} placeholder="pages.register.hint.placeholder" />
                     <FormInput className={Style.mb3} id="password" type="password" label="pages.register.password.label" field={$vm.form.password} placeholder="pages.register.password.placeholder" />

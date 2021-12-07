@@ -32,7 +32,7 @@ export function AddAccount(): JSX.Element {
             </h1>
 
             <BusyContent $vm={$vm}>
-                <form onSubmit={() => $vm.submitAsync()}>
+                <form onSubmit={event => { event.preventDefault(); $vm.submitAsync(); }}>
                     <FormInput className={Style.mb3} id="name" type="text" label="pages.addAccount.name.label" field={$vm.form.name} placeholder="pages.addAccount.name.placeholder" />
                     <FormInput className={Style.mb3} id="hint" type="text" label="pages.addAccount.hint.label" field={$vm.form.hint} placeholder="pages.addAccount.hint.placeholder" />
                     <FormCheckboxInput className={Style.mb3} id="isPinned" label="pages.addAccount.isPinned.label" field={$vm.form.isPinned} description="pages.addAccount.isPinned.description" />

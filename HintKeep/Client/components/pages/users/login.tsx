@@ -24,7 +24,7 @@ export function Login(): JSX.Element {
             </h1>
 
             <BusyContent $vm={$vm}>
-                <form onSubmit={() => $vm.authenticateAsync()}>
+                <form onSubmit={event => { event.preventDefault(); $vm.authenticateAsync(); }}>
                     <FormInput className={Style.mb3} id="email" type="email" label="pages.login.email.label" field={$vm.form.email} placeholder="pages.login.email.placeholder" />
                     <FormInput className={Style.mb3} id="password" type="password" label="pages.login.password.label" field={$vm.form.password} placeholder="pages.login.password.placeholder" />
 

@@ -41,7 +41,7 @@ export function EditAccount(): JSX.Element {
             </h1>
 
             <BusyContent $vm={$vm}>
-                <form onSubmit={() => $vm.submitAsync()}>
+                <form onSubmit={event => { event.preventDefault(); $vm.submitAsync(); }}>
                     <FormInput className={Style.mb3} id="name" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.name.label" field={$vm.form.name} placeholder="pages.editAccount.name.placeholder" />
                     <FormInput className={Style.mb3} id="hint" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.hint.label" field={$vm.form.hint} placeholder="pages.editAccount.hint.placeholder" />
                     <FormCheckboxInput className={Style.mb3} id="isPinned" disabled={!isConfirmationHidden} label="pages.editAccount.isPinned.label" field={$vm.form.isPinned} description="pages.editAccount.isPinned.description" />
