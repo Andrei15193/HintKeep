@@ -34,6 +34,7 @@ namespace HintKeep.Tests.Integration.UsersHintsNotifications
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
+                .WithSecurityService(out var securityService)
                 .WithEmailService(out var emailService)
                 .CreateClient();
             entityTables.Users.ExecuteBatch(
@@ -41,7 +42,7 @@ namespace HintKeep.Tests.Integration.UsersHintsNotifications
                 {
                     TableOperation.Insert(new UserEntity
                     {
-                        PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                        PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                         RowKey = "details".ToEncodedKeyProperty(),
                         EntityType = "UserEntity",
                         Hint = "#hint",
@@ -49,6 +50,9 @@ namespace HintKeep.Tests.Integration.UsersHintsNotifications
                     })
                 }
             );
+            securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/hints/notifications", new { email = "#TEST@domain.com" });
 
@@ -65,7 +69,11 @@ namespace HintKeep.Tests.Integration.UsersHintsNotifications
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase()
+                .WithSecurityService(out var securityService)
                 .CreateClient();
+            securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/hints/notifications", new { email = "#TEST@domain.com" });
 
@@ -78,19 +86,23 @@ namespace HintKeep.Tests.Integration.UsersHintsNotifications
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
+                .WithSecurityService(out var securityService)
                 .CreateClient();
             entityTables.Users.ExecuteBatch(
                 new TableBatchOperation
                 {
                     TableOperation.Insert(new UserEntity
                     {
-                        PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                        PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                         RowKey = "details".ToEncodedKeyProperty(),
                         EntityType = "UserEntity",
                         IsActive = false,
                     })
                 }
             );
+            securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/hints/notifications", new { email = "#TEST@domain.com" });
 

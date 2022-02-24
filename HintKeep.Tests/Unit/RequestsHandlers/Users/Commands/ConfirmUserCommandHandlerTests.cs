@@ -31,11 +31,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             {
                 TableOperation.Insert(new UserEntity
                 {
-                    PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                    PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                     RowKey = "details",
                     EntityType = "UserEntity",
                     Id = "#user-id",
-                    Email = "#TEST@domain.com",
                     Hint = "#test-hint",
                     PasswordSalt = "#password-salt",
                     PasswordHash = "#password-hash",
@@ -43,7 +42,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 }),
                 TableOperation.Insert(new UserActivationTokenEntity
                 {
-                    PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                    PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                     RowKey = "#test-token".ToEncodedKeyProperty(),
                     EntityType = "UserActivationTokenEntity",
                     Expiration = DateTimeOffset.UtcNow.AddDays(1)
@@ -53,12 +52,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             await _confirmUserCommandHandler.Handle(new ConfirmUserCommand { Token = "#test-token" }, default);
 
             var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery()));
-            Assert.Equal("#test@domain.com".ToEncodedKeyProperty(), userEntity.PartitionKey);
+            Assert.Equal("#email-hash".ToEncodedKeyProperty(), userEntity.PartitionKey);
             Assert.Equal("details", userEntity.RowKey);
-            Assert.Equal(7, userEntity.Properties.Count);
+            Assert.Equal(6, userEntity.Properties.Count);
             Assert.Equal("UserEntity", userEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
             Assert.NotEmpty(userEntity.Properties[nameof(UserEntity.Id)].StringValue);
-            Assert.Equal("#TEST@domain.com", userEntity.Properties[nameof(UserEntity.Email)].StringValue);
             Assert.Equal("#test-hint", userEntity.Properties[nameof(UserEntity.Hint)].StringValue);
             Assert.Equal("#password-salt", userEntity.Properties[nameof(UserEntity.PasswordSalt)].StringValue);
             Assert.Equal("#password-hash", userEntity.Properties[nameof(UserEntity.PasswordHash)].StringValue);
@@ -78,11 +76,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             {
                 TableOperation.Insert(new UserEntity
                 {
-                    PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                    PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                     RowKey = "details",
                     EntityType = "UserEntity",
                     Id = "#user-id",
-                    Email = "#TEST@domain.com",
                     Hint = "#test-hint",
                     PasswordSalt = "#password-salt",
                     PasswordHash = "#password-hash",
@@ -90,7 +87,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 }),
                 TableOperation.Insert(new UserActivationTokenEntity
                 {
-                    PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                    PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                     RowKey = "#test-token".ToEncodedKeyProperty(),
                     EntityType = "UserActivationTokenEntity",
                     Expiration = DateTimeOffset.UtcNow.AddDays(-1)

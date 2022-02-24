@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using HintKeep.Services;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using Microsoft.Azure.Cosmos.Table;
@@ -34,6 +35,7 @@ namespace HintKeep.Tests.Integration.UsersPasswordsResets
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
+                .WithSecurityService(out var securityService)
                 .WithEmailService(out var emailService)
                 .CreateClient();
             entityTables.Users.ExecuteBatch(
@@ -41,13 +43,19 @@ namespace HintKeep.Tests.Integration.UsersPasswordsResets
                 {
                     TableOperation.Insert(new UserEntity
                     {
-                        PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                        PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                         RowKey = "details".ToEncodedKeyProperty(),
                         EntityType = "UserEntity",
                         IsActive = true,
                     })
                 }
             );
+            securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
+            securityService
+                .Setup(securityService => securityService.GenerateConfirmationToken())
+                .Returns(new ConfirmationToken("#confirmation-token", TimeSpan.FromHours(1)));
 
             var response = await client.PostAsJsonAsync("/api/users/passwords/resets", new { email = "#TEST@domain.com" });
 
@@ -57,15 +65,15 @@ namespace HintKeep.Tests.Integration.UsersPasswordsResets
 
             var entities = entityTables.Users.ExecuteQuery(new TableQuery());
             var userPasswordResetTokenEntity = Assert.Single(entities, entity => entity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue == "UserPasswordResetTokenEntity");
-            Assert.Equal("#test@domain.com".ToEncodedKeyProperty(), userPasswordResetTokenEntity.PartitionKey);
-            Assert.NotEmpty(userPasswordResetTokenEntity.RowKey);
+            Assert.Equal("#email-hash".ToEncodedKeyProperty(), userPasswordResetTokenEntity.PartitionKey);
+            Assert.Equal("#confirmation-token".ToEncodedKeyProperty(), userPasswordResetTokenEntity.RowKey);
             Assert.Equal(2, userPasswordResetTokenEntity.Properties.Count);
             Assert.Equal("UserPasswordResetTokenEntity", userPasswordResetTokenEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
             var expiration = userPasswordResetTokenEntity.Properties[nameof(UserPasswordResetTokenEntity.Expiration)].DateTimeOffsetValue;
             Assert.True(DateTimeOffset.UtcNow.AddMinutes(55) < expiration);
             Assert.True(expiration < DateTimeOffset.UtcNow.AddMinutes(65));
 
-            emailService.Verify(emailService => emailService.SendAsync("#TEST@domain.com", "HintKeep - Password Reset", It.Is<string>(body => body.Contains(userPasswordResetTokenEntity.RowKey))), Times.Once);
+            emailService.Verify(emailService => emailService.SendAsync("#TEST@domain.com", "HintKeep - Password Reset", It.Is<string>(body => body.Contains("#confirmation-token"))), Times.Once);
             emailService.VerifyNoOtherCalls();
         }
 
@@ -74,7 +82,11 @@ namespace HintKeep.Tests.Integration.UsersPasswordsResets
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase()
+                .WithSecurityService(out var securityService)
                 .CreateClient();
+            securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/passwords/resets", new { email = "#TEST@domain.com" });
 
@@ -87,19 +99,23 @@ namespace HintKeep.Tests.Integration.UsersPasswordsResets
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
+                .WithSecurityService(out var securityService)
                 .CreateClient();
             entityTables.Users.ExecuteBatch(
                 new TableBatchOperation
                 {
                     TableOperation.Insert(new UserEntity
                     {
-                        PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                        PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                         RowKey = "details".ToEncodedKeyProperty(),
                         EntityType = "UserEntity",
                         IsActive = false,
                     })
                 }
             );
+            securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/passwords/resets", new { email = "#TEST@domain.com" });
 

@@ -9,20 +9,22 @@ using HintKeep.Storage.Entities;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
 
-namespace HintKeep.RequestsHandlers.Users.Commands{
+namespace HintKeep.RequestsHandlers.Users.Commands
+{
     public class UserRequestHintCommandHandler : AsyncRequestHandler<UserRequestHintCommand>
     {
         private readonly IEntityTables _entityTables;
+        private readonly ISecurityService _securityService;
         private readonly IEmailService _emailService;
 
-        public UserRequestHintCommandHandler(IEntityTables entityTables, IEmailService emailService)
-            => (_entityTables, _emailService) = (entityTables, emailService);
+        public UserRequestHintCommandHandler(IEntityTables entityTables, ISecurityService securityService, IEmailService emailService)
+            => (_entityTables, _securityService, _emailService) = (entityTables, securityService, emailService);
 
         protected override async Task Handle(UserRequestHintCommand command, CancellationToken cancellationToken)
         {
-            var emailInLowercase = command.Email.ToLowerInvariant();
+            var emailHash = _securityService.ComputeHash(command.Email.ToLowerInvariant());
             var userEntity = (UserEntity)(await _entityTables.Users.ExecuteAsync(
-                TableOperation.Retrieve<UserEntity>(emailInLowercase.ToEncodedKeyProperty(), "details", new List<string> { nameof(UserEntity.IsActive), nameof(UserEntity.Hint) }),
+                TableOperation.Retrieve<UserEntity>(emailHash.ToEncodedKeyProperty(), "details", new List<string> { nameof(UserEntity.IsActive), nameof(UserEntity.Hint) }),
                 cancellationToken
             )).Result;
             if (userEntity is null || !userEntity.IsActive)

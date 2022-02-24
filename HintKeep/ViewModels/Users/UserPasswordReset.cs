@@ -4,6 +4,9 @@ namespace HintKeep.ViewModels.Users
 {
     public class UserPasswordReset
     {
+        [RequiredEmail]
+        public string Email { get; set; }
+
         [RequiredMediumText]
         public string Token { get; set; }
 

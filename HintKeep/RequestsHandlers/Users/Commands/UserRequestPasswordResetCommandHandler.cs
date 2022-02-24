@@ -23,9 +23,9 @@ namespace HintKeep.RequestsHandlers.Users.Commands
 
         protected override async Task Handle(UserRequestPasswordResetCommand command, CancellationToken cancellationToken)
         {
-            var emailInLowercase = command.Email.ToLowerInvariant();
+            var emailHash = _securityService.ComputeHash(command.Email.ToLowerInvariant());
             var userEntity = (UserEntity)(await _entityTables.Users.ExecuteAsync(
-                TableOperation.Retrieve<UserEntity>(emailInLowercase.ToEncodedKeyProperty(), "details", new List<string> { nameof(UserEntity.IsActive) }),
+                TableOperation.Retrieve<UserEntity>(emailHash.ToEncodedKeyProperty(), "details", new List<string> { nameof(UserEntity.IsActive) }),
                 cancellationToken
             )).Result;
             if (userEntity is null || !userEntity.IsActive)
@@ -35,7 +35,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
             await _entityTables.Users.ExecuteAsync(
                 TableOperation.Insert(new UserPasswordResetTokenEntity
                 {
-                    PartitionKey = emailInLowercase.ToEncodedKeyProperty(),
+                    PartitionKey = emailHash.ToEncodedKeyProperty(),
                     RowKey = confirmationToken.Token.ToEncodedKeyProperty(),
                     EntityType = "UserPasswordResetTokenEntity",
                     Expiration = DateTimeOffset.UtcNow.Add(confirmationToken.Expiration)

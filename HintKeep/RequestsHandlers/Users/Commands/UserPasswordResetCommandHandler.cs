@@ -50,8 +50,9 @@ namespace HintKeep.Requests.Users.Commands
                 throw new NotFoundException();
             }
 
+            var emailHash = _securityService.ComputeHash(command.Email.ToLowerInvariant());
             var userEntity = (UserEntity)(await _entityTables.Users.ExecuteAsync(TableOperation.Retrieve<UserEntity>(userPasswordResetTokenEntity.PartitionKey, "details"), cancellationToken)).Result;
-            if (userEntity is null || !userEntity.IsActive)
+            if (userEntity is null || !userEntity.IsActive || userEntity.PartitionKey != emailHash.ToEncodedKeyProperty())
             {
                 await _entityTables.Users.ExecuteAsync(
                     TableOperation.Delete(userPasswordResetTokenEntity),
@@ -85,7 +86,7 @@ namespace HintKeep.Requests.Users.Commands
             );
 
             await _emailService.SendAsync(
-                userEntity.Email,
+                command.Email,
                 "HintKeep - Password Reset",
                 $@"<!DOCTYPE html>
 <html>

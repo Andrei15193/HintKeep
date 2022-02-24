@@ -8,6 +8,8 @@ namespace HintKeep.Services
 
         ConfirmationToken GenerateConfirmationToken();
 
+        string ComputeHash(string value);
+
         string ComputePasswordHash(string salt, string password);
     }
 

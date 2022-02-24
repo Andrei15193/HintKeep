@@ -23,9 +23,10 @@ namespace HintKeep.RequestsHandlers.Users.Commands
 
         public async Task<string> Handle(CreateUserSessionCommand command, CancellationToken cancellationToken)
         {
+            var emailHash = _securityService.ComputeHash(command.Email.ToLowerInvariant());
             var userEntity = (UserEntity)(await _entityTables.Users.ExecuteAsync(
                 TableOperation.Retrieve<UserEntity>(
-                    command.Email.ToLowerInvariant().ToEncodedKeyProperty(),
+                    emailHash.ToEncodedKeyProperty(),
                     "details".ToEncodedKeyProperty(),
                     new List<string>
                     {

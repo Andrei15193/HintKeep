@@ -24,8 +24,8 @@ namespace HintKeep.RequestsHandlers.Users.Commands
         protected override async Task Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var userId = Guid.NewGuid().ToString("N");
-            var userEmailInLowercase = command.Email.ToLowerInvariant();
 
+            var emailHash = _securityService.ComputeHash(command.Email.ToLowerInvariant());
             var passwordSalt = _securityService.GeneratePasswordSalt();
             var passwordHash = _securityService.ComputePasswordHash(passwordSalt, command.Password);
             var activationToken = _securityService.GenerateConfirmationToken();
@@ -37,11 +37,10 @@ namespace HintKeep.RequestsHandlers.Users.Commands
                     {
                         TableOperation.Insert(new UserEntity
                         {
-                            PartitionKey = userEmailInLowercase.ToEncodedKeyProperty(),
+                            PartitionKey = emailHash.ToEncodedKeyProperty(),
                             RowKey = "details",
                             EntityType = "UserEntity",
                             Id = userId,
-                            Email = command.Email,
                             Role = UserRole.Member,
                             Hint = command.Hint,
                             PasswordHash = passwordHash,
@@ -50,7 +49,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
                         }),
                         TableOperation.Insert(new UserActivationTokenEntity
                         {
-                            PartitionKey = userEmailInLowercase.ToEncodedKeyProperty(),
+                            PartitionKey = emailHash.ToEncodedKeyProperty(),
                             RowKey = activationToken.Token.ToEncodedKeyProperty(),
                             EntityType = "UserActivationTokenEntity",
                             Expiration = DateTimeOffset.UtcNow.Add(activationToken.Expiration)

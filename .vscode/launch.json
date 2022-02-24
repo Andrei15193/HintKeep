@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build: api",
-            "program": "${workspaceFolder}/HintKeep/bin/Debug/net5.0/HintKeep.dll",
+            "program": "${workspaceFolder}/HintKeep/bin/Debug/net6.0/HintKeep.dll",
             "args": [],
             "cwd": "${workspaceFolder}/HintKeep",
             "stopAtEntry": false,

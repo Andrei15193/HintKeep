@@ -1,5 +1,5 @@
 import type { AxiosResponse } from "axios";
-import type { IEvent, IFormFieldViewModel } from "react-model-view-viewmodel";
+import type { IEvent } from "react-model-view-viewmodel";
 import type { INotFoundResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from "../../api/users/passwords/post";
 import { DispatchEvent, FormFieldCollectionViewModel, FormFieldViewModel, registerValidators } from "react-model-view-viewmodel";
 import { ApiViewModel } from "../api-view-model";
@@ -19,6 +19,7 @@ export class PasswordResetViewModel extends ApiViewModel {
         if (this.form.isValid)
             await this
                 .post<IRequestData>('/api/users/passwords', {
+                    email: this.form.email.value,
                     token: this.form.token.value,
                     password: this.form.password.value
                 })
@@ -28,7 +29,8 @@ export class PasswordResetViewModel extends ApiViewModel {
                 .on(404, (_: AxiosResponse<INotFoundResponseData>) => {
                     this.form.token.error = 'errors.passwordReset.tokenExpired';
                 })
-                .on(422, ({ data: { token: tokenErrors = [], password: passwordErrors = [] } }: AxiosResponse<IUnprocessableEntityResponseData>) => {
+                .on(422, ({ data: { email: emailErrors = [], token: tokenErrors = [], password: passwordErrors = [] } }: AxiosResponse<IUnprocessableEntityResponseData>) => {
+                    this.form.email.error = emailErrors[0];
                     this.form.token.error = tokenErrors[0];
                     this.form.password.error = passwordErrors[0];
                 })
@@ -39,6 +41,7 @@ export class PasswordResetViewModel extends ApiViewModel {
 class PasswordResetFormViewModel extends FormFieldCollectionViewModel {
     public constructor() {
         super();
+        registerValidators(this.email = this.addField('email', ''), [required]);
         registerValidators(this.token = this.addField('token', ''), [required]);
         registerValidators(this.password = this.addField('password', ''), [required]);
         registerValidators(
@@ -54,6 +57,8 @@ class PasswordResetFormViewModel extends FormFieldCollectionViewModel {
 
         this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
     }
+
+    public readonly email: FormFieldViewModel<string>;
 
     public readonly token: FormFieldViewModel<string>;
 

@@ -33,16 +33,16 @@ namespace HintKeep.Tests.Integration.UsersConfirmations
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
+                .WithSecurityService(out var securityService)
                 .CreateClient();
             entityTables.Users.ExecuteBatch(
                 new TableBatchOperation
                 {
                     TableOperation.Insert(new UserEntity
                     {
-                        PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                        PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                         RowKey = "details".ToEncodedKeyProperty(),
                         EntityType = "UserEntity",
-                        Email = "#TEST@domain.com",
                         Hint = "#test-hint",
                         Id = "#user-id",
                         IsActive = false,
@@ -51,13 +51,16 @@ namespace HintKeep.Tests.Integration.UsersConfirmations
                     }),
                     TableOperation.Insert(new UserActivationTokenEntity
                     {
-                        PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                        PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                         RowKey = "#test-token".ToEncodedKeyProperty(),
                         EntityType = "UserActivationTokenEntity",
                         Expiration = DateTimeOffset.UtcNow.AddDays(1)
                     })
                 }
             );
+            securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/confirmations", new { token = "#test-token" });
 
@@ -67,12 +70,11 @@ namespace HintKeep.Tests.Integration.UsersConfirmations
 
             var entities = entityTables.Users.ExecuteQuery(new TableQuery());
             var userEntity = Assert.Single(entities);
-            Assert.Equal("#test@domain.com".ToEncodedKeyProperty(), userEntity.PartitionKey);
+            Assert.Equal("#email-hash".ToEncodedKeyProperty(), userEntity.PartitionKey);
             Assert.Equal("details", userEntity.RowKey);
-            Assert.Equal(7, userEntity.Properties.Count);
+            Assert.Equal(6, userEntity.Properties.Count);
             Assert.Equal("UserEntity", userEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
             Assert.NotEmpty(userEntity.Properties[nameof(UserEntity.Id)].StringValue);
-            Assert.Equal("#TEST@domain.com", userEntity.Properties[nameof(UserEntity.Email)].StringValue);
             Assert.Equal("#test-hint", userEntity.Properties[nameof(UserEntity.Hint)].StringValue);
             Assert.NotEmpty(userEntity.Properties[nameof(UserEntity.PasswordHash)].StringValue);
             Assert.NotEmpty(userEntity.Properties[nameof(UserEntity.PasswordSalt)].StringValue);
@@ -97,14 +99,18 @@ namespace HintKeep.Tests.Integration.UsersConfirmations
         {
             var client = _webApplicationFactory
                 .WithInMemoryDatabase(out var entityTables)
+                .WithSecurityService(out var securityService)
                 .CreateClient();
             entityTables.Users.Execute(TableOperation.Insert(new UserActivationTokenEntity
             {
-                PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                 RowKey = "#token".ToEncodedKeyProperty(),
                 EntityType = "UserActivationTokenEntity",
                 Expiration = DateTimeOffset.UtcNow.AddDays(-1)
             }));
+            securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/confirmations", new { token = "#token" });
 

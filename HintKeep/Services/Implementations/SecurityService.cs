@@ -10,7 +10,7 @@ namespace HintKeep.Services.Implementations
     {
         private readonly SecurityServiceConfig _securityServiceConfig;
 
-        private readonly RNGCryptoServiceProvider _rngProvider = new RNGCryptoServiceProvider();
+        private readonly RandomNumberGenerator _rngProvider = RandomNumberGenerator.Create();
 
         public SecurityService(SecurityServiceConfig securityServiceConfig)
             => _securityServiceConfig = securityServiceConfig;
@@ -29,6 +29,13 @@ namespace HintKeep.Services.Implementations
             var activationToken = string.Join("-", activationTokenBytes.Select(@byte => @byte.ToString("X2")));
 
             return new ConfirmationToken(activationToken, TimeSpan.FromMinutes(_securityServiceConfig.ActivationTokenExpirationMinutes));
+        }
+
+        public string ComputeHash(string value)
+        {
+            var hashAlgorithm = HashAlgorithm.Create(_securityServiceConfig.HashAlgorithm);
+            var valueHash = hashAlgorithm.ComputeHash(Encoding.Default.GetBytes(value));
+            return Convert.ToBase64String(valueHash);
         }
 
         public string ComputePasswordHash(string salt, string password)

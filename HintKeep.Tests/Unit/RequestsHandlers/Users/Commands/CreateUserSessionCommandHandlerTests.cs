@@ -33,6 +33,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenUserDoesNotExist_ThrowsException()
         {
+            _securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
+
             await Assert.ThrowsAsync<NotFoundException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand { Email = "#TEST@domain.com", Password = "#test-password" }, default));
         }
 
@@ -42,12 +46,15 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             _entityTables.Users.Execute(TableOperation.Insert(
                 new UserEntity
                 {
-                    PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                    PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                     RowKey = "details",
                     EntityType = "UserEntity",
                     IsActive = false,
                 }
             ));
+            _securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand { Email = "#TEST@domain.com", Password = "#test-password" }, default));
         }
@@ -58,7 +65,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             _entityTables.Users.Execute(TableOperation.Insert(
                 new UserEntity
                 {
-                    PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                    PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                     RowKey = "details".ToEncodedKeyProperty(),
                     EntityType = "UserEntity",
                     PasswordSalt = "#password-salt",
@@ -66,6 +73,9 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                     IsActive = true
                 }
             ));
+            _securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
             _securityService
                 .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#test-password"))
                 .Returns("#password-hash-not-matching");
@@ -80,7 +90,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             _entityTables.Users.Execute(TableOperation.Insert(
                 new UserEntity
                 {
-                    PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                    PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                     RowKey = "details".ToEncodedKeyProperty(),
                     EntityType = "UserEntity",
                     Id = "#user-id",
@@ -93,6 +103,9 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             _securityService
                 .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#test-password"))
                 .Returns("#password-hash");
+            _securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
             _sessionService
                 .Setup(sessionService => sessionService.CreateJsonWebToken("#user-id", "#user-role"))
                 .Returns("#json-web-token");
@@ -101,7 +114,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             Assert.Equal("#json-web-token", jsonWebToken);
 
             var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery<UserEntity>()));
-            Assert.Equal("#test@domain.com".ToEncodedKeyProperty(), userEntity.PartitionKey);
+            Assert.Equal("#email-hash".ToEncodedKeyProperty(), userEntity.PartitionKey);
             Assert.Equal("details".ToEncodedKeyProperty(), userEntity.RowKey);
             Assert.NotNull(userEntity.LastLoginTime);
             Assert.True(DateTimeOffset.UtcNow.AddMinutes(-1) <= userEntity.LastLoginTime && userEntity.LastLoginTime <= DateTimeOffset.UtcNow.AddMinutes(1));

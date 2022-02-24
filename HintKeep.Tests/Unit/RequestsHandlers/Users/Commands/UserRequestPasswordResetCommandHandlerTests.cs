@@ -33,7 +33,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenUserDoesNotExist_ThrowsException()
         {
-            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand { Email = "#TEST-email" }, default));
+            _securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
+
+            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand { Email = "#TEST@domain.com" }, default));
         }
 
         [Fact]
@@ -41,11 +45,14 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         {
             _entityTables.Users.Execute(TableOperation.Insert(new UserEntity
             {
-                PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                 RowKey = "details",
                 EntityType = "UserEntity",
                 IsActive = false
             }));
+            _securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand { Email = "#TEST@domain.com" }, default));
         }
@@ -53,22 +60,25 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenActiveUserExists_ThrowsException()
         {
-            _securityService
-                .Setup(securityService => securityService.GenerateConfirmationToken())
-                .Returns(new ConfirmationToken("#confirmation-token", TimeSpan.FromMinutes(60)));
             _entityTables.Users.Execute(TableOperation.Insert(new UserEntity
             {
-                PartitionKey = "#test@domain.com".ToEncodedKeyProperty(),
+                PartitionKey = "#email-hash".ToEncodedKeyProperty(),
                 RowKey = "details",
                 EntityType = "UserEntity",
                 IsActive = true
             }));
+            _securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
+            _securityService
+                .Setup(securityService => securityService.GenerateConfirmationToken())
+                .Returns(new ConfirmationToken("#confirmation-token", TimeSpan.FromMinutes(60)));
 
             await _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand { Email = "#TEST@domain.com" }, default);
 
             var entities = _entityTables.Users.ExecuteQuery(new TableQuery());
             var userPasswordResetTokenEntity = Assert.Single(entities, entity => entity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue == "UserPasswordResetTokenEntity");
-            Assert.Equal("#test@domain.com".ToEncodedKeyProperty(), userPasswordResetTokenEntity.PartitionKey);
+            Assert.Equal("#email-hash".ToEncodedKeyProperty(), userPasswordResetTokenEntity.PartitionKey);
             Assert.Equal("#confirmation-token".ToEncodedKeyProperty(), userPasswordResetTokenEntity.RowKey);
             Assert.Equal(2, userPasswordResetTokenEntity.Properties.Count);
             Assert.Equal("UserPasswordResetTokenEntity", userPasswordResetTokenEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);

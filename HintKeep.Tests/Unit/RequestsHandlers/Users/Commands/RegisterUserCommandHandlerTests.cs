@@ -34,6 +34,9 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public async Task Handle_WhenUserDoesNotExist_CreatesInactiveUserAndActivationToken()
         {
             _securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
+            _securityService
                 .Setup(securityService => securityService.GeneratePasswordSalt())
                 .Returns("#password-salt");
             _securityService
@@ -55,12 +58,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
 
             var entities = _entityTables.Users.ExecuteQuery(new TableQuery());
             var userEntity = Assert.Single(entities, entity => entity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue == "UserEntity");
-            Assert.Equal("#test@domain.com".ToEncodedKeyProperty(), userEntity.PartitionKey);
+            Assert.Equal("#email-hash".ToEncodedKeyProperty(), userEntity.PartitionKey);
             Assert.Equal("details", userEntity.RowKey);
-            Assert.Equal(8, userEntity.Properties.Count);
+            Assert.Equal(7, userEntity.Properties.Count);
             Assert.Equal("UserEntity", userEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
             Assert.NotEmpty(userEntity.Properties[nameof(UserEntity.Id)].StringValue);
-            Assert.Equal("#TEST@domain.com", userEntity.Properties[nameof(UserEntity.Email)].StringValue);
             Assert.Equal("member", userEntity.Properties[nameof(UserEntity.Role)].StringValue);
             Assert.Equal("#test-hint", userEntity.Properties[nameof(UserEntity.Hint)].StringValue);
             Assert.Equal("#password-salt", userEntity.Properties[nameof(UserEntity.PasswordSalt)].StringValue);
@@ -68,7 +70,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             Assert.False(userEntity.Properties[nameof(UserEntity.IsActive)].BooleanValue);
 
             var userActivationTokenEntity = Assert.Single(entities, entity => entity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue == "UserActivationTokenEntity");
-            Assert.Equal("#test@domain.com".ToEncodedKeyProperty(), userActivationTokenEntity.PartitionKey);
+            Assert.Equal("#email-hash".ToEncodedKeyProperty(), userActivationTokenEntity.PartitionKey);
             Assert.Equal("#activation-token".ToEncodedKeyProperty(), userActivationTokenEntity.RowKey);
             Assert.Equal(2, userActivationTokenEntity.Properties.Count);
             Assert.Equal("UserActivationTokenEntity", userActivationTokenEntity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue);
@@ -84,16 +86,19 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public async Task Handle_WhenUserEmailAlreadyExists_ThrowsException()
         {
             _securityService
+                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .Returns("#email-hash");
+            _securityService
                 .Setup(securityService => securityService.GenerateConfirmationToken())
                 .Returns(new ConfirmationToken("#token", TimeSpan.Zero));
-            _entityTables.Users.Execute(TableOperation.Insert(new TableEntity { PartitionKey = "test@domain.com".ToEncodedKeyProperty(), RowKey = "details" }));
+            _entityTables.Users.Execute(TableOperation.Insert(new TableEntity { PartitionKey = "#email-hash".ToEncodedKeyProperty(), RowKey = "details" }));
 
             await Assert.ThrowsAsync<ConflictException>(() => _registerUserCommandHandler.Handle(
                 new RegisterUserCommand
                 {
-                    Email = "TEST@domain.com",
-                    Hint = "test-hint",
-                    Password = "test-password"
+                    Email = "#TEST@domain.com",
+                    Hint = "#test-hint",
+                    Password = "#test-password"
                 },
                 default
             ));

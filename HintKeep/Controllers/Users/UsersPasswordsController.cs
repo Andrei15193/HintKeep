@@ -21,6 +21,7 @@ namespace HintKeep.Controllers.Users
         {
             await _mediator.Send(new UserPasswordResetCommand
             {
+                Email = userPasswordReset.Email,
                 Token = userPasswordReset.Token,
                 Password = userPasswordReset.Password
             });
