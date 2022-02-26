@@ -37,7 +37,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
                 .Returns("#email-hash");
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand { Email = "#TEST@domain.com", Password = "#test-password" }, default));
+            await Assert.ThrowsAsync<NotFoundException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand("#TEST@domain.com", "#test-password"), default));
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
                 .Returns("#email-hash");
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand { Email = "#TEST@domain.com", Password = "#test-password" }, default));
+            await Assert.ThrowsAsync<NotFoundException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand("#TEST@domain.com", "#test-password"), default));
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#test-password"))
                 .Returns("#password-hash-not-matching");
 
-            var exception = await Assert.ThrowsAsync<ValidationException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand { Email = "#TEST@domain.com", Password = "#test-password" }, default));
+            var exception = await Assert.ThrowsAsync<ValidationException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand("#TEST@domain.com", "#test-password"), default));
             Assert.Equal("errors.login.invalidCredentials", exception.ValidationResult.ErrorMessage);
         }
 
@@ -110,7 +110,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(sessionService => sessionService.CreateJsonWebToken("#user-id", "#user-role"))
                 .Returns("#json-web-token");
 
-            var jsonWebToken = await _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand { Email = "#TEST@domain.com", Password = "#test-password" }, default);
+            var jsonWebToken = await _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand("#TEST@domain.com", "#test-password"), default);
             Assert.Equal("#json-web-token", jsonWebToken);
 
             var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery<UserEntity>()));

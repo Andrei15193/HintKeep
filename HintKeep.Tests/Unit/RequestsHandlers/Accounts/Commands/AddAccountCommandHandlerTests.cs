@@ -30,13 +30,12 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         public async Task Handle_NewAccount_InsertsAccountEntity()
         {
             var accountId = await _createAccountCommandHandler.Handle(
-                new AddAccountCommand
-                {
-                    Name = "#Test-Name",
-                    Hint = "#Test-Hint",
-                    Notes = "#Test-Notes",
-                    IsPinned = true
-                },
+                new AddAccountCommand(
+                    "#Test-Name",
+                    "#Test-Hint",
+                    "#Test-Notes",
+                    IsPinned: true
+                ),
                 default
             );
 
@@ -75,11 +74,12 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
 
             var exception = await Assert.ThrowsAsync<ConflictException>(
                 () => _createAccountCommandHandler.Handle(
-                    new AddAccountCommand
-                    {
-                        Name = account.Name,
-                        Hint = "#Test-Hint"
-                    },
+                    new AddAccountCommand(
+                        account.Name,
+                        "#Test-Hint",
+                        string.Empty,
+                        IsPinned: false
+                    ),
                     default
                 )
             );
@@ -99,11 +99,12 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
 
             var exception = await Assert.ThrowsAsync<ConflictException>(
                 () => _createAccountCommandHandler.Handle(
-                    new AddAccountCommand
-                    {
-                        Name = "#Test-Name",
-                        Hint = "#Test-Hint-2"
-                    },
+                    new AddAccountCommand(
+                        "#Test-Name",
+                        "#Test-Hint-2",
+                        string.Empty,
+                        IsPinned: false
+                    ),
                     default
                 )
             );

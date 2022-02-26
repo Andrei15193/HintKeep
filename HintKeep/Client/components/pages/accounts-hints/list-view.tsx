@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react';
 import type { AccountHint } from '../../../view-models/accounts-hints/account-hints-view-model';
 import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
@@ -16,8 +16,8 @@ export interface IAccountHintsRouteParams {
 }
 
 export function AccountHints(): JSX.Element {
-    const { push } = useHistory();
-    const { id } = useParams<IAccountHintsRouteParams>();
+    const navigate = useNavigate();
+    const { id = "" } = useParams();
     const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new AccountHintsViewModel(axios, alertsViewModel, sessionViewModel));
     useEffect(() => { $vm.loadAsync(id); }, [$vm]);
     const [deleteConfirmationIndex, setDeleteConfirmationIndex] = useState<number | undefined>(undefined);
@@ -28,7 +28,7 @@ export function AccountHints(): JSX.Element {
                 <h1 className={classnames(Style.container, Style.containerFluid, Style.p0)}>
                     <div className={classnames(Style.row, Style.g0, Style.dFlex, Style.alignItemsCenter)}>
                         <div className={classnames(Style.col2, Style.textStart)}>
-                            <button type="button" onClick={() => push(`/accounts/${id}`)} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
+                            <button type="button" onClick={() => navigate(`/accounts/${id}`)} className={classnames(Style.btn, Style.btnSm, Style.btnPrimary)}>
                                 <Message id="pages.accountHints.back.label" />
                             </button>
                         </div>

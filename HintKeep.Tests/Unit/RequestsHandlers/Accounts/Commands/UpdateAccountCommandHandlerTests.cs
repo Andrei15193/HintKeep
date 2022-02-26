@@ -31,13 +31,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var exception = await Assert.ThrowsAsync<NotFoundException>(
                 () => _updateAccountCommandHandler.Handle(
-                    new UpdateAccountCommand
-                    {
-                        Id = "#account-id",
-                        Name = "#Test-Name-Updated",
-                        Hint = "#test-hint",
-                        IsPinned = true
-                    },
+                    new UpdateAccountCommand(
+                        "#account-id",
+                        "#Test-Name-Updated",
+                        "#test-hint",
+                        string.Empty,
+                        IsPinned: true
+                    ),
                     default
                 )
             );
@@ -54,14 +54,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             _entityTables.AddAccounts(account);
 
             await _updateAccountCommandHandler.Handle(
-                new UpdateAccountCommand
-                {
-                    Id = account.Id,
-                    Name = "#Test-Name-Updated",
-                    Hint = account.Hints.Single().Hint,
-                    Notes = account.Notes,
-                    IsPinned = account.IsPinned
-                },
+                new UpdateAccountCommand(
+                    account.Id,
+                    "#Test-Name-Updated",
+                    account.Hints.Single().Hint,
+                    account.Notes,
+                    account.IsPinned
+                ),
                 default
             );
 
@@ -78,14 +77,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             _entityTables.AddAccounts(account);
 
             await _updateAccountCommandHandler.Handle(
-                new UpdateAccountCommand
-                {
-                    Id = account.Id,
-                    Name = account.Name,
-                    Hint = "#Test-Hint-Updated",
-                    Notes = account.Notes,
-                    IsPinned = account.IsPinned
-                },
+                new UpdateAccountCommand(
+                    account.Id,
+                    account.Name,
+                    "#Test-Hint-Updated",
+                    account.Notes,
+                    account.IsPinned
+                ),
                 default
             );
 
@@ -119,14 +117,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             _entityTables.AddAccounts(account);
 
             await _updateAccountCommandHandler.Handle(
-                new UpdateAccountCommand
-                {
-                    Id = account.Id,
-                    Name = account.Name,
-                    Hint = account.Hints.Single().Hint,
-                    Notes = "#Test-Notes-Updated",
-                    IsPinned = account.IsPinned
-                },
+                new UpdateAccountCommand(
+                    account.Id,
+                    account.Name,
+                    account.Hints.Single().Hint,
+                    "#Test-Notes-Updated",
+                    account.IsPinned
+                ),
                 default
             );
 
@@ -143,14 +140,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             _entityTables.AddAccounts(account);
 
             await _updateAccountCommandHandler.Handle(
-                new UpdateAccountCommand
-                {
-                    Id = account.Id,
-                    Name = account.Name,
-                    Hint = account.Hints.Single().Hint,
-                    Notes = account.Notes,
-                    IsPinned = false
-                },
+                new UpdateAccountCommand(
+                    account.Id,
+                    account.Name,
+                    account.Hints.Single().Hint,
+                    account.Notes,
+                    IsPinned: false
+                ),
                 default
             );
 
@@ -168,13 +164,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             _entityTables.AddAccounts(account);
 
             var exception = await Assert.ThrowsAsync<NotFoundException>(() => _updateAccountCommandHandler.Handle(
-                new UpdateAccountCommand
-                {
-                    Id = account.Id,
-                    Name = account.Name,
-                    Hint = account.Hints.Single().Hint,
-                    IsPinned = account.IsPinned
-                },
+                new UpdateAccountCommand(
+                    account.Id,
+                    account.Name,
+                    account.Hints.Single().Hint,
+                    string.Empty,
+                    account.IsPinned
+                ),
                 default
             ));
             Assert.Empty(exception.Message);

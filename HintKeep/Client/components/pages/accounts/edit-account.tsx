@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import classnames from 'classnames';
 import { watchEvent } from 'react-model-view-viewmodel';
 import { useViewModel } from '../../use-view-model';
@@ -16,14 +16,14 @@ export interface IEditAccountRouteParams {
 }
 
 export function EditAccount(): JSX.Element {
-    const { push } = useHistory();
+    const navigate = useNavigate();
     const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new EditAccountViewModel(axios, alertsViewModel, sessionViewModel));
-    const { id } = useParams<IEditAccountRouteParams>();
+    const { id = "" } = useParams();
 
     const [isConfirmationHidden, setIsConfirmationHidden] = useState(true);
     useEffect(() => { $vm.loadAsync(id); }, [$vm, id]);
-    watchEvent($vm.editedEvent, () => push('/'));
-    watchEvent($vm.deletedEvent, () => push('/'));
+    watchEvent($vm.editedEvent, () => navigate('/'));
+    watchEvent($vm.deletedEvent, () => navigate('/'));
 
     return (
         <div className={Style.mx3}>

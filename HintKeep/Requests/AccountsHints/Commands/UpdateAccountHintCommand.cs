@@ -3,12 +3,9 @@ using MediatR;
 
 namespace HintKeep.Requests.AccountsHints.Commands
 {
-    public class UpdateAccountHintCommand : IRequest
-    {
-        public string AccountId { get; init; }
-
-        public string HintId { get; init; }
-
-        public DateTime? DateAdded { get; init; }
-    }
+    public record UpdateAccountHintCommand(
+        string AccountId,
+        string HintId,
+        DateTime? DateAdded
+    ) : IRequest;
 }

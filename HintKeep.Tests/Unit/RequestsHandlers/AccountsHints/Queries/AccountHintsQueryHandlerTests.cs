@@ -71,7 +71,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Queries
             };
             _entityTables.AddAccounts(accounts);
 
-            var accountHints = await _accountHintsQueryHandler.Handle(new AccountHintsQuery { AccountId = "#account-id" }, default);
+            var accountHints = await _accountHintsQueryHandler.Handle(new AccountHintsQuery("#account-id"), default);
 
             Assert.Equal(
                 new[]
@@ -121,7 +121,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Queries
         [Fact]
         public async Task Handle_WhenAccountDoesNotExist_ThrowsException()
         {
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _accountHintsQueryHandler.Handle(new AccountHintsQuery { AccountId = "#account-id" }, default));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _accountHintsQueryHandler.Handle(new AccountHintsQuery("#account-id"), default));
             Assert.Empty(exception.Message);
         }
 
@@ -134,7 +134,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Queries
                 Id = "#account-id",
                 IsDeleted = true
             });
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _accountHintsQueryHandler.Handle(new AccountHintsQuery { AccountId = "#account-id" }, default));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _accountHintsQueryHandler.Handle(new AccountHintsQuery("#account-id"), default));
             Assert.Empty(exception.Message);
         }
 
@@ -159,7 +159,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Queries
             });
             _entityTables.AddAccounts(Enumerable.Range(1, 100).Select(accountNumber => new Account { UserId = "#user-id", Id = $"#account-id-{accountNumber}", Name = $"#account-name-{accountNumber}" }).ToArray());
 
-            var accountHints = await _accountHintsQueryHandler.Handle(new AccountHintsQuery { AccountId = "#account-id" }, default);
+            var accountHints = await _accountHintsQueryHandler.Handle(new AccountHintsQuery("#account-id"), default);
 
             Assert.Equal(
                 new[]

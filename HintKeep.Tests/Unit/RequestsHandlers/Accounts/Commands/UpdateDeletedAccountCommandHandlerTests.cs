@@ -28,11 +28,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             var exception = await Assert.ThrowsAsync<NotFoundException>(
                 () => _updateAccountCommandHandler.Handle(
-                    new UpdateDeletedAccountCommand
-                    {
-                        Id = "#account-id",
-                        IsDeleted = false
-                    },
+                    new UpdateDeletedAccountCommand(
+                        "#account-id",
+                        IsDeleted: false
+                    ),
                     default
                 )
             );
@@ -50,11 +49,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             _entityTables.AddAccounts(account);
 
             await _updateAccountCommandHandler.Handle(
-                new UpdateDeletedAccountCommand
-                {
-                    Id = account.Id,
-                    IsDeleted = false
-                },
+                new UpdateDeletedAccountCommand(
+                    account.Id,
+                    IsDeleted: false
+                ),
                 default
             );
 
@@ -72,11 +70,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             _entityTables.AddAccounts(account);
 
             var exception = await Assert.ThrowsAsync<NotFoundException>(() => _updateAccountCommandHandler.Handle(
-                new UpdateDeletedAccountCommand
-                {
-                    Id = account.Id,
-                    IsDeleted = false
-                },
+                new UpdateDeletedAccountCommand(
+                    account.Id,
+                    IsDeleted: false
+                ),
                 default
             ));
             Assert.Empty(exception.Message);

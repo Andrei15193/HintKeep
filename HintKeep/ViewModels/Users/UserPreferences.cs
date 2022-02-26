@@ -2,8 +2,7 @@ using System.Collections.Generic;
 
 namespace HintKeep.ViewModels.Users
 {
-    public class UserPreferences
-    {
-        public IEnumerable<string> PreferredLanguages { get; set; }
-    }
+    public record UserPreferences(
+        IEnumerable<string> PreferredLanguages
+    );
 }

@@ -51,13 +51,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
                 continuationToken = result.ContinuationToken;
                 accounts.AddRange(
                     from accountEntity in result
-                    select new AccountSummary
-                    {
-                        Id = accountEntity.Id,
-                        Name = accountEntity.Name,
-                        Hint = accountEntity.Hint,
-                        IsPinned = accountEntity.IsPinned
-                    }
+                    select new AccountSummary(accountEntity.Id, accountEntity.Name, accountEntity.Hint, accountEntity.IsPinned)
                 );
             } while (continuationToken is object);
             accounts.Sort(new AccountSummarySortOrderComparer());

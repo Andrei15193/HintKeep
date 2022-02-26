@@ -61,12 +61,7 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Queries
             accountHints.Sort(new AccountHintEntitySortOrderComparer());
 
             return accountHints
-                .Select(accountHint => new AccountHintDetails
-                {
-                    Id = accountHint.HintId,
-                    Hint = accountHint.Hint,
-                    DateAdded = accountHint.DateAdded
-                })
+                .Select(accountHint => new AccountHintDetails(accountHint.HintId, accountHint.Hint, accountHint.DateAdded))
                 .ToArray();
         }
     }

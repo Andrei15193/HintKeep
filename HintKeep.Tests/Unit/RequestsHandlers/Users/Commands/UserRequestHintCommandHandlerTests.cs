@@ -36,7 +36,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
                 .Returns("#email-hash");
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestHintCommandHandler.Handle(new UserRequestHintCommand { Email = "#TEST@domain.com" }, default));
+            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestHintCommandHandler.Handle(new UserRequestHintCommand("#TEST@domain.com"), default));
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
                 .Returns("#email-hash");
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestHintCommandHandler.Handle(new UserRequestHintCommand { Email = "#TEST@domain.com" }, default));
+            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestHintCommandHandler.Handle(new UserRequestHintCommand("#TEST@domain.com"), default));
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
                 .Returns("#email-hash");
 
-            await _userRequestHintCommandHandler.Handle(new UserRequestHintCommand { Email = "#TEST@domain.com" }, default);
+            await _userRequestHintCommandHandler.Handle(new UserRequestHintCommand("#TEST@domain.com"), default);
 
             _emailService.Verify(emailService => emailService.SendAsync("#TEST@domain.com", "HintKeep - Account Hint", It.IsRegex("#hint")), Times.Once);
             _emailService.VerifyNoOtherCalls();

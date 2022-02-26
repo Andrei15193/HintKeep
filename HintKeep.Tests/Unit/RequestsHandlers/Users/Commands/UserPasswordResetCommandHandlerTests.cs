@@ -37,12 +37,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userPasswordResetCommandHandler.Handle(
-                new UserPasswordResetCommand
-                {
-                    Email = "#TEST@domain.com",
-                    Token = "#token",
-                    Password = "#password"
-                },
+                new UserPasswordResetCommand(
+                    "#TEST@domain.com",
+                    "#token",
+                    "#password"
+                ),
                 default
             ));
         }
@@ -62,12 +61,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             }));
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userPasswordResetCommandHandler.Handle(
-                new UserPasswordResetCommand
-                {
-                    Email = "#TEST@domain.com",
-                    Token = "#token",
-                    Password = "#password"
-                },
+                new UserPasswordResetCommand(
+                    "#TEST@domain.com",
+                    "#token",
+                    "#password"
+                ),
                 default
             ));
 
@@ -89,12 +87,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             }));
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userPasswordResetCommandHandler.Handle(
-                new UserPasswordResetCommand
-                {
-                    Email = "#TEST@domain.com",
-                    Token = "#token",
-                    Password = "#password"
-                },
+                new UserPasswordResetCommand(
+                    "#TEST@domain.com",
+                    "#token",
+                    "#password"
+                ),
                 default
             ));
 
@@ -135,12 +132,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Returns("#password-hash");
 
             await _userPasswordResetCommandHandler.Handle(
-                new UserPasswordResetCommand
-                {
-                    Email = "#TEST@domain.com",
-                    Token = "#token",
-                    Password = "#password"
-                },
+                new UserPasswordResetCommand(
+                    "#TEST@domain.com",
+                    "#token",
+                    "#password"
+                ),
                 default
             );
 
@@ -185,12 +181,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userPasswordResetCommandHandler.Handle(
-                new UserPasswordResetCommand
-                {
-                    Email = "#TEST@domain.com",
-                    Token = "#token",
-                    Password = "#password"
-                },
+                new UserPasswordResetCommand(
+                    "#TEST@domain.com",
+                    "#token",
+                    "#password"
+                ),
                 default
             ));
 

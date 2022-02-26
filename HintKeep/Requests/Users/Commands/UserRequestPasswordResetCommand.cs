@@ -2,8 +2,7 @@ using MediatR;
 
 namespace HintKeep.Requests.Users.Commands
 {
-    public class UserRequestPasswordResetCommand : IRequest
-    {
-        public string Email { get; set; }
-    }
+    public record UserRequestPasswordResetCommand(
+        string Email
+    ) : IRequest;
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
 import { watchEvent, watchViewModel } from 'react-model-view-viewmodel';
 import { Message } from '../../i18n';
@@ -11,10 +11,10 @@ import { useViewModel } from '../../use-view-model';
 import Style from '../../style.scss';
 
 export function AddAccount(): JSX.Element {
-    const { push } = useHistory();
+    const navigate = useNavigate();
     const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new AddAccountViewModel(axios, alertsViewModel, sessionViewModel));
     watchViewModel($vm.form, ['isInvalid', 'areAllFieldsTouched']);
-    watchEvent($vm.submittedEvent, () => push('/'));
+    watchEvent($vm.submittedEvent, () => navigate('/'));
 
     return (
         <div className={Style.mx3}>

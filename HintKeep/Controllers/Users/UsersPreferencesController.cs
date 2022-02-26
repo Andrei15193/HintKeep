@@ -13,10 +13,7 @@ namespace HintKeep.Controllers.Users
     {
         [AllowAnonymous, HttpGet]
         public IActionResult Get()
-            => Ok(new UserPreferences
-            {
-                PreferredLanguages = _GetPreferredLanguages()
-            });
+            => Ok(new UserPreferences(_GetPreferredLanguages()));
 
         [AllowAnonymous, HttpGet("preferred-languages")]
         public IActionResult GetPreferredLanguages()

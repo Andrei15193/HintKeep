@@ -4,7 +4,5 @@ using MediatR;
 
 namespace HintKeep.Requests.Accounts.Queries
 {
-    public class GetAccountsQuery : IRequest<IReadOnlyList<AccountSummary>>
-    {
-    }
+    public record GetAccountsQuery() : IRequest<IReadOnlyList<AccountSummary>>;
 }

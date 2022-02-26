@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { watchEvent, watchViewModel } from 'react-model-view-viewmodel';
 import { useViewModel } from '../../use-view-model';

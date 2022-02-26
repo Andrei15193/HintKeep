@@ -51,7 +51,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             };
             _entityTables.AddAccounts(account);
 
-            await _deleteAccountHintCommandHandler.Handle(new DeleteAccountHintCommand { AccountId = "#account-id", HintId = "#hint-id-2" }, default);
+            await _deleteAccountHintCommandHandler.Handle(new DeleteAccountHintCommand("#account-id", "#hint-id-2"), default);
             _entityTables.AssertAccounts(new Account(account)
             {
                 Hints = new[]
@@ -87,7 +87,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             };
             _entityTables.AddAccounts(account);
 
-            await _deleteAccountHintCommandHandler.Handle(new DeleteAccountHintCommand { AccountId = "#account-id", HintId = "#hint-id-1" }, default);
+            await _deleteAccountHintCommandHandler.Handle(new DeleteAccountHintCommand("#account-id", "#hint-id-1"), default);
             _entityTables.AssertAccounts(new Account(account)
             {
                 Hints = new[]
@@ -116,7 +116,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             };
             _entityTables.AddAccounts(account);
 
-            await _deleteAccountHintCommandHandler.Handle(new DeleteAccountHintCommand { AccountId = "#account-id", HintId = "#hint-id" }, default);
+            await _deleteAccountHintCommandHandler.Handle(new DeleteAccountHintCommand("#account-id", "#hint-id"), default);
             _entityTables.AssertAccounts(new Account(account)
             {
                 Hints = Array.Empty<AccountHint>()
@@ -126,7 +126,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
         [Fact]
         public async Task Handle_WhenHintDoesNotExist_ThrowsException()
         {
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _deleteAccountHintCommandHandler.Handle(new DeleteAccountHintCommand { AccountId = "#account-id", HintId = "#hint-id" }, default));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _deleteAccountHintCommandHandler.Handle(new DeleteAccountHintCommand("#account-id", "#hint-id"), default));
             Assert.Empty(exception.Message);
         }
     }

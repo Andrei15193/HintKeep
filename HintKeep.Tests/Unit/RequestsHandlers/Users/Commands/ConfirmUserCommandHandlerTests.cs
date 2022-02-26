@@ -49,7 +49,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 })
             });
 
-            await _confirmUserCommandHandler.Handle(new ConfirmUserCommand { Token = "#test-token" }, default);
+            await _confirmUserCommandHandler.Handle(new ConfirmUserCommand("#test-token"), default);
 
             var userEntity = Assert.Single(_entityTables.Users.ExecuteQuery(new TableQuery()));
             Assert.Equal("#email-hash".ToEncodedKeyProperty(), userEntity.PartitionKey);
@@ -66,7 +66,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         [Fact]
         public async Task Handle_WhenTokenDoesNotExist_ThrowsException()
         {
-            await Assert.ThrowsAsync<NotFoundException>(() => _confirmUserCommandHandler.Handle(new ConfirmUserCommand { Token = "#test-token" }, default));
+            await Assert.ThrowsAsync<NotFoundException>(() => _confirmUserCommandHandler.Handle(new ConfirmUserCommand("#test-token"), default));
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 })
             });
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _confirmUserCommandHandler.Handle(new ConfirmUserCommand { Token = "#test-token" }, default));
+            await Assert.ThrowsAsync<NotFoundException>(() => _confirmUserCommandHandler.Handle(new ConfirmUserCommand("#test-token"), default));
 
             Assert.Empty(_entityTables.Users.ExecuteQuery(new TableQuery()));
         }

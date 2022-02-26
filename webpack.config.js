@@ -100,10 +100,12 @@ module.exports = {
     </head>
     <body>
         <div id="app"></div>
-        <script crossorigin src="https://unpkg.com/core-js-bundle@3.13.0/minified.js"></script>
-        <script crossorigin src="https://unpkg.com/react@17/umd/react.${isProduction ? 'production.min' : 'development'}.js"></script>
-        <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.${isProduction ? 'production.min' : 'development'}.js"></script>
-        <script crossorigin src="https://unpkg.com/react-router-dom@5/umd/react-router-dom.min.js"></script>
+        <script crossorigin src="https://unpkg.com/core-js-bundle@3.21.1/minified.js"></script>
+        <script crossorigin src="https://unpkg.com/react@17.0.2/umd/react.${isProduction ? 'production.min' : 'development'}.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.${isProduction ? 'production.min' : 'development'}.js"></script>
+        <script crossorigin src="https://unpkg.com/history@5.3.0/umd/history.${isProduction ? 'production.min' : 'development'}.js"></script>
+        <script crossorigin src="https://unpkg.com/react-router@6.2.1/umd/react-router.${isProduction ? 'production.min' : 'development'}.js"></script>
+        <script crossorigin src="https://unpkg.com/react-router-dom@6.2.1/umd/react-router-dom.${isProduction ? 'production.min' : 'development'}.js"></script>
         <script crossorigin src="https://unpkg.com/axios/dist/axios.min.js"></script>
         ${htmlWebpackPlugin.tags.bodyTags}
     </body>
@@ -114,6 +116,7 @@ module.exports = {
     externals: {
         'react': 'React',
         'react-dom': 'ReactDOM',
+        'react-router': 'ReactRouter',
         'react-router-dom': 'ReactRouterDOM',
         'axios': 'axios'
     }

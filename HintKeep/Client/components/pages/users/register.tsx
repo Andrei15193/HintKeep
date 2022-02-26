@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
 import { watchEvent, watchViewModel } from 'react-model-view-viewmodel';
 import { useViewModel } from '../../use-view-model';
@@ -11,10 +11,10 @@ import { RegisterUserViewModel } from '../../../view-models/users/register-view-
 import Style from '../../style.scss';
 
 export function Register(): JSX.Element {
-    const { push } = useHistory();
+    const navigate = useNavigate();
 
     const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new RegisterUserViewModel(axios, alertsViewModel, sessionViewModel));
-    watchEvent($vm.registered, () => push('/confirm'));
+    watchEvent($vm.registered, () => navigate('/confirm'));
     watchViewModel($vm.form);
     watchViewModel($vm.form.termsOfServiceAcceptance);
 

@@ -40,14 +40,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
             if (accountEntity is null || !accountEntity.IsDeleted)
                 throw new NotFoundException();
 
-            return new AccountDetails
-            {
-                Id = accountEntity.Id,
-                Name = accountEntity.Name,
-                Hint = accountEntity.Hint,
-                Notes = accountEntity.Notes,
-                IsPinned = accountEntity.IsPinned
-            };
+            return new AccountDetails(accountEntity.Id, accountEntity.Name, accountEntity.Hint, accountEntity.Notes, accountEntity.IsPinned);
         }
     }
 }

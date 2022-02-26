@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from './i18n';
 import { Alerts } from './alerts';
@@ -12,66 +12,48 @@ import Style from './style.scss';
 export function App(): JSX.Element {
     const $vm = useViewModel(({ sessionViewModel }) => sessionViewModel);
 
-    const routes = $vm.isSessionActive
-        ? [
-            <Redirect key="accounts-redirect" from="/" to="/accounts" exact />,
-            <Route key="extra" path="/extra" exact>
-                <Extra />
-            </Route>,
-            <Route key="accounts" path="/accounts" exact>
-                <Accounts />
-            </Route>,
-            <Route key="accounts-bin" path="/accounts/bin" exact>
-                <DeletedAccounts />
-            </Route>,
-            <Route key="accounts-bin-details" path="/accounts/bin/:id" exact>
-                <DeletedAccountDetails />
-            </Route>,
-            <Route key="accounts-add" path="/accounts/add" exact>
-                <AddAccount />
-            </Route>,
-            <Route key="accounts-details" path="/accounts/:id" exact>
-                <EditAccount />
-            </Route>,
-            <Route key="accounts-details-hints" path="/accounts/:id/hints" exact>
-                <AccountHints />
-            </Route>
-        ]
-        : [
-            <Route key="login" path="/" exact>
-                <Login />
-            </Route>,
-            <Route key="register" path="/register" exact>
-                <Register />
-            </Route>,
-            <Route key="confirm" path="/confirm" exact>
-                <Confirmation />
-            </Route>,
-            <Route key="recovery" path="/recovery" exact>
-                <Recovery />
-            </Route>,
-            <Route key="password-reset" path="/password-reset" exact>
-                <PasswordReset />
-            </Route>
-        ];
-
     return (
         <div className={classnames(Style.app, Style.m3, Style.border, Style.dFlex, Style.flexColumn, Style.flexFill)}>
             <AppBanner className={Style.appHeader}><Message id="pages.header.banner" /></AppBanner>
             <AppContent>
                 <Alerts />
                 <BrowserRouter>
-                    <Switch>
-                        {routes}
-                        <Route path="/terms" exact>
-                            <TermsOfService />
-                        </Route>
-                        <Redirect to="/" />
-                    </Switch>
+                    <Routes>
+                        <Route path="/">
+                            {$vm.isSessionActive
+                                ? <>
+                                    <Route path="extra" element={<Extra />} />
+                                    <Route path="accounts">
+                                        <Route index element={<Accounts />} />
+                                        <Route path="add" element={<AddAccount />} />
+                                        <Route path="bin">
+                                            <Route index element={<DeletedAccounts />} />
+                                            <Route path=":id" element={<DeletedAccountDetails />} />
+                                        </Route>
+                                        <Route path=":id">
+                                            <Route index element={<EditAccount />} />
+                                            <Route path="hints" element={<AccountHints />} />
+                                        </Route>
+                                    </Route>
+                                    <Route path="terms" element={<TermsOfService />} />
+                                    <Route index element={<Navigate replace to="/accounts" />} />
+                                    <Route path="*" element={<Navigate replace to="/accounts" />} />
+                                </>
+                                : <>
+                                    <Route index element={<Login />} />,
+                                    <Route path="register" element={<Register />} />,
+                                    <Route path="confirm" element={<Confirmation />} />,
+                                    <Route path="recovery" element={<Recovery />} />,
+                                    <Route path="password-reset" element={<PasswordReset />} />
+                                    <Route path="terms" element={<TermsOfService />} />
+                                    <Route path="*" element={<Navigate to="/" />} />
+                                </>}
+                        </Route >;
+                    </Routes>
                 </BrowserRouter>
             </AppContent>
             <AppBanner className={Style.appFooter}><Message id="pages.footer.banner" /></AppBanner>
-        </div >
+        </div>
     );
 }
 

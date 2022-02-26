@@ -37,7 +37,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
                 .Returns("#email-hash");
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand { Email = "#TEST@domain.com" }, default));
+            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand("#TEST@domain.com"), default));
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
                 .Returns("#email-hash");
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand { Email = "#TEST@domain.com" }, default));
+            await Assert.ThrowsAsync<NotFoundException>(() => _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand("#TEST@domain.com"), default));
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Setup(securityService => securityService.GenerateConfirmationToken())
                 .Returns(new ConfirmationToken("#confirmation-token", TimeSpan.FromMinutes(60)));
 
-            await _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand { Email = "#TEST@domain.com" }, default);
+            await _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand("#TEST@domain.com"), default);
 
             var entities = _entityTables.Users.ExecuteQuery(new TableQuery());
             var userPasswordResetTokenEntity = Assert.Single(entities, entity => entity.Properties[nameof(HintKeepTableEntity.EntityType)].StringValue == "UserPasswordResetTokenEntity");

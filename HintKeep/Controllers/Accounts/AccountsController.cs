@@ -22,18 +22,17 @@ namespace HintKeep.Controllers.Accounts
 
         [HttpGet("{accountId}")]
         public async Task<IActionResult> GetAsync(string accountId)
-            => Ok(await _mediator.Send(new GetAccountDetailsQuery { Id = accountId }));
+            => Ok(await _mediator.Send(new GetAccountDetailsQuery(accountId)));
 
         [HttpPost]
         public async Task<IActionResult> PostAsync(AccountCreation accountCreation)
         {
-            var accountId = await _mediator.Send(new AddAccountCommand
-            {
-                Name = accountCreation.Name,
-                Hint = accountCreation.Hint,
-                Notes = accountCreation.Notes,
-                IsPinned = accountCreation.IsPinned
-            });
+            var accountId = await _mediator.Send(new AddAccountCommand(
+                accountCreation.Name,
+                accountCreation.Hint,
+                accountCreation.Notes,
+                accountCreation.IsPinned
+            ));
 
             return Created(new Uri($"/api/accounts/{accountId}", UriKind.Relative), null);
         }
@@ -41,14 +40,13 @@ namespace HintKeep.Controllers.Accounts
         [HttpPut("{accountId}")]
         public async Task<IActionResult> PutAsync(string accountId, AccountUpdate accountUpdate)
         {
-            await _mediator.Send(new UpdateAccountCommand
-            {
-                Id = accountId,
-                Name = accountUpdate.Name,
-                Hint = accountUpdate.Hint,
-                Notes = accountUpdate.Notes,
-                IsPinned = accountUpdate.IsPinned
-            });
+            await _mediator.Send(new UpdateAccountCommand(
+                accountId,
+                accountUpdate.Name,
+                accountUpdate.Hint,
+                accountUpdate.Notes,
+                accountUpdate.IsPinned
+            ));
 
             return NoContent();
         }
@@ -56,10 +54,7 @@ namespace HintKeep.Controllers.Accounts
         [HttpDelete("{accountId}")]
         public async Task<IActionResult> DeleteAsync(string accountId)
         {
-            await _mediator.Send(new MoveAccountToBinCommand
-            {
-                Id = accountId
-            });
+            await _mediator.Send(new MoveAccountToBinCommand(accountId));
 
             return NoContent();
         }

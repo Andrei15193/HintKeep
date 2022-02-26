@@ -40,12 +40,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             _entityTables.AddAccounts(account);
 
             await _addAccountHintCommandHandler.Handle(
-                new AddAccountHintCommand
-                {
-                    AccountId = "#account-id",
-                    Hint = "#hint",
-                    DateAdded = now
-                },
+                new AddAccountHintCommand(
+                    "#account-id",
+                    "#hint",
+                    DateAdded: now
+                ),
                 default
             );
 
@@ -85,12 +84,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             _entityTables.AddAccounts(account);
 
             await _addAccountHintCommandHandler.Handle(
-                new AddAccountHintCommand
-                {
-                    AccountId = "#account-id",
-                    Hint = "#hint-new",
-                    DateAdded = now
-                },
+                new AddAccountHintCommand(
+                    "#account-id",
+                    "#hint-new",
+                    DateAdded: now
+                ),
                 default
             );
 
@@ -133,11 +131,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             _entityTables.AddAccounts(account);
 
             await _addAccountHintCommandHandler.Handle(
-                new AddAccountHintCommand
-                {
-                    AccountId = "#account-id",
-                    Hint = "#hint-new"
-                },
+                new AddAccountHintCommand(
+                    "#account-id",
+                    "#hint-new",
+                    DateAdded: null
+                ),
                 default
             );
 
@@ -181,12 +179,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             _entityTables.AddAccounts(account);
 
             await _addAccountHintCommandHandler.Handle(
-                new AddAccountHintCommand
-                {
-                    AccountId = "#account-id",
-                    Hint = "#hint-new",
-                    DateAdded = now.AddDays(-2)
-                },
+                new AddAccountHintCommand(
+                    "#account-id",
+                    "#hint-new",
+                    DateAdded: now.AddDays(-2)
+                ),
                 default
             );
 
@@ -214,11 +211,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
         {
             var exception = await Assert.ThrowsAsync<NotFoundException>(
                 () => _addAccountHintCommandHandler.Handle(
-                    new AddAccountHintCommand
-                    {
-                        AccountId = "#account-id",
-                        Hint = "#hint-new"
-                    },
+                    new AddAccountHintCommand(
+                        "#account-id",
+                        "#hint-new",
+                        DateAdded: null
+                    ),
                     default
                 )
             );
@@ -237,11 +234,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
 
             var exception = await Assert.ThrowsAsync<NotFoundException>(
                 () => _addAccountHintCommandHandler.Handle(
-                    new AddAccountHintCommand
-                    {
-                        AccountId = "#account-id",
-                        Hint = "#hint-new"
-                    },
+                    new AddAccountHintCommand(
+                        "#account-id",
+                        "#hint-new",
+                        DateAdded: null
+                    ),
                     default
                 )
             );

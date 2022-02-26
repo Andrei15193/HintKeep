@@ -28,7 +28,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         [Fact]
         public async Task Handle_WhenAccountDoesNotExist_ThrowsException()
         {
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _moveAccountToBinCommandHandler.Handle(new DeleteAccountCommand { Id = "#account-id" }, default));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _moveAccountToBinCommandHandler.Handle(new DeleteAccountCommand("#account-id"), default));
             Assert.Empty(exception.Message);
         }
 
@@ -44,7 +44,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             };
             _entityTables.AddAccounts(account);
 
-            await _moveAccountToBinCommandHandler.Handle(new DeleteAccountCommand { Id = "#account-id" }, default);
+            await _moveAccountToBinCommandHandler.Handle(new DeleteAccountCommand("#account-id"), default);
 
             _entityTables.AssertAccounts(Enumerable.Empty<Account>());
         }
@@ -60,7 +60,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             };
             _entityTables.AddAccounts(account);
 
-            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _moveAccountToBinCommandHandler.Handle(new DeleteAccountCommand { Id = "#account-id" }, default));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _moveAccountToBinCommandHandler.Handle(new DeleteAccountCommand("#account-id"), default));
             Assert.Empty(exception.Message);
             _entityTables.AssertAccounts(account);
         }

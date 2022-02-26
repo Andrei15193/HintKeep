@@ -19,12 +19,11 @@ namespace HintKeep.Controllers.Users
         [HttpPost, AllowAnonymous]
         public async Task<IActionResult> PostAsync(UserRegistration userRegistration)
         {
-            await _mediator.Send(new RegisterUserCommand
-            {
-                Email = userRegistration.Email,
-                Hint = userRegistration.Hint,
-                Password = userRegistration.Password
-            });
+            await _mediator.Send(new RegisterUserCommand(
+                userRegistration.Email,
+                userRegistration.Hint,
+                userRegistration.Password
+            ));
 
             return Created(new Uri("/api/users/confirmations", UriKind.Relative), null);
         }

@@ -1,7 +1,6 @@
 namespace HintKeep.ViewModels.Accounts
 {
-    public class DeletedAccountUpdate
-    {
-        public bool IsDeleted { get; set; }
-    }
+    public record DeletedAccountUpdate(
+        bool IsDeleted
+    );
 }

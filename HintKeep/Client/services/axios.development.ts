@@ -10,7 +10,7 @@ Axios.interceptors.request.use(
     request => {
         if (request.headers)
             if (request.headers.Authorization)
-                localStorage.setItem('authorization', request.headers.Authorization);
+                localStorage.setItem('authorization', request.headers.Authorization?.toString());
             else if (localStorage.getItem('authorization'))
                 Object.assign(request.headers, { Authorization: localStorage.getItem('authorization') });
         return request;

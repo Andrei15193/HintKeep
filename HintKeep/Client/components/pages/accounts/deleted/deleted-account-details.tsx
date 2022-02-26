@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { watchEvent } from 'react-model-view-viewmodel';
 import classnames from 'classnames';
 import { Message } from '../../../i18n';
@@ -11,19 +11,15 @@ import { useViewModel } from '../../../use-view-model';
 
 import Style from '../../../style.scss';
 
-export interface IDeletedAccountDetailsRouteParams {
-    readonly id: string
-}
-
 export function DeletedAccountDetails(): JSX.Element {
-    const { push } = useHistory();
+    const navigate = useNavigate();
     const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new DeletedAccountDetailsViewModel(axios, alertsViewModel, sessionViewModel));
-    const { id } = useParams<IDeletedAccountDetailsRouteParams>();
+    const { id = "" } = useParams();
 
     const [isConfirmationHidden, setIsConfirmationHidden] = useState(true);
     useEffect(() => { $vm.loadAsync(id); }, [$vm, id]);
-    watchEvent($vm.restoredEvent, () => push('/accounts/bin'));
-    watchEvent($vm.deletedEvent, () => push('/accounts/bin'));
+    watchEvent($vm.restoredEvent, () => navigate('/accounts/bin'));
+    watchEvent($vm.deletedEvent, () => navigate('/accounts/bin'));
 
     return (
         <div className={Style.mx3}>

@@ -19,10 +19,9 @@ namespace HintKeep.Controllers.Users
         [HttpPost, AllowAnonymous]
         public async Task<IActionResult> PostAsync(UserAccountRecovery userAccountRecovery)
         {
-            await _mediator.Send(new UserRequestPasswordResetCommand
-            {
-                Email = userAccountRecovery.Email
-            });
+            await _mediator.Send(new UserRequestPasswordResetCommand(
+                userAccountRecovery.Email
+            ));
 
             return Created(new Uri("/api/users/passwords/resets", UriKind.Relative), null);
         }

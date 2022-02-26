@@ -21,16 +21,15 @@ namespace HintKeep.Controllers.Accounts
 
         [HttpGet("{accountId}")]
         public async Task<IActionResult> GetAsync(string accountId)
-            => Ok(await _mediator.Send(new GetDeletedAccountDetailsQuery { Id = accountId }));
+            => Ok(await _mediator.Send(new GetDeletedAccountDetailsQuery(accountId)));
 
         [HttpPut("{accountId}")]
         public async Task<IActionResult> PutAsync(string accountId, DeletedAccountUpdate deletedAccountUpdate)
         {
-            await _mediator.Send(new UpdateDeletedAccountCommand
-            {
-                Id = accountId,
-                IsDeleted = deletedAccountUpdate.IsDeleted
-            });
+            await _mediator.Send(new UpdateDeletedAccountCommand(
+                accountId,
+                deletedAccountUpdate.IsDeleted
+            ));
 
             return NoContent();
         }
@@ -38,10 +37,7 @@ namespace HintKeep.Controllers.Accounts
         [HttpDelete("{accountId}")]
         public async Task<IActionResult> DeleteAsync(string accountId)
         {
-            await _mediator.Send(new DeleteAccountCommand
-            {
-                Id = accountId
-            });
+            await _mediator.Send(new DeleteAccountCommand(accountId));
 
             return NoContent();
         }

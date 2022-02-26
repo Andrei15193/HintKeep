@@ -4,8 +4,7 @@ using MediatR;
 
 namespace HintKeep.Requests.AccountsHints.Queries
 {
-    public class AccountHintsQuery : IRequest<IEnumerable<AccountHintDetails>>
-    {
-        public string AccountId { get; init; }
-    }
+    public record AccountHintsQuery(
+        string AccountId
+    ) : IRequest<IEnumerable<AccountHintDetails>>;
 }

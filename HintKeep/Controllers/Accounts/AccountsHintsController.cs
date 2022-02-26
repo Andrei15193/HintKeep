@@ -18,46 +18,40 @@ namespace HintKeep.Controllers.Accounts
 
         [HttpGet]
         public async Task<IActionResult> GetAsync(string accountId)
-        {
-            var accountHints = await _mediator.Send(new AccountHintsQuery
-            {
-                AccountId = accountId
-            });
-            return Ok(accountHints);
-        }
+            => Ok(await _mediator.Send(new AccountHintsQuery(accountId)));
 
         [HttpPost]
         public async Task<IActionResult> PostAsync(string accountId, AccountHintCreation accountHintCreation)
         {
-            var hintId = await _mediator.Send(new AddAccountHintCommand
-            {
-                AccountId = accountId,
-                Hint = accountHintCreation.Hint,
-                DateAdded = accountHintCreation.DateAdded
-            });
+            var hintId = await _mediator.Send(new AddAccountHintCommand(
+                accountId,
+                accountHintCreation.Hint,
+                accountHintCreation.DateAdded
+            ));
+
             return Created(new Uri($"/api/accounts/{accountId}/hints/{hintId}", UriKind.Relative), null);
         }
 
         [HttpPut("{hintId}")]
         public async Task<IActionResult> PutAsync(string accountId, string hintId, AccountHintUpdate accountHintUpdate)
         {
-            await _mediator.Send(new UpdateAccountHintCommand
-            {
-                AccountId = accountId,
-                HintId = hintId,
-                DateAdded = accountHintUpdate.DateAdded
-            });
+            await _mediator.Send(new UpdateAccountHintCommand(
+                accountId,
+                hintId,
+                accountHintUpdate.DateAdded
+            ));
+
             return NoContent();
         }
 
         [HttpDelete("{hintId}")]
         public async Task<IActionResult> DeleteAsync(string accountId, string hintId)
         {
-            await _mediator.Send(new DeleteAccountHintCommand
-            {
-                AccountId = accountId,
-                HintId = hintId
-            });
+            await _mediator.Send(new DeleteAccountHintCommand(
+                accountId,
+                hintId
+            ));
+
             return NoContent();
         }
     }

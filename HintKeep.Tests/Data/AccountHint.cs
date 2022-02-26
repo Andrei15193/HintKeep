@@ -15,10 +15,10 @@ namespace HintKeep.Tests.Data
             DateAdded = accountHint.DateAdded;
         }
 
-        public string Id { get; set; } = Guid.NewGuid().ToString("N");
+        public string Id { get; init; } = Guid.NewGuid().ToString("N");
 
-        public string Hint { get; set; } = "#Test-Hint";
+        public string Hint { get; init; } = "#Test-Hint";
 
-        public DateTime? DateAdded { get; set; } = DateTime.UtcNow;
+        public DateTime? DateAdded { get; init; } = DateTime.UtcNow;
     }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
 import { watchEvent, watchViewModel } from 'react-model-view-viewmodel';
 import { Message } from '../../i18n';
@@ -11,10 +11,9 @@ import { LoginViewModel } from '../../../view-models/users/login-view-model';
 import Style from '../../style.scss';
 
 export function Login(): JSX.Element {
-    const { push } = useHistory();
-
+    const navigate = useNavigate();
     const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new LoginViewModel(axios, alertsViewModel, sessionViewModel));
-    watchEvent($vm.authenticated, () => push('/accounts'));
+    watchEvent($vm.authenticated, () => navigate('/'));
     watchViewModel($vm.form);
 
     return (

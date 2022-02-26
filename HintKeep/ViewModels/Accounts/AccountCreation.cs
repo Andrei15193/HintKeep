@@ -2,17 +2,10 @@ using HintKeep.ViewModels.ValidationAttributes;
 
 namespace HintKeep.ViewModels.Accounts
 {
-    public class AccountCreation
-    {
-        [RequiredMediumText]
-        public string Name { get; set; }
-
-        [RequiredMediumText]
-        public string Hint { get; set; }
-
-        [LongText]
-        public string Notes { get; set; }
-
-        public bool IsPinned { get; set; }
-    }
+    public record AccountCreation(
+        [RequiredMediumText] string Name,
+        [RequiredMediumText] string Hint,
+        [LongText] string Notes,
+        bool IsPinned
+    );
 }

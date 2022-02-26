@@ -66,44 +66,41 @@ namespace HintKeep
                     foreach (var @char in serverCredentialsConfigSection.GetValue<string>(nameof(NetworkCredential.Password)))
                         password.AppendChar(@char);
 
-                    return new EmailServiceConfig
-                    {
-                        SenderEmailAddress = emailServiceConfigSection.GetValue<string>(nameof(EmailServiceConfig.SenderEmailAddress)),
-                        SenderDisplayNameAddress = emailServiceConfigSection.GetValue<string>(nameof(EmailServiceConfig.SenderDisplayNameAddress)),
-                        ServerAddress = emailServiceConfigSection.GetValue<string>(nameof(EmailServiceConfig.ServerAddress)),
-                        ServerPort = emailServiceConfigSection.GetValue<int>(nameof(EmailServiceConfig.ServerPort)),
-                        ServerCredentials = new NetworkCredential(serverCredentialsConfigSection.GetValue<string>(nameof(NetworkCredential.UserName)), password)
-                    };
+                    return new EmailServiceConfig(
+                        emailServiceConfigSection.GetValue<string>(nameof(EmailServiceConfig.SenderEmailAddress)),
+                        emailServiceConfigSection.GetValue<string>(nameof(EmailServiceConfig.SenderDisplayNameAddress)),
+                        emailServiceConfigSection.GetValue<string>(nameof(EmailServiceConfig.ServerAddress)),
+                        emailServiceConfigSection.GetValue<int>(nameof(EmailServiceConfig.ServerPort)),
+                        new NetworkCredential(serverCredentialsConfigSection.GetValue<string>(nameof(NetworkCredential.UserName)), password)
+                    );
                 })
                 .AddTransient(serviceProvider =>
                 {
                     var sessionServiceConfigSection = serviceProvider.GetService<IConfiguration>().GetSection(nameof(SessionService));
 
-                    return new SessionServiceConfig
-                    {
-                        ApplicationId = sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.ApplicationId)),
-                        Audience = sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.Audience)),
-                        SigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.SigningKey)))),
-                        SingingAlgorithm = (string)typeof(SecurityAlgorithms)
+                    return new SessionServiceConfig(
+                        sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.ApplicationId)),
+                        sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.Audience)),
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.SigningKey)))),
+                        (string)typeof(SecurityAlgorithms)
                             .GetField(
                                 sessionServiceConfigSection.GetValue<string>(nameof(SessionServiceConfig.SingingAlgorithm)),
                                 BindingFlags.Public | BindingFlags.Static | BindingFlags.GetField
                             )
                             .GetValue(default)
-                    };
+                    );
                 })
                 .AddTransient(serviceProvider =>
                 {
                     var securityServiceConfigSection = serviceProvider.GetService<IConfiguration>().GetSection(nameof(SecurityService));
 
-                    return new SecurityServiceConfig
-                    {
-                        HashAlgorithm = securityServiceConfigSection.GetValue<string>(nameof(SecurityServiceConfig.HashAlgorithm)),
-                        SaltLength = securityServiceConfigSection.GetValue<int>(nameof(SecurityServiceConfig.SaltLength)),
-                        PasswordFormat = securityServiceConfigSection.GetValue<string>(nameof(SecurityServiceConfig.PasswordFormat)),
-                        ActivationTokenLength = securityServiceConfigSection.GetValue<int>(nameof(SecurityServiceConfig.ActivationTokenLength)),
-                        ActivationTokenExpirationMinutes = securityServiceConfigSection.GetValue<int>(nameof(SecurityServiceConfig.ActivationTokenExpirationMinutes))
-                    };
+                    return new SecurityServiceConfig(
+                        securityServiceConfigSection.GetValue<string>(nameof(SecurityServiceConfig.HashAlgorithm)),
+                        securityServiceConfigSection.GetValue<int>(nameof(SecurityServiceConfig.SaltLength)),
+                        securityServiceConfigSection.GetValue<string>(nameof(SecurityServiceConfig.PasswordFormat)),
+                        securityServiceConfigSection.GetValue<int>(nameof(SecurityServiceConfig.ActivationTokenLength)),
+                        securityServiceConfigSection.GetValue<int>(nameof(SecurityServiceConfig.ActivationTokenExpirationMinutes))
+                    );
                 });
 
             if (_webHostEnvironment.IsDevelopment())

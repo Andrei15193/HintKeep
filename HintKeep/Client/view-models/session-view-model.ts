@@ -23,7 +23,7 @@ export class SessionViewModel extends ViewModel {
 
     public endSession(): void {
         if (this._axios.defaults.headers) {
-            delete this._axios.defaults.headers.Authorization;
+            delete this._axios.defaults.headers.common.Authorization;
             this._isSessionActive = false;
             this.notifyPropertiesChanged("isSessionActive");
         }

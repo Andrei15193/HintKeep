@@ -19,11 +19,10 @@ namespace HintKeep.Controllers.Users
         [HttpPost, AllowAnonymous]
         public async Task<IActionResult> PostAsync(UserAuthentication userAuthentication)
         {
-            var jsonWebToken = await _mediator.Send(new CreateUserSessionCommand
-            {
-                Email = userAuthentication.Email,
-                Password = userAuthentication.Password
-            });
+            var jsonWebToken = await _mediator.Send(new CreateUserSessionCommand(
+                userAuthentication.Email,
+                userAuthentication.Password
+            ));
 
             return Created(new Uri("/api/users/sessions", UriKind.Relative), jsonWebToken);
         }

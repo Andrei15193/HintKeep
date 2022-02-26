@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
 import { watchEvent, watchViewModel } from 'react-model-view-viewmodel';
 import { Message } from '../../i18n';
@@ -11,10 +11,9 @@ import { FormInput } from '../../forms';
 import Style from '../../style.scss';
 
 export function Confirmation(): JSX.Element {
-    const { push } = useHistory();
-
+    const navigate = useNavigate();
     const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new ConfirmUserViewModel(axios, alertsViewModel, sessionViewModel));
-    watchEvent($vm.confirmed, () => push('/'));
+    watchEvent($vm.confirmed, () => navigate('/'));
     watchViewModel($vm.form);
 
     return (

@@ -47,12 +47,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 .Returns(new ConfirmationToken("#activation-token", TimeSpan.FromMinutes(60)));
 
             await _registerUserCommandHandler.Handle(
-                new RegisterUserCommand
-                {
-                    Email = "#TEST@domain.com",
-                    Hint = "#test-hint",
-                    Password = "#test-password"
-                },
+                new RegisterUserCommand(
+                    "#TEST@domain.com",
+                    "#test-hint",
+                    "#test-password"
+                ),
                 default
             );
 
@@ -94,12 +93,11 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             _entityTables.Users.Execute(TableOperation.Insert(new TableEntity { PartitionKey = "#email-hash".ToEncodedKeyProperty(), RowKey = "details" }));
 
             await Assert.ThrowsAsync<ConflictException>(() => _registerUserCommandHandler.Handle(
-                new RegisterUserCommand
-                {
-                    Email = "#TEST@domain.com",
-                    Hint = "#test-hint",
-                    Password = "#test-password"
-                },
+                new RegisterUserCommand(
+                    "#TEST@domain.com",
+                    "#test-hint",
+                    "#test-password"
+                ),
                 default
             ));
 
