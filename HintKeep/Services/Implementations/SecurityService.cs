@@ -41,7 +41,7 @@ namespace HintKeep.Services.Implementations
         public string ComputePasswordHash(string salt, string password)
         {
             var hashAlgorithm = HashAlgorithm.Create(_securityServiceConfig.HashAlgorithm);
-            var passwordHashBytes = hashAlgorithm.ComputeHash(Encoding.Default.GetBytes(string.Format(_securityServiceConfig.PasswordFormat, CultureInfo.InvariantCulture, salt, password)));
+            var passwordHashBytes = hashAlgorithm.ComputeHash(Encoding.Default.GetBytes(string.Format(CultureInfo.InvariantCulture, _securityServiceConfig.PasswordFormat, salt, password)));
             return Convert.ToBase64String(passwordHashBytes);
         }
     }
