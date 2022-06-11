@@ -1,10 +1,10 @@
 import type { IObservableCollection, IReadOnlyObservableCollection } from 'react-model-view-viewmodel';
-import { ViewModel, observableCollection } from 'react-model-view-viewmodel';
+import { ViewModel, ObservableCollection } from 'react-model-view-viewmodel';
 
 export class AccountsListViewModel extends ViewModel {
     private _accounts: readonly Account[] = [];
     private _searchText: string = '';
-    private readonly _filteredAccounts: IObservableCollection<Account> = observableCollection();
+    private readonly _filteredAccounts: IObservableCollection<Account> = new ObservableCollection<Account>();
 
     public get accounts(): readonly Account[] {
         return this._accounts;

@@ -1,8 +1,8 @@
 import type { IReadOnlyObservableCollection, IObservableCollection } from 'react-model-view-viewmodel';
-import { observableCollection, ViewModel } from 'react-model-view-viewmodel';
+import { ObservableCollection, ViewModel } from 'react-model-view-viewmodel';
 
 export class AlertsViewModel extends ViewModel {
-    private readonly _alerts: IObservableCollection<AlertViewModel> = observableCollection();
+    private readonly _alerts: IObservableCollection<AlertViewModel> = new ObservableCollection<AlertViewModel>();
 
     public get alerts(): IReadOnlyObservableCollection<AlertViewModel> {
         return this._alerts;
