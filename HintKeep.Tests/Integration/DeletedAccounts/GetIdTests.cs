@@ -64,7 +64,7 @@ namespace HintKeep.Tests.Integration.DeletedAccounts
                 {
                     Id = account.Id,
                     Name = account.Name,
-                    account.Hints.Single().Hint,
+                    Hint = account.LatestHint,
                     Notes = account.Notes,
                     IsPinned = account.IsPinned
                 },

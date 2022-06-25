@@ -17,5 +17,8 @@ namespace HintKeep.Storage.CloudStub
 
         public CloudTable Accounts
             => new StubCloudTable(new StubTable(nameof(Accounts), _tableStorageHandler));
+
+        public CloudTable AccountHints
+            => new StubCloudTable(new StubTable(nameof(AccountHints), _tableStorageHandler));
     }
 }

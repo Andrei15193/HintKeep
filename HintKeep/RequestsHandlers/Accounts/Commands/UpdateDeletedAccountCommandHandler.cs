@@ -23,7 +23,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
             var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
                 TableOperation.Retrieve<AccountEntity>(
                     _login.UserId.ToEncodedKeyProperty(),
-                    $"id-{command.Id}".ToEncodedKeyProperty(),
+                    $"accountId-{command.Id}".ToEncodedKeyProperty(),
                     new List<string> { nameof(AccountEntity.IsDeleted) }
                 ),
                 cancellationToken

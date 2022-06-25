@@ -7,5 +7,7 @@ namespace HintKeep.Storage
         CloudTable Users { get; }
 
         CloudTable Accounts { get; }
+
+        CloudTable AccountHints { get; }
     }
 }

@@ -23,6 +23,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
+            _entityTables.AccountHints.Create();
             _updateAccountCommandHandler = new UpdateAccountCommandHandler(_entityTables, new Session("#user-id"));
         }
 
@@ -88,8 +89,8 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
             );
 
             var latestAccountHintEntity = _entityTables
-                .Accounts
-                .ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(AccountHintEntity.AccountId), QueryComparisons.Equal, account.Id)))
+                .AccountHints
+                .ExecuteQuery(new TableQuery<AccountHintEntity>())
                 .Where(accountHintEntity => accountHintEntity.HintId != account.Hints.Single().Id)
                 .Single();
             _entityTables.AssertAccounts(new Account(account)

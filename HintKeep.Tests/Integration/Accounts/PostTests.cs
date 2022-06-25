@@ -68,7 +68,7 @@ namespace HintKeep.Tests.Integration.Accounts
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
 
-            var accountHintEntity = Assert.Single(entityTables.Accounts.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(
+            var accountHintEntity = Assert.Single(entityTables.AccountHints.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(
                 TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
             )));
 
@@ -78,6 +78,7 @@ namespace HintKeep.Tests.Integration.Accounts
                 UserId = userId,
                 Id = accountHintEntity.AccountId,
                 Name = "#Test-Name",
+                LatestHint = "#Test-Hint",
                 Hints = new[]
                 {
                     new AccountHint

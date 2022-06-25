@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,43 +20,25 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Commands
 
         protected override async Task Handle(DeleteAccountHintCommand command, CancellationToken cancellationToken)
         {
-            var account = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
-                TableOperation.Retrieve<AccountEntity>(_session.UserId.ToEncodedKeyProperty(), $"id-{command.AccountId}".ToEncodedKeyProperty(), new List<string> { nameof(AccountEntity.IsDeleted) }),
+            var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
+                TableOperation.Retrieve<AccountEntity>(_session.UserId.ToEncodedKeyProperty(), $"accountId-{command.AccountId}".ToEncodedKeyProperty()),
                 cancellationToken
-            )).Result ?? throw new NotFoundException();
-            if (account.IsDeleted)
+            )).Result;
+            if (accountEntity is null || accountEntity.IsDeleted)
                 throw new NotFoundException();
-
-            var latestHint = await _entityTables.GetLatestHint(
-                _session.UserId,
-                command.AccountId,
-                new[] { nameof(AccountHintEntity.HintId) },
-                accountHint => accountHint.HintId == command.HintId ? null : accountHint,
-                cancellationToken
-            );
 
             try
             {
-                await _entityTables.Accounts.ExecuteBatchAsync(
-                    new TableBatchOperation
+                accountEntity.Hint = null;
+                await _entityTables.Accounts.ExecuteAsync(TableOperation.Replace(accountEntity), cancellationToken);
+
+                await _entityTables.AccountHints.ExecuteAsync(
+                    TableOperation.Delete(new TableEntity
                     {
-                        TableOperation.Delete(new TableEntity
-                        {
-                            PartitionKey = _session.UserId.ToEncodedKeyProperty(),
-                            RowKey = $"id-{command.AccountId}-hintId-{command.HintId}".ToEncodedKeyProperty(),
-                            ETag = "*"
-                        }),
-                        TableOperation.Merge(new DynamicTableEntity
-                        {
-                            PartitionKey = account.PartitionKey,
-                            RowKey = account.RowKey,
-                            ETag = account.ETag,
-                            Properties =
-                            {
-                                { nameof(AccountEntity.Hint), EntityProperty.GeneratePropertyForString(latestHint?.Hint ?? string.Empty) }
-                            }
-                        })
-                    },
+                        PartitionKey = $"accountId-{command.AccountId}".ToEncodedKeyProperty(),
+                        RowKey = $"hintId-{command.HintId}".ToEncodedKeyProperty(),
+                        ETag = "*"
+                    }),
                     cancellationToken
                 );
             }

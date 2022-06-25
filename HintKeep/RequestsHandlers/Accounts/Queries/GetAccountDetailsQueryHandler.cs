@@ -24,7 +24,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
             var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
                 TableOperation.Retrieve<AccountEntity>(
                     _login.UserId.ToEncodedKeyProperty(),
-                    $"id-{query.Id}".ToEncodedKeyProperty(),
+                    $"accountId-{query.Id}".ToEncodedKeyProperty(),
                     new List<string>
                     {
                         nameof(AccountEntity.Id),
@@ -39,6 +39,8 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
             )).Result;
             if (accountEntity is null || accountEntity.IsDeleted)
                 throw new NotFoundException();
+
+            await _entityTables.EnsureAccountLatestHintAsync(accountEntity, cancellationToken);
 
             return new AccountDetails(accountEntity.Id, accountEntity.Name, accountEntity.Hint, accountEntity.Notes, accountEntity.IsPinned);
         }

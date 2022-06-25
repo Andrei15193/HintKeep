@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
@@ -21,44 +20,28 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Commands
 
         public async Task<string> Handle(AddAccountHintCommand command, CancellationToken cancellationToken)
         {
-            var account = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
-                TableOperation.Retrieve<AccountEntity>(_session.UserId.ToEncodedKeyProperty(), $"id-{command.AccountId}".ToEncodedKeyProperty(), new List<string> { nameof(AccountEntity.IsDeleted) }),
+            var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
+                TableOperation.Retrieve<AccountEntity>(_session.UserId.ToEncodedKeyProperty(), $"accountId-{command.AccountId}".ToEncodedKeyProperty()),
                 cancellationToken
-            )).Result ?? throw new NotFoundException();
-            if (account.IsDeleted)
+            )).Result;
+            if (accountEntity is null || accountEntity.IsDeleted)
                 throw new NotFoundException();
 
+            accountEntity.Hint = null;
+            await _entityTables.Accounts.ExecuteAsync(TableOperation.Replace(accountEntity), cancellationToken);
+
             var hintId = Guid.NewGuid().ToString("N");
-            var accountHint = new AccountHintEntity
+            var accountHintEntity = new AccountHintEntity
             {
                 EntityType = "AccountHintEntity",
-                PartitionKey = _session.UserId.ToEncodedKeyProperty(),
-                RowKey = $"id-{command.AccountId}-hintId-{hintId}".ToEncodedKeyProperty(),
+                PartitionKey = $"accountId-{command.AccountId}".ToEncodedKeyProperty(),
+                RowKey = $"hintId-{hintId}".ToEncodedKeyProperty(),
                 AccountId = command.AccountId,
                 HintId = hintId,
                 Hint = command.Hint,
                 DateAdded = command.DateAdded
             };
-            var currentLatestHint = await _entityTables.GetLatestHint(_session.UserId, command.AccountId, cancellationToken);
-            var latestHint = AccountHintEntitySortOrderComparer.Compare(accountHint, currentLatestHint) < 0 ? accountHint : currentLatestHint;
-
-            await _entityTables.Accounts.ExecuteBatchAsync(
-                new TableBatchOperation
-                {
-                    TableOperation.Insert(accountHint),
-                    TableOperation.Merge(new DynamicTableEntity
-                    {
-                        PartitionKey = account.PartitionKey,
-                        RowKey = account.RowKey,
-                        ETag = account.ETag,
-                        Properties =
-                        {
-                            { nameof(AccountEntity.Hint), EntityProperty.GeneratePropertyForString(latestHint?.Hint ?? string.Empty) }
-                        }
-                    })
-                },
-                cancellationToken
-            );
+            await _entityTables.AccountHints.ExecuteAsync(TableOperation.Insert(accountHintEntity), cancellationToken);
             return hintId;
         }
     }

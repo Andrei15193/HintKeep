@@ -20,6 +20,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Commands
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
+            _entityTables.AccountHints.Create();
             _updateAccountCommandHandler = new UpdateDeletedAccountCommandHandler(_entityTables, new Session("#user-id"));
         }
 

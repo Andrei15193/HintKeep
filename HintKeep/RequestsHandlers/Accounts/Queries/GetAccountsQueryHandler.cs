@@ -48,6 +48,11 @@ namespace HintKeep.RequestsHandlers.Accounts.Queries
             do
             {
                 var result = await _entityTables.Accounts.ExecuteQuerySegmentedAsync(tableQuery, continuationToken, cancellationToken);
+                await Task.WhenAll(
+                    from accountEntity in result
+                    select _entityTables.EnsureAccountLatestHintAsync(accountEntity, cancellationToken)
+                );
+
                 continuationToken = result.ContinuationToken;
                 accounts.AddRange(
                     from accountEntity in result

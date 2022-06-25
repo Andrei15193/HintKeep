@@ -17,7 +17,7 @@ namespace HintKeep.Tests.Data.Extensions
         {
             foreach (var account in accounts)
             {
-                var tableBatchOperation = new TableBatchOperation
+                entityTables.Accounts.ExecuteBatch(new TableBatchOperation
                 {
                     TableOperation.Insert(new IndexEntity
                     {
@@ -30,27 +30,35 @@ namespace HintKeep.Tests.Data.Extensions
                     {
                         EntityType = "AccountEntity",
                         PartitionKey = account.UserId.ToEncodedKeyProperty(),
-                        RowKey = $"id-{account.Id}".ToEncodedKeyProperty(),
+                        RowKey = $"accountId-{account.Id}".ToEncodedKeyProperty(),
                         Id = account.Id,
                         Name = account.Name,
-                        Hint = account.Hints.OrderByDescending(accountHint => accountHint.DateAdded).Select(accountHint => accountHint.Hint).FirstOrDefault(),
+                        Hint = account.LatestHint,
                         Notes = account.Notes,
                         IsPinned = account.IsPinned,
                         IsDeleted = account.IsDeleted
                     })
-                };
-                foreach (var accountHint in account.Hints)
-                    tableBatchOperation.Add(TableOperation.Insert(new AccountHintEntity
+                });
+
+                var tableBatchOperation = account.Hints.Aggregate(
+                    new TableBatchOperation(),
+                    (tableBatchOperation, accountHint) =>
                     {
-                        EntityType = "AccountHintEntity",
-                        PartitionKey = account.UserId.ToEncodedKeyProperty(),
-                        RowKey = $"id-{account.Id}-hintId-{accountHint.Id}".ToEncodedKeyProperty(),
-                        AccountId = account.Id,
-                        HintId = accountHint.Id,
-                        Hint = accountHint.Hint,
-                        DateAdded = accountHint.DateAdded
-                    }));
-                entityTables.Accounts.ExecuteBatch(tableBatchOperation);
+                        tableBatchOperation.Add(TableOperation.Insert(new AccountHintEntity
+                        {
+                            EntityType = "AccountHintEntity",
+                            PartitionKey = $"accountId-{account.Id}".ToEncodedKeyProperty(),
+                            RowKey = $"hintId-{accountHint.Id}".ToEncodedKeyProperty(),
+                            AccountId = account.Id,
+                            HintId = accountHint.Id,
+                            Hint = accountHint.Hint,
+                            DateAdded = accountHint.DateAdded
+                        }));
+                        return tableBatchOperation;
+                    }
+                );
+                if (tableBatchOperation.Count > 0)
+                    entityTables.AccountHints.ExecuteBatch(tableBatchOperation);
             }
 
             return entityTables;
@@ -64,24 +72,25 @@ namespace HintKeep.Tests.Data.Extensions
             foreach (var account in accounts)
                 Assert.NotNull(account.UserId);
 
-            Assert.Equal(accounts.Sum(account => 2 + account.Hints.Count), entityTables.Accounts.ExecuteQuery(new TableQuery()).Count());
+            Assert.Equal(2 * accounts.Count(), entityTables.Accounts.ExecuteQuery(new TableQuery()).Count());
+            Assert.Equal(accounts.Sum(account => account.Hints.Count), entityTables.AccountHints.ExecuteQuery(new TableQuery()).Count());
             foreach (var account in accounts)
             {
                 var indexEntity = (IndexEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<IndexEntity>(account.UserId.ToEncodedKeyProperty(), $"name-{account.Name.ToLowerInvariant()}".ToEncodedKeyProperty())).Result;
                 Assert.NotNull(indexEntity);
                 Assert.Equal("IndexEntity", indexEntity.EntityType);
-                Assert.Equal(account.UserId, indexEntity.PartitionKey.FromEncodedKeyProperty());
-                Assert.Equal($"name-{account.Name.ToLowerInvariant()}", indexEntity.RowKey.FromEncodedKeyProperty());
+                Assert.Equal(account.UserId.ToEncodedKeyProperty(), indexEntity.PartitionKey);
+                Assert.Equal($"name-{account.Name.ToLowerInvariant()}".ToEncodedKeyProperty(), indexEntity.RowKey);
                 Assert.Equal(account.Id, indexEntity.IndexedEntityId);
 
-                var accountEntity = (AccountEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>(account.UserId.ToEncodedKeyProperty(), $"id-{account.Id}".ToEncodedKeyProperty())).Result;
+                var accountEntity = (AccountEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountEntity>(account.UserId.ToEncodedKeyProperty(), $"accountId-{account.Id}".ToEncodedKeyProperty())).Result;
                 Assert.NotNull(accountEntity);
                 Assert.Equal("AccountEntity", accountEntity.EntityType);
-                Assert.Equal(account.UserId, accountEntity.PartitionKey.FromEncodedKeyProperty());
-                Assert.Equal($"id-{account.Id}", accountEntity.RowKey.FromEncodedKeyProperty());
+                Assert.Equal(account.UserId.ToEncodedKeyProperty(), accountEntity.PartitionKey);
+                Assert.Equal($"accountId-{account.Id}".ToEncodedKeyProperty(), accountEntity.RowKey);
                 Assert.Equal(account.Id, accountEntity.Id);
                 Assert.Equal(account.Name, accountEntity.Name);
-                Assert.Equal(account.Hints.Select(accountHint => accountHint.Hint).FirstOrDefault() ?? string.Empty, accountEntity.Hint);
+                Assert.Equal(account.LatestHint, accountEntity.Hint);
                 Assert.Equal(account.Notes, accountEntity.Notes);
 
                 if (account.IsPinned)
@@ -96,11 +105,11 @@ namespace HintKeep.Tests.Data.Extensions
 
                 foreach (var accountHint in account.Hints)
                 {
-                    var accountHintEntity = (AccountHintEntity)entityTables.Accounts.Execute(TableOperation.Retrieve<AccountHintEntity>(account.UserId.ToEncodedKeyProperty(), $"id-{account.Id}-hintId-{accountHint.Id}".ToEncodedKeyProperty())).Result;
+                    var accountHintEntity = (AccountHintEntity)entityTables.AccountHints.Execute(TableOperation.Retrieve<AccountHintEntity>($"accountId-{account.Id}".ToEncodedKeyProperty(), $"hintId-{accountHint.Id}".ToEncodedKeyProperty())).Result;
                     Assert.NotNull(accountHintEntity);
                     Assert.Equal("AccountHintEntity", accountHintEntity.EntityType);
-                    Assert.Equal(account.UserId, accountHintEntity.PartitionKey.FromEncodedKeyProperty());
-                    Assert.Equal($"id-{account.Id}-hintId-{accountHint.Id}", accountHintEntity.RowKey.FromEncodedKeyProperty());
+                    Assert.Equal($"accountId-{account.Id}".ToEncodedKeyProperty(), accountHintEntity.PartitionKey);
+                    Assert.Equal($"hintId-{accountHint.Id}".ToEncodedKeyProperty(), accountHintEntity.RowKey);
                     Assert.Equal(account.Id, accountHintEntity.AccountId);
                     Assert.Equal(accountHint.Id, accountHintEntity.HintId);
                     Assert.Equal(accountHint.Hint, accountHintEntity.Hint);

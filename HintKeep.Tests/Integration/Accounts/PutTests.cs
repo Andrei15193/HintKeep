@@ -89,7 +89,7 @@ namespace HintKeep.Tests.Integration.Accounts
             Assert.Empty(await response.Content.ReadAsStringAsync());
 
             var latestAccountHintEntity = entityTables
-                .Accounts
+                .AccountHints
                 .ExecuteQuery(new TableQuery<AccountHintEntity>().Where(
                     TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
                 ))
@@ -98,6 +98,7 @@ namespace HintKeep.Tests.Integration.Accounts
             entityTables.AssertAccounts(new Account(account)
             {
                 Name = "#Test-Name-Updated",
+                LatestHint = null,
                 Hints = new[]
                 {
                     new AccountHint

@@ -24,6 +24,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
+            _entityTables.AccountHints.Create();
             _addAccountHintCommandHandler = new AddAccountHintCommandHandler(_entityTables, new Session("#user-id"));
         }
 
@@ -48,7 +49,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
                 default
             );
 
-            var accountHint = Assert.Single(_entityTables.Accounts.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity"))));
+            var accountHint = Assert.Single(_entityTables.AccountHints.ExecuteQuery(new TableQuery<AccountHintEntity>()));
             _entityTables.AssertAccounts(new Account(account)
             {
                 Hints = new[]
@@ -93,7 +94,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             );
 
             var accountHint = Assert.Single(
-                _entityTables.Accounts.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity"))),
+                _entityTables.AccountHints.ExecuteQuery(new TableQuery<AccountHintEntity>()),
                 accountHint => accountHint.DateAdded == now
             );
             _entityTables.AssertAccounts(new Account(account)
@@ -140,7 +141,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             );
 
             var accountHint = Assert.Single(
-                _entityTables.Accounts.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity"))),
+                _entityTables.AccountHints.ExecuteQuery(new TableQuery<AccountHintEntity>()),
                 accountHint => accountHint.DateAdded is null
             );
             _entityTables.AssertAccounts(new Account(account)
@@ -188,7 +189,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
             );
 
             var accountHint = Assert.Single(
-                _entityTables.Accounts.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity"))),
+                _entityTables.AccountHints.ExecuteQuery(new TableQuery<AccountHintEntity>()),
                 accountHint => accountHint.DateAdded == now.AddDays(-2)
             );
             _entityTables.AssertAccounts(new Account(account)

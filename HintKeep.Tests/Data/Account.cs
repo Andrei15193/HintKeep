@@ -27,6 +27,8 @@ namespace HintKeep.Tests.Data
 
         public string Name { get; set; } = "#Test-Name";
 
+        public string LatestHint { get; set; }
+
         public IReadOnlyCollection<AccountHint> Hints { get; set; } = new[] { new AccountHint() };
 
         public string Notes { get; set; } = "#Test-Notes";

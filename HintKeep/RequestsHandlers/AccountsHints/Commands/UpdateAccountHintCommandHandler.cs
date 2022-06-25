@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using HintKeep.Exceptions;
@@ -20,44 +19,26 @@ namespace HintKeep.RequestsHandlers.AccountsHints.Commands
 
         protected override async Task Handle(UpdateAccountHintCommand command, CancellationToken cancellationToken)
         {
-            var account = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
-                TableOperation.Retrieve<AccountEntity>(_session.UserId.ToEncodedKeyProperty(), $"id-{command.AccountId}".ToEncodedKeyProperty(), new List<string> { nameof(AccountEntity.IsDeleted) }),
+            var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
+                TableOperation.Retrieve<AccountEntity>(_session.UserId.ToEncodedKeyProperty(), $"accountId-{command.AccountId}".ToEncodedKeyProperty()),
                 cancellationToken
-            )).Result ?? throw new NotFoundException();
-            if (account.IsDeleted)
+            )).Result;
+            if (accountEntity is null || accountEntity.IsDeleted)
                 throw new NotFoundException();
 
-            var updatedAccountHint = (AccountHintEntity)(await _entityTables.Accounts.ExecuteAsync(
-                TableOperation.Retrieve<AccountHintEntity>(_session.UserId.ToEncodedKeyProperty(), $"id-{command.AccountId}-hintId-{command.HintId}".ToEncodedKeyProperty()),
+            var accountHintEntity = (AccountHintEntity)(await _entityTables.AccountHints.ExecuteAsync(
+                TableOperation.Retrieve<AccountHintEntity>($"accountId-{command.AccountId}".ToEncodedKeyProperty(), $"hintId-{command.HintId}".ToEncodedKeyProperty()),
                 cancellationToken
-            )).Result ?? throw new NotFoundException();
+            )).Result;
 
-            updatedAccountHint.DateAdded = command.DateAdded;
-            var latestHint = await _entityTables.GetLatestHint(
-                _session.UserId,
-                command.AccountId,
-                new[] { nameof(AccountHintEntity.HintId) },
-                accountHint => accountHint.HintId == command.HintId ? updatedAccountHint : accountHint,
-                cancellationToken
-            );
+            if (accountHintEntity is null)
+                throw new NotFoundException();
 
-            await _entityTables.Accounts.ExecuteBatchAsync(
-                new TableBatchOperation
-                {
-                    TableOperation.Replace(updatedAccountHint),
-                    TableOperation.Merge(new DynamicTableEntity
-                    {
-                        PartitionKey = account.PartitionKey,
-                        RowKey = account.RowKey,
-                        ETag = account.ETag,
-                        Properties =
-                        {
-                            { nameof(AccountEntity.Hint), EntityProperty.GeneratePropertyForString(latestHint.Hint) }
-                        }
-                    })
-                },
-                cancellationToken
-            );
+            accountEntity.Hint = null;
+            await _entityTables.Accounts.ExecuteAsync(TableOperation.Replace(accountEntity), cancellationToken);
+
+            accountHintEntity.DateAdded = command.DateAdded;
+            await _entityTables.AccountHints.ExecuteAsync(TableOperation.Replace(accountHintEntity), cancellationToken);
         }
     }
 }

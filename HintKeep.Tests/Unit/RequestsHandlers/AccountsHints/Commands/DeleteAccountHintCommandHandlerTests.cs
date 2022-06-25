@@ -22,6 +22,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.AccountsHints.Commands
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
+            _entityTables.AccountHints.Create();
             _deleteAccountHintCommandHandler = new DeleteAccountHintCommandHandler(_entityTables, new Session("#user-id"));
         }
 

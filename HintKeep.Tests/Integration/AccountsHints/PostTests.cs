@@ -90,7 +90,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Empty(await response.Content.ReadAsStringAsync());
 
-            var accountHintEntity = Assert.Single(entityTables.Accounts.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(
+            var accountHintEntity = Assert.Single(entityTables.AccountHints.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(
                 TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity")
             )));
 
@@ -138,7 +138,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
             Assert.Empty(await response.Content.ReadAsStringAsync());
 
             var accountHintEntity = Assert.Single(
-                entityTables.Accounts.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity"))),
+                entityTables.AccountHints.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity"))),
                 accountHint => accountHint.DateAdded == now
             );
 
@@ -187,7 +187,7 @@ namespace HintKeep.Tests.Integration.AccountsHints
             Assert.Empty(await response.Content.ReadAsStringAsync());
 
             var accountHintEntity = Assert.Single(
-                entityTables.Accounts.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity"))),
+                entityTables.AccountHints.ExecuteQuery(new TableQuery<AccountHintEntity>().Where(TableQuery.GenerateFilterCondition(nameof(HintKeepTableEntity.EntityType), QueryComparisons.Equal, "AccountHintEntity"))),
                 accountHint => accountHint.DateAdded == now.AddDays(-2)
             );
 

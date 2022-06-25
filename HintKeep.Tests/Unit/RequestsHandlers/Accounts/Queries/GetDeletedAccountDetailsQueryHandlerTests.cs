@@ -22,6 +22,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
         {
             _entityTables = new InMemoryEntityTables();
             _entityTables.Accounts.Create();
+            _entityTables.AccountHints.Create();
             _getAccountsQueryHandler = new GetDeletedAccountDetailsQueryHandler(_entityTables, new Session("#user-id"));
         }
 
@@ -50,7 +51,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Accounts.Queries
                 {
                     account.Id,
                     account.Name,
-                    account.Hints.Single().Hint,
+                    Hint = account.LatestHint,
                     account.Notes,
                     account.IsPinned
                 },

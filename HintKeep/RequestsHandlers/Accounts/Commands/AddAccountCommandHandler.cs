@@ -43,7 +43,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                             {
                                 EntityType = "AccountEntity",
                                 PartitionKey = _login.UserId.ToEncodedKeyProperty(),
-                                RowKey = $"id-{accountId}".ToEncodedKeyProperty(),
+                                RowKey = $"accountId-{accountId}".ToEncodedKeyProperty(),
                                 Id = accountId,
                                 Name = command.Name,
                                 Hint = command.Hint,
@@ -51,21 +51,24 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
                                 IsPinned = command.IsPinned,
                                 IsDeleted = false
                             }
-                        ),
-                        TableOperation.Insert(
-                            new AccountHintEntity
-                            {
-                                EntityType = "AccountHintEntity",
-                                PartitionKey = _login.UserId.ToEncodedKeyProperty(),
-                                RowKey = $"id-{accountId}-hintId-{hintId}".ToEncodedKeyProperty(),
-                                AccountId = accountId,
-                                HintId = hintId,
-                                DateAdded = now,
-                                Hint = command.Hint
-                            }
                         )
                     },
                     cancellationToken
+                );
+
+                await _entityTables.AccountHints.ExecuteAsync(
+                    TableOperation.Insert(
+                        new AccountHintEntity
+                        {
+                            EntityType = "AccountHintEntity",
+                            PartitionKey =  $"accountId-{accountId}".ToEncodedKeyProperty(),
+                            RowKey = $"hintId-{hintId}".ToEncodedKeyProperty(),
+                            AccountId = accountId,
+                            HintId = hintId,
+                            Hint = command.Hint,
+                            DateAdded = now
+                        }
+                    )
                 );
             }
             catch (StorageException storageException) when (storageException.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
