@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
-using CloudStub.Core.StorageHandlers;
+using CloudStub.StorageHandlers;
 
 namespace HintKeep.Storage.CloudStub
 {

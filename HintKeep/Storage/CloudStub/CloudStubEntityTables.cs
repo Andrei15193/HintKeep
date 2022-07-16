@@ -1,6 +1,5 @@
 using CloudStub;
-using CloudStub.Core;
-using CloudStub.Core.StorageHandlers;
+using CloudStub.StorageHandlers;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.Storage.CloudStub
