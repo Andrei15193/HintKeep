@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using Microsoft.Azure.Cosmos.Table;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Integration.UsersSessions
@@ -54,7 +55,7 @@ namespace HintKeep.Tests.Integration.UsersSessions
                 IsActive = false
             }));
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "#TEST@domain.com", password = "#test-password" });
@@ -70,7 +71,7 @@ namespace HintKeep.Tests.Integration.UsersSessions
                 .WithSecurityService(out var securityService)
                 .CreateClient();
             securityService
-                .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#test-password"))
+                .ComputePasswordHash("#password-salt", "#test-password")
                 .Returns("#password-hash-not-matching");
             entityTables.Users.Execute(TableOperation.Insert(new UserEntity
             {
@@ -81,10 +82,10 @@ namespace HintKeep.Tests.Integration.UsersSessions
                 IsActive = true
             }));
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             securityService
-                .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#test-password"))
+                .ComputePasswordHash("#password-salt", "#test-password")
                 .Returns("#password-hash-not-matching");
 
             var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "#TEST@domain.com", password = "#test-password" });
@@ -111,10 +112,10 @@ namespace HintKeep.Tests.Integration.UsersSessions
                 IsActive = true
             }));
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             securityService
-                .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#test-password"))
+                .ComputePasswordHash("#password-salt", "#test-password")
                 .Returns("#password-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/sessions", new { email = "#TEST@domain.com", password = "#test-password" });

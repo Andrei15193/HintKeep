@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using Microsoft.Azure.Cosmos.Table;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Integration.UsersConfirmations
@@ -59,7 +60,7 @@ namespace HintKeep.Tests.Integration.UsersConfirmations
                 }
             );
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/confirmations", new { token = "#test-token" });
@@ -109,7 +110,7 @@ namespace HintKeep.Tests.Integration.UsersConfirmations
                 Expiration = DateTimeOffset.UtcNow.AddDays(-1)
             }));
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/confirmations", new { token = "#token" });

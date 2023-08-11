@@ -2,11 +2,10 @@ using System;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using HintKeep.Services;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using Microsoft.Azure.Cosmos.Table;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Integration.UsersPasswords
@@ -45,7 +44,7 @@ namespace HintKeep.Tests.Integration.UsersPasswords
                 Expiration = DateTimeOffset.UtcNow.AddDays(-1)
             }));
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/passwords", new { email = "#TEST@domain.com", token = "#token", password = "passWORD$123" });
@@ -69,7 +68,7 @@ namespace HintKeep.Tests.Integration.UsersPasswords
                 Expiration = DateTimeOffset.UtcNow.AddDays(1)
             }));
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/passwords", new { email = "#TEST@domain.com", token = "#token", password = "passWORD$123" });
@@ -108,13 +107,13 @@ namespace HintKeep.Tests.Integration.UsersPasswords
                 })
             });
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             securityService
-                .Setup(securityService => securityService.GeneratePasswordSalt())
+                .GeneratePasswordSalt()
                 .Returns("#password-salt");
             securityService
-                .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "passWORD$123"))
+                .ComputePasswordHash("#password-salt", "passWORD$123")
                 .Returns("#password-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/passwords", new { email = "#TEST@domain.com", token = "#token", password = "passWORD$123" });
@@ -134,8 +133,10 @@ namespace HintKeep.Tests.Integration.UsersPasswords
             Assert.Equal("#password-hash", userEntity.Properties[nameof(UserEntity.PasswordHash)].StringValue);
             Assert.True(userEntity.Properties[nameof(UserEntity.IsActive)].BooleanValue);
 
-            emailService.Verify(emailService => emailService.SendAsync("#TEST@domain.com", "HintKeep - Password Reset", It.IsAny<string>()), Times.Once);
-            emailService.VerifyNoOtherCalls();
+            await emailService
+                .Received()
+                .SendAsync("#TEST@domain.com", "HintKeep - Password Reset", Arg.Any<string>());
+            Assert.Single(emailService.ReceivedCalls());
         }
 
         [Fact]
@@ -167,7 +168,7 @@ namespace HintKeep.Tests.Integration.UsersPasswords
                 })
             });
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/passwords", new { email = "#TEST@domain.com", token = "#token", password = "passWORD$123" });

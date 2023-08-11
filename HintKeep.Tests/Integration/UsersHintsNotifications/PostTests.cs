@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using Microsoft.Azure.Cosmos.Table;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Integration.UsersHintsNotifications
@@ -51,7 +51,7 @@ namespace HintKeep.Tests.Integration.UsersHintsNotifications
                 }
             );
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/hints/notifications", new { email = "#TEST@domain.com" });
@@ -60,8 +60,10 @@ namespace HintKeep.Tests.Integration.UsersHintsNotifications
             Assert.Empty(await response.Content.ReadAsStringAsync());
             Assert.Equal(new Uri("/api/users/sessions", UriKind.Relative), response.Headers.Location);
 
-            emailService.Verify(emailService => emailService.SendAsync("#TEST@domain.com", "HintKeep - Account Hint", It.IsRegex("#hint")), Times.Once);
-            emailService.VerifyNoOtherCalls();
+            await emailService
+                .Received()
+                .SendAsync("#TEST@domain.com", "HintKeep - Account Hint", Arg.Is<string>(body => body.Contains("#hint")));
+            Assert.Single(emailService.ReceivedCalls());
         }
 
         [Fact]
@@ -72,7 +74,7 @@ namespace HintKeep.Tests.Integration.UsersHintsNotifications
                 .WithSecurityService(out var securityService)
                 .CreateClient();
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/hints/notifications", new { email = "#TEST@domain.com" });
@@ -101,7 +103,7 @@ namespace HintKeep.Tests.Integration.UsersHintsNotifications
                 }
             );
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             var response = await client.PostAsJsonAsync("/api/users/hints/notifications", new { email = "#TEST@domain.com" });

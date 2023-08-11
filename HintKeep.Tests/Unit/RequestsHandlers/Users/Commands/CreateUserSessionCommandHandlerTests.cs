@@ -9,7 +9,7 @@ using HintKeep.Storage.Entities;
 using HintKeep.Tests.Stubs;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
@@ -17,16 +17,16 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
     public class CreateUserSessionCommandHandlerTests
     {
         private readonly IEntityTables _entityTables;
-        private readonly Mock<ISecurityService> _securityService;
-        private readonly Mock<ISessionService> _sessionService;
+        private readonly ISecurityService _securityService;
+        private readonly ISessionService _sessionService;
         private readonly IRequestHandler<CreateUserSessionCommand, string> _createUserSessionCommandHandler;
 
         public CreateUserSessionCommandHandlerTests()
         {
             _entityTables = new InMemoryEntityTables();
-            _securityService = new Mock<ISecurityService>();
-            _sessionService = new Mock<ISessionService>();
-            _createUserSessionCommandHandler = new CreateUserSessionCommandHandler(_entityTables, _securityService.Object, _sessionService.Object);
+            _securityService = Substitute.For<ISecurityService>();
+            _sessionService = Substitute.For<ISessionService>();
+            _createUserSessionCommandHandler = new CreateUserSessionCommandHandler(_entityTables, _securityService, _sessionService);
             _entityTables.Users.Create();
         }
 
@@ -34,7 +34,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public async Task Handle_WhenUserDoesNotExist_ThrowsException()
         {
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand("#TEST@domain.com", "#test-password"), default));
@@ -53,7 +53,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 }
             ));
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand("#TEST@domain.com", "#test-password"), default));
@@ -74,10 +74,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 }
             ));
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             _securityService
-                .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#test-password"))
+                .ComputePasswordHash("#password-salt", "#test-password")
                 .Returns("#password-hash-not-matching");
 
             var exception = await Assert.ThrowsAsync<ValidationException>(() => _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand("#TEST@domain.com", "#test-password"), default));
@@ -101,13 +101,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 }
             ));
             _securityService
-                .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#test-password"))
+                .ComputePasswordHash("#password-salt", "#test-password")
                 .Returns("#password-hash");
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             _sessionService
-                .Setup(sessionService => sessionService.CreateJsonWebToken("#user-id", "#user-role"))
+                .CreateJsonWebToken("#user-id", "#user-role")
                 .Returns("#json-web-token");
 
             var jsonWebToken = await _createUserSessionCommandHandler.Handle(new CreateUserSessionCommand("#TEST@domain.com", "#test-password"), default);

@@ -8,7 +8,7 @@ using HintKeep.Storage.Entities;
 using HintKeep.Tests.Stubs;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
@@ -16,16 +16,16 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
     public class UserRequestHintCommandHandlerTests
     {
         private readonly IEntityTables _entityTables;
-        private readonly Mock<ISecurityService> _securityService;
-        private readonly Mock<IEmailService> _emailService;
+        private readonly ISecurityService _securityService;
+        private readonly IEmailService _emailService;
         private readonly IRequestHandler<UserRequestHintCommand> _userRequestHintCommandHandler;
 
         public UserRequestHintCommandHandlerTests()
         {
             _entityTables = new InMemoryEntityTables();
-            _securityService = new Mock<ISecurityService>();
-            _emailService = new Mock<IEmailService>();
-            _userRequestHintCommandHandler = new UserRequestHintCommandHandler(_entityTables, _securityService.Object, _emailService.Object);
+            _securityService = Substitute.For<ISecurityService>();
+            _emailService = Substitute.For<IEmailService>();
+            _userRequestHintCommandHandler = new UserRequestHintCommandHandler(_entityTables, _securityService, _emailService);
             _entityTables.Users.Create();
         }
 
@@ -33,7 +33,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public async Task Handle_WhenUserDoesNotExist_ThrowsException()
         {
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userRequestHintCommandHandler.Handle(new UserRequestHintCommand("#TEST@domain.com"), default));
@@ -50,7 +50,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 IsActive = false
             }));
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userRequestHintCommandHandler.Handle(new UserRequestHintCommand("#TEST@domain.com"), default));
@@ -68,13 +68,15 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 IsActive = true
             }));
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             await _userRequestHintCommandHandler.Handle(new UserRequestHintCommand("#TEST@domain.com"), default);
 
-            _emailService.Verify(emailService => emailService.SendAsync("#TEST@domain.com", "HintKeep - Account Hint", It.IsRegex("#hint")), Times.Once);
-            _emailService.VerifyNoOtherCalls();
+            await _emailService
+                .Received()
+                .SendAsync("#TEST@domain.com", "HintKeep - Account Hint", Arg.Is<string>(body => body.Contains("#hint")));
+            Assert.Single(_emailService.ReceivedCalls());
         }
     }
 }

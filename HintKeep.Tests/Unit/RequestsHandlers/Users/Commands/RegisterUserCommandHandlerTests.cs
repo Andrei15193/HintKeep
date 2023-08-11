@@ -9,7 +9,7 @@ using HintKeep.Storage.Entities;
 using HintKeep.Tests.Stubs;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
@@ -17,33 +17,33 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
     public class RegisterUserCommandHandlerTests
     {
         private readonly IEntityTables _entityTables;
-        private readonly Mock<IEmailService> _emailService;
-        private readonly Mock<ISecurityService> _securityService;
+        private readonly IEmailService _emailService;
+        private readonly ISecurityService _securityService;
         private readonly IRequestHandler<RegisterUserCommand> _registerUserCommandHandler;
 
         public RegisterUserCommandHandlerTests()
         {
             _entityTables = new InMemoryEntityTables();
-            _emailService = new Mock<IEmailService>();
-            _securityService = new Mock<ISecurityService>();
+            _emailService = Substitute.For<IEmailService>();
+            _securityService = Substitute.For<ISecurityService>();
             _entityTables.Users.Create();
-            _registerUserCommandHandler = new RegisterUserCommandHandler(_entityTables, _emailService.Object, _securityService.Object);
+            _registerUserCommandHandler = new RegisterUserCommandHandler(_entityTables, _emailService, _securityService);
         }
 
         [Fact]
         public async Task Handle_WhenUserDoesNotExist_CreatesInactiveUserAndActivationToken()
         {
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             _securityService
-                .Setup(securityService => securityService.GeneratePasswordSalt())
+                .GeneratePasswordSalt()
                 .Returns("#password-salt");
             _securityService
-                .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#test-password"))
+                .ComputePasswordHash("#password-salt", "#test-password")
                 .Returns("#password-hash");
             _securityService
-                .Setup(securityService => securityService.GenerateConfirmationToken())
+                .GenerateConfirmationToken()
                 .Returns(new ConfirmationToken("#activation-token", TimeSpan.FromMinutes(60)));
 
             await _registerUserCommandHandler.Handle(
@@ -77,18 +77,20 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             Assert.True(DateTimeOffset.UtcNow.AddMinutes(55) < expiration);
             Assert.True(expiration < DateTimeOffset.UtcNow.AddMinutes(65));
 
-            _emailService.Verify(emailService => emailService.SendAsync("#TEST@domain.com", "Welcome to HintKeep!", It.IsRegex("#activation-token")), Times.Once);
-            _emailService.VerifyNoOtherCalls();
+            await _emailService
+                .Received()
+                .SendAsync("#TEST@domain.com", "Welcome to HintKeep!", Arg.Is<string>(body => body.Contains("#activation-token")));
+            Assert.Single(_emailService.ReceivedCalls());
         }
 
         [Fact]
         public async Task Handle_WhenUserEmailAlreadyExists_ThrowsException()
         {
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             _securityService
-                .Setup(securityService => securityService.GenerateConfirmationToken())
+                .GenerateConfirmationToken()
                 .Returns(new ConfirmationToken("#token", TimeSpan.Zero));
             _entityTables.Users.Execute(TableOperation.Insert(new TableEntity { PartitionKey = "#email-hash".ToEncodedKeyProperty(), RowKey = "details" }));
 
@@ -101,7 +103,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 default
             ));
 
-            _emailService.VerifyNoOtherCalls();
+            Assert.Empty(_emailService.ReceivedCalls());
         }
     }
 }

@@ -9,7 +9,7 @@ using HintKeep.Storage.Entities;
 using HintKeep.Tests.Stubs;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
@@ -17,16 +17,16 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
     public class UserRequestPasswordResetCommandHandlerTests
     {
         private IEntityTables _entityTables;
-        private Mock<ISecurityService> _securityService;
-        private Mock<IEmailService> _emailService;
+        private ISecurityService _securityService;
+        private IEmailService _emailService;
         private IRequestHandler<UserRequestPasswordResetCommand> _userRequestPasswordResetCommand;
 
         public UserRequestPasswordResetCommandHandlerTests()
         {
             _entityTables = new InMemoryEntityTables();
-            _securityService = new Mock<ISecurityService>();
-            _emailService = new Mock<IEmailService>();
-            _userRequestPasswordResetCommand = new UserRequestPasswordResetCommandHandler(_entityTables, _securityService.Object, _emailService.Object);
+            _securityService = Substitute.For<ISecurityService>();
+            _emailService = Substitute.For<IEmailService>();
+            _userRequestPasswordResetCommand = new UserRequestPasswordResetCommandHandler(_entityTables, _securityService, _emailService);
             _entityTables.Users.Create();
         }
 
@@ -34,7 +34,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public async Task Handle_WhenUserDoesNotExist_ThrowsException()
         {
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand("#TEST@domain.com"), default));
@@ -51,7 +51,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 IsActive = false
             }));
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand("#TEST@domain.com"), default));
@@ -68,10 +68,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 IsActive = true
             }));
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             _securityService
-                .Setup(securityService => securityService.GenerateConfirmationToken())
+                .GenerateConfirmationToken()
                 .Returns(new ConfirmationToken("#confirmation-token", TimeSpan.FromMinutes(60)));
 
             await _userRequestPasswordResetCommand.Handle(new UserRequestPasswordResetCommand("#TEST@domain.com"), default);
@@ -86,8 +86,10 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
             Assert.True(DateTimeOffset.UtcNow.AddMinutes(55) < expiration);
             Assert.True(expiration < DateTimeOffset.UtcNow.AddMinutes(65));
 
-            _emailService.Verify(emailService => emailService.SendAsync("#TEST@domain.com", "HintKeep - Password Reset", It.IsRegex("#confirmation-token")), Times.Once);
-            _emailService.VerifyNoOtherCalls();
+            await _emailService
+                .Received()
+                .SendAsync("#TEST@domain.com", "HintKeep - Password Reset", Arg.Is<string>(body => body.Contains("#confirmation-token")));
+            Assert.Single(_emailService.ReceivedCalls());
         }
     }
 }

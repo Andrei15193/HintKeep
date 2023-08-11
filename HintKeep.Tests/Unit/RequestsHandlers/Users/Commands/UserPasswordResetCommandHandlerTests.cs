@@ -8,7 +8,7 @@ using HintKeep.Storage.Entities;
 using HintKeep.Tests.Stubs;
 using MediatR;
 using Microsoft.Azure.Cosmos.Table;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
@@ -16,16 +16,16 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
     public class UserPasswordResetCommandHandlerTests
     {
         private readonly InMemoryEntityTables _entityTables;
-        private readonly Mock<ISecurityService> _securityService;
-        private readonly Mock<IEmailService> _emailService;
+        private readonly ISecurityService _securityService;
+        private readonly IEmailService _emailService;
         private readonly IRequestHandler<UserPasswordResetCommand> _userPasswordResetCommandHandler;
 
         public UserPasswordResetCommandHandlerTests()
         {
             _entityTables = new InMemoryEntityTables();
-            _securityService = new Mock<ISecurityService>();
-            _emailService = new Mock<IEmailService>();
-            _userPasswordResetCommandHandler = new UserPasswordResetCommandHandler(_entityTables, _securityService.Object, _emailService.Object);
+            _securityService = Substitute.For<ISecurityService>();
+            _emailService = Substitute.For<IEmailService>();
+            _userPasswordResetCommandHandler = new UserPasswordResetCommandHandler(_entityTables, _securityService, _emailService);
             _entityTables.Users.Create();
         }
 
@@ -33,7 +33,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public async Task Handle_WhenTokenDoesNotExist_ThrowsException()
         {
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userPasswordResetCommandHandler.Handle(
@@ -50,7 +50,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public async Task Handle_WhenExpiredTokenExist_ThrowsException()
         {
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             _entityTables.Users.Execute(TableOperation.Insert(new UserPasswordResetTokenEntity
             {
@@ -76,7 +76,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
         public async Task Handle_WhenUserDoesNotExist_ThrowsException()
         {
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             _entityTables.Users.Execute(TableOperation.Insert(new UserPasswordResetTokenEntity
             {
@@ -122,13 +122,13 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 })
             });
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             _securityService
-                .Setup(securityService => securityService.GeneratePasswordSalt())
+                .GeneratePasswordSalt()
                 .Returns("#password-salt");
             _securityService
-                .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#password"))
+                .ComputePasswordHash("#password-salt", "#password")
                 .Returns("#password-hash");
 
             await _userPasswordResetCommandHandler.Handle(
@@ -177,7 +177,7 @@ namespace HintKeep.Tests.Unit.RequestsHandlers.Users.Commands
                 })
             });
             _securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
 
             await Assert.ThrowsAsync<NotFoundException>(() => _userPasswordResetCommandHandler.Handle(

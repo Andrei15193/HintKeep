@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ using HintKeep.Services;
 using HintKeep.Storage;
 using HintKeep.Storage.Entities;
 using Microsoft.Azure.Cosmos.Table;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace HintKeep.Tests.Integration.Users
@@ -63,16 +64,16 @@ namespace HintKeep.Tests.Integration.Users
                 .WithEmailService(out var emailService)
                 .CreateClient();
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             securityService
-                .Setup(securityService => securityService.GeneratePasswordSalt())
+                .GeneratePasswordSalt()
                 .Returns("#password-salt");
             securityService
-                .Setup(securityService => securityService.ComputePasswordHash("#password-salt", "#Test-Password1"))
+                .ComputePasswordHash("#password-salt", "#Test-Password1")
                 .Returns("#password-hash");
             securityService
-                .Setup(securityService => securityService.GenerateConfirmationToken())
+                .GenerateConfirmationToken()
                 .Returns(new ConfirmationToken("#confirmation-token", TimeSpan.FromHours(1)));
 
             var response = await client.PostAsJsonAsync("/api/users", new { email = "#TEST@domain.com", hint = "#Test-Hint", password = "#Test-Password1" });
@@ -103,8 +104,10 @@ namespace HintKeep.Tests.Integration.Users
             Assert.True(DateTimeOffset.UtcNow.AddMinutes(55) < expiration);
             Assert.True(expiration < DateTimeOffset.UtcNow.AddMinutes(65));
 
-            emailService.Verify(emailService => emailService.SendAsync("#TEST@domain.com", "Welcome to HintKeep!", It.Is<string>(body => body.Contains("#confirmation-token"))), Times.Once);
-            emailService.VerifyNoOtherCalls();
+            await emailService
+                .Received()
+                .SendAsync("#TEST@domain.com", "Welcome to HintKeep!", Arg.Is<string>(body => body.Contains("#confirmation-token")));
+            Assert.Single(emailService.ReceivedCalls());
         }
 
         [Fact]
@@ -116,10 +119,10 @@ namespace HintKeep.Tests.Integration.Users
                 .WithEmailService(out var emailService)
                 .CreateClient();
             securityService
-                .Setup(securityService => securityService.ComputeHash("#test@domain.com"))
+                .ComputeHash("#test@domain.com")
                 .Returns("#email-hash");
             securityService
-                .Setup(securityService => securityService.GenerateConfirmationToken())
+                .GenerateConfirmationToken()
                 .Returns(new ConfirmationToken("#confirmation-token", TimeSpan.FromHours(1)));
             entityTables.Users.Execute(TableOperation.Insert(new TableEntity { PartitionKey = "#email-hash".ToEncodedKeyProperty(), RowKey = "details" }));
 
@@ -133,7 +136,7 @@ namespace HintKeep.Tests.Integration.Users
             Assert.Equal("#email-hash".ToEncodedKeyProperty(), userEntity.PartitionKey);
             Assert.Equal("details", userEntity.RowKey);
 
-            emailService.VerifyNoOtherCalls();
+            Assert.Empty(emailService.ReceivedCalls());
         }
     }
 }
