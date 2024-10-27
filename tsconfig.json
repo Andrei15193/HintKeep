@@ -1,19 +1,23 @@
 {
-    "compilerOptions": {
-        "sourceMap": true,
-        "target": "es5",
-        "moduleResolution": "node",
-        "module": "es6",
-        "allowJs": true,
-        "resolveJsonModule": true,
-        "strict": true,
-        "esModuleInterop": true,
-        "jsx": "react"
-    },
-    "include": [
-        "HintKeep/Client"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "ES2015",
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strictPropertyInitialization": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "HintKeep/Client"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

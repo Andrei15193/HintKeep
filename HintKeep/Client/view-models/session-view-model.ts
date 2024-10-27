@@ -1,14 +1,16 @@
-import type { AxiosInstance } from "axios";
-import { ViewModel } from "react-model-view-viewmodel";
+import { type AxiosInstance } from "axios";
+import { type IDependencyResolver, ViewModel } from "react-model-view-viewmodel";
+import { Axios } from "../services";
 
 export class SessionViewModel extends ViewModel {
     private _isSessionActive: boolean;
     private readonly _axios: AxiosInstance;
 
-    public constructor(axios: AxiosInstance) {
+    public constructor({ resolve }: IDependencyResolver) {
         super();
+
         this._isSessionActive = false;
-        this._axios = axios;
+        this._axios = resolve(Axios);
     }
 
     public get isSessionActive(): boolean {

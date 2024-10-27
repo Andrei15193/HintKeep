@@ -111,7 +111,7 @@ namespace HintKeep
             services
                 .AddTransient<ISecurityService, SecurityService>()
                 .AddTransient<ISessionService, SessionService>()
-                .AddMediatR(typeof(Startup))
+                .AddMediatR(new MediatRServiceConfiguration().RegisterServicesFromAssembly(typeof(Startup).Assembly))
                 .AddControllers(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter());

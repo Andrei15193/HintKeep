@@ -1,9 +1,8 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
-import { watchEvent, watchViewModel } from 'react-model-view-viewmodel';
+import { type IEventHandler, useViewModel, useViewModelDependency } from 'react-model-view-viewmodel';
 import { Message } from '../../i18n';
-import { useViewModel } from '../../use-view-model';
 import { BusyContent } from '../../loaders';
 import { FormInput } from '../../forms';
 import { LoginViewModel } from '../../../view-models/users/login-view-model';
@@ -12,9 +11,26 @@ import Style from '../../style.scss';
 
 export function Login(): JSX.Element {
     const navigate = useNavigate();
-    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new LoginViewModel(axios, alertsViewModel, sessionViewModel));
-    watchEvent($vm.authenticated, () => navigate('/'));
-    watchViewModel($vm.form);
+
+    const loginViewModel = useViewModelDependency(LoginViewModel);
+    useViewModel(loginViewModel.form);
+
+    useEffect(
+        () => {
+            const authenticatedEventHandler: IEventHandler<unknown> = {
+                handle() {
+                    navigate('/')
+                }
+            }
+
+            loginViewModel.authenticated.subscribe(authenticatedEventHandler);
+
+            return () => {
+                loginViewModel.authenticated.unsubscribe(authenticatedEventHandler);
+            }
+        },
+        [loginViewModel, navigate]
+    )
 
     return (
         <div className={Style.mx3}>
@@ -22,13 +38,13 @@ export function Login(): JSX.Element {
                 <Message id="pages.login.pageTitle" />
             </h1>
 
-            <BusyContent $vm={$vm}>
-                <form onSubmit={event => { event.preventDefault(); $vm.authenticateAsync(); }}>
-                    <FormInput className={Style.mb3} id="email" type="email" label="pages.login.email.label" field={$vm.form.email} placeholder="pages.login.email.placeholder" />
-                    <FormInput className={Style.mb3} id="password" type="password" label="pages.login.password.label" field={$vm.form.password} placeholder="pages.login.password.placeholder" />
+            <BusyContent apiViewModel={loginViewModel}>
+                <form onSubmit={event => { event.preventDefault(); loginViewModel.authenticateAsync(); }}>
+                    <FormInput className={Style.mb3} id="email" type="email" label="pages.login.email.label" field={loginViewModel.form.email} placeholder="pages.login.email.placeholder" />
+                    <FormInput className={Style.mb3} id="password" type="password" label="pages.login.password.label" field={loginViewModel.form.password} placeholder="pages.login.password.placeholder" />
 
                     <div className={Style.mb3}>
-                        <button type="submit" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)}>
+                        <button type="submit" disabled={(loginViewModel.form.isInvalid && loginViewModel.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)}>
                             <Message id="pages.login.login.label" />
                         </button>
                     </div>

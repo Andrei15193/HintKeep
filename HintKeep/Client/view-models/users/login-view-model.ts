@@ -1,16 +1,16 @@
 import type { AxiosResponse } from 'axios';
-import type { FormFieldViewModel, IEvent } from 'react-model-view-viewmodel';
 import type { IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../../api/users/authentications/post';
-import { DispatchEvent, FormFieldCollectionViewModel, registerValidators } from 'react-model-view-viewmodel';
+import { type IEvent, EventDispatcher } from 'react-model-view-viewmodel';
 import { ApiViewModel } from '../api-view-model';
 import { required } from '../validation';
+import { HintKeepForm, HintKeepFormField } from '../forms';
 
 export class LoginViewModel extends ApiViewModel {
-    private readonly _authenticated: DispatchEvent = new DispatchEvent();
+    private readonly _authenticated: EventDispatcher<this> = new EventDispatcher<this>();
 
     public readonly form: LoginFormViewModel = new LoginFormViewModel();
 
-    public get authenticated(): IEvent {
+    public get authenticated(): IEvent<this> {
         return this._authenticated;
     }
 
@@ -37,25 +37,25 @@ export class LoginViewModel extends ApiViewModel {
     }
 }
 
-class LoginFormViewModel extends FormFieldCollectionViewModel {
+class LoginFormViewModel extends HintKeepForm {
     public constructor() {
         super();
-        registerValidators(this.email = this.addField('email', ''), [required]);
-        registerValidators(this.password = this.addField('password', ''), [required]);
 
-        this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
+        this.withFields(
+            this.email = new HintKeepFormField({
+                name: 'email',
+                initialValue: '',
+                validators: [required]
+            }),
+            this.password = new HintKeepFormField({
+                name: 'password',
+                initialValue: '',
+                validators: [required]
+            })
+        );
     }
 
-    public readonly email: FormFieldViewModel<string>;
+    public readonly email: HintKeepFormField<string>;
 
-    public readonly password: FormFieldViewModel<string>;
-
-    public get areAllFieldsTouched(): boolean {
-        return this.fields.every(field => field.isTouched);
-    }
-
-    private _fieldChanged = (field: FormFieldViewModel<any>, changedProperties: readonly string[]): void => {
-        if (changedProperties.includes('isTouched'))
-            this.notifyPropertiesChanged('areAllFieldsTouched');
-    };
+    public readonly password: HintKeepFormField<string>;
 }

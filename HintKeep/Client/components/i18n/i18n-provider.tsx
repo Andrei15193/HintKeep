@@ -2,11 +2,11 @@ import type { PropsWithChildren } from 'react';
 import type { AxiosResponse } from 'axios';
 import type { IMessages } from '../../translations/IMessages';
 import type { IResponseData } from '../../api/users/preferences/preferred-languages/get';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { enGB } from '../../translations';
 import { Spinner } from '../loaders';
 import { I18nContext, EmptyMessageResolver, MessageResolver } from './i18n-context';
-import { Axios } from '../../services';
+import { AxiosInstance } from '../../services';
 
 const defaultLocale = 'en-GB';
 const messagesByLanguage: { [locale: string]: IMessages } = {
@@ -20,7 +20,7 @@ export function I18nProvider({ children }: PropsWithChildren<{}>): JSX.Element {
     useEffect(
         () => {
             setIsLoading(true);
-            Axios
+            AxiosInstance
                 .get('/api/users/preferences/preferred-languages')
                 .then((response: AxiosResponse<IResponseData>) => {
                     const locale = response.status === 200

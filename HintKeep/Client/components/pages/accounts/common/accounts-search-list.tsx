@@ -1,26 +1,26 @@
 import type { ComponentType } from 'react';
 import type { AccountsListViewModel, Account } from '../../../../view-models/accounts/accounts-list-view-model';
-import React, { useContext, Fragment } from 'react';
+import { useContext, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
-import { watchCollection, watchViewModel } from 'react-model-view-viewmodel';
 import { I18nContext, Message } from '../../../i18n';
+import { type IReadOnlyObservableCollection, useObservableCollection, useViewModel } from 'react-model-view-viewmodel';
 
 import Style from '../../../style.scss';
 
 export interface IAccountsSearchListProps {
-    readonly $vm: AccountsListViewModel;
+    readonly accountsListViewModel: AccountsListViewModel;
     readonly noItemsComponent: ComponentType;
 
     getDetailsRoute(account: Account): string;
 }
 
-export function AccountsSearchList({ $vm, noItemsComponent: NoItemsComponent, getDetailsRoute }: IAccountsSearchListProps): JSX.Element {
+export function AccountsSearchList({ accountsListViewModel, noItemsComponent: NoItemsComponent, getDetailsRoute }: IAccountsSearchListProps): JSX.Element {
     const messageResolver = useContext(I18nContext);
-    watchViewModel($vm, ['searchText']);
-    watchCollection($vm.filteredAccounts);
+    useViewModel(accountsListViewModel);
+    useObservableCollection(accountsListViewModel.filteredAccounts);
 
-    if ($vm.accounts.length === 0)
+    if (accountsListViewModel.accounts.length === 0)
         return <NoItemsComponent />;
     else
         return (
@@ -31,22 +31,22 @@ export function AccountsSearchList({ $vm, noItemsComponent: NoItemsComponent, ge
                             type="text"
                             inputMode="search"
                             className={Style.formControl}
-                            value={$vm.searchText}
-                            onChange={event => $vm.searchText = event.target.value}
+                            value={accountsListViewModel.searchText}
+                            onChange={event => accountsListViewModel.searchText = event.target.value}
                             placeholder={messageResolver.resolve('pages.accounts.search.placeholder')}
                         />
                     </div>
                 </div>
 
                 <div className={classnames(Style.px3, Style.pt2, Style.listView, Style.flexFill)}>
-                    <AccountsListDisplay accounts={$vm.filteredAccounts} getDetailsRoute={getDetailsRoute} />
+                    <AccountsListDisplay accounts={accountsListViewModel.filteredAccounts} getDetailsRoute={getDetailsRoute} />
                 </div>
             </>
         );
 }
 
 export interface IAccountsListDisplayProps {
-    readonly accounts: readonly Account[];
+    readonly accounts: IReadOnlyObservableCollection<Account>;
 
     getDetailsRoute(account: Account): string;
 }

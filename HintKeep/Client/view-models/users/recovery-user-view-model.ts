@@ -2,21 +2,22 @@ import type { AxiosResponse } from "axios";
 import type { IEvent } from "react-model-view-viewmodel";
 import type { IRequestData as IHintNotificationRequestData, IResponseData as IHintNotificationResponseData, IUnprocessableEntityResponseData as IHintNotificationUnprocessableEntityResponseData } from "../../api/users/hints/notifications/post";
 import type { IRequestData as IPasswordResetRequestData, IResponseData as IPasswordResetResponseData, IUnprocessableEntityResponseData as IPasswordResetUnprocessableEntityResponseData } from "../../api/users/passwords/resets/post";
-import { DispatchEvent, FormFieldCollectionViewModel, FormFieldViewModel, registerValidators } from "react-model-view-viewmodel";
+import { EventDispatcher, Form, FormField } from "react-model-view-viewmodel";
 import { ApiViewModel } from "../api-view-model";
 import { required } from "../validation";
+import { HintKeepForm, HintKeepFormField } from "../forms";
 
 export class RecoverUserViewModel extends ApiViewModel {
-    private readonly _hintSent: DispatchEvent = new DispatchEvent();
-    private readonly _passwordResetRequestSent: DispatchEvent = new DispatchEvent();
+    private readonly _hintSent: EventDispatcher<this> = new EventDispatcher<this>();
+    private readonly _passwordResetRequestSent: EventDispatcher<this> = new EventDispatcher<this>();
 
     public readonly form: RecoverUserFormViewModel = new RecoverUserFormViewModel();
 
-    public get hintSent(): IEvent {
+    public get hintSent(): IEvent<this> {
         return this._hintSent;
     }
 
-    public get passwordResetRequestSent(): IEvent {
+    public get passwordResetRequestSent(): IEvent<this> {
         return this._passwordResetRequestSent;
     }
 
@@ -59,22 +60,18 @@ export class RecoverUserViewModel extends ApiViewModel {
     }
 }
 
-class RecoverUserFormViewModel extends FormFieldCollectionViewModel {
+class RecoverUserFormViewModel extends HintKeepForm {
     public constructor() {
         super();
-        registerValidators(this.email = this.addField('email', ''), [required]);
 
-        this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
+        this.withFields(
+            this.email = new HintKeepFormField<string>({
+                name: 'email',
+                initialValue: '',
+                validators: [required]
+            })
+        );
     }
 
-    public readonly email: FormFieldViewModel<string>;
-
-    public get areAllFieldsTouched(): boolean {
-        return this.fields.every(field => field.isTouched);
-    }
-
-    private _fieldChanged = (field: FormFieldViewModel<any>, changedProperties: readonly string[]): void => {
-        if (changedProperties.includes('isTouched'))
-            this.notifyPropertiesChanged('areAllFieldsTouched');
-    };
+    public readonly email: HintKeepFormField<string>;
 }

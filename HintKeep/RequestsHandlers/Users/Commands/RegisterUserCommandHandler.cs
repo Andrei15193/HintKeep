@@ -12,7 +12,7 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.Users.Commands
 {
-    public class RegisterUserCommandHandler : AsyncRequestHandler<RegisterUserCommand>
+    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand>
     {
         private readonly IEntityTables _entityTables;
         private readonly IEmailService _emailService;
@@ -21,7 +21,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
         public RegisterUserCommandHandler(IEntityTables entityTables, IEmailService emailService, ISecurityService securityService)
             => (_entityTables, _emailService, _securityService) = (entityTables, emailService, securityService);
 
-        protected override async Task Handle(RegisterUserCommand command, CancellationToken cancellationToken)
+        public async Task Handle(RegisterUserCommand command, CancellationToken cancellationToken)
         {
             var userId = Guid.NewGuid().ToString("N");
 

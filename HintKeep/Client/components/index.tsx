@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import classnames from 'classnames';
 import { App } from './app';
 import { I18nProvider } from './i18n';
@@ -12,13 +11,13 @@ const appElement = document.getElementById('app');
 if (appElement !== null) {
     appElement.className = classnames(Style.dFlex, Style.flexFill, Style.h100);
 
-    ReactDOM.render(
+    const root = createRoot(appElement);
+    root.render(
         <I18nProvider>
             <ServicesProvider>
                 <App />
             </ServicesProvider>
         </I18nProvider>,
-        appElement
     );
 }
 else

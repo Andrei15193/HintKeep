@@ -11,7 +11,7 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.Accounts.Commands
 {
-    public class DeleteAccountCommandHandler : AsyncRequestHandler<DeleteAccountCommand>
+    public class DeleteAccountCommandHandler : IRequestHandler<DeleteAccountCommand>
     {
         private readonly IEntityTables _entityTables;
         private readonly Session _login;
@@ -19,7 +19,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
         public DeleteAccountCommandHandler(IEntityTables entityTables, Session login)
             => (_entityTables, _login) = (entityTables, login);
 
-        protected override async Task Handle(DeleteAccountCommand command, CancellationToken cancellationToken)
+        public async Task Handle(DeleteAccountCommand command, CancellationToken cancellationToken)
         {
             var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
                 TableOperation.Retrieve<AccountEntity>(

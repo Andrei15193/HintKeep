@@ -1,12 +1,11 @@
 import type { PropsWithChildren } from 'react';
 import type { IInputProps } from './input';
-import React from 'react';
 import classnames from 'classnames';
-import { watchViewModel } from 'react-model-view-viewmodel';
 import { Input } from './input';
 import { Message } from '../i18n';
 
 import Style from '../style.scss';
+import { useViewModel } from 'react-model-view-viewmodel';
 
 export interface IFormCheckboxInputProps extends IInputProps {
     readonly label: string;
@@ -15,7 +14,7 @@ export interface IFormCheckboxInputProps extends IInputProps {
 }
 
 export function FormCheckboxInput({ label, description, field, id, className, type, children, ...inputProps }: PropsWithChildren<IFormCheckboxInputProps>): JSX.Element {
-    watchViewModel(field, ['value', 'error']);
+    useViewModel(field);
 
     return (
         <div className={classnames(className, Style.formCheck)}>
@@ -24,7 +23,7 @@ export function FormCheckboxInput({ label, description, field, id, className, ty
                 <Message id={label} />
                 {children}
             </label>
-            <div id={`${id}Feedback`} className={Style.invalidFeedback}>{field.error !== undefined && <Message id={field.error} />}</div>
+            <div id={`${id}Feedback`} className={Style.invalidFeedback}>{field.error !== null && <Message id={field.error} />}</div>
             {description && <div className={Style.mt2}><Message id={description} /></div>}
         </div>
     );

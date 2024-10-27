@@ -1,16 +1,15 @@
 import type { AxiosResponse } from 'axios';
-import type { IEvent } from 'react-model-view-viewmodel'
 import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../../api/accounts/post';
-import { DispatchEvent } from 'react-model-view-viewmodel'
+import { type IEvent, EventDispatcher } from 'react-model-view-viewmodel'
 import { ApiViewModel } from '../api-view-model';
 import { AccountFormViewModel } from './account-form-view-model';
 
 export class AddAccountViewModel extends ApiViewModel {
-    private readonly _submittedEvent: DispatchEvent = new DispatchEvent();
+    private readonly _submittedEvent: EventDispatcher<this> = new EventDispatcher<this>();
 
     public readonly form: AccountFormViewModel = new AccountFormViewModel();
 
-    public get submittedEvent(): IEvent {
+    public get submittedEvent(): IEvent<this> {
         return this._submittedEvent;
     }
 

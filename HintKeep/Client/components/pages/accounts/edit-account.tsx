@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import classnames from 'classnames';
-import { watchEvent } from 'react-model-view-viewmodel';
-import { useViewModel } from '../../use-view-model';
+import { type IEventHandler, useViewModel, useViewModelDependency } from 'react-model-view-viewmodel';
 import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
 import { EditAccountViewModel } from '../../../view-models/accounts/edit-account-view-model';
@@ -16,14 +15,39 @@ export interface IEditAccountRouteParams {
 }
 
 export function EditAccount(): JSX.Element {
-    const navigate = useNavigate();
-    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new EditAccountViewModel(axios, alertsViewModel, sessionViewModel));
     const { id = "" } = useParams();
 
+    const navigate = useNavigate();
+
+    const editAccountViewModel = useViewModelDependency(EditAccountViewModel);
+    useViewModel(editAccountViewModel.form);
+
     const [isConfirmationHidden, setIsConfirmationHidden] = useState(true);
-    useEffect(() => { $vm.loadAsync(id); }, [$vm, id]);
-    watchEvent($vm.editedEvent, () => navigate('/'));
-    watchEvent($vm.deletedEvent, () => navigate('/'));
+    useEffect(
+        () => {
+            editAccountViewModel.loadAsync(id);
+        },
+        [editAccountViewModel, id]
+    );
+
+    useEffect(
+        () => {
+            const editedOrDeletedEventHandler: IEventHandler<unknown> = {
+                handle() {
+                    navigate('/')
+                }
+            }
+
+            editAccountViewModel.editedEvent.subscribe(editedOrDeletedEventHandler);
+            editAccountViewModel.deletedEvent.subscribe(editedOrDeletedEventHandler);
+
+            return () => {
+                editAccountViewModel.deletedEvent.unsubscribe(editedOrDeletedEventHandler);
+                editAccountViewModel.editedEvent.unsubscribe(editedOrDeletedEventHandler);
+            }
+        },
+        [editAccountViewModel, navigate]
+    )
 
     return (
         <div className={Style.mx3}>
@@ -40,17 +64,17 @@ export function EditAccount(): JSX.Element {
                 </div>
             </h1>
 
-            <BusyContent $vm={$vm}>
-                <form onSubmit={event => { event.preventDefault(); $vm.submitAsync(); }}>
-                    <FormInput className={Style.mb3} id="name" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.name.label" field={$vm.form.name} placeholder="pages.editAccount.name.placeholder" />
-                    <FormInput className={Style.mb3} id="hint" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.hint.label" field={$vm.form.hint} placeholder="pages.editAccount.hint.placeholder" />
-                    <FormCheckboxInput className={Style.mb3} id="isPinned" disabled={!isConfirmationHidden} label="pages.editAccount.isPinned.label" field={$vm.form.isPinned} description="pages.editAccount.isPinned.description" />
-                    <FormTextArea className={Style.mb3} id="notes" label="pages.editAccount.notes.label" field={$vm.form.notes} />
+            <BusyContent apiViewModel={editAccountViewModel}>
+                <form onSubmit={event => { event.preventDefault(); editAccountViewModel.submitAsync(); }}>
+                    <FormInput className={Style.mb3} id="name" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.name.label" field={editAccountViewModel.form.name} placeholder="pages.editAccount.name.placeholder" />
+                    <FormInput className={Style.mb3} id="hint" type="text" disabled={!isConfirmationHidden} label="pages.editAccount.hint.label" field={editAccountViewModel.form.hint} placeholder="pages.editAccount.hint.placeholder" />
+                    <FormCheckboxInput className={Style.mb3} id="isPinned" disabled={!isConfirmationHidden} label="pages.editAccount.isPinned.label" field={editAccountViewModel.form.isPinned} description="pages.editAccount.isPinned.description" />
+                    <FormTextArea className={Style.mb3} id="notes" label="pages.editAccount.notes.label" field={editAccountViewModel.form.notes} />
 
                     <If condition={isConfirmationHidden}>
                         <Then>
                             <div className={classnames(Style.dFlex, Style.flexRow, Style.mb3)}>
-                                <button type="submit" disabled={(!$vm.isLoaded || ($vm.form.isInvalid && $vm.form.fields.every(field => field.isTouched)))} className={classnames(Style.btn, Style.btnPrimary)}>
+                                <button type="submit" disabled={(!editAccountViewModel.isLoaded || (editAccountViewModel.form.isInvalid && editAccountViewModel.form.fields.every(field => field.isTouched)))} className={classnames(Style.btn, Style.btnPrimary)}>
                                     <Message id="pages.editAccount.save.label" />
                                 </button>
                                 <Link to={`/accounts/${id}/hints`} className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
@@ -59,7 +83,7 @@ export function EditAccount(): JSX.Element {
                                 <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
                                     <Message id="pages.editAccount.cancel.label" />
                                 </Link>
-                                <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.msAuto)} onClick={() => setIsConfirmationHidden(false)}>
+                                <button type="button" disabled={!editAccountViewModel.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.msAuto)} onClick={() => setIsConfirmationHidden(false)}>
                                     <Message id="pages.editAccount.delete.label" />
                                 </button>
                             </div>
@@ -75,7 +99,7 @@ export function EditAccount(): JSX.Element {
                                     </p>
 
                                     <div className={classnames(Style.dFlex, Style.flexRow)}>
-                                        <button type="button" className={classnames(Style.btn, Style.btnDanger)} onClick={() => { setIsConfirmationHidden(true); $vm.deleteAsync(); }}>
+                                        <button type="button" className={classnames(Style.btn, Style.btnDanger)} onClick={() => { setIsConfirmationHidden(true); editAccountViewModel.deleteAsync(); }}>
                                             <Message id="pages.editAccount.moveToBin.label" />
                                         </button>
                                         <button type="button" className={classnames(Style.msAuto, Style.btn, Style.btnSecondary)} onClick={() => setIsConfirmationHidden(true)}>

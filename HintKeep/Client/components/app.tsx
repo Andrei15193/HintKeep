@@ -1,16 +1,16 @@
 import type { PropsWithChildren } from 'react';
-import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from './i18n';
 import { Alerts } from './alerts';
-import { useViewModel } from './use-view-model';
 import { Login, Register, Confirmation, Recovery, PasswordReset, Extra, Accounts, AddAccount, EditAccount, AccountHints, DeletedAccountDetails, DeletedAccounts, TermsOfService } from './pages';
+import { useViewModelDependency } from 'react-model-view-viewmodel';
+import { SessionViewModel } from '../view-models/session-view-model';
 
 import Style from './style.scss';
 
 export function App(): JSX.Element {
-    const $vm = useViewModel(({ sessionViewModel }) => sessionViewModel);
+    const sessionViewModel = useViewModelDependency(SessionViewModel);
 
     return (
         <div className={classnames(Style.app, Style.m3, Style.border, Style.dFlex, Style.flexColumn, Style.flexFill)}>
@@ -20,7 +20,7 @@ export function App(): JSX.Element {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/">
-                            {$vm.isSessionActive
+                            {sessionViewModel.isSessionActive
                                 ? <>
                                     <Route path="extra" element={<Extra />} />
                                     <Route path="accounts">

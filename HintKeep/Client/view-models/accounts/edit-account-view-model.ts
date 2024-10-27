@@ -1,17 +1,16 @@
 import type { AxiosResponse } from 'axios';
-import type { IEvent } from 'react-model-view-viewmodel';
+import { type IEvent, EventDispatcher } from 'react-model-view-viewmodel';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../../api/accounts/get-by-id';
 import type { IConflictResponseData, INotFoundResponseData as INotFoundPutResponseData, IRequestData, IResponseData as IPutResponseData, IUnprocessableEntityResponseData } from '../../api/accounts/put';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../../api/accounts/delete';
-import { DispatchEvent } from 'react-model-view-viewmodel';
 import { ApiViewModel } from '../api-view-model';
 import { AccountFormViewModel } from './account-form-view-model';
 
 export class EditAccountViewModel extends ApiViewModel {
     private _id: string | null = null;
     private _form: AccountFormViewModel = new AccountFormViewModel();
-    private readonly _editedEvent: DispatchEvent = new DispatchEvent();
-    private readonly _deletedEvent: DispatchEvent = new DispatchEvent();
+    private readonly _editedEvent: EventDispatcher<this> = new EventDispatcher<this>();
+    private readonly _deletedEvent: EventDispatcher<this> = new EventDispatcher<this>();
 
     public get form(): AccountFormViewModel {
         return this._form;
@@ -21,11 +20,11 @@ export class EditAccountViewModel extends ApiViewModel {
         return this._id !== null;
     }
 
-    public get editedEvent(): IEvent {
+    public get editedEvent(): IEvent<this> {
         return this._editedEvent;
     }
 
-    public get deletedEvent(): IEvent {
+    public get deletedEvent(): IEvent<this> {
         return this._deletedEvent;
     }
 

@@ -11,7 +11,7 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.Accounts.Commands
 {
-    public class UpdateAccountCommandHandler : AsyncRequestHandler<UpdateAccountCommand>
+    public class UpdateAccountCommandHandler : IRequestHandler<UpdateAccountCommand>
     {
         private readonly IEntityTables _entityTables;
         private readonly Session _login;
@@ -19,7 +19,7 @@ namespace HintKeep.RequestsHandlers.Accounts.Commands
         public UpdateAccountCommandHandler(IEntityTables entityTables, Session login)
             => (_entityTables, _login) = (entityTables, login);
 
-        protected override async Task Handle(UpdateAccountCommand command, CancellationToken cancellationToken)
+        public async Task Handle(UpdateAccountCommand command, CancellationToken cancellationToken)
         {
             var accountEntity = (AccountEntity)(await _entityTables.Accounts.ExecuteAsync(
                 TableOperation.Retrieve<AccountEntity>(_login.UserId.ToEncodedKeyProperty(), $"accountId-{command.Id}".ToEncodedKeyProperty()),

@@ -1,15 +1,14 @@
-import React from 'react';
 import { Alert } from './alert';
-import { requireViewModel } from '../use-view-model';
-import { watchCollection } from 'react-model-view-viewmodel';
+import { useObservableCollection, useViewModelDependency } from 'react-model-view-viewmodel';
+import { AlertsViewModel } from '../../view-models/alerts-view-model';
 
 export function Alerts(): JSX.Element {
-    const $vm = requireViewModel(({ alertsViewModel }) => alertsViewModel);
-    watchCollection($vm.alerts);
+    const alertsViewModel = useViewModelDependency(AlertsViewModel);
+    useObservableCollection(alertsViewModel.alerts);
 
     return (
         <>
-            {$vm.alerts.map((alert, index) => <Alert key={index} $vm={alert} />)}
+            {alertsViewModel.alerts.map((alert, index) => <Alert key={index} alertViewModel={alert} />)}
         </>
     );
 }

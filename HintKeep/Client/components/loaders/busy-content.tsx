@@ -1,16 +1,15 @@
 import type { PropsWithChildren } from 'react'
 import type { ApiViewModel } from '../../view-models/api-view-model';
-import { watchViewModel } from 'react-model-view-viewmodel';
-import React from 'react';
 import { Spinner } from './spinner';
 import { ApiViewModelState } from '../../view-models/api-view-model';
+import { useViewModel } from 'react-model-view-viewmodel';
 
 export interface IBusyContentProps {
-    readonly $vm: ApiViewModel;
+    readonly apiViewModel: ApiViewModel;
 }
 
-export function BusyContent({ $vm, children }: PropsWithChildren<IBusyContentProps>): JSX.Element {
-    watchViewModel($vm, ['state']);
+export function BusyContent({ apiViewModel, children }: PropsWithChildren<IBusyContentProps>): JSX.Element {
+    useViewModel(apiViewModel);
 
-    return $vm.state === ApiViewModelState.Busy ? <Spinner /> : <>{children}</>
+    return apiViewModel.state === ApiViewModelState.Busy ? <Spinner /> : <>{children}</>
 }

@@ -1,5 +1,5 @@
 import type { IMessages } from '../../translations/IMessages';
-import React from 'react';
+import { createContext } from 'react';
 
 export interface IMessageResolver {
     resolve(key: string, values?: any): string;
@@ -31,4 +31,4 @@ export class MessageResolver implements IMessageResolver {
     }
 }
 
-export const I18nContext = React.createContext<IMessageResolver>(new EmptyMessageResolver());
+export const I18nContext = createContext<IMessageResolver>(new EmptyMessageResolver());

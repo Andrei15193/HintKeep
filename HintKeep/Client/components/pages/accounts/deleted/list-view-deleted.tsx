@@ -1,17 +1,22 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../../i18n'
-import { useViewModel } from '../../../use-view-model';
 import { DeletedAccountsViewModel } from '../../../../view-models/accounts/deleted/deleted-accounts-view-model';
 import { BusyContent } from '../../../loaders';
 import { AccountsSearchList } from '../common/accounts-search-list';
+import { useViewModelDependency } from 'react-model-view-viewmodel';
 
 import Style from '../../../style.scss';
 
 export function DeletedAccounts(): JSX.Element {
-    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new DeletedAccountsViewModel(axios, alertsViewModel, sessionViewModel));
-    useEffect(() => { $vm.loadAsync(); }, [$vm]);
+    const deletedAccountsViewModel = useViewModelDependency(DeletedAccountsViewModel);
+    useEffect(
+        () => {
+            deletedAccountsViewModel.loadAsync();
+        },
+        [deletedAccountsViewModel]
+    );
 
     return (
         <>
@@ -32,8 +37,8 @@ export function DeletedAccounts(): JSX.Element {
             </div>
 
             <div className={classnames(Style.dFlex, Style.flexFill, Style.flexColumn)}>
-                <BusyContent $vm={$vm}>
-                    <AccountsSearchList $vm={$vm.accounts} noItemsComponent={NoAccountsMessage} getDetailsRoute={account => `/accounts/bin/${account.id}`} />
+                <BusyContent apiViewModel={deletedAccountsViewModel}>
+                    <AccountsSearchList accountsListViewModel={deletedAccountsViewModel.accounts} noItemsComponent={NoAccountsMessage} getDetailsRoute={account => `/accounts/bin/${account.id}`} />
                 </BusyContent>
             </div>
         </>

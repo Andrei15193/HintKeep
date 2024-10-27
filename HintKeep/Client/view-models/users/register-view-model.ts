@@ -1,16 +1,16 @@
 import type { AxiosResponse } from 'axios';
 import type { IConflictResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../../api/users/post';
-import { IEvent, registerValidators } from 'react-model-view-viewmodel';
-import { DispatchEvent, FormFieldCollectionViewModel, FormFieldViewModel } from 'react-model-view-viewmodel';
+import { type IEvent, EventDispatcher } from 'react-model-view-viewmodel';
 import { ApiViewModel } from '../api-view-model';
 import { required } from '../validation';
+import { HintKeepForm, HintKeepFormField } from '../forms';
 
 export class RegisterUserViewModel extends ApiViewModel {
-    private readonly _registeredEvent: DispatchEvent = new DispatchEvent();
+    private readonly _registeredEvent: EventDispatcher<this> = new EventDispatcher<this>();
 
     public readonly form: RegisterUserFormViewModel = new RegisterUserFormViewModel();
 
-    public get registered(): IEvent {
+    public get registered(): IEvent<this> {
         return this._registeredEvent;
     }
 
@@ -38,31 +38,38 @@ export class RegisterUserViewModel extends ApiViewModel {
     }
 }
 
-class RegisterUserFormViewModel extends FormFieldCollectionViewModel {
+class RegisterUserFormViewModel extends HintKeepForm {
     public constructor() {
         super();
-        registerValidators(this.email = this.addField('email', ''), [required]);
-        registerValidators(this.hint = this.addField('hint', ''), [required]);
-        registerValidators(this.password = this.addField('password', ''), [required]);
-        this.termsOfServiceAcceptance = this.addField('termsOfServiceAcceptance', false);
 
-        this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
+        this.withFields(
+            this.email = new HintKeepFormField<string>({
+                name: 'email',
+                initialValue: '',
+                validators: [required]
+            }),
+            this.hint = new HintKeepFormField<string>({
+                name: 'hint',
+                initialValue: '',
+                validators: [required]
+            }),
+            this.password = new HintKeepFormField<string>({
+                name: 'password',
+                initialValue: '',
+                validators: [required]
+            }),
+            this.termsOfServiceAcceptance = new HintKeepFormField<boolean>({
+                name: 'termsOfServiceAcceptance',
+                initialValue: false
+            })
+        );
     }
 
-    public readonly email: FormFieldViewModel<string>;
+    public readonly email: HintKeepFormField<string>;
 
-    public readonly hint: FormFieldViewModel<string>;
+    public readonly hint: HintKeepFormField<string>;
 
-    public readonly password: FormFieldViewModel<string>;
+    public readonly password: HintKeepFormField<string>;
 
-    public readonly termsOfServiceAcceptance: FormFieldViewModel<boolean>;
-
-    public get areAllFieldsTouched(): boolean {
-        return this.fields.every(field => field.isTouched);
-    }
-
-    private _fieldChanged = (field: FormFieldViewModel<any>, changedProperties: readonly string[]): void => {
-        if (changedProperties.includes('isTouched'))
-            this.notifyPropertiesChanged('areAllFieldsTouched');
-    };
+    public readonly termsOfServiceAcceptance: HintKeepFormField<boolean>;
 }

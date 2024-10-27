@@ -13,12 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8
+
+    - name: Setup NodeJS
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
 
     - name: Restore dependencies
       run: |
@@ -27,7 +32,7 @@ jobs:
 
     - name: Build
       run: |
-        npm run build -- --mode=production
+        npm run build -- -- --mode=production
         dotnet build --configuration Release --no-restore
 
     - name: Test
@@ -45,16 +50,11 @@ jobs:
         rm appsettings.Development.json
         zip -r ../HintKeep.zip .
 
-    - name: Azure Authentication
-      if: github.event_name == 'push' && contains(toJSON(github.event.commits.*.message), '[release]')
-      uses: azure/login@v1
+    - uses: Azure/webapps-deploy@v3.0.1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Deploy Application
-      if: github.event_name == 'push' && contains(toJSON(github.event.commits.*.message), '[release]')
-      shell: pwsh
-      run: |
-        az webapp stop --resource-group HintKeep --name HintKeep
-        az webapp deployment source config-zip --resource-group HintKeep --name HintKeep --src ./Publish/HintKeep.zip
-        az webapp start --resource-group HintKeep --name HintKeep
+        app-name: ''
+        publish-profile: ${{ secrets.PUBLISH_PROFILE }}
+        package: ./Publish/HintKeep.zip
+        type: zip
+        clean: true
+        restart: true

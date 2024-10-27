@@ -1,25 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { watchEvent } from 'react-model-view-viewmodel';
+import { type IEventHandler, useViewModelDependency } from 'react-model-view-viewmodel';
 import classnames from 'classnames';
 import { Message } from '../../../i18n';
 import { BusyContent } from '../../../loaders';
 import { DeletedAccountDetailsViewModel } from '../../../../view-models/accounts/deleted/deleted-account-details-view-model';
 import { FormInput, FormCheckboxInput, FormTextArea } from '../../../forms';
 import { Else, If, Then } from '../../../conditionals';
-import { useViewModel } from '../../../use-view-model';
 
 import Style from '../../../style.scss';
 
 export function DeletedAccountDetails(): JSX.Element {
-    const navigate = useNavigate();
-    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new DeletedAccountDetailsViewModel(axios, alertsViewModel, sessionViewModel));
     const { id = "" } = useParams();
 
+    const navigate = useNavigate();
+
+    const deletedAccountDetailsViewModel = useViewModelDependency(DeletedAccountDetailsViewModel);
+
     const [isConfirmationHidden, setIsConfirmationHidden] = useState(true);
-    useEffect(() => { $vm.loadAsync(id); }, [$vm, id]);
-    watchEvent($vm.restoredEvent, () => navigate('/accounts/bin'));
-    watchEvent($vm.deletedEvent, () => navigate('/accounts/bin'));
+    useEffect(
+        () => {
+            deletedAccountDetailsViewModel.loadAsync(id);
+        },
+        [deletedAccountDetailsViewModel, id]
+    );
+
+    useEffect(
+        () => {
+            const restoredOrDeletedEventHandler: IEventHandler<unknown> = {
+                handle() {
+                    navigate('/accounts/bin');
+                }
+            }
+
+            deletedAccountDetailsViewModel.restoredEvent.subscribe(restoredOrDeletedEventHandler);
+            deletedAccountDetailsViewModel.deletedEvent.subscribe(restoredOrDeletedEventHandler);
+
+            return () => {
+                deletedAccountDetailsViewModel.deletedEvent.unsubscribe(restoredOrDeletedEventHandler);
+                deletedAccountDetailsViewModel.restoredEvent.unsubscribe(restoredOrDeletedEventHandler);
+            }
+        },
+        [deletedAccountDetailsViewModel, navigate]
+    )
 
     return (
         <div className={Style.mx3}>
@@ -36,22 +59,22 @@ export function DeletedAccountDetails(): JSX.Element {
                 </div>
             </h1>
 
-            <BusyContent $vm={$vm}>
-                <FormInput className={Style.mb3} id="name" type="text" disabled label="pages.deletedAccountDetails.name.label" field={$vm.form.name} />
-                <FormInput className={Style.mb3} id="hint" type="text" disabled label="pages.deletedAccountDetails.hint.label" field={$vm.form.hint} />
-                <FormCheckboxInput className={Style.mb3} id="isPinned" disabled label="pages.deletedAccountDetails.isPinned.label" field={$vm.form.isPinned} />
-                <FormTextArea className={Style.mb3} id="notes" disabled label="pages.deletedAccountDetails.notes.label" field={$vm.form.notes} />
+            <BusyContent apiViewModel={deletedAccountDetailsViewModel}>
+                <FormInput className={Style.mb3} id="name" type="text" disabled label="pages.deletedAccountDetails.name.label" field={deletedAccountDetailsViewModel.form.name} />
+                <FormInput className={Style.mb3} id="hint" type="text" disabled label="pages.deletedAccountDetails.hint.label" field={deletedAccountDetailsViewModel.form.hint} />
+                <FormCheckboxInput className={Style.mb3} id="isPinned" disabled label="pages.deletedAccountDetails.isPinned.label" field={deletedAccountDetailsViewModel.form.isPinned} />
+                <FormTextArea className={Style.mb3} id="notes" disabled label="pages.deletedAccountDetails.notes.label" field={deletedAccountDetailsViewModel.form.notes} />
 
                 <If condition={isConfirmationHidden}>
                     <Then>
                         <div className={classnames(Style.dFlex, Style.flexRow, Style.mb3)}>
-                            <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.restoreAsync()}>
+                            <button type="button" disabled={!deletedAccountDetailsViewModel.isLoaded} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => deletedAccountDetailsViewModel.restoreAsync()}>
                                 <Message id="pages.deletedAccountDetails.restore.label" />
                             </button>
                             <Link to="/accounts/bin" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
                                 <Message id="pages.deletedAccountDetails.cancel.label" />
                             </Link>
-                            <button type="button" disabled={!$vm.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.msAuto)} onClick={() => setIsConfirmationHidden(false)}>
+                            <button type="button" disabled={!deletedAccountDetailsViewModel.isLoaded} className={classnames(Style.btn, Style.btnDanger, Style.msAuto)} onClick={() => setIsConfirmationHidden(false)}>
                                 <Message id="pages.deletedAccountDetails.delete.label" />
                             </button>
                         </div>
@@ -67,7 +90,7 @@ export function DeletedAccountDetails(): JSX.Element {
                                 </p>
 
                                 <div className={classnames(Style.dFlex, Style.flexRow)}>
-                                    <button type="button" className={classnames(Style.btn, Style.btnDanger)} onClick={() => { setIsConfirmationHidden(true); $vm.deleteAsync(); }}>
+                                    <button type="button" className={classnames(Style.btn, Style.btnDanger)} onClick={() => { setIsConfirmationHidden(true); deletedAccountDetailsViewModel.deleteAsync(); }}>
                                         <Message id="pages.deletedAccountDetails.delete.label" />
                                     </button>
                                     <button type="button" className={classnames(Style.msAuto, Style.btn, Style.btnSecondary)} onClick={() => setIsConfirmationHidden(true)}>

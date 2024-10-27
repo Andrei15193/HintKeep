@@ -42,7 +42,7 @@ export class AccountsListViewModel extends ViewModel {
                 const accountName = account.name.toLocaleLowerCase();
                 return searchTerms.some(searchTerm => accountName.includes(searchTerm));
             });
-        this._filteredAccounts.reset(...filteredAccounts);
+        this._filteredAccounts.splice(0, Number.POSITIVE_INFINITY, ...filteredAccounts);
     }
 }
 

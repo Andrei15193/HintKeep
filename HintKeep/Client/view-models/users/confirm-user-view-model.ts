@@ -1,16 +1,16 @@
 import type { AxiosResponse } from 'axios';
-import type { FormFieldViewModel, IEvent } from 'react-model-view-viewmodel';
 import type { INotFoundResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from '../../api/users/confirmations/post';
-import { DispatchEvent, FormFieldCollectionViewModel, registerValidators } from 'react-model-view-viewmodel';
+import { type IEvent, EventDispatcher } from 'react-model-view-viewmodel';
 import { ApiViewModel } from '../api-view-model';
 import { required } from '../validation';
+import { HintKeepForm, HintKeepFormField } from '../forms';
 
 export class ConfirmUserViewModel extends ApiViewModel {
-    private readonly _confirmedEvent: DispatchEvent = new DispatchEvent();
+    private readonly _confirmedEvent: EventDispatcher<this> = new EventDispatcher<this>();
 
     public readonly form: ConfirmUserFormViewModel = new ConfirmUserFormViewModel();
 
-    public get confirmed(): IEvent {
+    public get confirmed(): IEvent<this> {
         return this._confirmedEvent;
     }
 
@@ -34,22 +34,18 @@ export class ConfirmUserViewModel extends ApiViewModel {
     }
 }
 
-class ConfirmUserFormViewModel extends FormFieldCollectionViewModel {
+class ConfirmUserFormViewModel extends HintKeepForm {
     public constructor() {
         super();
-        registerValidators(this.token = this.addField('token', ''), [required]);
 
-        this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
+        this.withFields(
+            this.token = new HintKeepFormField<string>({
+                name: 'token',
+                initialValue: '',
+                validators: [required]
+            })
+        )
     }
 
-    public readonly token: FormFieldViewModel<string>;
-
-    public get areAllFieldsTouched(): boolean {
-        return this.fields.every(field => field.isTouched);
-    }
-
-    private _fieldChanged = (field: FormFieldViewModel<any>, changedProperties: readonly string[]): void => {
-        if (changedProperties.includes('isTouched'))
-            this.notifyPropertiesChanged('areAllFieldsTouched');
-    };
+    public readonly token: HintKeepFormField<string>;
 }

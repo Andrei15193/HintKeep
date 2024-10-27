@@ -12,7 +12,7 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.Requests.Users.Commands
 {
-    public class UserPasswordResetCommandHandler : AsyncRequestHandler<UserPasswordResetCommand>
+    public class UserPasswordResetCommandHandler : IRequestHandler<UserPasswordResetCommand>
     {
         private readonly IEntityTables _entityTables;
         private readonly ISecurityService _securityService;
@@ -21,7 +21,7 @@ namespace HintKeep.Requests.Users.Commands
         public UserPasswordResetCommandHandler(IEntityTables entityTables, ISecurityService securityService, IEmailService emailService)
             => (_entityTables, _securityService, _emailService) = (entityTables, securityService, emailService);
 
-        protected override async Task Handle(UserPasswordResetCommand command, CancellationToken cancellationToken)
+        public async Task Handle(UserPasswordResetCommand command, CancellationToken cancellationToken)
         {
             var userPasswordResetTokenEntity = (
                 await _entityTables.Users.ExecuteQuerySegmentedAsync(

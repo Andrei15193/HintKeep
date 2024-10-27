@@ -12,14 +12,14 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.Users.Commands
 {
-    public class ConfirmUserCommandHandler : AsyncRequestHandler<ConfirmUserCommand>
+    public class ConfirmUserCommandHandler : IRequestHandler<ConfirmUserCommand>
     {
         private readonly IEntityTables _entityTables;
 
         public ConfirmUserCommandHandler(IEntityTables entityTables)
             => _entityTables = entityTables;
 
-        protected override async Task Handle(ConfirmUserCommand command, CancellationToken cancellationToken)
+        public async Task Handle(ConfirmUserCommand command, CancellationToken cancellationToken)
         {
             var entities = await _entityTables.Users.ExecuteQuerySegmentedAsync(
                 new TableQuery<UserActivationTokenEntity>()

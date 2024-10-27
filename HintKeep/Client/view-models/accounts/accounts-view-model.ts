@@ -15,7 +15,7 @@ export class AccountsViewModel extends ApiViewModel {
             .get("/api/accounts")
             .on(200, (response: AxiosResponse<IResponseData>) => {
                 this._accounts.reset(response.data.map(account => new Account(account.id, account.name, account.hint, account.isPinned)));
-                this.notifyPropertiesChanged('accounts', 'hasAccounts');
+                this.notifyPropertiesChanged('accounts');
             })
             .sendAsync();
     }

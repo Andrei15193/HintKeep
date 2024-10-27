@@ -1,17 +1,16 @@
 import type { AxiosResponse } from 'axios';
-import type { IEvent } from 'react-model-view-viewmodel';
+import { type IEvent, EventDispatcher } from 'react-model-view-viewmodel';
 import type { INotFoundResponseData as INotFoundGetResponseData, IResponseData as IGetResponseData } from '../../../api/deleted-accounts/get-by-id';
 import type { INotFoundResponseData as INotFoundPutResponseData, IResponseData as IPutResponseData, IRequestData as IPutRequestData } from '../../../api/deleted-accounts/put';
 import type { INotFoundResponseData as INotFoundDeleteResponseData, IResponseData as IDeleteResponseData } from '../../../api/deleted-accounts/delete';
-import { DispatchEvent } from 'react-model-view-viewmodel';
 import { ApiViewModel } from '../../api-view-model';
 import { AccountFormViewModel } from '../account-form-view-model';
 
 export class DeletedAccountDetailsViewModel extends ApiViewModel {
     private _id: string | null = null;
     private _form: AccountFormViewModel = new AccountFormViewModel();
-    private readonly _restoredEvent: DispatchEvent= new DispatchEvent();
-    private readonly _deletedEvent: DispatchEvent= new DispatchEvent();
+    private readonly _restoredEvent: EventDispatcher<this> = new EventDispatcher<this>();
+    private readonly _deletedEvent: EventDispatcher<this> = new EventDispatcher<this>();
 
     public get form(): AccountFormViewModel {
         return this._form;
@@ -21,11 +20,11 @@ export class DeletedAccountDetailsViewModel extends ApiViewModel {
         return this._id !== null;
     }
 
-    public get restoredEvent(): IEvent {
+    public get restoredEvent(): IEvent<this> {
         return this._restoredEvent;
     }
 
-    public get deletedEvent(): IEvent {
+    public get deletedEvent(): IEvent<this> {
         return this._deletedEvent;
     }
 

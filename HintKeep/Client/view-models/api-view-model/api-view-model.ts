@@ -1,8 +1,9 @@
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
-import type { AlertsViewModel } from '../alerts-view-model';
-import type { SessionViewModel } from '../session-view-model';
-import { ViewModel } from 'react-model-view-viewmodel';
+import { type IDependencyResolver, ViewModel } from 'react-model-view-viewmodel';
+import { AlertsViewModel } from '../alerts-view-model';
+import { SessionViewModel } from '../session-view-model';
 import { RequestHandlerBuilder } from './request-handler-builder';
+import { Axios } from '../../services';
 
 export enum ApiViewModelState {
     Ready,
@@ -14,12 +15,12 @@ export abstract class ApiViewModel extends ViewModel {
     private _state: ApiViewModelState;
     private readonly _axios: AxiosInstance;
 
-    public constructor(axios: AxiosInstance, alertsViewModel: AlertsViewModel, sessionViewModel: SessionViewModel) {
+    public constructor({ resolve }: IDependencyResolver) {
         super();
         this._state = ApiViewModelState.Ready;
-        this._axios = axios;
-        this.alertsViewModel = alertsViewModel;
-        this.sessionViewModel = sessionViewModel;
+        this._axios = resolve(Axios);
+        this.alertsViewModel = resolve(AlertsViewModel);
+        this.sessionViewModel = resolve(SessionViewModel);
     }
 
     public get state(): ApiViewModelState {

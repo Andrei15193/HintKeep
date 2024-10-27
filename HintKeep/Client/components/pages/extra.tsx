@@ -1,13 +1,13 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
-import { useViewModel } from '../use-view-model';
 import { Message } from '../i18n';
+import { useViewModelDependency } from 'react-model-view-viewmodel';
+import { SessionViewModel } from '../../view-models/session-view-model';
 
 import Style from '../style.scss';
 
 export function Extra(): JSX.Element {
-    const $vm = useViewModel(({ sessionViewModel }) => sessionViewModel);
+    const sessionViewModel = useViewModelDependency(SessionViewModel);
 
     return (
         <>
@@ -30,7 +30,7 @@ export function Extra(): JSX.Element {
                     <div className={Style.flexFill}>
                         <ul>
                             <li><Link to="/accounts/bin"><Message id="pages.extra.accountsBin.label" /></Link></li>
-                            <li><Link to="/" onClick={() => $vm.endSession()}><Message id="pages.extra.logOut.label" /></Link></li>
+                            <li><Link to="/" onClick={() => sessionViewModel.endSession()}><Message id="pages.extra.logOut.label" /></Link></li>
                         </ul>
                     </div>
                 </div>

@@ -11,7 +11,7 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace HintKeep.RequestsHandlers.Users.Commands
 {
-    public class UserRequestHintCommandHandler : AsyncRequestHandler<UserRequestHintCommand>
+    public class UserRequestHintCommandHandler : IRequestHandler<UserRequestHintCommand>
     {
         private readonly IEntityTables _entityTables;
         private readonly ISecurityService _securityService;
@@ -20,7 +20,7 @@ namespace HintKeep.RequestsHandlers.Users.Commands
         public UserRequestHintCommandHandler(IEntityTables entityTables, ISecurityService securityService, IEmailService emailService)
             => (_entityTables, _securityService, _emailService) = (entityTables, securityService, emailService);
 
-        protected override async Task Handle(UserRequestHintCommand command, CancellationToken cancellationToken)
+        public async Task Handle(UserRequestHintCommand command, CancellationToken cancellationToken)
         {
             var emailHash = _securityService.ComputeHash(command.Email.ToLowerInvariant());
             var userEntity = (UserEntity)(await _entityTables.Users.ExecuteAsync(

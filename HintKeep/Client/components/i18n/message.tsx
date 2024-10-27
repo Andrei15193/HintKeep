@@ -1,4 +1,3 @@
-import React from 'react';
 import { I18nConsumer } from './i18n-consumer';
 
 export interface IMessageProps {

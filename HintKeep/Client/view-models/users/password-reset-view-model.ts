@@ -1,16 +1,16 @@
 import type { AxiosResponse } from "axios";
-import type { IEvent } from "react-model-view-viewmodel";
 import type { INotFoundResponseData, IRequestData, IResponseData, IUnprocessableEntityResponseData } from "../../api/users/passwords/post";
-import { DispatchEvent, FormFieldCollectionViewModel, FormFieldViewModel, registerValidators } from "react-model-view-viewmodel";
+import { type IEvent, EventDispatcher } from "react-model-view-viewmodel";
 import { ApiViewModel } from "../api-view-model";
 import { required } from "../validation";
+import { HintKeepForm, HintKeepFormField } from "../forms";
 
 export class PasswordResetViewModel extends ApiViewModel {
-    private readonly _passwordReset: DispatchEvent = new DispatchEvent();
+    private readonly _passwordReset: EventDispatcher<this> = new EventDispatcher<this>();
 
     public readonly form: PasswordResetFormViewModel = new PasswordResetFormViewModel();
 
-    public get passwordReset(): IEvent {
+    public get passwordReset(): IEvent<this> {
         return this._passwordReset;
     }
 
@@ -38,40 +38,45 @@ export class PasswordResetViewModel extends ApiViewModel {
     }
 }
 
-class PasswordResetFormViewModel extends FormFieldCollectionViewModel {
+class PasswordResetFormViewModel extends HintKeepForm {
     public constructor() {
         super();
-        registerValidators(this.email = this.addField('email', ''), [required]);
-        registerValidators(this.token = this.addField('token', ''), [required]);
-        registerValidators(this.password = this.addField('password', ''), [required]);
-        registerValidators(
-            {
-                target: this.passwordConfirmation = this.addField('passwordConfirmation', ''),
-                triggers: [this.password]
-            },
-            [
-                required,
-                () => this.passwordConfirmation.value !== this.password.value ? 'validation.errors.passwordsDoNotMatch' : undefined
-            ]
-        );
 
-        this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
+        this.withFields(
+            this.email = new HintKeepFormField<string>({
+                name: 'email',
+                initialValue: '',
+                validators: [required]
+            }),
+            this.token = new HintKeepFormField<string>({
+                name: 'token',
+                initialValue: '',
+                validators: [required]
+            }),
+            this.password = new HintKeepFormField<string>({
+                name: 'password',
+                initialValue: '',
+                validators: [required]
+            }),
+            this.passwordConfirmation = new HintKeepFormField<string>({
+                name: 'passwordConfirmation',
+                initialValue: '',
+                validators: [
+                    required,
+                    passwordConfirmation => passwordConfirmation.value !== this.password.value ? 'validation.errors.passwordsDoNotMatch' : undefined
+                ],
+                validationTriggers: [
+                    this.password
+                ]
+            })
+        )
     }
 
-    public readonly email: FormFieldViewModel<string>;
+    public readonly email: HintKeepFormField<string>;
 
-    public readonly token: FormFieldViewModel<string>;
+    public readonly token: HintKeepFormField<string>;
 
-    public readonly password: FormFieldViewModel<string>;
+    public readonly password: HintKeepFormField<string>;
 
-    public readonly passwordConfirmation: FormFieldViewModel<string>;
-
-    public get areAllFieldsTouched(): boolean {
-        return this.fields.every(field => field.isTouched);
-    }
-
-    private _fieldChanged = (field: FormFieldViewModel<any>, changedProperties: readonly string[]): void => {
-        if (changedProperties.includes('isTouched'))
-            this.notifyPropertiesChanged('areAllFieldsTouched');
-    };
+    public readonly passwordConfirmation: HintKeepFormField<string>;
 }

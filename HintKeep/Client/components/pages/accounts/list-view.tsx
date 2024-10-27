@@ -1,17 +1,23 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
-import { useViewModel } from '../../use-view-model';
 import { AccountsViewModel } from '../../../view-models/accounts/accounts-view-model';
 import { BusyContent } from '../../loaders';
 import { AccountsSearchList } from './common/accounts-search-list';
+import { useViewModelDependency } from 'react-model-view-viewmodel';
 
 import Style from '../../style.scss';
 
 export function Accounts(): JSX.Element {
-    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new AccountsViewModel(axios, alertsViewModel, sessionViewModel));
-    useEffect(() => { $vm.loadAsync(); }, [$vm]);
+    const accountsViewModel = useViewModelDependency(AccountsViewModel);
+
+    useEffect(
+        () => {
+            accountsViewModel.loadAsync();
+        },
+        [accountsViewModel]
+    );
 
     return (
         <>
@@ -37,8 +43,8 @@ export function Accounts(): JSX.Element {
             </div>
 
             <div className={classnames(Style.dFlex, Style.flexFill, Style.flexColumn)}>
-                <BusyContent $vm={$vm}>
-                    <AccountsSearchList $vm={$vm.accounts} noItemsComponent={NoAccountsMessage} getDetailsRoute={account => `/accounts/${account.id}`} />
+                <BusyContent apiViewModel={accountsViewModel}>
+                    <AccountsSearchList accountsListViewModel={accountsViewModel.accounts} noItemsComponent={NoAccountsMessage} getDetailsRoute={account => `/accounts/${account.id}`} />
                 </BusyContent>
             </div>
         </>

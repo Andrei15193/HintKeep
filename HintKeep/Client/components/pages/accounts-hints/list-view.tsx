@@ -1,25 +1,34 @@
 import type { MouseEvent } from 'react';
 import type { AccountHint } from '../../../view-models/accounts-hints/account-hints-view-model';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import classnames from 'classnames';
 import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
 import { AccountHintsViewModel } from '../../../view-models/accounts-hints/account-hints-view-model';
-import { If, Then } from '../../conditionals';
+import { If } from '../../conditionals';
+import { useViewModelDependency } from 'react-model-view-viewmodel';
 
 import Style from '../../style.scss';
-import { useViewModel } from '../../use-view-model';
 
 export interface IAccountHintsRouteParams {
     readonly id: string
 }
 
 export function AccountHints(): JSX.Element {
-    const navigate = useNavigate();
     const { id = "" } = useParams();
-    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new AccountHintsViewModel(axios, alertsViewModel, sessionViewModel));
-    useEffect(() => { $vm.loadAsync(id); }, [$vm]);
+
+    const navigate = useNavigate();
+
+    const accountHintsViewModel = useViewModelDependency(AccountHintsViewModel);
+
+    useEffect(
+        () => {
+            accountHintsViewModel.loadAsync(id);
+        },
+        [accountHintsViewModel]
+    );
+
     const [deleteConfirmationIndex, setDeleteConfirmationIndex] = useState<number | undefined>(undefined);
 
     return (
@@ -40,11 +49,11 @@ export function AccountHints(): JSX.Element {
                 <hr />
             </div>
             <div className={classnames(Style.dFlex, Style.flexFill, Style.flexColumn, Style.mx3)}>
-                <BusyContent $vm={$vm}>
+                <BusyContent apiViewModel={accountHintsViewModel}>
                     {
-                        $vm.accountHints.length === 0
+                        accountHintsViewModel.accountHints.length === 0
                             ? <NoAccountHintsMessage />
-                            : $vm.accountHints.map((accountHint, accountHintIndex) => (
+                            : accountHintsViewModel.accountHints.map((accountHint, accountHintIndex) => (
                                 <div key={accountHint.id} className={Style.mb3}>
                                     <AccountHintDisplay accountHint={accountHint} onDeleteButtonClick={() => toggleConfirmation(accountHintIndex)} />
                                     <If condition={deleteConfirmationIndex === accountHintIndex}>
@@ -67,7 +76,7 @@ export function AccountHints(): JSX.Element {
 
     function confirmDeletion(hintId: string): void {
         setDeleteConfirmationIndex(undefined);
-        $vm.deleteAsync(hintId);
+        accountHintsViewModel.deleteAsync(hintId);
     }
 
     function dismissConfimation(): void {

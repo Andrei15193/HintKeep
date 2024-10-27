@@ -1,28 +1,34 @@
-import { FormFieldViewModel, FormFieldCollectionViewModel, registerValidators } from 'react-model-view-viewmodel';
 import { required } from '../validation';
+import { HintKeepForm, HintKeepFormField } from '../forms';
 
-export class AccountFormViewModel extends FormFieldCollectionViewModel {
+export class AccountFormViewModel extends HintKeepForm {
     public constructor() {
         super();
-        registerValidators(this.name = this.addField('name', ''), [required]);
-        registerValidators(this.hint = this.addField('hint', ''), [required]);
-        this.isPinned = this.addField('isPinned', false);
-        this.notes = this.addField('notes', '');
 
-        this.fields.forEach(field => field.propertiesChanged.subscribe({ handle: this._fieldChanged }));
+        this.withFields(
+            this.name = new HintKeepFormField<string>({
+                name: 'name',
+                initialValue: '',
+                validators: [required]
+            }),
+            this.hint = new HintKeepFormField<string>({
+                name: 'hint',
+                initialValue: '',
+                validators: [required]
+            }),
+            this.isPinned = new HintKeepFormField<boolean>({
+                name: 'isPinned',
+                initialValue: false
+            }),
+            this.notes = new HintKeepFormField<string>({
+                name: 'notes',
+                initialValue: ''
+            })
+        );
     }
 
-    public readonly name: FormFieldViewModel<string>;
-    public readonly hint: FormFieldViewModel<string>;
-    public readonly isPinned: FormFieldViewModel<boolean>;
-    public readonly notes: FormFieldViewModel<string>;
-
-    public get areAllFieldsTouched(): boolean {
-        return this.fields.every(field => field.isTouched);
-    }
-
-    private _fieldChanged = (field: FormFieldViewModel<any>, changedProperties: readonly string[]): void => {
-        if (changedProperties.includes('isTouched'))
-            this.notifyPropertiesChanged('areAllFieldsTouched');
-    };
+    public readonly name: HintKeepFormField<string>;
+    public readonly hint: HintKeepFormField<string>;
+    public readonly isPinned: HintKeepFormField<boolean>;
+    public readonly notes: HintKeepFormField<string>;
 }

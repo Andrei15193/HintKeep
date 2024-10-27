@@ -1,28 +1,22 @@
 import type { PropsWithChildren } from 'react';
-import type { AxiosInstance } from 'axios';
-import React, { createContext } from 'react';
-import { Axios } from '../services/axios';
+import { useMemo } from 'react';
+import { Axios, AxiosInstance } from '../services';
 import { AlertsViewModel } from '../view-models/alerts-view-model';
 import { SessionViewModel } from '../view-models/session-view-model';
-
-export interface IServices {
-    readonly axios: AxiosInstance;
-    readonly alertsViewModel: AlertsViewModel;
-    readonly sessionViewModel: SessionViewModel;
-};
-
-export const Services: IServices = {
-    axios: Axios,
-    alertsViewModel: new AlertsViewModel(),
-    sessionViewModel: new SessionViewModel(Axios)
-};
-
-export const ServicesContext = createContext<IServices>(Services);
+import { DependencyContainer, DependencyResolverProvider } from 'react-model-view-viewmodel';
 
 export function ServicesProvider({ children }: PropsWithChildren<{}>): JSX.Element {
+    const dependencyContainer = useMemo(
+        () => new DependencyContainer()
+            .registerInstanceToToken(Axios, AxiosInstance)
+            .registerSingletonType(AlertsViewModel)
+            .registerSingletonType(SessionViewModel),
+        []
+    );
+
     return (
-        <ServicesContext.Provider value={Services}>
-            {children}
-        </ServicesContext.Provider>
+        <DependencyResolverProvider
+            dependencyResolver={dependencyContainer}
+            children={children} />
     );
 }

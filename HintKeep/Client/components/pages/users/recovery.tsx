@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
-import { watchEvent, watchViewModel } from 'react-model-view-viewmodel';
-import { useViewModel } from '../../use-view-model';
+import { type IEventHandler, useViewModel, useViewModelDependency } from 'react-model-view-viewmodel';
 import { Message } from '../../i18n';
 import { BusyContent } from '../../loaders';
 import { FormInput } from '../../forms';
@@ -13,10 +12,32 @@ import Style from '../../style.scss';
 export function Recovery(): JSX.Element {
     const [message, setMessage] = useState<string | null>(null);
 
-    const $vm = useViewModel(({ axios, alertsViewModel, sessionViewModel }) => new RecoverUserViewModel(axios, alertsViewModel, sessionViewModel));
-    watchEvent($vm.hintSent, () => setMessage("pages.confirmation.hintSent"));
-    watchEvent($vm.passwordResetRequestSent, () => setMessage("pages.confirmation.passwordReset"));
-    watchViewModel($vm.form);
+    const recoverUserViewModel = useViewModelDependency(RecoverUserViewModel);
+    useViewModel(recoverUserViewModel.form);
+
+    useEffect(
+        () => {
+            const hintSentEventHandler: IEventHandler<unknown> = {
+                handle() {
+                    setMessage("pages.confirmation.hintSent");
+                }
+            };
+            const passwordResetRequestSentEventHandler: IEventHandler<unknown> = {
+                handle() {
+                    setMessage("pages.confirmation.passwordReset");
+                }
+            };
+
+            recoverUserViewModel.hintSent.subscribe(hintSentEventHandler);
+            recoverUserViewModel.passwordResetRequestSent.subscribe(passwordResetRequestSentEventHandler);
+
+            return () => {
+                recoverUserViewModel.passwordResetRequestSent.unsubscribe(passwordResetRequestSentEventHandler);
+                recoverUserViewModel.hintSent.unsubscribe(hintSentEventHandler);
+            }
+        },
+        [recoverUserViewModel, setMessage]
+    )
 
     return (
         <div className={Style.mx3}>
@@ -31,14 +52,14 @@ export function Recovery(): JSX.Element {
                 </div>
             }
 
-            <BusyContent $vm={$vm}>
-                <FormInput className={Style.mb3} id="email" type="email" label="pages.recovery.email.label" field={$vm.form.email} placeholder="pages.recovery.email.placeholder" />
+            <BusyContent apiViewModel={recoverUserViewModel}>
+                <FormInput className={Style.mb3} id="email" type="email" label="pages.recovery.email.label" field={recoverUserViewModel.form.email} placeholder="pages.recovery.email.placeholder" />
 
                 <div className={Style.mb3}>
-                    <button type="button" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => $vm.sendHintAsync()}>
+                    <button type="button" disabled={(recoverUserViewModel.form.isInvalid && recoverUserViewModel.form.areAllFieldsTouched)} className={classnames(Style.btn, Style.btnPrimary)} onClick={() => recoverUserViewModel.sendHintAsync()}>
                         <Message id="pages.recovery.sendHint.label" />
                     </button>
-                    <button type="button" disabled={($vm.form.isInvalid && $vm.form.areAllFieldsTouched)} className={classnames(Style.ms2, Style.btn, Style.btnDanger)} onClick={() => $vm.resetPasswordAsync()}>
+                    <button type="button" disabled={(recoverUserViewModel.form.isInvalid && recoverUserViewModel.form.areAllFieldsTouched)} className={classnames(Style.ms2, Style.btn, Style.btnDanger)} onClick={() => recoverUserViewModel.resetPasswordAsync()}>
                         <Message id="pages.recovery.resetPassword.label" />
                     </button>
                     <Link to="/" className={classnames(Style.ms2, Style.btn, Style.btnLight)}>
