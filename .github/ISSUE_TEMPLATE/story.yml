@@ -8,15 +8,6 @@ body:
       value: |
         Thanks for taking the time to fill a feature request as a user story!
 
-  - type: input
-    id: contact
-    attributes:
-      label: Contact Details
-      description: How can we get in touch with you if we need more info?
-      placeholder: email@example.com
-    validations:
-      required: false
-
   - type: textarea
     id: description
     attributes:
