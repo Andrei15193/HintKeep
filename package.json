@@ -1,0 +1,66 @@
+{
+  "name": "hintkeep",
+  "version": "2.0.0",
+  "description": "Store hints, not passwords",
+  "license": "MIT",
+  "author": "Andrei15193",
+  "keywords": [
+    "password",
+    "hint",
+    "manager"
+  ],
+  "homepage": "https://github.com/Andrei15193/HintKeep",
+  "bugs": {
+    "url": "https://github.com/Andrei15193/HintKeep/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Andrei15193/HintKeep.git"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "webpack serve",
+    "build-dev": "webpack",
+    "build-release": "webpack --mode production",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "**/*.test.ts"
+    ]
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^4.1.0",
+    "@stylistic/eslint-plugin-jsx": "^4.1.0",
+    "@stylistic/eslint-plugin-ts": "^4.1.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.5",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/webpack": "^5.28.5",
+    "@types/webpack-dev-server": "^4.7.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "html-webpack-plugin": "^5.6.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jiti": "^2.4.2",
+    "ts-jest": "^29.2.6",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.25.0",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+    "eslint.format.enable": true,
+    "[typescript]": {
+        "editor.indentSize": 4,
+        "editor.detectIndentation": false,
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[typescriptreact]": {
+        "editor.indentSize": 4,
+        "editor.detectIndentation": false,
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    }
+}
