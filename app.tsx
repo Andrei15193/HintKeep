@@ -10,7 +10,11 @@ Promise
         import("react-dom/client")
     ])
     .then(([{ createElement }, { createRoot }]) => {
-        createRoot(document.body.appendChild(document.createElement("div")))
+        const appElement = document.getElementById("app")!;
+        appElement.removeAttribute("class");
+        appElement.childNodes.forEach((childNode) => childNode.remove());
+
+        createRoot(appElement)
             .render(
                 createElement(BrowserRouter, {
                     children: createElement(Routes, {

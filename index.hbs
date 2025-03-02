@@ -5,6 +5,31 @@
 </head>
 
 <body>
+    <div id="app" class="loader">!*</div>
+
+    <script>
+        var preferredTheme = localStorage.getItem("preferences/theme");
+        var themeClassName;
+
+        switch (preferredTheme) {
+            case "light":
+                themeClassName = "light-theme";
+                break;
+
+            case "dark":
+                themeClassName = "dark-theme";
+                break;
+
+            default:
+                if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)
+                    themeClassName = "dark-theme";
+                else
+                    themeClassName = "light-theme";
+                break;
+        }
+
+        document.body.classList.add(themeClassName);
+    </script>
 </body>
 
 </html>
