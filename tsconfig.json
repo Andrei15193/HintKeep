@@ -2,8 +2,8 @@
     "compilerOptions": {
         "outDir": "./bin/",
         "sourceMap": true,
-        "module": "Node16",
-        "moduleResolution": "node16",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
         "target": "ES2015",
         "declaration": false,
         "jsx": "react",
@@ -22,6 +22,12 @@
         "strictFunctionTypes": true,
         "forceConsistentCasingInFileNames": true,
         "noUncheckedIndexedAccess": true
+    },
+    "ts-node": {
+        "compilerOptions": {
+            "module": "NodeNext",
+            "moduleResolution": "nodenext"
+        }
     },
     "exclude": [
         "/node_modules/",

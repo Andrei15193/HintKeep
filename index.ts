@@ -1,0 +1,14 @@
+Promise
+    .all([
+        import("react"),
+        import("react-dom/client"),
+        import("./app")
+    ])
+    .then(([{ createElement }, { createRoot }, { App }]) => {
+        const appElement = document.getElementById("app")!;
+        appElement.removeAttribute("class");
+        appElement.childNodes.forEach((childNode) => childNode.remove());
+
+        createRoot(appElement)
+            .render(createElement(App));
+    });

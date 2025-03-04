@@ -12,7 +12,7 @@ interface IBuildOptions {
 export default function (_: any, { mode }: IBuildOptions): Configuration {
     return {
         entry: {
-            app: path.resolve(__dirname, "app.tsx"),
+            app: path.resolve(__dirname, "index.ts"),
             index: path.resolve(__dirname, "index.scss")
         },
         mode: "development",
