@@ -412,7 +412,13 @@ export default {
             "error",
             {
                 after: true,
-                before: false
+                before: false,
+                overrides: {
+                    arrow: {
+                        before: true,
+                        after: true
+                    }
+                }
             }
         ],
         "@stylistic/type-generic-spacing": ["error"],
