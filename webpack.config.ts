@@ -68,7 +68,10 @@ export default function (_: any, { mode }: IBuildOptions): Configuration {
             ]
         },
         devServer: {
-            open: true
+            open: true,
+            client: {
+                overlay: false
+            }
         }
     };
 }

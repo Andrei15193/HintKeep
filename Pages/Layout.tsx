@@ -1,11 +1,11 @@
 import React from "react";
 import { Outlet } from "react-router";
 import { IndexedDatabaseProvider, useIndexedDatabase } from "../Data/IndexedDatabase";
-import { HintKeepDatabaseConnectionInfo } from "../Data/IndexedDatabase/HintKeep";
+import { HintKeepDatabaseDefinition } from "../Data/IndexedDatabase/HintKeep";
 
 export function Layout(): React.JSX.Element {
     return (
-        <IndexedDatabaseProvider connectionInfo={HintKeepDatabaseConnectionInfo}>
+        <IndexedDatabaseProvider databaseDefinition={HintKeepDatabaseDefinition}>
             <h1>
                 HintKeep
             </h1>

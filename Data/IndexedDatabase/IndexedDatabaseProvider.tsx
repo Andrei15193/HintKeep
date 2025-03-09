@@ -1,13 +1,13 @@
 import type { IIndexedDatabase } from "./IIndexedDatabase";
-import type { IIndexedDatabaseConnectionInfo } from "./IIndexedDatabaseConnectionInfo";
+import type { IIndexedDatabaseDefinition } from "./IIndexedDatabaseDefinition";
 import React, { type PropsWithChildren, useRef, useState, useCallback, useMemo } from "react";
 import { IndexedDatabaseContext } from "./IndexedDatabaseContext";
 
 export interface IIndexedDatabaseProviderProps {
-    readonly connectionInfo: IIndexedDatabaseConnectionInfo;
+    readonly databaseDefinition: IIndexedDatabaseDefinition;
 }
 
-export function IndexedDatabaseProvider({ connectionInfo: { name, version, databaseMigrations }, children }: PropsWithChildren<IIndexedDatabaseProviderProps>): React.JSX.Element {
+export function IndexedDatabaseProvider({ databaseDefinition: { name, structureDefinitions }, children }: PropsWithChildren<IIndexedDatabaseProviderProps>): React.JSX.Element {
     const databaseRef = useRef<IDBDatabase | null>(null);
     const errorRef = useRef<unknown | null>(null);
     const [state, setState] = useState<IIndexedDatabase["state"]>("uninitialized");
@@ -17,27 +17,14 @@ export function IndexedDatabaseProvider({ connectionInfo: { name, version, datab
             try {
                 setState("opening");
 
-                const databaseRequest = window.indexedDB.open(name, version);
+                const databaseRequest = window.indexedDB.open(name, structureDefinitions.length);
 
                 databaseRequest.addEventListener("upgradeneeded", ({ oldVersion, newVersion }) => {
-                    const database = databaseRequest.result;
-                    const sortedDatabaseMigrations = databaseMigrations
-                        .slice()
-                        .sort((left, right) => left.version - right.version);
-
-                    const migrationStartIndex = sortedDatabaseMigrations.findIndex((migration) => migration.version > oldVersion);
-                    if (migrationStartIndex >= 0)
-                        for (
-                            let migrationIndex = migrationStartIndex;
-                            migrationIndex < sortedDatabaseMigrations.length && (
-                                newVersion === null || sortedDatabaseMigrations[migrationIndex]!.version <= newVersion
-                            );
-                            migrationIndex++
-                        )
-                            sortedDatabaseMigrations[migrationIndex]!.applyChanges(database);
+                    for (let databaseStructureChangeIndex = oldVersion; databaseStructureChangeIndex < newVersion!; databaseStructureChangeIndex++)
+                        structureDefinitions[databaseStructureChangeIndex]!.configure(databaseRequest.result);
                 });
 
-                databaseRequest.addEventListener("success", (event) => {
+                databaseRequest.addEventListener("success", () => {
                     databaseRef.current = databaseRequest.result;
                     setState("ready");
                     resolve();
@@ -54,7 +41,7 @@ export function IndexedDatabaseProvider({ connectionInfo: { name, version, datab
                 setState("unavailable");
             }
         }),
-        [name, version, databaseMigrations]
+        [name, structureDefinitions]
     );
 
     const indexedDatabase = useMemo<IIndexedDatabase>(

@@ -1,23 +1,14 @@
-import type { IIndexedDatabaseConnectionInfo } from "../IIndexedDatabaseConnectionInfo";
+import type { IIndexedDatabaseDefinition } from "../IIndexedDatabaseDefinition";
 
-export const HintKeepDatabaseConnectionInfo: IIndexedDatabaseConnectionInfo = {
+export const HintKeepDatabaseDefinition: IIndexedDatabaseDefinition = {
     name: "HintKeep",
-    get version() {
-        return Math.max(...this.databaseMigrations.map(({ version }) => version));
-    },
 
-    databaseMigrations: [
+    structureDefinitions: [
         {
-            version: 1,
-
-            applyChanges(database) {
+            configure(database) {
                 database.createObjectStore("Users", {
                     keyPath: "Username"
                 });
-            },
-
-            revertChanges(database) {
-                database.deleteObjectStore("Users");
             }
         }
     ]
