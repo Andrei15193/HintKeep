@@ -69,6 +69,7 @@
   "dependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-model-view-viewmodel": "^3.0.2",
     "react-router": "^7.2.0"
   }
 }
