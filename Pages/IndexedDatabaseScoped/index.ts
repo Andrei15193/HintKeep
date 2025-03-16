@@ -1,0 +1,1 @@
+export { type IIndexedDatabaseScopedProps, IndexedDatabaseScoped } from "./IndexedDatabaseScoped";

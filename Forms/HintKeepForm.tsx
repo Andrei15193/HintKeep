@@ -6,6 +6,15 @@ export class HintKeepForm extends Form {
     public readonly sections: IReadOnlyObservableCollection<HintKeepForm>;
     public readonly sectionsCollections: IReadOnlyObservableCollection<IReadOnlyFormCollection<HintKeepForm>>;
 
+    public validate(): void {
+        this.fields.forEach((field) => {
+            field.validation.validate();
+            field.wasTouched = true;
+        });
+
+        this.sections.forEach((section) => section.validate());
+    }
+
     protected withFields(...fields: readonly HintKeepFormField<any>[]): IObservableCollection<HintKeepFormField<any>> {
         return super.withFields.apply(this, arguments);
     }

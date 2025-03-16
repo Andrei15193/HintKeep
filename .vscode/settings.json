@@ -1,5 +1,6 @@
 {
     "eslint.format.enable": true,
+    "workbench.colorTheme": "Default Light Modern",
     "[typescript]": {
         "editor.indentSize": 4,
         "editor.detectIndentation": false,

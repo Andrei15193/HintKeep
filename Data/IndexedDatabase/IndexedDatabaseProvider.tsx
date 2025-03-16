@@ -44,6 +44,17 @@ export function IndexedDatabaseProvider({ databaseDefinition: { name, structureD
         [name, structureDefinitions]
     );
 
+    const closeDatabaseCallback = useCallback(
+        () => {
+            if (databaseRef.current !== null) {
+                databaseRef.current.close();
+                databaseRef.current = null;
+                setState("closed");
+            }
+        },
+        [databaseRef, setState]
+    );
+
     const indexedDatabase = useMemo<IIndexedDatabase>(
         () => ({
             state,
@@ -51,14 +62,16 @@ export function IndexedDatabaseProvider({ databaseDefinition: { name, structureD
             database: databaseRef.current,
             error: errorRef.current,
 
-            isUninitialized: (state === "uninitialized") as any,
-            isOpening: (state === "opening") as any,
-            isReady: (state === "ready") as any,
-            isUnavailable: (state === "unavailable") as any,
+            isUninitialized: state === "uninitialized",
+            isOpening: state === "opening",
+            isReady: state === "ready",
+            isUnavailable: state === "unavailable",
+            isClosed: state === "closed",
 
-            initializeAsync: initializeAsyncCallback
+            initializeAsync: initializeAsyncCallback,
+            closeDatabase: closeDatabaseCallback
         }),
-        [state, databaseRef, errorRef, initializeAsyncCallback]
+        [state, databaseRef, errorRef, initializeAsyncCallback, closeDatabaseCallback]
     );
 
     return (
