@@ -69,6 +69,7 @@ export default function (_: any, { mode }: IBuildOptions): Configuration {
         },
         devServer: {
             open: true,
+            historyApiFallback: true,
             client: {
                 overlay: false
             }
