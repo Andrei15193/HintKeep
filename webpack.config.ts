@@ -1,5 +1,6 @@
 import type { Configuration } from "webpack";
 import path from "path";
+import CopyWebpackPlugin from "copy-webpack-plugin";
 import HtmlInlineCSSWebpackPlugin from "html-inline-css-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -42,6 +43,14 @@ export default function (_: any, { mode }: IBuildOptions): Configuration {
             ]
         },
         plugins: [
+            new CopyWebpackPlugin({
+                patterns: [
+                    {
+                        from: path.resolve(__dirname, "_redirects"),
+                        to: path.resolve(__dirname, "bin")
+                    }
+                ]
+            }),
             new HtmlWebpackPlugin({
                 template: "!!handlebars-loader!index.hbs",
                 title: "HintKeep",
