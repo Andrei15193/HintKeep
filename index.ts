@@ -2,7 +2,7 @@ Promise
     .all([
         import("react"),
         import("react-dom/client"),
-        import("./app")
+        import("./App")
     ])
     .then(([{ createElement }, { createRoot }, { App }]) => {
         const appElement = document.getElementById("app")!;

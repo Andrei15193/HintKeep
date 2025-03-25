@@ -11,7 +11,7 @@ import { Layout } from "./Pages/Layout";
 import { LoginPage } from "./Pages/Login";
 import { SignUpPage } from "./Pages/SignUp/SignUpPage";
 
-import "./app.scss";
+import "./App.scss";
 
 export function App(): React.JSX.Element {
     return (
