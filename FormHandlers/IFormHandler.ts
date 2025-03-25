@@ -1,3 +1,5 @@
-export interface IFormHandler<TForm> {
-    handleAsync(form: TForm): Promise<void>;
+import type { HintKeepForm } from "../Forms";
+
+export interface IFormHandler<TForm extends HintKeepForm, TResul = void> {
+    handleAsync(form: TForm): Promise<TResul>;
 }

@@ -5,7 +5,7 @@ export class RequiredValidator implements IValidator<HintKeepFormField<unknown>>
     private static readonly _WhiteSpaceRegex = /^\s*$/;
     private readonly _errorMessage: string;
 
-    public constructor(errorMessage: string = "This field is required") {
+    public constructor(errorMessage: string = "This field is mandatory. Please fill it in to create an account.") {
         this._errorMessage = errorMessage;
     }
 

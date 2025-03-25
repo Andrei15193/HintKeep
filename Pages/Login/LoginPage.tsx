@@ -81,12 +81,9 @@ export function LoginPage(): React.JSX.Element {
             </div>
 
             <div>
-                <a
-                    href="#"
-                    title="Currently unavailable"
-                >
+                <Link to="/sign-up">
                     Sign up
-                </a>
+                </Link>
             </div>
         </>
     );

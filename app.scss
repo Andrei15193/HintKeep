@@ -1,5 +1,11 @@
-form input.invalid {
-    border-color: red;
+form {
+
+    input,
+    textarea {
+        &.invalid {
+            border-color: red;
+        }
+    }
 }
 
 .prevent-pointer-events {

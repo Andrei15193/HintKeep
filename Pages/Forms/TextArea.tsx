@@ -2,18 +2,16 @@ import type { HintKeepFormField } from "../../Forms";
 import React, { type ChangeEvent, useCallback } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
 
-export interface ITextInputProps {
+export interface ITextAreaProps {
     readonly field: HintKeepFormField<string>;
     readonly isInvalid?: boolean;
-
-    readonly type?: "email" | "search" | "tel" | "text" | "url" | "password";
 }
 
-export function TextInput({ field, type = "text", isInvalid }: ITextInputProps): React.JSX.Element {
+export function TextArea({ field, isInvalid }: ITextAreaProps): React.JSX.Element {
     useViewModel(field);
 
     const onChangedCallback = useCallback(
-        (event: ChangeEvent<HTMLInputElement>) => {
+        (event: ChangeEvent<HTMLTextAreaElement>) => {
             field.value = event.target.value;
         },
         [field]
@@ -28,13 +26,11 @@ export function TextInput({ field, type = "text", isInvalid }: ITextInputProps):
 
     return (
         <>
-            <input
+            <textarea
                 autoComplete="off"
-                autoCorrect="off"
                 id={field.name}
                 name={field.name}
                 value={field.value}
-                type={type}
                 onBlur={onBlurCallback}
                 onChange={onChangedCallback}
                 className={field.wasTouched && (isInvalid || field.isInvalid) ? "invalid" : ""}
