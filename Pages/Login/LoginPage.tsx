@@ -1,21 +1,36 @@
-import React from "react";
-import { Link } from "react-router";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router";
 import { useIndexedDatabase } from "../../Data/IndexedDatabase";
 import { useCreateFlow } from "../../PageFlows";
+import { useUserContext } from "../Contexts/UserContext";
 import { TextInput } from "../Forms";
 import { LoginFormHandler } from "./FormHandlers/LoginFormHandler";
 import { LoginForm } from "./Forms/LoginForm";
 
 export function LoginPage(): React.JSX.Element {
+    const navigate = useNavigate();
+    const { authenticate } = useUserContext();
     const { closeDatabase } = useIndexedDatabase();
 
     const {
         form,
+        isSubmitted,
+        result: user,
         submitAsync
     } = useCreateFlow({
         form: LoginForm,
         formHandler: LoginFormHandler
     });
+
+    useEffect(
+        () => {
+            if (isSubmitted) {
+                authenticate(user!);
+                navigate("/");
+            }
+        },
+        [isSubmitted, user, authenticate, navigate]
+    );
 
     return (
         <>
