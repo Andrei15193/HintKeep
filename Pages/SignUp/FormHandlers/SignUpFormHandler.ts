@@ -1,4 +1,4 @@
-import type { IUserObject } from "../../../Data/IndexedDatabase/Model/IUserObject";
+import type { IUserObject } from "../../../Data/IndexedDatabase/HintKeep/Model/IUserObject";
 import type { IFormHandler } from "../../../FormHandlers/IFormHandler";
 import type { IUser } from "../../Model/IUser";
 import type { SignUpForm } from "../Forms/SignUpForm";
@@ -16,7 +16,8 @@ export class SignUpFormHandler implements IFormHandler<SignUpForm, IUser | null>
     public async handleAsync(form: SignUpForm): Promise<IUser | null> {
         const userObject: IUserObject = {
             username: form.username.value,
-            passwordHash: await getHashAsync(form.password.value, "SHA-256")
+            passwordHash: await getHashAsync(form.password.value, "SHA-256"),
+            hint: form.hint.value
         };
 
         const transaction = this._database.transaction("Users", "readwrite");

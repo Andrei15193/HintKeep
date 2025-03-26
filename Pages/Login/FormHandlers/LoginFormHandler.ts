@@ -1,4 +1,4 @@
-import type { IUserObject } from "../../../Data/IndexedDatabase/Model/IUserObject";
+import type { IUserObject } from "../../../Data/IndexedDatabase/HintKeep/Model/IUserObject";
 import type { IFormHandler } from "../../../FormHandlers/IFormHandler";
 import type { IUser } from "../../Model/IUser";
 import type { LoginForm } from "../Forms/LoginForm";
