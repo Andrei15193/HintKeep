@@ -10,6 +10,13 @@ export const HintKeepDatabaseDefinition: IIndexedDatabaseDefinition = {
                     keyPath: "username"
                 });
             }
+        },
+        {
+            configure(database) {
+                database.createObjectStore("Accounts", {
+                    keyPath: "id"
+                });
+            }
         }
     ]
 };

@@ -1,1 +1,0 @@
-export { HintsListPage } from "./HintsListPage";

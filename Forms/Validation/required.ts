@@ -9,6 +9,14 @@ export class RequiredValidator implements IValidator<HintKeepFormField<unknown>>
         this._errorMessage = errorMessage;
     }
 
+    public onAdd(field: HintKeepFormField<unknown>): void {
+        field.isRequired = true;
+    }
+
+    public onRemove(field: HintKeepFormField<unknown>): void {
+        field.isRequired = false;
+    }
+
     public validate(formField: HintKeepFormField<unknown>): string | null | undefined {
         if (
             formField.value === null

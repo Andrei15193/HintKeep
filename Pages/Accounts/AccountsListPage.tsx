@@ -1,7 +1,8 @@
 import React from "react";
+import { Link } from "react-router";
 import { useUser } from "../Contexts/UserContext";
 
-export function HintsListPage(): React.JSX.Element {
+export function AccountsListPage(): React.JSX.Element {
     const { username } = useUser()!;
 
     return (
@@ -15,6 +16,9 @@ export function HintsListPage(): React.JSX.Element {
             <p>
                 Sadly, you do not like storing hints... Maybe we can change that!
             </p>
+            <Link to="add">
+                Add
+            </Link>
         </>
     );
 }

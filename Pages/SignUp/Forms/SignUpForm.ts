@@ -8,16 +8,19 @@ export class SignUpForm extends HintKeepForm {
         this.withFields(
             this.username = new HintKeepFormField<string>({
                 name: "username",
+                label: "Username",
                 initialValue: "",
                 validators: [new RequiredValidator()]
             }),
             this.password = new HintKeepFormField<string>({
                 name: "password",
+                label: "Password",
                 initialValue: "",
                 validators: [new RequiredValidator()]
             }),
             this.hint = new HintKeepFormField<string>({
                 name: "hint",
+                label: "Hint",
                 initialValue: "",
                 validators: [new RequiredValidator()]
             })

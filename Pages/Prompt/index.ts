@@ -1,0 +1,1 @@
+export { type IPrompt, usePrompt, usePromptContext } from "./UsePrompt";

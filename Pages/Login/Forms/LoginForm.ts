@@ -8,11 +8,13 @@ export class LoginForm extends HintKeepForm {
         this.withFields(
             this.username = new HintKeepFormField<string>({
                 name: "username",
+                label: "Username",
                 initialValue: "",
                 validators: [new RequiredValidator("This field is mandatory. Please fill it in to login.")]
             }),
             this.password = new HintKeepFormField<string>({
                 name: "password",
+                label: "Password",
                 initialValue: "",
                 validators: [new RequiredValidator("This field is mandatory. Please fill it in to login.")]
             })

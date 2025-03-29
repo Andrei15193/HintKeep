@@ -1,10 +1,10 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { IndexedDatabaseProvider } from "./Data/IndexedDatabase";
 import { HintKeepDatabaseDefinition } from "./Data/IndexedDatabase/HintKeep/HintKeepDatabaseDefinition";
 import { HintKeepDependencyContainerProvider } from "./Dependencies";
+import { AccountAddPage, AccountsListPage } from "./Pages/Accounts";
 import { UserContextProvider, useUser } from "./Pages/Contexts/UserContext";
-import { HintsListPage } from "./Pages/HintsList";
 import { HomePage } from "./Pages/Home";
 import { IndexedDatabaseScoped } from "./Pages/IndexedDatabaseScoped";
 import { Layout } from "./Pages/Layout";
@@ -56,12 +56,25 @@ export function AppRoutes(): React.JSX.Element {
                                 <Route Component={Layout}>
                                     <Route
                                         index
-                                        Component={HintsListPage}
+                                        Component={AccountsListPage}
+                                    />
+                                    <Route
+                                        path="add"
+                                        Component={AccountAddPage}
                                     />
                                 </Route>
                             </Route>
                         )
                 }
+                <Route
+                    path="*"
+                    element={
+                        <Navigate
+                            to="/"
+                            replace
+                        />
+                    }
+                />
             </Routes>
         </BrowserRouter>
     );
