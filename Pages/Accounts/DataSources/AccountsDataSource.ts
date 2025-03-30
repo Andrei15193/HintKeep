@@ -1,0 +1,76 @@
+import type { IAccountObject } from "../../../Data/IndexedDatabase/HintKeep/Model/IAccountObject";
+import type { IDataSource } from "../../../DataSources";
+import type { IAccount } from "../../Model/IAccount";
+import type { IDependencyResolver } from "react-model-view-viewmodel";
+import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
+import { type IUser, User } from "../../Model/IUser";
+
+export interface ISearchText {
+    readonly searchText: string;
+}
+
+export interface IListResult<TItem> {
+    readonly items: readonly TItem[];
+    readonly totalCount: number;
+}
+
+export class AccountsDataSource implements IDataSource<ISearchText, IListResult<IAccount>> {
+    private readonly _user: IUser;
+    private readonly _database: IDBDatabase;
+
+    public constructor({ resolve }: IDependencyResolver) {
+        this._user = resolve(User);
+        this._database = resolve(IndexedDatabase);
+    }
+
+    public async getDataAsync({ searchText }: ISearchText): Promise<IListResult<IAccount>> {
+        const transaction = this._database.transaction("Accounts", "readonly");
+
+        try {
+            const userAccountsIndex = transaction
+                .objectStore("Accounts")
+                .index("UserAccounts");
+
+            const accountObjects = await mapDbRequestToPromise<readonly IAccountObject[]>(userAccountsIndex.getAll(this._user.id));
+            transaction.commit();
+
+            const searchTerms = searchText
+                .trim()
+                .split(/[^a-z0-9]/ig)
+                .map((searchTerm) => searchTerm.toLowerCase());
+
+            return {
+                items: accountObjects
+                    .map((accountObject) => ({
+                        id: accountObject.id,
+                        name: accountObject.name,
+                        username: accountObject.username,
+                        hint: accountObject.hint,
+                        isPinned: accountObject.isPinned,
+                        notes: accountObject.notes
+                    }))
+                    .filter((account) => (
+                        searchTerms.length === 0
+                        || searchTerms.some((searchTerm) => (
+                            account.name.includes(searchTerm)
+                            || account.name.toLowerCase()
+                                .includes(searchTerm)
+                        ))
+                    ))
+                    .sort((left, right) => {
+                        if (left.isPinned === right.isPinned)
+                            return left.name.localeCompare(right.name, undefined, { sensitivity: "base" });
+                        else if (left.isPinned)
+                            return -1;
+                        else
+                            return 1;
+                    }),
+                totalCount: accountObjects.length
+            };
+        }
+        catch (error) {
+            transaction.abort();
+            throw error;
+        }
+    }
+}

@@ -1,9 +1,58 @@
-import React from "react";
+import type { IAccount } from "../Model/IAccount";
+import React, { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useDependency, useViewModelMemo } from "react-model-view-viewmodel";
 import { Link } from "react-router";
+import { HintKeepFormField } from "../../Forms";
 import { useUser } from "../Contexts/UserContext";
+import { TextInput } from "../Forms";
+import { AccountsDataSource } from "./DataSources/AccountsDataSource";
 
 export function AccountsListPage(): React.JSX.Element {
     const { username } = useUser()!;
+    const accountsDataSource = useDependency(AccountsDataSource);
+    const searchTextInputRef = useRef<HTMLInputElement | null>(null);
+    const searchTextField = useViewModelMemo(
+        () => new HintKeepFormField<string>({
+            name: "search",
+            label: "Search",
+            initialValue: ""
+        }),
+        []
+    );
+
+    const [isLoading, setIsLoading] = useState(true);
+    const accountsTotalCountRef = useRef(0);
+    const [accounts, setAccounts] = useState<readonly IAccount[]>([]);
+
+    const loadAccountsAsyncCallback = useCallback(
+        async (searchText: string) => {
+            setIsLoading(true);
+            try {
+                const { items: accounts, totalCount } = await accountsDataSource.getDataAsync({ searchText });
+                accountsTotalCountRef.current = totalCount;
+                setAccounts(accounts);
+            }
+            finally {
+                setIsLoading(false);
+            }
+        },
+        [accountsDataSource]
+    );
+
+    const searchAccountsCallback = useCallback(
+        (event: FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            loadAccountsAsyncCallback(searchTextField.value);
+        },
+        [searchTextField, loadAccountsAsyncCallback]
+    );
+
+    useEffect(
+        () => {
+            loadAccountsAsyncCallback("");
+        },
+        [accountsDataSource, loadAccountsAsyncCallback]
+    );
 
     return (
         <>
@@ -13,12 +62,83 @@ export function AccountsListPage(): React.JSX.Element {
                 {username}
                 !
             </h1>
-            <p>
-                Sadly, you do not like storing hints... Maybe we can change that!
-            </p>
-            <Link to="add">
-                Add
-            </Link>
+            {
+                accountsTotalCountRef.current === 0
+                    ? (
+                        <>
+                            {
+                                isLoading
+                                    ? "Loading"
+                                    : (
+                                        <p>
+                                            Sadly, you do not like storing hints... Maybe we can change that!
+                                        </p>
+                                    )
+                            }
+                            <Link to="add">
+                                Add account
+                            </Link>
+                        </>
+                    )
+                    : (
+                        <>
+                            <Link to="add">
+                                Add account
+                            </Link>
+                            <form onSubmit={searchAccountsCallback}>
+                                <TextInput
+                                    ref={searchTextInputRef}
+                                    field={searchTextField}
+                                />
+                                <button
+                                    type="submit"
+                                    hidden
+                                >
+                                    Search
+                                </button>
+                            </form>
+
+                            {
+                                isLoading
+                                    ? "Loading"
+                                    : (
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        Account
+                                                    </th>
+                                                    <th>
+                                                        Hint
+                                                    </th>
+                                                    <th>
+                                                        Pinned
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {
+                                                    accounts.map((account) => (
+                                                        <tr key={account.id}>
+                                                            <td>
+                                                                {account.name}
+                                                            </td>
+                                                            <td>
+                                                                {account.hint}
+                                                            </td>
+                                                            <td>
+                                                                {account.isPinned ? "Yes" : "No"}
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                }
+                                            </tbody>
+                                        </table>
+                                    )
+                            }
+                        </>
+                    )
+            }
         </>
     );
 }
