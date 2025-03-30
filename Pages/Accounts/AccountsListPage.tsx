@@ -118,19 +118,25 @@ export function AccountsListPage(): React.JSX.Element {
                                             </thead>
                                             <tbody>
                                                 {
-                                                    accounts.map((account) => (
-                                                        <tr key={account.id}>
-                                                            <td>
-                                                                {account.name}
-                                                            </td>
-                                                            <td>
-                                                                {account.hint}
-                                                            </td>
-                                                            <td>
-                                                                {account.isPinned ? "Yes" : "No"}
+                                                    accounts.length === 0
+                                                        ? <tr>
+                                                            <td colSpan={3}>
+                                                                No account match the search criteria.
                                                             </td>
                                                         </tr>
-                                                    ))
+                                                        : accounts.map((account) => (
+                                                            <tr key={account.id}>
+                                                                <td>
+                                                                    {account.name}
+                                                                </td>
+                                                                <td>
+                                                                    {account.hint}
+                                                                </td>
+                                                                <td>
+                                                                    {account.isPinned ? "Yes" : "No"}
+                                                                </td>
+                                                            </tr>
+                                                        ))
                                                 }
                                             </tbody>
                                         </table>
