@@ -1,4 +1,5 @@
 export interface IAccountObject {
+    readonly userId: string;
     readonly id: string;
     readonly name: string;
     readonly username: string;

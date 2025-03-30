@@ -14,16 +14,20 @@ export class LoginFormHandler implements IFormHandler<LoginForm, IUser | null> {
     }
 
     public async handleAsync(form: LoginForm): Promise<IUser | null> {
+        const passwordHash = await getHashAsync(form.password.value, "SHA-256");
+
         const transaction = this._database.transaction("Users", "readonly");
-
         try {
-            const usersStore = transaction.objectStore("Users");
+            const usersAuthenticationIndex = transaction
+                .objectStore("Users")
+                .index("Authenticaiton");
 
-            const userObject = await mapDbRequestToPromise<IUserObject | undefined>(usersStore.get(form.username.value));
+            const userObject = await mapDbRequestToPromise<IUserObject | undefined>(usersAuthenticationIndex.get([form.username.value.toLowerCase(), passwordHash]));
             transaction.commit();
 
-            if (userObject && userObject.passwordHash === await getHashAsync(form.password.value, "SHA-256")) {
+            if (userObject) {
                 return {
+                    id: userObject.id,
                     username: userObject.username
                 };
             }

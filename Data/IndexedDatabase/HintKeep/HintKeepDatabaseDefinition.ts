@@ -6,16 +6,25 @@ export const HintKeepDatabaseDefinition: IIndexedDatabaseDefinition = {
     structureDefinitions: [
         {
             configure(database) {
-                database.createObjectStore("Users", {
-                    keyPath: "username"
-                });
-            }
-        },
-        {
-            configure(database) {
-                database.createObjectStore("Accounts", {
-                    keyPath: "id"
-                });
+                database
+                    .createObjectStore("Users", {
+                        keyPath: "id"
+                    })
+                    .createIndex("Usernames", "username", {
+                        unique: true
+                    })
+                    .objectStore
+                    .createIndex("Authenticaiton", ["username", "passwordHash"], {
+                        unique: false
+                    });
+
+                database
+                    .createObjectStore("Accounts", {
+                        keyPath: "id"
+                    })
+                    .createIndex("UserAccounts", "userId", {
+                        unique: false
+                    });
             }
         }
     ]

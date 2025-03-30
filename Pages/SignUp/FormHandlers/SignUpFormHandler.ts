@@ -14,34 +14,41 @@ export class SignUpFormHandler implements IFormHandler<SignUpForm, IUser | null>
     }
 
     public async handleAsync(form: SignUpForm): Promise<IUser | null> {
-        const userObject: IUserObject = {
-            username: form.username.value,
-            passwordHash: await getHashAsync(form.password.value, "SHA-256"),
-            hint: form.hint.value
-        };
+        const passwordHash = await getHashAsync(form.password.value, "SHA-256");
 
         const transaction = this._database.transaction("Users", "readwrite");
         try {
             const usersStore = transaction.objectStore("Users");
 
-            if (await mapDbRequestToPromise(usersStore.getKey(userObject.username))) {
-                transaction.abort();
-                form.username.error = "The username you have picked is already in use";
+            let userId: string;
+            do
+                userId = crypto.randomUUID();
+            while (await mapDbRequestToPromise(usersStore.getKey(userId)));
 
-                return null;
-            }
-            else {
-                await mapDbRequestToPromise(usersStore.add(userObject));
-                transaction.commit();
+            const userObject: IUserObject = {
+                id: userId,
+                username: form.username.value.toLowerCase(),
+                passwordHash: passwordHash,
+                hint: form.hint.value
+            };
 
-                return {
-                    username: userObject.username
-                };
-            }
+            await mapDbRequestToPromise(usersStore.add(userObject));
+            transaction.commit();
+
+            return {
+                id: userObject.id,
+                username: userObject.username
+            };
         }
         catch (error) {
             transaction.abort();
-            throw error;
+            if (error instanceof DOMException && error.name === "ConstraintError") {
+                form.error = "Duplicate account";
+
+                return null;
+            }
+            else
+                throw error;
         }
     }
 }

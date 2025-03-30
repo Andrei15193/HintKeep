@@ -4,11 +4,14 @@ import type { IAccount } from "../../Model/IAccount";
 import type { AccountForm } from "../Forms/AccountForm";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
 import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
+import { type IUser, User } from "../../Model/IUser";
 
 export class AddAccountFormHandler implements IFormHandler<AccountForm, IAccount> {
+    private readonly _user: IUser;
     private readonly _database: IDBDatabase;
 
     public constructor({ resolve }: IDependencyResolver) {
+        this._user = resolve(User);
         this._database = resolve(IndexedDatabase);
     }
 
@@ -24,6 +27,7 @@ export class AddAccountFormHandler implements IFormHandler<AccountForm, IAccount
             } while (await mapDbRequestToPromise(accountsStore.getKey(accountId)));
 
             const accountObject: IAccountObject = {
+                userId: this._user.id,
                 id: accountId,
                 name: form.name.value,
                 username: form.username.value,
