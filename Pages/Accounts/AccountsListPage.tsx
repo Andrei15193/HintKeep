@@ -109,6 +109,9 @@ export function AccountsListPage(): React.JSX.Element {
                                                         Account
                                                     </th>
                                                     <th>
+                                                        Username
+                                                    </th>
+                                                    <th>
                                                         Hint
                                                     </th>
                                                     <th>
@@ -128,6 +131,9 @@ export function AccountsListPage(): React.JSX.Element {
                                                             <tr key={account.id}>
                                                                 <td>
                                                                     {account.name}
+                                                                </td>
+                                                                <td>
+                                                                    {account.username}
                                                                 </td>
                                                                 <td>
                                                                     {account.hint}
