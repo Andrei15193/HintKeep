@@ -34,7 +34,7 @@ export class AccountForm extends HintKeepForm {
                 name: "notes",
                 label: "Notes",
                 initialValue: "",
-                validators: [new MaxLengthValidator(250)]
+                validators: [new MaxLengthValidator(1000)]
             })
         );
     }
