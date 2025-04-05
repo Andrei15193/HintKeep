@@ -11,17 +11,37 @@ interface IBuildOptions {
 }
 
 export default function (_: any, { mode }: IBuildOptions): Configuration {
+    let generatedChunkId = 0;
+
     return {
         entry: {
-            app: path.resolve(__dirname, "index.ts"),
-            index: path.resolve(__dirname, "index.scss")
+            index: path.resolve(__dirname, "index.scss"),
+            app: path.resolve(__dirname, "index.ts")
         },
         mode: "development",
         devtool: mode === "production" ? false : "inline-source-map",
+        optimization: {
+            chunkIds: "named"
+        },
         output: {
             clean: true,
-            filename: mode === "production" ? "[name].[fullhash].js" : "[name].js",
-            chunkFilename: mode === "production" ? "[id].[fullhash].js" : "[id].js",
+            filename: mode === "production" ? "[name].[contenthash].js" : "[name].js",
+            chunkFilename(pathData) {
+                const chunkId = pathData.chunk?.id;
+                const packageChunkMapping = typeof chunkId === "string"
+                    ? packageChunkMappings.find((mapping) => mapping.pattern.test(chunkId))
+                    : undefined;
+
+                if (packageChunkMapping)
+                    return `${packageChunkMapping.packageId}.[contenthash].js`;
+                else {
+                    generatedChunkId++;
+                    if (mode === "production")
+                        return `${generatedChunkId}.[fullhash].js`;
+                    else
+                        return `${generatedChunkId}.js`;
+                }
+            },
             path: path.resolve(__dirname, "bin")
         },
         module: {
@@ -54,13 +74,15 @@ export default function (_: any, { mode }: IBuildOptions): Configuration {
             new HtmlWebpackPlugin({
                 template: "!!handlebars-loader!index.hbs",
                 title: "HintKeep",
+                inject: "body",
                 meta: {
                     charset: "utf-8",
                     viewport: "width=device-width,initial-scale=1"
                 }
             }),
             new MiniCssExtractPlugin({
-                filename: mode === "production" ? "[name].[fullhash].css" : "[name].css"
+                filename: mode === "production" ? "index.[contenthash].css" : "index.css",
+                chunkFilename: mode === "production" ? "app.[contenthash].css" : "app.css"
             }),
             new HtmlInlineCSSWebpackPlugin({
                 filter(fileName) {
@@ -84,4 +106,28 @@ export default function (_: any, { mode }: IBuildOptions): Configuration {
             }
         }
     };
+}
+
+const packageChunkMappings: readonly IPackageChunkMapping[] = [
+    {
+        pattern: /node_modules_react_index_js/i,
+        packageId: "react"
+    },
+    {
+        pattern: /node_modules_react-dom_client_js/i,
+        packageId: "react-dom"
+    },
+    {
+        pattern: /node_modules_react-model-view-viewmodel/i,
+        packageId: "react-model-view-viewmodel"
+    },
+    {
+        pattern: /node_modules_react-router/i,
+        packageId: "react-router"
+    }
+];
+
+interface IPackageChunkMapping {
+    readonly pattern: RegExp;
+    readonly packageId: string;
 }

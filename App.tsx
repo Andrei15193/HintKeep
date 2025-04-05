@@ -25,7 +25,7 @@ export function App(): React.JSX.Element {
     );
 }
 
-export function AppRoutes(): React.JSX.Element {
+function AppRoutes(): React.JSX.Element {
     const user = useUser();
 
     return (
