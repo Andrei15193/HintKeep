@@ -2,6 +2,7 @@ import type { Configuration } from "webpack";
 import path from "path";
 import CopyWebpackPlugin from "copy-webpack-plugin";
 import HtmlInlineCSSWebpackPlugin from "html-inline-css-webpack-plugin";
+import HtmlInlineScriptPlugin from "html-inline-script-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import "webpack-dev-server";
@@ -10,13 +11,14 @@ interface IBuildOptions {
     readonly mode?: "development" | "production";
 }
 
-export default function (_: any, { mode }: IBuildOptions): Configuration {
-    let generatedChunkId = 0;
+let lastGeneratedChunkId = 0;
+const chunkNamesById: Record<string | number, number> = {};
 
+export default function (_: any, { mode }: IBuildOptions): Configuration {
     return {
         entry: {
-            index: path.resolve(__dirname, "index.scss"),
-            app: path.resolve(__dirname, "index.ts")
+            index: path.resolve(__dirname, "index.ts"),
+            app: path.resolve(__dirname, "App.tsx")
         },
         mode: "development",
         devtool: mode === "production" ? false : "inline-source-map",
@@ -35,7 +37,19 @@ export default function (_: any, { mode }: IBuildOptions): Configuration {
                 if (packageChunkMapping)
                     return `${packageChunkMapping.packageId}.[contenthash].js`;
                 else {
-                    generatedChunkId++;
+                    let generatedChunkId: number;
+                    if (pathData.chunk && pathData.chunk.id !== undefined && pathData.chunk.id !== null)
+                        if (pathData.chunk.id in chunkNamesById)
+                            generatedChunkId = chunkNamesById[pathData.chunk.id]!;
+                        else {
+                            lastGeneratedChunkId++;
+                            chunkNamesById[pathData.chunk.id] = generatedChunkId = lastGeneratedChunkId;
+                        }
+                    else {
+                        lastGeneratedChunkId++;
+                        generatedChunkId = lastGeneratedChunkId;
+                    }
+
                     if (mode === "production")
                         return `${generatedChunkId}.[fullhash].js`;
                     else
@@ -80,14 +94,16 @@ export default function (_: any, { mode }: IBuildOptions): Configuration {
                     viewport: "width=device-width,initial-scale=1"
                 }
             }),
-            new MiniCssExtractPlugin({
-                filename: mode === "production" ? "index.[contenthash].css" : "index.css",
-                chunkFilename: mode === "production" ? "app.[contenthash].css" : "app.css"
+            new HtmlInlineScriptPlugin({
+                scriptMatchPattern: [/^index(\.\w+)?\.js$/]
             }),
             new HtmlInlineCSSWebpackPlugin({
                 filter(fileName) {
                     return /^index(\.[a-z0-9]+)?\.(css|html)$/i.test(fileName);
                 }
+            }),
+            new MiniCssExtractPlugin({
+                filename: mode === "production" ? "[name].[contenthash].css" : "[name].css"
             })
         ],
         resolve: {

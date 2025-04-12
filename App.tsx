@@ -1,81 +1,17 @@
-import React from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
-import { IndexedDatabaseProvider } from "./Data/IndexedDatabase";
-import { HintKeepDatabaseDefinition } from "./Data/IndexedDatabase/HintKeep/HintKeepDatabaseDefinition";
-import { HintKeepDependencyContainerProvider } from "./Dependencies";
-import { AccountAddPage, AccountsListPage } from "./Pages/Accounts";
-import { UserContextProvider, useUser } from "./Pages/Contexts/UserContext";
-import { HomePage } from "./Pages/Home";
-import { IndexedDatabaseScoped } from "./Pages/IndexedDatabaseScoped";
-import { Layout } from "./Pages/Layout";
-import { LoginPage } from "./Pages/Login";
-import { SignUpPage } from "./Pages/SignUp/SignUpPage";
-
 import "./App.scss";
 
-export function App(): React.JSX.Element {
-    return (
-        <UserContextProvider>
-            <IndexedDatabaseProvider databaseDefinition={HintKeepDatabaseDefinition}>
-                <HintKeepDependencyContainerProvider>
-                    <AppRoutes />
-                </HintKeepDependencyContainerProvider>
-            </IndexedDatabaseProvider>
-        </UserContextProvider>
-    );
-}
+Promise
+    .all([
+        import("react"),
+        import("react-dom/client"),
+        import("./Pages/Startup"),
+        import("react-model-view-viewmodel")
+    ])
+    .then(([{ createElement }, { createRoot }, { Startup }]) => {
+        const appElement = document.getElementById("app")!;
+        appElement.removeAttribute("class");
+        appElement.childNodes.forEach((childNode) => childNode.remove());
 
-function AppRoutes(): React.JSX.Element {
-    const user = useUser();
-
-    return (
-        <BrowserRouter>
-            <Routes>
-                {
-                    user === null
-                        ? (
-                            <Route Component={Layout}>
-                                <Route
-                                    index
-                                    Component={HomePage}
-                                />
-                                <Route Component={IndexedDatabaseScoped}>
-                                    <Route
-                                        path="login"
-                                        Component={LoginPage}
-                                    />
-                                    <Route
-                                        path="sign-up"
-                                        Component={SignUpPage}
-                                    />
-                                </Route>
-                            </Route>
-                        )
-                        : (
-                            <Route Component={IndexedDatabaseScoped}>
-                                <Route Component={Layout}>
-                                    <Route
-                                        index
-                                        Component={AccountsListPage}
-                                    />
-                                    <Route
-                                        path="add"
-                                        Component={AccountAddPage}
-                                    />
-                                </Route>
-                            </Route>
-                        )
-                }
-                <Route
-                    path="*"
-                    element={
-                        <Navigate
-                            to="/"
-                            replace
-                        />
-                    }
-                />
-            </Routes>
-        </BrowserRouter>
-    );
-}
+        createRoot(appElement)
+            .render(createElement(Startup));
+    });
