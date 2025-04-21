@@ -1,47 +1,63 @@
-// The contents of this file gets inline into the resulting `index.html` file.
+/* The contents of this file gets inline into the resulting `index.html` file. */
+:root {
+    --hk---spacing-narrow: 0.5rem; // normal / 2
+    --hk---spacing-normal: 1rem;
 
-@keyframes hintkeep-loader-active-animation {
-    0% {
-        opacity: 1;
+    @keyframes hintkeep-loader-active-animation {
+        0% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0.6;
+        }
     }
 
-    100% {
-        opacity: 0.6;
-    }
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    width: 100vw;
-
-    &.light-theme {
-        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    }
-
-    &.dark-theme {
-        color: white;
-        background-color: black;
-
-        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    }
-
-    .loader {
+    body {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column;
 
-        flex: 1 1 auto;
-        font-size: 20rem;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        width: 100vw;
 
-        animation-name: hintkeep-loader-active-animation;
-        animation-duration: 1s;
-        animation-timing-function: ease-in;
-        animation-iteration-count: infinite;
-        animation-direction: alternate;
+        color: var(--hk---color-text);
+        background-color: var(--hk---color-background);
+
+        &.light-theme {
+            --hk---color-text: black;
+            --hk---color-background: white;
+            --hk---color-border: black;
+            --hk---color-border-error: red;
+            --hk---color-border-warning: orange;
+
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        &.dark-theme {
+            --hk---color-text: white;
+            --hk---color-background: black;
+            --hk---color-border: darkgray;
+            --hk---color-border-error: red;
+            --hk---color-border-warning: orange;
+
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        .loader {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex: 1 1 auto;
+            font-size: 20rem;
+
+            animation-name: hintkeep-loader-active-animation;
+            animation-duration: 1s;
+            animation-timing-function: ease-in;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+        }
     }
 }

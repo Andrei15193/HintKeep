@@ -2,6 +2,7 @@ import type { IFormHandler } from "../FormHandlers/IFormHandler";
 import type { HintKeepForm } from "../Forms";
 import { type SyntheticEvent, useCallback, useMemo, useRef, useState } from "react";
 import { useDependency, useViewModel, type ResolvableSimpleDependency, type ViewModelType } from "react-model-view-viewmodel";
+import { Notifications } from "../Pages/Notifications";
 
 export interface ICreateFlow<TForm extends HintKeepForm, TResult> {
     readonly state: "ready" | "faulted" | "submitting" | "submitted";
@@ -31,6 +32,7 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
         form: formDependency,
         formHandler: formHandlerDependency
     } = options;
+    const notifications = useDependency(Notifications);
 
     const resultRef = useRef<TResult | null>(null);
     const [state, setState] = useState<ICreateFlow<TForm, TResult>["state"]>("ready");
@@ -56,10 +58,13 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
                 }
                 catch (error) {
                     setState("faulted");
-                    console.error(error);
+                    notifications.add({
+                        message: error instanceof DOMException ? error.message : error,
+                        type: "error"
+                    });
                 }
         },
-        [form, formHandler, resultRef, setState]
+        [form, formHandler, resultRef, notifications, setState]
     );
 
     return useMemo(

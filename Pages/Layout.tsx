@@ -1,41 +1,52 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDependency } from "react-model-view-viewmodel";
 import { Outlet } from "react-router";
 import { useIndexedDatabase } from "../Data/IndexedDatabase";
+import { GlobalNotificationsContainer, Notifications } from "./Notifications";
 
 export function Layout(): React.JSX.Element {
+    useIndexedDatabaseErrorHandler();
+
     return (
         <>
-            <h1>
-                HintKeep
-            </h1>
-            <IndexedDatabaseErrorHandler />
-            <div>
+            <header>
+                <h1>
+                    HintKeep
+                </h1>
+            </header>
+            <main>
                 <Outlet />
-            </div>
+            </main>
+            <aside className="global-notifications">
+                <GlobalNotificationsContainer />
+            </aside>
         </>
     );
 }
 
-export function IndexedDatabaseErrorHandler(): React.JSX.Element | null {
+export function useIndexedDatabaseErrorHandler(): void {
+    const notifications = useDependency(Notifications);
     const { error, isUnavailable, initializeAsync } = useIndexedDatabase();
 
-    if (isUnavailable && error)
-        return (
-            <>
-                <div>
-                    Oops... something went wrong, wanna
-                    {" "}
-                    <button onClick={initializeAsync}>
-                        try again
-                    </button>
-                    ?
-                </div>
-
-                <div>
-                    {error instanceof Error ? error.message : JSON.stringify(error)}
-                </div>
-            </>
-        );
-
-    return null;
+    useEffect(
+        () => {
+            if (isUnavailable && error)
+                notifications.add({
+                    type: "error",
+                    message() {
+                        return (
+                            <>
+                                <div>
+                                    {error instanceof Error ? error.message : JSON.stringify(error)}
+                                </div>
+                                <button onClick={initializeAsync}>
+                                    Try again
+                                </button>
+                            </>
+                        );
+                    }
+                });
+        },
+        [isUnavailable, error, notifications, initializeAsync]
+    );
 }

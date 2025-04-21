@@ -1,13 +1,46 @@
-form {
+div#app {
+    >aside.global-notifications {
+        position: absolute;
+        inset: 0;
 
-    input,
-    textarea {
-        &.invalid {
-            border-color: red;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+
+        padding: var(--hk---spacing-normal);
+        gap: var(--hk---spacing-normal);
+
+        pointer-events: none;
+
+        >div.global-notification-item {
+            border-width: 1px;
+            border-style: solid;
+            border-color: var(--hk---color-border);
+            padding: var(--hk---spacing-narrow);
+            background-color: var(--hk---color-background);
+
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+
+            gap: var(--hk---spacing-narrow);
+
+            pointer-events: all;
+
+            &.error {
+                color: var(--hk---color-border-error);
+                border-color: var(--hk---color-border-error);
+            }
         }
     }
-}
 
-.prevent-pointer-events {
-    pointer-events: none;
+    form {
+
+        input,
+        textarea {
+            &.invalid {
+                border-color: var(--hk---color-border-error);
+            }
+        }
+    }
 }

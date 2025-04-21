@@ -3,6 +3,7 @@ import { DependencyContainer } from "react-model-view-viewmodel";
 import { useIndexedDatabase, IndexedDatabase } from "../Data/IndexedDatabase";
 import { useUser } from "../Pages/Contexts/UserContext";
 import { User } from "../Pages/Model/IUser";
+import { Notifications } from "../Pages/Notifications";
 
 export function useHintKeepDependencyContainer(): DependencyContainer {
     const user = useUser();
@@ -18,6 +19,7 @@ export function useHintKeepDependencyContainer(): DependencyContainer {
                 dependencyContainer.registerInstanceToToken(IndexedDatabase, database);
             }
             dependencyContainer.registerInstanceToToken(User, user);
+            dependencyContainer.registerSingletonType(Notifications);
 
             return dependencyContainer;
         },

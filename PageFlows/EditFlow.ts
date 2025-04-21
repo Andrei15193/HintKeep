@@ -3,6 +3,7 @@ import type { IFormHandler } from "../FormHandlers/IFormHandler";
 import type { HintKeepForm } from "../Forms";
 import { type SyntheticEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useDependency, useViewModel, type ResolvableSimpleDependency, type ViewModelType } from "react-model-view-viewmodel";
+import { Notifications } from "../Pages/Notifications";
 import { useDisplayFlow } from "./DisplayFlow";
 
 export interface IEditFlow<TEntity, TForm> {
@@ -39,6 +40,7 @@ export function useEditFlow<TEntity, TForm extends HintKeepForm>(options: IEditF
         formHandler: formHandlerDependency
     } = options;
 
+    const notifications = useDependency(Notifications);
     const [state, setState] = useState<IEditFlow<TEntity, TForm>["state"]>("loading");
 
     const {
@@ -85,11 +87,15 @@ export function useEditFlow<TEntity, TForm extends HintKeepForm>(options: IEditF
 
                     setState("submitted");
                 }
-                catch {
+                catch (error) {
                     setState("faulted");
+                    notifications.add({
+                        message: error instanceof DOMException ? error.message : error,
+                        type: "error"
+                    });
                 }
         },
-        [form, formHandler, setState]
+        [form, formHandler, notifications, setState]
     );
 
     return useMemo(

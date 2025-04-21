@@ -14,13 +14,13 @@ interface IBuildOptions {
 let lastGeneratedChunkId = 0;
 const chunkNamesById: Record<string | number, number> = {};
 
-export default function (_: any, { mode }: IBuildOptions): Configuration {
+export default function (_: any, { mode = "development" }: IBuildOptions): Configuration {
     return {
         entry: {
             index: path.resolve(__dirname, "index.ts"),
             app: path.resolve(__dirname, "App.tsx")
         },
-        mode: "development",
+        mode,
         devtool: mode === "production" ? false : "inline-source-map",
         optimization: {
             chunkIds: "named"
@@ -87,6 +87,10 @@ export default function (_: any, { mode }: IBuildOptions): Configuration {
             }),
             new HtmlWebpackPlugin({
                 template: "!!handlebars-loader!index.hbs",
+                templateParameters: {
+                    mode,
+                    bodyClassName: mode === "development" && "light-theme"
+                },
                 title: "HintKeep",
                 inject: "body",
                 meta: {
