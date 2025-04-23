@@ -1,1 +1,2 @@
-export { type IPrompt, usePrompt, usePromptContext } from "./UsePrompt";
+export { type IConfirmationPromptFlow, useConfirmationPromptFlow } from "./UseConfirmationPromptFlow";
+export { ConfirmationPromptProvider } from "./ConfirmationPromptProvider";
