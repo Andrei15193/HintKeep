@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useCreateFlow } from "../../PageFlows";
 import { Checkbox, Label, TextArea, TextInput } from "../Forms";
-import { useConfirmationPromptFlow } from "../Prompt";
 import { AddAccountFormHandler } from "./FormHandlers/AddAccountFormHandler";
 import { AccountForm } from "./Forms/AccountForm";
 
@@ -12,27 +11,28 @@ export function AccountAddPage(): React.JSX.Element {
     const {
         form,
         isSubmitted,
-        submitAsync
+        submitAsync,
+        dismissAsync
     } = useCreateFlow({
         form: AccountForm,
-        formHandler: AddAccountFormHandler
-    });
+        formHandler: AddAccountFormHandler,
 
-    const {
-        isConfirmed: isCancelConfirmed,
-        show: prompCancelConfirmation
-    } = useConfirmationPromptFlow({
-        message: "Any unsaved changes will be discarded, continue?",
-        confirmButtonLabel: "Yes, cancel",
-        dismissButtonLabel: "No, continue adding hint"
+        confirmationPrompt: {
+            message: "Any unsaved changes will be discarded, continue?",
+            confirmButtonLabel: "Yes, cancel",
+            dismissButtonLabel: "No, continue adding hint",
+            onConfirm() {
+                navigate("/");
+            }
+        }
     });
 
     useEffect(
         () => {
-            if (isSubmitted || isCancelConfirmed)
+            if (isSubmitted)
                 navigate("/");
         },
-        [isSubmitted, isCancelConfirmed, navigate]
+        [isSubmitted, navigate]
     );
 
     return (
@@ -70,12 +70,17 @@ export function AccountAddPage(): React.JSX.Element {
                     <button type="submit">
                         Save
                     </button>
-                    <button
-                        type="button"
-                        onClick={prompCancelConfirmation}
+                    <Link
+                        to="/"
+                        onClick={
+                            (event) => {
+                                event.preventDefault();
+                                dismissAsync();
+                            }
+                        }
                     >
                         Cancel
-                    </button>
+                    </Link>
                 </div>
             </form>
         </>

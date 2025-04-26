@@ -29,15 +29,17 @@ export function Layout(): React.JSX.Element {
 }
 
 export function ConfirmationPrompt(): React.JSX.Element | null {
-    const confirmationPrompt = useConfirmationPrompt();
+    const { confirmationPrompt } = useConfirmationPrompt();
 
     if (confirmationPrompt === null)
         return null;
 
     const {
-        message,
-        confirmButtonLabel = "Yes",
-        dismissButtonLabel = "No",
+        options: {
+            message = "Any unsaved changes will be discarded, continue?",
+            confirmButtonLabel = "Yes",
+            dismissButtonLabel = "No"
+        } = {},
         confirm,
         dismiss
     } = confirmationPrompt;

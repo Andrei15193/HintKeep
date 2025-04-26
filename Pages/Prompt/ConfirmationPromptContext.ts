@@ -1,23 +1,29 @@
 import { createContext, useContext } from "react";
 
 export interface IConfirmationPromptContext {
-    readonly prompt: IConfirmationPrompt | null;
+    readonly confirmationPrompt: IConfirmationPrompt | null;
 
-    show(prompt: IConfirmationPrompt): void;
-    dismiss(): void;
+    show(options?: IConfirmationPromptOptions): void;
+}
+
+export interface IConfirmationPromptOptions {
+    readonly message?: string;
+    readonly confirmButtonLabel?: string;
+    readonly dismissButtonLabel?: string;
+
+    onConfirm?(): void;
+    onDismiss?(): void;
 }
 
 export interface IConfirmationPrompt {
-    readonly message: string;
-    readonly confirmButtonLabel?: string;
-    readonly dismissButtonLabel?: string;
+    readonly options?: IConfirmationPromptOptions;
 
     confirm(): void;
     dismiss(): void;
 }
 
-export const ConfirmationPromptContext = createContext<IConfirmationPromptContext | null>(null);
+export const ConfirmationPromptContext = createContext<IConfirmationPromptContext>(null!);
 
-export function useConfirmationPrompt(): IConfirmationPrompt | null {
-    return useContext(ConfirmationPromptContext)!.prompt;
+export function useConfirmationPrompt(): IConfirmationPromptContext {
+    return useContext(ConfirmationPromptContext);
 }

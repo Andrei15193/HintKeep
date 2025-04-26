@@ -1,18 +1,39 @@
 import React, { type PropsWithChildren, useCallback, useMemo, useState } from "react";
-import { type IConfirmationPrompt, type IConfirmationPromptContext, ConfirmationPromptContext } from "./ConfirmationPromptContext";
+import { type IConfirmationPrompt, type IConfirmationPromptContext, type IConfirmationPromptOptions, ConfirmationPromptContext } from "./ConfirmationPromptContext";
 
 export function ConfirmationPromptProvider({ children }: PropsWithChildren<{}>): React.JSX.Element {
-    const [prompt, setPrompt] = useState<IConfirmationPrompt | null>(null);
+    const [confirmationPrompt, setConfirmationPrompt] = useState<IConfirmationPrompt | null>(null);
 
-    const dismissCallback = useCallback(() => setPrompt(null), [setPrompt]);
+    const showCallback = useCallback(
+        (options?: IConfirmationPromptOptions) => {
+            setConfirmationPrompt({
+                options,
+
+                confirm() {
+                    const onConfirm = options?.onConfirm;
+                    onConfirm && onConfirm();
+
+                    setConfirmationPrompt(null);
+                },
+
+                dismiss() {
+                    const onDismiss = options?.onDismiss;
+                    onDismiss && onDismiss();
+
+                    setConfirmationPrompt(null);
+                }
+            });
+        },
+        [setConfirmationPrompt]
+    );
 
     const confirmationPromptContext = useMemo<IConfirmationPromptContext>(
         () => ({
-            prompt,
-            show: setPrompt,
-            dismiss: dismissCallback
+            confirmationPrompt,
+
+            show: showCallback
         }),
-        [prompt, dismissCallback, setPrompt]
+        [confirmationPrompt, showCallback]
     );
 
     return (
