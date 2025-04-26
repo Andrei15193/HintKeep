@@ -4,22 +4,23 @@ import { useIndexedDatabase } from "../../Data/IndexedDatabase";
 
 export function HomePage(): React.JSX.Element {
     const navigate = useNavigate();
-    const { isOpening, isReady, initializeAsync } = useIndexedDatabase();
+    const { isOpening, initializeAsync, closeDatabase } = useIndexedDatabase();
 
     const initializeIndexedDatabaseCallback = useCallback(
         async (event: MouseEvent<HTMLAnchorElement>) => {
             event.preventDefault();
             await initializeAsync();
+
+            navigate("/login", { replace: true });
         },
-        [initializeAsync]
+        [initializeAsync, navigate]
     );
 
     useEffect(
         () => {
-            if (isReady)
-                navigate("/login", { replace: true });
+            closeDatabase();
         },
-        [isReady, navigate]
+        [closeDatabase]
     );
 
     return (

@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useIndexedDatabase } from "../../Data/IndexedDatabase";
 import { useCreateFlow } from "../../PageFlows";
 import { useUserContext } from "../Contexts/UserContext";
 import { TextInput } from "../Forms";
@@ -10,7 +9,6 @@ import { LoginForm } from "./Forms/LoginForm";
 export function LoginPage(): React.JSX.Element {
     const navigate = useNavigate();
     const { authenticate } = useUserContext();
-    const { closeDatabase } = useIndexedDatabase();
 
     const {
         form,
@@ -19,7 +17,8 @@ export function LoginPage(): React.JSX.Element {
         submitAsync
     } = useCreateFlow({
         form: LoginForm,
-        formHandler: LoginFormHandler
+        formHandler: LoginFormHandler,
+        skipConfirmationPrompt: true
     });
 
     useEffect(
@@ -78,10 +77,7 @@ export function LoginPage(): React.JSX.Element {
                     Login
                 </button>
 
-                <Link
-                    to="/"
-                    onClick={closeDatabase}
-                >
+                <Link to="/">
                     Cancel
                 </Link>
             </form>

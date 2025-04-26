@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import React, { useEffect } from "react";
+import { createBrowserRouter, Outlet, useMatch, useNavigate } from "react-router";
 import { AccountAddPage, AccountsListPage } from "../Accounts";
 import { useUser } from "../Contexts/UserContext";
 import { HomePage } from "../Home";
@@ -8,57 +8,93 @@ import { Layout } from "../Layout";
 import { LoginPage } from "../Login";
 import { SignUpPage } from "../SignUp/SignUpPage";
 
-export function AppRouter(): React.JSX.Element {
-    const user = useUser();
+export const AppRouter = createBrowserRouter([
+    {
+        path: "/",
+        Component() {
+            const user = useUser();
+            const match = useMatch({
+                path: "/",
+                end: true
+            });
 
-    return (
-        <BrowserRouter>
-            <Routes>
-                {
-                    user === null
-                        ? (
-                            <Route Component={Layout}>
-                                <Route
-                                    index
-                                    Component={HomePage}
-                                />
-                                <Route Component={IndexedDatabaseScoped}>
-                                    <Route
-                                        path="login"
-                                        Component={LoginPage}
-                                    />
-                                    <Route
-                                        path="sign-up"
-                                        Component={SignUpPage}
-                                    />
-                                </Route>
-                            </Route>
-                        )
-                        : (
-                            <Route Component={IndexedDatabaseScoped}>
-                                <Route Component={Layout}>
-                                    <Route
-                                        index
-                                        Component={AccountsListPage}
-                                    />
-                                    <Route
-                                        path="add"
-                                        Component={AccountAddPage}
-                                    />
-                                </Route>
-                            </Route>
-                        )
-                }
-                <Route
-                    path="*"
-                    element={
-                        <Navigate
-                            to="/"
-                            replace
-                        />
+            if (match)
+                if (user === null)
+                    return <HomePage />;
+                else
+                    return (
+                        <IndexedDatabaseScoped>
+                            <AccountsListPage />
+                        </IndexedDatabaseScoped>
+                    );
+            else
+                return <Outlet />;
+        },
+        children: [
+            {
+                Component: IndexedDatabaseScoped,
+                children: [
+                    {
+                        Component: Layout,
+                        children: [
+                            {
+                                Component() {
+                                    const user = useUser();
+                                    const navigate = useNavigate();
+
+                                    useEffect(
+                                        () => {
+                                            if (user !== null)
+                                                navigate("/");
+                                        },
+                                        [user, navigate]
+                                    );
+
+                                    if (user === null)
+                                        return <Outlet />;
+
+                                    return null;
+                                },
+                                children: [
+                                    {
+                                        path: "login",
+                                        Component: LoginPage
+                                    },
+                                    {
+                                        path: "sign-up",
+                                        Component: SignUpPage
+                                    }
+                                ]
+                            },
+                            {
+                                Component() {
+                                    const user = useUser();
+                                    const navigate = useNavigate();
+
+                                    useEffect(
+                                        () => {
+                                            if (user === null)
+                                                navigate("/");
+                                        },
+                                        [user, navigate]
+                                    );
+
+                                    if (user !== null)
+                                        return <Outlet />;
+
+                                    return null;
+                                },
+                                children: [
+                                    {
+                                        path: "add",
+                                        Component: AccountAddPage
+                                    }
+                                ]
+                            }
+                        ]
                     }
-                />
-            </Routes>
-        </BrowserRouter>
-    );
-}
+                ]
+            }
+        ]
+    }
+]);

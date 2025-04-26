@@ -1,4 +1,8 @@
 div#app {
+    .prevent-pointer-events {
+        pointer-events: none;
+    }
+
     >aside.confirmation-prompt-container {
         position: absolute;
         inset: 0;

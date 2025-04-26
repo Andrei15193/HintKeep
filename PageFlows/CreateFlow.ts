@@ -1,7 +1,8 @@
 import type { IFormHandler } from "../FormHandlers/IFormHandler";
 import type { HintKeepForm } from "../Forms";
-import { type SyntheticEvent, useCallback, useMemo, useRef, useState } from "react";
+import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDependency, useViewModel, type ResolvableSimpleDependency, type ViewModelType } from "react-model-view-viewmodel";
+import { useBlocker } from "react-router";
 import { Notifications } from "../Pages/Notifications";
 import { useConfirmationPrompt, type IConfirmationPromptOptions } from "../Pages/Prompt";
 
@@ -21,13 +22,13 @@ export interface ICreateFlow<TForm extends HintKeepForm, TResult> {
     readonly result: TResult | null;
 
     submitAsync(event?: SyntheticEvent<unknown>): Promise<void>;
-    dismissAsync(event?: SyntheticEvent<unknown>): Promise<void>;
 }
 
 export interface ICreateFlowOptions<TForm extends HintKeepForm, TResult> {
     readonly form: ViewModelType<TForm>;
     readonly formHandler: ResolvableSimpleDependency<IFormHandler<TForm, TResult>>;
 
+    readonly skipConfirmationPrompt?: boolean;
     readonly confirmationPrompt?: IConfirmationPromptOptions;
 }
 
@@ -35,6 +36,7 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
     const {
         form: formDependency,
         formHandler: formHandlerDependency,
+        skipConfirmationPrompt,
         confirmationPrompt = {}
     } = options;
     const notifications = useDependency(Notifications);
@@ -80,21 +82,47 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
         onConfirm,
         onDismiss
     } = confirmationPrompt;
-    const dismissCallback = useCallback(
-        () => new Promise<void>((resolve) => showConfirmationPrompt({
-            message,
-            confirmButtonLabel,
-            dismissButtonLabel,
-            onConfirm() {
-                onConfirm && onConfirm();
-                resolve();
-            },
-            onDismiss() {
-                onDismiss && onDismiss();
-                resolve();
+    const shouldBlockNavigation = !skipConfirmationPrompt && state !== "submitted";
+    const blocker = useBlocker(shouldBlockNavigation);
+
+    useEffect(
+        () => {
+            if (shouldBlockNavigation) {
+                const beforeUnloadEventHandler = (event: BeforeUnloadEvent) => {
+                    event.preventDefault();
+                    // Chrome requires returnValue to be set.
+                    event.returnValue = "";
+                };
+                window.addEventListener("beforeunload", beforeUnloadEventHandler);
+
+                return () => {
+                    window.removeEventListener("beforeunload", beforeUnloadEventHandler);
+                };
             }
-        })),
-        [message, confirmButtonLabel, dismissButtonLabel, onConfirm, onDismiss, showConfirmationPrompt]
+            else
+                return undefined;
+        },
+        [shouldBlockNavigation]
+    );
+
+    useEffect(
+        () => {
+            if (blocker.state === "blocked")
+                showConfirmationPrompt({
+                    message,
+                    confirmButtonLabel,
+                    dismissButtonLabel,
+                    onConfirm() {
+                        onConfirm && onConfirm();
+                        blocker.proceed();
+                    },
+                    onDismiss() {
+                        onDismiss && onDismiss();
+                        blocker.reset();
+                    }
+                });
+        },
+        [blocker, message, confirmButtonLabel, dismissButtonLabel, onConfirm, onDismiss, showConfirmationPrompt]
     );
 
     return useMemo(
@@ -115,9 +143,8 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
 
             result: state === "submitted" ? resultRef.current : null,
 
-            submitAsync: submitAsyncCallback,
-            dismissAsync: dismissCallback
+            submitAsync: submitAsyncCallback
         }),
-        [state, form, resultRef, submitAsyncCallback, dismissCallback]
+        [state, form, resultRef, submitAsyncCallback]
     );
 }

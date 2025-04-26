@@ -11,8 +11,7 @@ export function AccountAddPage(): React.JSX.Element {
     const {
         form,
         isSubmitted,
-        submitAsync,
-        dismissAsync
+        submitAsync
     } = useCreateFlow({
         form: AccountForm,
         formHandler: AddAccountFormHandler,
@@ -20,10 +19,7 @@ export function AccountAddPage(): React.JSX.Element {
         confirmationPrompt: {
             message: "Any unsaved changes will be discarded, continue?",
             confirmButtonLabel: "Yes, cancel",
-            dismissButtonLabel: "No, continue adding hint",
-            onConfirm() {
-                navigate("/");
-            }
+            dismissButtonLabel: "No, continue adding hint"
         }
     });
 
@@ -70,15 +66,7 @@ export function AccountAddPage(): React.JSX.Element {
                     <button type="submit">
                         Save
                     </button>
-                    <Link
-                        to="/"
-                        onClick={
-                            (event) => {
-                                event.preventDefault();
-                                dismissAsync();
-                            }
-                        }
-                    >
+                    <Link to="/">
                         Cancel
                     </Link>
                 </div>
