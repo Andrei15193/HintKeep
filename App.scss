@@ -3,7 +3,7 @@ div#app {
         pointer-events: none;
     }
 
-    >aside.confirmation-prompt-container {
+    >.confirmation-prompt {
         position: absolute;
         inset: 0;
 
@@ -11,11 +11,9 @@ div#app {
         align-items: center;
         justify-content: center;
 
-        pointer-events: none;
+        background-color: var(--hk---color-background-overlay);
 
-        >.confirmation-prompt {
-            pointer-events: all;
-
+        >.confirmation-prompt-content {
             display: flex;
             flex-direction: column;
             align-items: flex-start;

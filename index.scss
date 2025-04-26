@@ -28,6 +28,7 @@
         &.light-theme {
             --hk---color-text: black;
             --hk---color-background: white;
+            --hk---color-background-overlay: rgb(255 255 255 / 0.7);
             --hk---color-border: black;
             --hk---color-border-error: red;
             --hk---color-border-warning: orange;
@@ -38,6 +39,7 @@
         &.dark-theme {
             --hk---color-text: white;
             --hk---color-background: black;
+            --hk---color-background-overlay: rgb(0 0 0 / 0.7);
             --hk---color-border: darkgray;
             --hk---color-border-error: red;
             --hk---color-border-warning: orange;

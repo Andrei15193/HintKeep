@@ -7,7 +7,7 @@ export interface IConfirmationPromptContext {
 }
 
 export interface IConfirmationPromptOptions {
-    readonly message?: string;
+    readonly message?: React.ReactNode;
     readonly confirmButtonLabel?: string;
     readonly dismissButtonLabel?: string;
 

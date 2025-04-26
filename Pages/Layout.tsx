@@ -18,9 +18,7 @@ export function Layout(): React.JSX.Element {
             <main>
                 <Outlet />
             </main>
-            <aside className="confirmation-prompt-container">
-                <ConfirmationPrompt />
-            </aside>
+            <ConfirmationPrompt />
             <aside className="global-notifications">
                 <GlobalNotificationsContainer />
             </aside>
@@ -45,25 +43,27 @@ export function ConfirmationPrompt(): React.JSX.Element | null {
     } = confirmationPrompt;
 
     return (
-        <div className="confirmation-prompt">
-            <div className="confirmation-prompt-message">
-                {message}
+        <aside className="confirmation-prompt">
+            <div className="confirmation-prompt-content">
+                <div className="confirmation-prompt-message">
+                    {message}
+                </div>
+                <nav className="confirmation-prompt-actions">
+                    <button
+                        type="button"
+                        onClick={confirm}
+                    >
+                        {confirmButtonLabel}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={dismiss}
+                    >
+                        {dismissButtonLabel}
+                    </button>
+                </nav>
             </div>
-            <div className="confirmation-prompt-actions">
-                <button
-                    type="button"
-                    onClick={confirm}
-                >
-                    {confirmButtonLabel}
-                </button>
-                <button
-                    type="button"
-                    onClick={dismiss}
-                >
-                    {dismissButtonLabel}
-                </button>
-            </div>
-        </div>
+        </aside>
     );
 }
 
