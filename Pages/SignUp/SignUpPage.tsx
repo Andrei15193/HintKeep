@@ -11,7 +11,7 @@ export function SignUpPage(): React.JSX.Element {
     const { authenticate } = useUserContext();
     const {
         form,
-        isSubmitting,
+        isProcessing,
         isSubmitted,
         result: user,
         submitAsync
@@ -41,7 +41,7 @@ export function SignUpPage(): React.JSX.Element {
             </p>
 
             {
-                isSubmitting
+                isProcessing
                     ? "Loading"
                     : (
                         <form onSubmit={submitAsync}>

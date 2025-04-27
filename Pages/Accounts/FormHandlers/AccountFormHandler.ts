@@ -6,7 +6,7 @@ import type { IDependencyResolver } from "react-model-view-viewmodel";
 import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
 import { type IUser, User } from "../../Model/IUser";
 
-export class AddAccountFormHandler implements IFormHandler<AccountForm, IAccountDetails> {
+export class AccountFormHandler implements IFormHandler<AccountForm, IAccountDetails> {
     private readonly _user: IUser;
     private readonly _database: IDBDatabase;
 
@@ -22,9 +22,12 @@ export class AddAccountFormHandler implements IFormHandler<AccountForm, IAccount
             const accountsStore = transaction.objectStore("Accounts");
 
             let accountId: string;
-            do {
-                accountId = crypto.randomUUID();
-            } while (await mapDbRequestToPromise(accountsStore.getKey(accountId)));
+            if (form.id !== null)
+                accountId = form.id;
+            else
+                do
+                    accountId = crypto.randomUUID();
+                while (await mapDbRequestToPromise(accountsStore.getKey(accountId)));
 
             const accountObject: IAccountObject = {
                 userId: this._user.id,
@@ -36,7 +39,7 @@ export class AddAccountFormHandler implements IFormHandler<AccountForm, IAccount
                 notes: form.notes.value
             };
 
-            await mapDbRequestToPromise(accountsStore.add(accountObject));
+            await mapDbRequestToPromise(accountsStore.put(accountObject));
             transaction.commit();
 
             return {

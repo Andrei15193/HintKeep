@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { type SyntheticEvent, createContext, useCallback, useContext } from "react";
 
 export interface IConfirmationPromptContext {
     readonly confirmationPrompt: IConfirmationPrompt | null;
@@ -22,8 +22,36 @@ export interface IConfirmationPrompt {
     dismiss(): void;
 }
 
-export const ConfirmationPromptContext = createContext<IConfirmationPromptContext>(null!);
+export type ShowConfirmationPromptCallback = (event?: SyntheticEvent) => void;
 
-export function useConfirmationPrompt(): IConfirmationPromptContext {
-    return useContext(ConfirmationPromptContext);
+export function useShowConfirmationPrompt(options: IConfirmationPromptOptions = {}): ShowConfirmationPromptCallback {
+    const { show } = useContext(ConfirmationPromptContext);
+
+    const {
+        message,
+        confirmButtonLabel,
+        dismissButtonLabel,
+        onConfirm,
+        onDismiss
+    } = options;
+
+    return useCallback(
+        (event) => {
+            event?.preventDefault();
+
+            show({
+                message,
+                confirmButtonLabel,
+                dismissButtonLabel,
+                onConfirm,
+                onDismiss
+            });
+        },
+        [message, confirmButtonLabel, dismissButtonLabel, onConfirm, onDismiss, show]
+    );
 }
+
+/**
+ * Expected global context, set at app root.
+ */
+export const ConfirmationPromptContext = createContext<IConfirmationPromptContext>(null!);

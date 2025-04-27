@@ -4,9 +4,10 @@ import { MaxLengthValidator } from "../../../Forms/Validation/maxLength";
 import { RequiredValidator } from "../../../Forms/Validation/required";
 
 export class AccountForm extends HintKeepForm {
-    public constructor(account?: IAccountDetails) {
+    public constructor(account?: IAccountDetails | null) {
         super();
 
+        this.id = account?.id || null;
         this.withFields(
             this.name = new HintKeepFormField<string>({
                 name: "name",
@@ -40,6 +41,7 @@ export class AccountForm extends HintKeepForm {
         );
     }
 
+    public readonly id: string | null;
     public readonly name: HintKeepFormField<string>;
     public readonly username: HintKeepFormField<string>;
     public readonly hint: HintKeepFormField<string>;

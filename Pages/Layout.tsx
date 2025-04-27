@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useDependency } from "react-model-view-viewmodel";
 import { Link, Outlet } from "react-router";
 import { useIndexedDatabase } from "../Data/IndexedDatabase";
 import { useUser } from "./Contexts/UserContext";
 import { GlobalNotificationsContainer, Notifications } from "./Notifications";
-import { useConfirmationPrompt } from "./Prompt/ConfirmationPromptContext";
+import { ConfirmationPromptContext } from "./Prompt/ConfirmationPromptContext";
 
 export function Layout(): React.JSX.Element {
     useIndexedDatabaseErrorHandler();
@@ -42,7 +42,7 @@ export function Layout(): React.JSX.Element {
 }
 
 export function ConfirmationPrompt(): React.JSX.Element | null {
-    const { confirmationPrompt } = useConfirmationPrompt();
+    const { confirmationPrompt } = useContext(ConfirmationPromptContext);
 
     if (confirmationPrompt === null)
         return null;

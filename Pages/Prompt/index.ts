@@ -1,2 +1,2 @@
-export { IConfirmationPrompt, IConfirmationPromptOptions, useConfirmationPrompt } from "./ConfirmationPromptContext";
+export { type IConfirmationPrompt, type IConfirmationPromptOptions, type ShowConfirmationPromptCallback, useShowConfirmationPrompt } from "./ConfirmationPromptContext";
 export { ConfirmationPromptProvider } from "./ConfirmationPromptProvider";

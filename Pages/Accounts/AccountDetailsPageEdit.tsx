@@ -1,44 +1,48 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router";
-import { useCreateFlow } from "../../PageFlows";
+import { generatePath, Link, useParams } from "react-router";
+import { useEditFlow } from "../../PageFlows";
 import { Checkbox, Label, TextArea, TextInput } from "../Forms";
+import { useShowConfirmationPrompt } from "../Prompt";
+import { useViewEditToggleContext } from "../ViewEditToggle";
+import { AccountDetailsDataSource } from "./DataSources/AccountDetailsDataSource";
 import { AccountFormHandler } from "./FormHandlers/AccountFormHandler";
 import { AccountForm } from "./Forms/AccountForm";
 
-export function AccountAddPage(): React.JSX.Element {
-    const navigate = useNavigate();
+export function AccountDetailsPageEdit(): React.JSX.Element {
+    const { id } = useParams<{ readonly id: string }>();
+    const { goToViewMode } = useViewEditToggleContext();
 
     const {
         form,
-        isProcessing,
+        isLoading,
         isSubmitted,
         submitAsync
-    } = useCreateFlow({
+    } = useEditFlow({
+        entityId: id!,
+        dataSource: AccountDetailsDataSource,
         form: AccountForm,
-        formHandler: AccountFormHandler,
+        formHandler: AccountFormHandler
+    });
 
-        confirmationPrompt: {
-            message: "Any unsaved changes will be discarded, continue?",
-            confirmButtonLabel: "Yes, cancel",
-            dismissButtonLabel: "No, continue adding hint"
-        }
+    const discardChangesCallback = useShowConfirmationPrompt({
+        onConfirm: goToViewMode
     });
 
     useEffect(
         () => {
             if (isSubmitted)
-                navigate("/");
+                goToViewMode();
         },
-        [isSubmitted, navigate]
+        [isSubmitted, goToViewMode]
     );
 
     return (
         <>
             <h1>
-                Add hint
+                Edit Account
             </h1>
             {
-                isProcessing
+                isLoading
                     ? "Loading"
                     : (
                         <form onSubmit={submitAsync}>
@@ -71,7 +75,11 @@ export function AccountAddPage(): React.JSX.Element {
                                 <button type="submit">
                                     Save
                                 </button>
-                                <Link to="/">
+                                <Link
+                                    to={generatePath("/:id", { id: id || "" })}
+                                    onClick={discardChangesCallback}
+                                    replace
+                                >
                                     Cancel
                                 </Link>
                             </div>

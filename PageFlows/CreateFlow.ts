@@ -4,13 +4,14 @@ import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState 
 import { useDependency, useViewModel, type ResolvableSimpleDependency, type ViewModelType } from "react-model-view-viewmodel";
 import { useBlocker } from "react-router";
 import { Notifications } from "../Pages/Notifications";
-import { useConfirmationPrompt, type IConfirmationPromptOptions } from "../Pages/Prompt";
+import { type IConfirmationPromptOptions, useShowConfirmationPrompt } from "../Pages/Prompt";
 
 export interface ICreateFlow<TForm extends HintKeepForm, TResult> {
     readonly state: "ready" | "faulted" | "submitting" | "submitted";
 
     readonly form: TForm;
 
+    readonly isProcessing: boolean;
     readonly isReady: boolean;
     readonly isFaulted: boolean;
 
@@ -21,7 +22,7 @@ export interface ICreateFlow<TForm extends HintKeepForm, TResult> {
 
     readonly result: TResult | null;
 
-    submitAsync(event?: SyntheticEvent<unknown>): Promise<void>;
+    submitAsync(event?: SyntheticEvent): Promise<void>;
 }
 
 export interface ICreateFlowOptions<TForm extends HintKeepForm, TResult> {
@@ -37,10 +38,13 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
         form: formDependency,
         formHandler: formHandlerDependency,
         skipConfirmationPrompt,
-        confirmationPrompt = {}
+        confirmationPrompt: {
+            onConfirm,
+            onDismiss,
+            ...otherConfirmationPromptOptions
+        } = {}
     } = options;
     const notifications = useDependency(Notifications);
-    const { show: showConfirmationPrompt } = useConfirmationPrompt();
 
     const resultRef = useRef<TResult | null>(null);
     const [state, setState] = useState<ICreateFlow<TForm, TResult>["state"]>("ready");
@@ -49,7 +53,7 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
     const formHandler = useDependency(formHandlerDependency);
 
     const submitAsyncCallback = useCallback(
-        async (event?: SyntheticEvent<unknown>) => {
+        async (event?: SyntheticEvent) => {
             event?.preventDefault();
 
             form.validate();
@@ -75,15 +79,28 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
         [form, formHandler, resultRef, notifications, setState]
     );
 
-    const {
-        message,
-        confirmButtonLabel,
-        dismissButtonLabel,
-        onConfirm,
-        onDismiss
-    } = confirmationPrompt;
     const shouldBlockNavigation = !skipConfirmationPrompt && state !== "submitted";
     const blocker = useBlocker(shouldBlockNavigation);
+    const onConfirmCallback = useCallback(
+        () => {
+            onConfirm && onConfirm();
+            blocker.state === "blocked" && blocker.proceed();
+        },
+        [blocker, onConfirm]
+    );
+    const onDismissCallback = useCallback(
+        () => {
+            onDismiss && onDismiss();
+            blocker.state === "blocked" && blocker.reset();
+        },
+        [blocker, onDismiss]
+    );
+
+    const showDiscardConfirmationPrompt = useShowConfirmationPrompt({
+        onConfirm: onConfirmCallback,
+        onDismiss: onDismissCallback,
+        ...otherConfirmationPromptOptions
+    });
 
     useEffect(
         () => {
@@ -108,28 +125,17 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
     useEffect(
         () => {
             if (blocker.state === "blocked")
-                showConfirmationPrompt({
-                    message,
-                    confirmButtonLabel,
-                    dismissButtonLabel,
-                    onConfirm() {
-                        onConfirm && onConfirm();
-                        blocker.proceed();
-                    },
-                    onDismiss() {
-                        onDismiss && onDismiss();
-                        blocker.reset();
-                    }
-                });
+                showDiscardConfirmationPrompt();
         },
-        [blocker, message, confirmButtonLabel, dismissButtonLabel, onConfirm, onDismiss, showConfirmationPrompt]
+        [blocker, showDiscardConfirmationPrompt]
     );
 
-    return useMemo(
+    return useMemo<ICreateFlow<TForm, TResult>>(
         () => ({
             state,
             form,
 
+            isProcessing: state === "submitting",
             isFaulted: state === "faulted",
             isReady: (
                 state === "ready"
