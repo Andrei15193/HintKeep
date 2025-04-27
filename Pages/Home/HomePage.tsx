@@ -1,6 +1,7 @@
 import React, { type MouseEvent, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useIndexedDatabase } from "../../Data/IndexedDatabase";
+import { HintKeepDatabaseDefinition } from "../../Data/IndexedDatabase/HintKeep";
 
 export function HomePage(): React.JSX.Element {
     const navigate = useNavigate();
@@ -14,6 +15,14 @@ export function HomePage(): React.JSX.Element {
             navigate("/login", { replace: true });
         },
         [initializeAsync, navigate]
+    );
+
+    // Temporary, only for dev/testing!
+    const dropDatabaseCallback = useCallback(
+        () => {
+            indexedDB.deleteDatabase(HintKeepDatabaseDefinition.name);
+        },
+        []
     );
 
     useEffect(
@@ -38,6 +47,9 @@ export function HomePage(): React.JSX.Element {
             >
                 Use application locally
             </Link>
+            <button onClick={dropDatabaseCallback}>
+                Drop database
+            </button>
         </>
     );
 }
