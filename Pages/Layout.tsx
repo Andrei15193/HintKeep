@@ -1,20 +1,35 @@
 import React, { useEffect } from "react";
 import { useDependency } from "react-model-view-viewmodel";
-import { Outlet } from "react-router";
+import { Link, Outlet } from "react-router";
 import { useIndexedDatabase } from "../Data/IndexedDatabase";
+import { useUser } from "./Contexts/UserContext";
 import { GlobalNotificationsContainer, Notifications } from "./Notifications";
 import { useConfirmationPrompt } from "./Prompt/ConfirmationPromptContext";
 
 export function Layout(): React.JSX.Element {
     useIndexedDatabaseErrorHandler();
+    const user = useUser();
 
     return (
         <>
             <header>
-                <h1>
-                    HintKeep
-                </h1>
+                <div>
+                    <h1>
+                        HintKeep
+                    </h1>
+                </div>
             </header>
+            <nav>
+                {
+                    user === null
+                        ? null
+                        : (
+                            <Link to="/profile">
+                                Profile
+                            </Link>
+                        )
+                }
+            </nav>
             <main>
                 <Outlet />
             </main>

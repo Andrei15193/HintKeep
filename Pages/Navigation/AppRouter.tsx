@@ -7,35 +7,36 @@ import { IndexedDatabaseScoped } from "../IndexedDatabaseScoped";
 import { Layout } from "../Layout";
 import { LoginPage } from "../Login";
 import { SignUpPage } from "../SignUp/SignUpPage";
+import { UserProfilePage } from "../User";
 
 export const AppRouter = createBrowserRouter([
     {
-        path: "/",
-        Component() {
-            const user = useUser();
-            const match = useMatch({
-                path: "/",
-                end: true
-            });
-
-            if (match)
-                if (user === null)
-                    return <HomePage />;
-                else
-                    return (
-                        <IndexedDatabaseScoped>
-                            <AccountsListPage />
-                        </IndexedDatabaseScoped>
-                    );
-            else
-                return <Outlet />;
-        },
+        Component: Layout,
         children: [
             {
-                Component: IndexedDatabaseScoped,
+                path: "/",
+                Component() {
+                    const user = useUser();
+                    const match = useMatch({
+                        path: "/",
+                        end: true
+                    });
+
+                    if (match)
+                        if (user === null)
+                            return <HomePage />;
+                        else
+                            return (
+                                <IndexedDatabaseScoped>
+                                    <AccountsListPage />
+                                </IndexedDatabaseScoped>
+                            );
+                    else
+                        return <Outlet />;
+                },
                 children: [
                     {
-                        Component: Layout,
+                        Component: IndexedDatabaseScoped,
                         children: [
                             {
                                 Component() {
@@ -85,6 +86,10 @@ export const AppRouter = createBrowserRouter([
                                     return null;
                                 },
                                 children: [
+                                    {
+                                        path: "profile",
+                                        Component: UserProfilePage
+                                    },
                                     {
                                         path: "add",
                                         Component: AccountAddPage
