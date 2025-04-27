@@ -51,7 +51,7 @@ export default function (_: any, { mode = "development" }: IBuildOptions): Confi
                     }
 
                     if (mode === "production")
-                        return `${generatedChunkId}.[fullhash].js`;
+                        return `${generatedChunkId}.[contenthash].js`;
                     else
                         return `${generatedChunkId}.js`;
                 }
