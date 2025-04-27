@@ -1,6 +1,6 @@
 import type { IAccountObject } from "../../../Data/IndexedDatabase/HintKeep/Model/IAccountObject";
 import type { IDataSource } from "../../../DataSources";
-import type { IAccount } from "../../Model/IAccount";
+import type { IAccountListItem } from "../Models/IAccountListItem";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
 import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
 import { type IUser, User } from "../../Model/IUser";
@@ -14,7 +14,7 @@ export interface IListResult<TItem> {
     readonly totalCount: number;
 }
 
-export class AccountsDataSource implements IDataSource<ISearchText, IListResult<IAccount>> {
+export class AccountsDataSource implements IDataSource<ISearchText, IListResult<IAccountListItem>> {
     private readonly _user: IUser;
     private readonly _database: IDBDatabase;
 
@@ -23,7 +23,7 @@ export class AccountsDataSource implements IDataSource<ISearchText, IListResult<
         this._database = resolve(IndexedDatabase);
     }
 
-    public async getDataAsync({ searchText }: ISearchText): Promise<IListResult<IAccount>> {
+    public async getDataAsync({ searchText }: ISearchText): Promise<IListResult<IAccountListItem>> {
         const transaction = this._database.transaction("Accounts", "readonly");
 
         try {
@@ -41,13 +41,12 @@ export class AccountsDataSource implements IDataSource<ISearchText, IListResult<
 
             return {
                 items: accountObjects
-                    .map((accountObject) => ({
+                    .map<IAccountListItem>((accountObject) => ({
                         id: accountObject.id,
                         name: accountObject.name,
                         username: accountObject.username,
                         hint: accountObject.hint,
-                        isPinned: accountObject.isPinned,
-                        notes: accountObject.notes
+                        isPinned: accountObject.isPinned
                     }))
                     .filter((account) => (
                         searchTerms.length === 0

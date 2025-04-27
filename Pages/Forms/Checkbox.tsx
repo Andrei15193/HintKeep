@@ -5,9 +5,10 @@ import { useViewModel } from "react-model-view-viewmodel";
 export interface ICheckboxProps {
     readonly field: HintKeepFormField<boolean>;
     readonly isInvalid?: boolean;
+    readonly disabled?: boolean;
 }
 
-export function Checkbox({ field, isInvalid }: ICheckboxProps): React.JSX.Element {
+export function Checkbox({ field, isInvalid, disabled }: ICheckboxProps): React.JSX.Element {
     useViewModel(field);
 
     const onChangedCallback = useCallback(
@@ -36,6 +37,7 @@ export function Checkbox({ field, isInvalid }: ICheckboxProps): React.JSX.Elemen
                 onBlur={onBlurCallback}
                 onChange={onChangedCallback}
                 className={field.wasTouched && (isInvalid || field.isInvalid) ? "invalid" : ""}
+                disabled={disabled}
             />
             {field.wasTouched && (isInvalid || field.isInvalid) ? field.error : null}
         </>

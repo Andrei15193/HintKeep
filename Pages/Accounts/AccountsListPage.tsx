@@ -1,7 +1,7 @@
-import type { IAccount } from "../Model/IAccount";
+import type { IAccountListItem } from "./Models/IAccountListItem";
 import React, { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDependency, useViewModelMemo } from "react-model-view-viewmodel";
-import { Link } from "react-router";
+import { generatePath, Link } from "react-router";
 import { HintKeepFormField } from "../../Forms";
 import { useUser } from "../Contexts/UserContext";
 import { TextInput } from "../Forms";
@@ -22,7 +22,7 @@ export function AccountsListPage(): React.JSX.Element {
 
     const [isLoading, setIsLoading] = useState(true);
     const accountsTotalCountRef = useRef(0);
-    const [accounts, setAccounts] = useState<readonly IAccount[]>([]);
+    const [accounts, setAccounts] = useState<readonly IAccountListItem[]>([]);
 
     const loadAccountsAsyncCallback = useCallback(
         async (searchText: string) => {
@@ -130,7 +130,9 @@ export function AccountsListPage(): React.JSX.Element {
                                                         : accounts.map((account) => (
                                                             <tr key={account.id}>
                                                                 <td>
-                                                                    {account.name}
+                                                                    <Link to={generatePath("/:id", { id: account.id })}>
+                                                                        {account.name}
+                                                                    </Link>
                                                                 </td>
                                                                 <td>
                                                                     {account.username}

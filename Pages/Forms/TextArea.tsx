@@ -5,9 +5,10 @@ import { useViewModel } from "react-model-view-viewmodel";
 export interface ITextAreaProps {
     readonly field: HintKeepFormField<string>;
     readonly isInvalid?: boolean;
+    readonly disabled?: boolean;
 }
 
-export function TextArea({ field, isInvalid }: ITextAreaProps): React.JSX.Element {
+export function TextArea({ field, isInvalid, disabled }: ITextAreaProps): React.JSX.Element {
     useViewModel(field);
 
     const onChangedCallback = useCallback(
@@ -34,6 +35,7 @@ export function TextArea({ field, isInvalid }: ITextAreaProps): React.JSX.Elemen
                 onBlur={onBlurCallback}
                 onChange={onChangedCallback}
                 className={field.wasTouched && (isInvalid || field.isInvalid) ? "invalid" : ""}
+                disabled={disabled}
             />
             {field.wasTouched && (isInvalid || field.isInvalid) ? field.error : null}
         </>

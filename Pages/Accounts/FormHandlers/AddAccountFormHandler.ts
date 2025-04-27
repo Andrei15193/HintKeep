@@ -1,12 +1,12 @@
 import type { IAccountObject } from "../../../Data/IndexedDatabase/HintKeep/Model/IAccountObject";
 import type { IFormHandler } from "../../../FormHandlers/IFormHandler";
-import type { IAccount } from "../../Model/IAccount";
 import type { AccountForm } from "../Forms/AccountForm";
+import type { IAccountDetails } from "../Models/IAcountDetails";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
 import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
 import { type IUser, User } from "../../Model/IUser";
 
-export class AddAccountFormHandler implements IFormHandler<AccountForm, IAccount> {
+export class AddAccountFormHandler implements IFormHandler<AccountForm, IAccountDetails> {
     private readonly _user: IUser;
     private readonly _database: IDBDatabase;
 
@@ -15,7 +15,7 @@ export class AddAccountFormHandler implements IFormHandler<AccountForm, IAccount
         this._database = resolve(IndexedDatabase);
     }
 
-    public async handleAsync(form: AccountForm): Promise<IAccount> {
+    public async handleAsync(form: AccountForm): Promise<IAccountDetails> {
         const transaction = this._database.transaction("Accounts", "readwrite");
 
         try {

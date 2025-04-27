@@ -1,39 +1,40 @@
+import type { IAccountDetails } from "../Models/IAcountDetails";
 import { HintKeepForm, HintKeepFormField } from "../../../Forms";
 import { MaxLengthValidator } from "../../../Forms/Validation/maxLength";
 import { RequiredValidator } from "../../../Forms/Validation/required";
 
 export class AccountForm extends HintKeepForm {
-    public constructor() {
+    public constructor(account?: IAccountDetails) {
         super();
 
         this.withFields(
             this.name = new HintKeepFormField<string>({
                 name: "name",
                 label: "Account",
-                initialValue: "",
+                initialValue: account?.name || "",
                 validators: [new RequiredValidator(), new MaxLengthValidator(250)]
             }),
             this.username = new HintKeepFormField<string>({
                 name: "username",
                 label: "Username",
-                initialValue: "",
+                initialValue: account?.username || "",
                 validators: [new RequiredValidator(), new MaxLengthValidator(250)]
             }),
             this.hint = new HintKeepFormField<string>({
                 name: "hint",
                 label: "Hint",
-                initialValue: "",
+                initialValue: account?.hint || "",
                 validators: [new RequiredValidator(), new MaxLengthValidator(250)]
             }),
             this.pinned = new HintKeepFormField<boolean>({
                 name: "pinned",
                 label: "Is pinned",
-                initialValue: false
+                initialValue: account?.isPinned || false
             }),
             this.notes = new HintKeepFormField<string>({
                 name: "notes",
                 label: "Notes",
-                initialValue: "",
+                initialValue: account?.notes || "",
                 validators: [new MaxLengthValidator(1000)]
             })
         );

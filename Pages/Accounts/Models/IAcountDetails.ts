@@ -1,4 +1,4 @@
-export interface IAccount {
+export interface IAccountDetails {
     readonly id: string;
     readonly name: string;
     readonly username: string;

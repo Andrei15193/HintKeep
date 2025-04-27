@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import { createBrowserRouter, Outlet, useMatch, useNavigate } from "react-router";
-import { AccountAddPage, AccountsListPage } from "../Accounts";
+import { AccountAddPage, AccountDetailsPage, AccountsListPage } from "../Accounts";
 import { useUser } from "../Contexts/UserContext";
 import { HomePage } from "../Home";
 import { IndexedDatabaseScoped } from "../IndexedDatabaseScoped";
@@ -43,7 +43,7 @@ export const AppRouter = createBrowserRouter([
                                     const user = useUser();
                                     const navigate = useNavigate();
 
-                                    useEffect(
+                                    useLayoutEffect(
                                         () => {
                                             if (user !== null)
                                                 navigate("/");
@@ -72,7 +72,7 @@ export const AppRouter = createBrowserRouter([
                                     const user = useUser();
                                     const navigate = useNavigate();
 
-                                    useEffect(
+                                    useLayoutEffect(
                                         () => {
                                             if (user === null)
                                                 navigate("/");
@@ -93,6 +93,10 @@ export const AppRouter = createBrowserRouter([
                                     {
                                         path: "add",
                                         Component: AccountAddPage
+                                    },
+                                    {
+                                        path: ":id",
+                                        Component: AccountDetailsPage
                                     }
                                 ]
                             }
@@ -101,5 +105,20 @@ export const AppRouter = createBrowserRouter([
                 ]
             }
         ]
+    },
+    {
+        path: "*",
+        Component() {
+            const navigate = useNavigate();
+
+            useLayoutEffect(
+                () => {
+                    navigate("/");
+                },
+                [navigate]
+            );
+
+            return null;
+        }
     }
 ]);

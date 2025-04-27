@@ -5,12 +5,13 @@ import { useViewModel } from "react-model-view-viewmodel";
 export interface ITextInputProps {
     readonly field: HintKeepFormField<string>;
     readonly isInvalid?: boolean;
+    readonly disabled?: boolean;
 
     readonly type?: "email" | "search" | "tel" | "text" | "url" | "password";
 }
 
 export const TextInput = forwardRef<HTMLInputElement, ITextInputProps>(
-    function TextInput({ field, type = "text", isInvalid }, ref): React.JSX.Element {
+    function TextInput({ field, type = "text", isInvalid, disabled }, ref): React.JSX.Element {
         useViewModel(field);
 
         const onChangedCallback = useCallback(
@@ -40,6 +41,7 @@ export const TextInput = forwardRef<HTMLInputElement, ITextInputProps>(
                     onBlur={onBlurCallback}
                     onChange={onChangedCallback}
                     className={field.wasTouched && (isInvalid || field.isInvalid) ? "invalid" : ""}
+                    disabled={disabled}
                 />
                 {field.wasTouched && (isInvalid || field.isInvalid) ? field.error : null}
             </>
