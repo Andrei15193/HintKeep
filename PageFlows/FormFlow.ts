@@ -1,39 +1,26 @@
 import type { IFormHandler } from "../FormHandlers/IFormHandler";
 import type { HintKeepForm } from "../Forms";
 import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useDependency, useViewModel, type ResolvableSimpleDependency, type ViewModelType } from "react-model-view-viewmodel";
+import { type ResolvableSimpleDependency, useDependency } from "react-model-view-viewmodel";
 import { useBlocker } from "react-router";
 import { Notifications } from "../Pages/Notifications";
 import { type IConfirmationPromptOptions, useShowConfirmationPrompt } from "../Pages/Prompt";
 
-export interface ICreateFlow<TForm extends HintKeepForm, TResult> {
-    readonly state: "ready" | "faulted" | "submitting" | "submitted";
+export type IFormFlow<TForm extends HintKeepForm, TResult> =
+    IFormFlowReadyState<TForm, TResult>
+    | IFormFlowSubmittingState<TForm, TResult>
+    | IFormFlowSubmittedState<TForm, TResult>
+    | IFormFlowFaultedState<TForm, TResult>;
 
-    readonly form: TForm;
-
-    readonly isProcessing: boolean;
-    readonly isReady: boolean;
-    readonly isFaulted: boolean;
-
-    readonly isSubmitting: boolean;
-    readonly isSubmitted: boolean;
-
-    readonly isCompleted: boolean;
-
-    readonly result: TResult | null;
-
-    submitAsync(event?: SyntheticEvent): Promise<void>;
-}
-
-export interface ICreateFlowOptions<TForm extends HintKeepForm, TResult> {
-    readonly form: ViewModelType<TForm>;
+export interface IFormFlowOptions<TForm extends HintKeepForm, TResult> {
+    readonly form: ResolvableSimpleDependency<TForm>;
     readonly formHandler: ResolvableSimpleDependency<IFormHandler<TForm, TResult>>;
 
     readonly skipConfirmationPrompt?: boolean;
     readonly confirmationPrompt?: IConfirmationPromptOptions;
 }
 
-export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICreateFlowOptions<TForm, TResult>): ICreateFlow<TForm, TResult> {
+export function useFormFlow<TForm extends HintKeepForm, TResult>(options: IFormFlowOptions<TForm, TResult>): IFormFlow<TForm, TResult> {
     const {
         form: formDependency,
         formHandler: formHandlerDependency,
@@ -47,9 +34,10 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
     const notifications = useDependency(Notifications);
 
     const resultRef = useRef<TResult | null>(null);
-    const [state, setState] = useState<ICreateFlow<TForm, TResult>["state"]>("ready");
+    const errorRef = useRef<Error | null>(null);
+    const [state, setState] = useState<IFormFlow<TForm, TResult>["state"]>("ready");
 
-    const form = useViewModel(formDependency);
+    const form = useDependency(formDependency);
     const formHandler = useDependency(formHandlerDependency);
 
     const submitAsyncCallback = useCallback(
@@ -59,17 +47,23 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
             form.validate();
             if (form.isValid)
                 try {
+                    resultRef.current = null;
+                    errorRef.current = null;
                     setState("submitting");
 
-                    resultRef.current = await formHandler.handleAsync(form);
-
-                    if (form.isValid)
+                    const result = await formHandler.handleAsync(form);
+                    if (form.isValid && result !== null && result !== undefined) {
+                        resultRef.current = result;
                         setState("submitted");
-                    else
+                    }
+                    else {
                         setState("ready");
+                    }
                 }
                 catch (error) {
+                    errorRef.current = error instanceof Error ? error : new Error(typeof error === "string" ? error : JSON.stringify(error));
                     setState("faulted");
+
                     notifications.add({
                         message: error instanceof DOMException ? error.message : error,
                         type: "error"
@@ -107,8 +101,7 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
             if (shouldBlockNavigation) {
                 const beforeUnloadEventHandler = (event: BeforeUnloadEvent) => {
                     event.preventDefault();
-                    // Chrome requires returnValue to be set.
-                    event.returnValue = "";
+                    event.returnValue = ""; // Chrome requires returnValue to be set.
                 };
                 window.addEventListener("beforeunload", beforeUnloadEventHandler);
 
@@ -130,27 +123,89 @@ export function useCreateFlow<TForm extends HintKeepForm, TResult>(options: ICre
         [blocker, showDiscardConfirmationPrompt]
     );
 
-    return useMemo<ICreateFlow<TForm, TResult>>(
+    const editForm = useMemo<IFormFlowBaseState<TForm, TResult>>(
         () => ({
             state,
-            form,
 
-            isProcessing: state === "submitting",
-            isFaulted: state === "faulted",
             isReady: (
                 state === "ready"
                 || state === "submitted"
             ),
-
             isSubmitting: state === "submitting",
             isSubmitted: state === "submitted",
+            isFaulted: state === "faulted",
 
-            isCompleted: state === "submitted",
-
+            form,
             result: state === "submitted" ? resultRef.current : null,
+            error: state === "faulted" ? errorRef.current : null,
 
             submitAsync: submitAsyncCallback
         }),
         [state, form, resultRef, submitAsyncCallback]
     );
+
+    return editForm as IFormFlow<TForm, TResult>;
+}
+
+interface IFormFlowBaseState<TForm extends HintKeepForm, TResult> {
+    readonly state: "ready" | "submitting" | "submitted" | "faulted";
+    readonly form: TForm;
+
+    readonly isReady: boolean;
+    readonly isSubmitting: boolean;
+    readonly isSubmitted: boolean;
+    readonly isFaulted: boolean;
+
+    readonly result: TResult | null;
+    readonly error: Error | null;
+
+    submitAsync(event?: SyntheticEvent): Promise<void>;
+}
+
+interface IFormFlowReadyState<TForm extends HintKeepForm, TResult> extends IFormFlowBaseState<TForm, TResult> {
+    readonly state: "ready";
+
+    readonly isReady: true;
+    readonly isSubmitting: false;
+    readonly isSubmitted: false;
+    readonly isFaulted: false;
+
+    readonly result: null;
+    readonly error: null;
+}
+
+interface IFormFlowSubmittingState<TForm extends HintKeepForm, TResult> extends IFormFlowBaseState<TForm, TResult> {
+    readonly state: "submitting";
+
+    readonly isReady: false;
+    readonly isSubmitting: true;
+    readonly isSubmitted: false;
+    readonly isFaulted: false;
+
+    readonly result: null;
+    readonly error: null;
+}
+
+interface IFormFlowSubmittedState<TForm extends HintKeepForm, TResult> extends IFormFlowBaseState<TForm, TResult> {
+    readonly state: "submitted";
+
+    readonly isReady: true;
+    readonly isSubmitting: false;
+    readonly isSubmitted: true;
+    readonly isFaulted: false;
+
+    readonly result: TResult;
+    readonly error: null;
+}
+
+interface IFormFlowFaultedState<TForm extends HintKeepForm, TResult> extends IFormFlowBaseState<TForm, TResult> {
+    readonly state: "faulted";
+
+    readonly isReady: false;
+    readonly isSubmitting: false;
+    readonly isSubmitted: false;
+    readonly isFaulted: true;
+
+    readonly result: TResult;
+    readonly error: Error;
 }

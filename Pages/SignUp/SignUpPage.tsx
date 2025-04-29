@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useCreateFlow } from "../../PageFlows";
+import { useFormFlow } from "../../PageFlows";
 import { useUserContext } from "../Contexts/UserContext";
 import { TextArea, TextInput } from "../Forms";
 import { SignUpFormHandler } from "./FormHandlers/SignUpFormHandler";
@@ -11,11 +11,11 @@ export function SignUpPage(): React.JSX.Element {
     const { authenticate } = useUserContext();
     const {
         form,
-        isProcessing,
+        isSubmitting,
         isSubmitted,
         result: user,
         submitAsync
-    } = useCreateFlow({
+    } = useFormFlow({
         form: SignUpForm,
         formHandler: SignUpFormHandler
     });
@@ -41,7 +41,7 @@ export function SignUpPage(): React.JSX.Element {
             </p>
 
             {
-                isProcessing
+                isSubmitting
                     ? "Loading"
                     : (
                         <form onSubmit={submitAsync}>

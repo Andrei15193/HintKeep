@@ -6,7 +6,7 @@ import type { IDependencyResolver } from "react-model-view-viewmodel";
 import { getHashAsync } from "../../../Crypto";
 import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
 
-export class LoginFormHandler implements IFormHandler<LoginForm, IUser | null> {
+export class LoginFormHandler implements IFormHandler<LoginForm, IUser> {
     private readonly _database: IDBDatabase;
 
     public constructor({ resolve }: IDependencyResolver) {
@@ -32,7 +32,7 @@ export class LoginFormHandler implements IFormHandler<LoginForm, IUser | null> {
                 };
             }
             else {
-                form.error = "Wrong credentials. Try again or follow the password recovery steps.";
+                form.username.error = "Wrong credentials. Try again or follow the password recovery steps.";
 
                 return null;
             }

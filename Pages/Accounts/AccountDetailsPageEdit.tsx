@@ -15,6 +15,7 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
     const {
         form,
         isLoading,
+        isFaulted,
         isSubmitted,
         submitAsync
     } = useEditFlow({
@@ -44,47 +45,49 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
             {
                 isLoading
                     ? "Loading"
-                    : (
-                        <form onSubmit={submitAsync}>
-                            <div>
-                                <Label field={form.name} />
-                                <TextInput field={form.name} />
-                            </div>
+                    : isFaulted
+                        ? "Faulted"
+                        : (
+                            <form onSubmit={submitAsync}>
+                                <div>
+                                    <Label field={form.name} />
+                                    <TextInput field={form.name} />
+                                </div>
 
-                            <div>
-                                <Label field={form.username} />
-                                <TextInput field={form.username} />
-                            </div>
+                                <div>
+                                    <Label field={form.username} />
+                                    <TextInput field={form.username} />
+                                </div>
 
-                            <div>
-                                <Label field={form.hint} />
-                                <TextInput field={form.hint} />
-                            </div>
+                                <div>
+                                    <Label field={form.hint} />
+                                    <TextInput field={form.hint} />
+                                </div>
 
-                            <div>
-                                <Label field={form.pinned} />
-                                <Checkbox field={form.pinned} />
-                            </div>
+                                <div>
+                                    <Label field={form.pinned} />
+                                    <Checkbox field={form.pinned} />
+                                </div>
 
-                            <div>
-                                <Label field={form.notes} />
-                                <TextArea field={form.notes} />
-                            </div>
+                                <div>
+                                    <Label field={form.notes} />
+                                    <TextArea field={form.notes} />
+                                </div>
 
-                            <div>
-                                <button type="submit">
-                                    Save
-                                </button>
-                                <Link
-                                    to={generatePath("/:id", { id: id || "" })}
-                                    onClick={discardChangesCallback}
-                                    replace
-                                >
-                                    Cancel
-                                </Link>
-                            </div>
-                        </form>
-                    )
+                                <div>
+                                    <button type="submit">
+                                        Save
+                                    </button>
+                                    <Link
+                                        to={generatePath("/:id", { id: id || "" })}
+                                        onClick={discardChangesCallback}
+                                        replace
+                                    >
+                                        Cancel
+                                    </Link>
+                                </div>
+                            </form>
+                        )
             }
         </>
     );

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useCreateFlow } from "../../PageFlows";
+import { useFormFlow } from "../../PageFlows";
 import { useUserContext } from "../Contexts/UserContext";
 import { TextInput } from "../Forms";
 import { LoginFormHandler } from "./FormHandlers/LoginFormHandler";
@@ -12,10 +12,11 @@ export function LoginPage(): React.JSX.Element {
 
     const {
         form,
+        isSubmitting,
         isSubmitted,
         result: user,
         submitAsync
-    } = useCreateFlow({
+    } = useFormFlow({
         form: LoginForm,
         formHandler: LoginFormHandler,
         skipConfirmationPrompt: true
@@ -24,7 +25,7 @@ export function LoginPage(): React.JSX.Element {
     useEffect(
         () => {
             if (isSubmitted) {
-                authenticate(user!);
+                authenticate(user);
                 navigate("/");
             }
         },
@@ -41,46 +42,52 @@ export function LoginPage(): React.JSX.Element {
                 Welcome to HintKeep, please provide your credentials to start using the app!
             </p>
 
-            <form onSubmit={submitAsync}>
-                {
-                    form.isInvalid
-                        ? (
+            {
+                isSubmitting
+                    ? "Loading"
+                    : (
+                        <form onSubmit={submitAsync}>
+                            {
+                                form.isInvalid
+                                    ? (
+                                        <div>
+                                            {form.error}
+                                        </div>
+                                    )
+                                    : null
+                            }
+
                             <div>
-                                {form.error}
+                                <label htmlFor={form.username.name}>
+                                    Username
+                                </label>
+                                <TextInput
+                                    field={form.username}
+                                    isInvalid={form.error !== null}
+                                />
                             </div>
-                        )
-                        : null
-                }
 
-                <div>
-                    <label htmlFor={form.username.name}>
-                        Username
-                    </label>
-                    <TextInput
-                        field={form.username}
-                        isInvalid={form.error !== null}
-                    />
-                </div>
+                            <div>
+                                <label htmlFor={form.password.name}>
+                                    Password
+                                </label>
+                                <TextInput
+                                    field={form.password}
+                                    type="password"
+                                    isInvalid={form.error !== null}
+                                />
+                            </div>
 
-                <div>
-                    <label htmlFor={form.password.name}>
-                        Password
-                    </label>
-                    <TextInput
-                        field={form.password}
-                        type="password"
-                        isInvalid={form.error !== null}
-                    />
-                </div>
+                            <button type="submit">
+                                Login
+                            </button>
 
-                <button type="submit">
-                    Login
-                </button>
-
-                <Link to="/">
-                    Cancel
-                </Link>
-            </form>
+                            <Link to="/">
+                                Cancel
+                            </Link>
+                        </form>
+                    )
+            }
 
             <div>
                 <a

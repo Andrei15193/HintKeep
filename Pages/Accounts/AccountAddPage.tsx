@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useCreateFlow } from "../../PageFlows";
+import { useFormFlow } from "../../PageFlows";
 import { Checkbox, Label, TextArea, TextInput } from "../Forms";
 import { AccountFormHandler } from "./FormHandlers/AccountFormHandler";
 import { AccountForm } from "./Forms/AccountForm";
@@ -10,10 +10,10 @@ export function AccountAddPage(): React.JSX.Element {
 
     const {
         form,
-        isProcessing,
+        isSubmitting,
         isSubmitted,
         submitAsync
-    } = useCreateFlow({
+    } = useFormFlow({
         form: AccountForm,
         formHandler: AccountFormHandler,
 
@@ -38,7 +38,7 @@ export function AccountAddPage(): React.JSX.Element {
                 Add hint
             </h1>
             {
-                isProcessing
+                isSubmitting
                     ? "Loading"
                     : (
                         <form onSubmit={submitAsync}>

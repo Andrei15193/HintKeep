@@ -1,39 +1,23 @@
 import type { IDataSource, IEntityScoped } from "../DataSources";
 import type { IFormHandler } from "../FormHandlers/IFormHandler";
 import type { HintKeepForm } from "../Forms";
-import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useDependency, useViewModel, type ResolvableSimpleDependency, type ViewModelType } from "react-model-view-viewmodel";
-import { useBlocker } from "react-router";
-import { Notifications } from "../Pages/Notifications";
-import { type IConfirmationPromptOptions, useShowConfirmationPrompt } from "../Pages/Prompt";
-import { useDisplayFlow } from "./DisplayFlow";
+import type { IConfirmationPromptOptions } from "../Pages/Prompt";
+import { type SyntheticEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type IDependencyResolver, useDependencyResolver, type ResolvableSimpleDependency, type ViewModelType } from "react-model-view-viewmodel";
+import { useDataSourceFlow } from "./DataSourceFlow";
+import { useFormFlow } from "./FormFlow";
 
-export interface IEditFlow<TEntity, TForm extends HintKeepForm, TResult> {
-    readonly state: "loading" | "ready" | "faulted" | "submitting" | "submitted";
-
-    readonly entity: TEntity | null;
-    readonly form: TForm;
-
-    readonly isLoading: boolean;
-    readonly isProcessing: boolean;
-    readonly isReady: boolean;
-    readonly isFaulted: boolean;
-
-    readonly isSubmitting: boolean;
-    readonly isSubmitted: boolean;
-
-    readonly isCompleted: boolean;
-
-    readonly result: TResult | null;
-
-    loadAsync(): Promise<void>;
-    submitAsync(event?: SyntheticEvent): Promise<void>;
-}
+export type IEditFlow<TEntity, TForm extends HintKeepForm, TResult> =
+    IEditFlowLoadingState<TEntity, TForm, TResult>
+    | IEditFlowReadyState<TEntity, TForm, TResult>
+    | IEditFlowSubmittingState<TEntity, TForm, TResult>
+    | IEditFlowSubmittedState<TEntity, TForm, TResult>
+    | IEditFlowFaultedState<TEntity, TForm, TResult>;
 
 export interface IEditFlowOptions<TEntity, TForm extends HintKeepForm, TResult> {
     readonly entityId: string;
     readonly dataSource: ResolvableSimpleDependency<IDataSource<IEntityScoped, TEntity>>;
-    readonly form: ViewModelType<TForm, [entity: TEntity | null]>;
+    readonly form: ViewModelType<TForm, [entity: TEntity, dependencyResolver: IDependencyResolver]>;
     readonly formHandler: ResolvableSimpleDependency<IFormHandler<TForm, TResult>>;
 
     readonly skipConfirmationPrompt?: boolean;
@@ -41,138 +25,89 @@ export interface IEditFlowOptions<TEntity, TForm extends HintKeepForm, TResult> 
 }
 
 export function useEditFlow<TEntity, TForm extends HintKeepForm, TResult>(options: IEditFlowOptions<TEntity, TForm, TResult>): IEditFlow<TEntity, TForm, TResult> {
-    const {
-        entityId,
-        dataSource,
-        form: formDependency,
-        formHandler: formHandlerDependency,
-        skipConfirmationPrompt,
-        confirmationPrompt: {
-            onConfirm,
-            onDismiss,
-            ...otherConfirmationPromptOptions
-        } = {}
-    } = options;
-    const notifications = useDependency(Notifications);
-
-    const resultRef = useRef<TResult | null>(null);
+    const formRef = useRef<TForm | null>(null);
+    const errorRef = useRef<Error | null>(null);
+    const dependencyResolver = useDependencyResolver();
     const [state, setState] = useState<IEditFlow<TEntity, TForm, TResult>["state"]>("loading");
 
     const {
-        state: loadingState,
+        entityId,
+        dataSource,
+        form: FormType,
+        formHandler,
+        skipConfirmationPrompt,
+        confirmationPrompt
+    } = options;
+
+    const {
+        state: dataSourceFlowState,
         entity,
+        error: dataSourceFlowError,
         loadAsync
-    } = useDisplayFlow({
+    } = useDataSourceFlow({
         entityId,
         dataSource
     });
-
-    const form = useViewModel(formDependency, [entity]);
-    const formHandler = useDependency(formHandlerDependency);
+    const {
+        state: formFlowState,
+        form,
+        result,
+        error: formFlowError,
+        submitAsync
+    } = useFormFlow({
+        form: formRef.current as ResolvableSimpleDependency<TForm>,
+        formHandler,
+        skipConfirmationPrompt,
+        confirmationPrompt
+    });
 
     useEffect(
         () => {
-            switch (loadingState) {
+            switch (dataSourceFlowState) {
                 case "loading":
                     setState("loading");
                     break;
 
-                case "faulted":
-                    setState("faulted");
-                    break;
-
                 case "ready":
-                    setState("ready");
+                    formRef.current = new FormType(entity, dependencyResolver);
+                    switch (formFlowState) {
+                        case "ready":
+                            setState("ready");
+                            break;
+
+                        case "submitting":
+                            setState("submitting");
+                            break;
+
+                        case "submitted":
+                            setState("submitted");
+                            break;
+
+                        case "faulted":
+                            errorRef.current = formFlowError;
+                            setState("faulted");
+                            break;
+                    }
+                    break;
+
+                case "faulted":
+                    errorRef.current = dataSourceFlowError;
+                    setState("faulted");
                     break;
             }
         },
-        [loadingState]
+        [dataSourceFlowState, formFlowState, dataSourceFlowError, formFlowError, entity, FormType, dependencyResolver, formRef]
     );
 
-    const submitAsyncCallback = useCallback(
-        async (event?: SyntheticEvent) => {
-            event?.preventDefault();
-
-            form.validate();
-            if (form.isValid)
-                try {
-                    setState("submitting");
-
-                    resultRef.current = await formHandler.handleAsync(form);
-
-                    setState("submitted");
-                }
-                catch (error) {
-                    setState("faulted");
-                    notifications.add({
-                        message: error instanceof DOMException ? error.message : error,
-                        type: "error"
-                    });
-                }
-        },
-        [form, formHandler, resultRef, notifications, setState]
-    );
-
-    const shouldBlockNavigation = !skipConfirmationPrompt && state !== "submitted";
-    const blocker = useBlocker(shouldBlockNavigation);
-    const onConfirmCallback = useCallback(
-        () => {
-            onConfirm && onConfirm();
-            blocker.state === "blocked" && blocker.proceed();
-        },
-        [blocker, onConfirm]
-    );
-    const onDismissCallback = useCallback(
-        () => {
-            onDismiss && onDismiss();
-            blocker.state === "blocked" && blocker.reset();
-        },
-        [blocker, onDismiss]
-    );
-
-    const showDiscardConfirmationPrompt = useShowConfirmationPrompt({
-        onConfirm: onConfirmCallback,
-        onDismiss: onDismissCallback,
-        ...otherConfirmationPromptOptions
-    });
-
-    useEffect(
-        () => {
-            if (shouldBlockNavigation) {
-                const beforeUnloadEventHandler = (event: BeforeUnloadEvent) => {
-                    event.preventDefault();
-                    // Chrome requires returnValue to be set.
-                    event.returnValue = "";
-                };
-                window.addEventListener("beforeunload", beforeUnloadEventHandler);
-
-                return () => {
-                    window.removeEventListener("beforeunload", beforeUnloadEventHandler);
-                };
-            }
-            else
-                return undefined;
-        },
-        [shouldBlockNavigation]
-    );
-
-    useEffect(
-        () => {
-            if (blocker.state === "blocked")
-                showDiscardConfirmationPrompt();
-        },
-        [blocker, showDiscardConfirmationPrompt]
-    );
-
-    return useMemo<IEditFlow<TEntity, TForm, TResult>>(
+    const editFlow = useMemo<IEditFlowBaseState<TEntity, TForm, TResult>>(
         () => ({
             state,
             entity: state === "loading" || state === "faulted" ? null : entity,
-            form,
+            form: state === "loading" ? null : form,
+
+            isProcessing: state === "loading" || state === "submitting",
 
             isLoading: state === "loading",
-            isProcessing: state === "loading" || state === "submitting",
-            isFaulted: state === "faulted",
             isReady: (
                 state === "ready"
                 || state === "submitted"
@@ -180,14 +115,127 @@ export function useEditFlow<TEntity, TForm extends HintKeepForm, TResult>(option
 
             isSubmitting: state === "submitting",
             isSubmitted: state === "submitted",
+            isFaulted: state === "faulted",
 
-            isCompleted: state === "submitted",
-
-            result: resultRef.current,
+            result,
+            error: errorRef.current,
 
             loadAsync,
-            submitAsync: submitAsyncCallback
+            submitAsync
         }),
-        [state, entity, form, resultRef, loadAsync, submitAsyncCallback]
+        [state, entity, form, result, errorRef, loadAsync, submitAsync]
     );
+
+    return editFlow as IEditFlow<TEntity, TForm, TResult>;
+}
+
+interface IEditFlowBaseState<TEntity, TForm extends HintKeepForm, TResult> {
+    readonly state: "loading" | "ready" | "submitting" | "submitted" | "faulted";
+    readonly entity: TEntity | null;
+    readonly form: TForm | null;
+
+    readonly isProcessing: boolean;
+
+    readonly isLoading: boolean;
+    readonly isReady: boolean;
+
+    readonly isSubmitting: boolean;
+    readonly isSubmitted: boolean;
+    readonly isFaulted: boolean;
+
+    readonly result: TResult | null;
+    readonly error: Error | null;
+
+    loadAsync(event?: SyntheticEvent): Promise<void>;
+    submitAsync(event?: SyntheticEvent): Promise<void>;
+}
+
+interface IEditFlowLoadingState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
+    readonly state: "loading";
+    readonly entity: null;
+    readonly form: null;
+
+    readonly isProcessing: true;
+
+    readonly isLoading: true;
+    readonly isReady: false;
+
+    readonly isSubmitting: false;
+    readonly isSubmitted: false;
+    readonly isFaulted: false;
+
+    readonly result: null;
+    readonly error: null;
+}
+
+interface IEditFlowReadyState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
+    readonly state: "ready";
+    readonly entity: TEntity;
+    readonly form: TForm;
+
+    readonly isProcessing: false;
+
+    readonly isLoading: false;
+    readonly isReady: true;
+
+    readonly isSubmitting: false;
+    readonly isSubmitted: false;
+    readonly isFaulted: false;
+
+    readonly result: null;
+    readonly error: null;
+}
+
+interface IEditFlowSubmittingState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
+    readonly state: "submitting";
+    readonly entity: TEntity;
+    readonly form: TForm;
+
+    readonly isProcessing: true;
+
+    readonly isLoading: false;
+    readonly isReady: false;
+
+    readonly isSubmitting: true;
+    readonly isSubmitted: false;
+    readonly isFaulted: false;
+
+    readonly result: null;
+    readonly error: null;
+}
+
+interface IEditFlowSubmittedState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
+    readonly state: "submitted";
+    readonly entity: TEntity;
+    readonly form: TForm;
+
+    readonly isProcessing: false;
+
+    readonly isLoading: false;
+    readonly isReady: false;
+
+    readonly isSubmitting: false;
+    readonly isSubmitted: true;
+    readonly isFaulted: false;
+
+    readonly result: TResult;
+    readonly error: null;
+}
+
+interface IEditFlowFaultedState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
+    readonly state: "faulted";
+    readonly entity: null;
+    readonly form: null;
+
+    readonly isProcessing: false;
+
+    readonly isLoading: false;
+    readonly isReady: false;
+
+    readonly isSubmitting: false;
+    readonly isSubmitted: false;
+    readonly isFaulted: true;
+
+    readonly result: null;
+    readonly error: Error;
 }
