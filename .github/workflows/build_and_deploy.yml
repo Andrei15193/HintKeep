@@ -62,7 +62,7 @@ jobs:
         run: |
           Invoke-RestMethod `
             -Method Post `
-            -Uri 'https://api.netlify.com/api/v1/sites/${{ env.SITE_ID }}/deploys' `
+            -Uri 'https://api.netlify.com/api/v1/sites/${{ vars.SITE_ID }}/deploys' `
             -ContentType 'application/zip' `
             -Authentication Bearer `
             -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.DEPLOY_TOKEN }}') `
