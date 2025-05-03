@@ -35,10 +35,13 @@ jobs:
       - name: Pack
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
+
           Get-ChildItem -Path bin `
           | Compress-Archive `
-              -DestinationPath build.zip `
-              -CompressionLevel Optimal
+            -DestinationPath build.zip `
+            -CompressionLevel Optimal `
+          | Out-Null
 
       - name: Publish Artifact
         uses: actions/upload-artifact@v4
@@ -48,7 +51,7 @@ jobs:
 
   deployment:
     needs: build
-    name: Test Deployment
+    name: Deployment on Test
     runs-on: ubuntu-latest
     environment: Test
     steps:
@@ -60,11 +63,13 @@ jobs:
       - name: Deploy
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
+
           Invoke-RestMethod `
             -Method Post `
             -Uri 'https://api.netlify.com/api/v1/sites/${{ vars.SITE_ID }}/deploys' `
             -ContentType 'application/zip' `
             -Authentication Bearer `
             -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.DEPLOY_TOKEN }}') `
-            -InFile build.zip
-          
+            -InFile build.zip `
+          | Out-Null
