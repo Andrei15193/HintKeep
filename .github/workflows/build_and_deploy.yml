@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,6 +33,7 @@ jobs:
         run: npm run test
 
       - name: Pack
+        shell: pwsh
         run: |
           Get-ChildItem -Path bin `
           | Compress-Archive `
@@ -45,6 +47,8 @@ jobs:
           path: build.zip
 
   deployment:
+    needs: build
+    name: Test Deployment
     runs-on: ubuntu-latest
     environment: Test
     steps:
