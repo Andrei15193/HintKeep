@@ -61,6 +61,6 @@ jobs:
             -Uri 'https://api.netlify.com/api/v1/sites/${{ env.SITE_ID }}/deploys' `
             -ContentType 'application/zip' `
             -Authentication Bearer `
-            -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.DEPLOY_TOKEN }') `
+            -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.DEPLOY_TOKEN }}') `
             -InFile build.zip
           
