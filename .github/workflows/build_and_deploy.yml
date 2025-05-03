@@ -1,0 +1,75 @@
+name: Build & Deploy HintKeep
+
+on:
+  push:
+    branches:
+      - vNext
+      - vNext_cd
+
+concurrency:
+  group: test
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Restore
+        run: npm install
+        
+      - name: Build
+        run: npm run build-release
+        
+      - name: Test
+        run: npm run test
+
+      - name: Pack
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          Get-ChildItem -Path bin `
+          | Compress-Archive `
+            -DestinationPath build.zip `
+            -CompressionLevel Optimal `
+          | Out-Null
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build.zip
+
+  deployment:
+    needs: build
+    name: Deployment on Test
+    runs-on: ubuntu-latest
+    environment: Test
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+
+      - name: Deploy
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          Invoke-RestMethod `
+            -Method Post `
+            -Uri 'https://api.netlify.com/api/v1/sites/${{ vars.SITE_ID }}/deploys' `
+            -ContentType 'application/zip' `
+            -Authentication Bearer `
+            -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.DEPLOY_TOKEN }}') `
+            -InFile build.zip `
+          | Out-Null
