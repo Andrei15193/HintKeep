@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { generatePath, Link, useParams } from "react-router";
-import { useEditFlow } from "../../PageFlows";
-import { Checkbox, Label, TextArea, TextInput } from "../Forms";
+import { Checkbox, Label, TextArea, TextInput } from "../../Core/Forms/Components";
+import { useEditFlow } from "../../Core/PageFlows";
+import { useViewEditToggleContext } from "../../Core/ViewEditToggle";
 import { useShowConfirmationPrompt } from "../Prompt";
-import { useViewEditToggleContext } from "../ViewEditToggle";
 import { AccountDetailsDataSource } from "./DataSources/AccountDetailsDataSource";
 import { AccountFormHandler } from "./FormHandlers/AccountFormHandler";
 import { AccountForm } from "./Forms/AccountForm";

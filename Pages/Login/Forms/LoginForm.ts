@@ -1,5 +1,5 @@
-import { HintKeepForm, HintKeepFormField } from "../../../Forms";
-import { RequiredValidator } from "../../../Forms/Validation/required";
+import { RequiredValidator } from "../../../Core/Forms/Validation";
+import { HintKeepForm, HintKeepFormField } from "../../../Core/Forms/ViewModels";
 
 export class LoginForm extends HintKeepForm {
     public constructor() {

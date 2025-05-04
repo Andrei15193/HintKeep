@@ -1,4 +1,4 @@
-import { initialize } from "./Pages/Themes";
+import { initialize } from "./Core/Themes";
 
 import "./index.scss";
 

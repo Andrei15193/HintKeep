@@ -1,8 +1,8 @@
-import type { IAccountObject } from "../../../Data/IndexedDatabase/HintKeep/Model/IAccountObject";
-import type { IDataSource } from "../../../DataSources";
+import type { IAccountObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
+import type { IDataSource } from "../../../Core/DataSources";
 import type { IAccountDetails } from "../Models/IAcountDetails";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
-import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
+import { IndexedDatabase, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
 
 export interface IEntityScoped {
     readonly id: string;

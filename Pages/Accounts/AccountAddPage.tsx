@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useFormFlow } from "../../PageFlows";
-import { Checkbox, Label, TextArea, TextInput } from "../Forms";
+import { Checkbox, Label, TextArea, TextInput } from "../../Core/Forms/Components";
+import { useFormFlow } from "../../Core/PageFlows";
 import { AccountFormHandler } from "./FormHandlers/AccountFormHandler";
 import { AccountForm } from "./Forms/AccountForm";
 

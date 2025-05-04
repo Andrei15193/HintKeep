@@ -2,9 +2,9 @@ import type { IAccountDetails } from "./Models/IAcountDetails";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDependency, useViewModel } from "react-model-view-viewmodel";
 import { Link, useNavigate, useParams } from "react-router";
-import { isUniqueId } from "../../Crypto";
-import { Checkbox, Label, TextArea, TextInput } from "../Forms";
-import { useViewEditToggleContext } from "../ViewEditToggle";
+import { isUniqueId } from "../../Core/Crypto";
+import { Checkbox, Label, TextArea, TextInput } from "../../Core/Forms/Components";
+import { useViewEditToggleContext } from "../../Core/ViewEditToggle";
 import { AccountDetailsDataSource } from "./DataSources/AccountDetailsDataSource";
 import { AccountForm } from "./Forms/AccountForm";
 

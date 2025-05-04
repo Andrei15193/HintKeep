@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import { DependencyContainer } from "react-model-view-viewmodel";
+import { useAuthentication } from "../Contexts/AuthenticationContext";
 import { useIndexedDatabase, IndexedDatabase } from "../Data/IndexedDatabase";
-import { useUser } from "../Pages/Contexts/UserContext";
-import { User } from "../Pages/Model/IUser";
-import { Notifications } from "../Pages/Notifications";
+import { User } from "../Models";
+import { Notifications } from "../Notifications";
 
 export function useHintKeepDependencyContainer(): DependencyContainer {
-    const user = useUser();
+    const { user } = useAuthentication();
     const { database } = useIndexedDatabase();
 
     return useMemo(

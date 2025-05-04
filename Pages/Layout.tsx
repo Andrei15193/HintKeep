@@ -1,14 +1,14 @@
 import React, { useContext, useEffect } from "react";
 import { useDependency } from "react-model-view-viewmodel";
 import { Link, Outlet } from "react-router";
-import { useIndexedDatabase } from "../Data/IndexedDatabase";
-import { useUser } from "./Contexts/UserContext";
-import { GlobalNotificationsContainer, Notifications } from "./Notifications";
+import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
+import { useIndexedDatabase } from "../Core/Data/IndexedDatabase";
+import { GlobalNotificationsContainer, Notifications } from "../Core/Notifications";
 import { ConfirmationPromptContext } from "./Prompt/ConfirmationPromptContext";
 
 export function Layout(): React.JSX.Element {
     useIndexedDatabaseErrorHandler();
-    const user = useUser();
+    const { user } = useAuthentication();
 
     return (
         <>

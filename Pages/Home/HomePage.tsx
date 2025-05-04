@@ -1,7 +1,7 @@
 import React, { type MouseEvent, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useIndexedDatabase } from "../../Data/IndexedDatabase";
-import { HintKeepDatabaseDefinition } from "../../Data/IndexedDatabase/HintKeep";
+import { useIndexedDatabase } from "../../Core/Data/IndexedDatabase";
+import { HintKeepDatabaseDefinition } from "../../Core/Data/IndexedDatabase/HintKeep";
 
 export function HomePage(): React.JSX.Element {
     const navigate = useNavigate();

@@ -1,9 +1,9 @@
 import React from "react";
-import { useUser, useUserContext } from "../Contexts/UserContext";
+import { useAuthenticatedUser, useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 
 export function UserProfilePage(): React.JSX.Element {
-    const user = useUser()!;
-    const { logOut } = useUserContext();
+    const user = useAuthenticatedUser();
+    const { logOut } = useAuthentication();
 
     return (
         <>

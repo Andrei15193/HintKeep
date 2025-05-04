@@ -1,5 +1,5 @@
 import React from "react";
-import { ViewEditToggle } from "../ViewEditToggle";
+import { ViewEditToggle } from "../../Core/ViewEditToggle";
 import { AccountDetailsPageEdit } from "./AccountDetailsPageEdit";
 import { AccountDetailsPageView } from "./AccountDetailsPageView";
 

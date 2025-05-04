@@ -1,10 +1,10 @@
-import type { IAccountObject } from "../../../Data/IndexedDatabase/HintKeep/Model/IAccountObject";
-import type { IFormHandler } from "../../../FormHandlers/IFormHandler";
+import type { IAccountObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
+import type { IFormHandler } from "../../../Core/FormHandlers/IFormHandler";
 import type { AccountForm } from "../Forms/AccountForm";
 import type { IAccountDetails } from "../Models/IAcountDetails";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
-import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
-import { type IUser, User } from "../../Model/IUser";
+import { IndexedDatabase, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
+import { type IUser, User } from "../../../Core/Models";
 
 export class AccountFormHandler implements IFormHandler<AccountForm, IAccountDetails> {
     private readonly _user: IUser;

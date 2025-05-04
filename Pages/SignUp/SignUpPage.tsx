@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useFormFlow } from "../../PageFlows";
-import { useUserContext } from "../Contexts/UserContext";
-import { TextArea, TextInput } from "../Forms";
+import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
+import { TextArea, TextInput } from "../../Core/Forms/Components";
+import { useFormFlow } from "../../Core/PageFlows";
 import { SignUpFormHandler } from "./FormHandlers/SignUpFormHandler";
 import { SignUpForm } from "./Forms/SignUpForm";
 
 export function SignUpPage(): React.JSX.Element {
     const navigate = useNavigate();
-    const { authenticate } = useUserContext();
+    const { authenticate } = useAuthentication();
     const {
         form,
         isSubmitting,

@@ -1,9 +1,9 @@
-import type { IAccountObject } from "../../../Data/IndexedDatabase/HintKeep/Model/IAccountObject";
-import type { IDataSource } from "../../../DataSources";
+import type { IAccountObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
+import type { IDataSource } from "../../../Core/DataSources";
 import type { IAccountListItem } from "../Models/IAccountListItem";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
-import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
-import { type IUser, User } from "../../Model/IUser";
+import { IndexedDatabase, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
+import { type IUser, User } from "../../../Core/Models";
 
 export interface ISearchText {
     readonly searchText: string;

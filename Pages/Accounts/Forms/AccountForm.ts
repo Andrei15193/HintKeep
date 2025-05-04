@@ -1,7 +1,6 @@
 import type { IAccountDetails } from "../Models/IAcountDetails";
-import { HintKeepForm, HintKeepFormField } from "../../../Forms";
-import { MaxLengthValidator } from "../../../Forms/Validation/maxLength";
-import { RequiredValidator } from "../../../Forms/Validation/required";
+import { MaxLengthValidator, RequiredValidator } from "../../../Core/Forms/Validation";
+import { HintKeepForm, HintKeepFormField } from "../../../Core/Forms/ViewModels";
 
 export class AccountForm extends HintKeepForm {
     public constructor(account?: IAccountDetails | null) {

@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useFormFlow } from "../../PageFlows";
-import { useUserContext } from "../Contexts/UserContext";
-import { TextInput } from "../Forms";
+import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
+import { TextInput } from "../../Core/Forms/Components";
+import { useFormFlow } from "../../Core/PageFlows";
 import { LoginFormHandler } from "./FormHandlers/LoginFormHandler";
 import { LoginForm } from "./Forms/LoginForm";
 
 export function LoginPage(): React.JSX.Element {
     const navigate = useNavigate();
-    const { authenticate } = useUserContext();
+    const { authenticate } = useAuthentication();
 
     const {
         form,

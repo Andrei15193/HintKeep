@@ -1,10 +1,10 @@
-import type { IUserObject } from "../../../Data/IndexedDatabase/HintKeep/Model/IUserObject";
-import type { IFormHandler } from "../../../FormHandlers/IFormHandler";
-import type { IUser } from "../../Model/IUser";
+import type { IUserObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IUserObject";
+import type { IFormHandler } from "../../../Core/FormHandlers/IFormHandler";
+import type { IUser } from "../../../Core/Models";
 import type { SignUpForm } from "../Forms/SignUpForm";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
-import { getHashAsync } from "../../../Crypto";
-import { IndexedDatabase, mapDbRequestToPromise } from "../../../Data/IndexedDatabase";
+import { getHashAsync } from "../../../Core/Crypto";
+import { IndexedDatabase, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
 
 export class SignUpFormHandler implements IFormHandler<SignUpForm, IUser | null> {
     private readonly _database: IDBDatabase;

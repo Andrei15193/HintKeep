@@ -1,10 +1,10 @@
 import type { IFormHandler } from "../FormHandlers/IFormHandler";
-import type { HintKeepForm } from "../Forms";
+import type { HintKeepForm } from "../Forms/ViewModels";
 import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type ResolvableSimpleDependency, useDependency } from "react-model-view-viewmodel";
 import { useBlocker } from "react-router";
-import { Notifications } from "../Pages/Notifications";
-import { type IConfirmationPromptOptions, useShowConfirmationPrompt } from "../Pages/Prompt";
+import { useShowConfirmationPrompt, type IConfirmationPromptOptions } from "../../Pages/Prompt";
+import { Notifications } from "../Notifications";
 
 export type IFormFlow<TForm extends HintKeepForm, TResult> =
     IFormFlowReadyState<TForm, TResult>

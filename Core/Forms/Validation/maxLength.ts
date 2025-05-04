@@ -1,4 +1,4 @@
-import type { HintKeepFormField } from "../HintKeepFormField";
+import type { HintKeepFormField } from "../ViewModels/HintKeepFormField";
 import type { IValidator } from "react-model-view-viewmodel";
 
 export class MaxLengthValidator implements IValidator<HintKeepFormField<string | null | undefined>> {

@@ -1,6 +1,6 @@
 import React, { type PropsWithChildren, useEffect } from "react";
 import { Outlet } from "react-router";
-import { useIndexedDatabase } from "../../Data/IndexedDatabase";
+import { useIndexedDatabase } from "../../Core/Data/IndexedDatabase";
 
 export interface IIndexedDatabaseScopedProps {
 }

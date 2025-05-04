@@ -1,4 +1,4 @@
-import type { HintKeepFormField } from "../../Forms";
+import type { HintKeepFormField } from "../ViewModels/HintKeepFormField";
 import React, { type ChangeEvent, useCallback } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
 

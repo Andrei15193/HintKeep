@@ -2,13 +2,13 @@ import type { IAccountListItem } from "./Models/IAccountListItem";
 import React, { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useDependency, useViewModelMemo } from "react-model-view-viewmodel";
 import { generatePath, Link } from "react-router";
-import { HintKeepFormField } from "../../Forms";
-import { useUser } from "../Contexts/UserContext";
-import { TextInput } from "../Forms";
+import { useAuthenticatedUser } from "../../Core/Contexts/AuthenticationContext";
+import { TextInput } from "../../Core/Forms/Components";
+import { HintKeepFormField } from "../../Core/Forms/ViewModels";
 import { AccountsDataSource } from "./DataSources/AccountsDataSource";
 
 export function AccountsListPage(): React.JSX.Element {
-    const { username } = useUser()!;
+    const { username } = useAuthenticatedUser()!;
     const accountsDataSource = useDependency(AccountsDataSource);
     const searchTextInputRef = useRef<HTMLInputElement | null>(null);
     const searchTextField = useViewModelMemo(

@@ -1,7 +1,7 @@
+import type { IConfirmationPromptOptions } from "../../Pages/Prompt";
 import type { IDataSource, IEntityScoped } from "../DataSources";
 import type { IFormHandler } from "../FormHandlers/IFormHandler";
-import type { HintKeepForm } from "../Forms";
-import type { IConfirmationPromptOptions } from "../Pages/Prompt";
+import type { HintKeepForm } from "../Forms/ViewModels";
 import { type SyntheticEvent, useEffect, useMemo, useRef, useState } from "react";
 import { type IDependencyResolver, useDependencyResolver, type ResolvableSimpleDependency, type ViewModelType } from "react-model-view-viewmodel";
 import { useDataSourceFlow } from "./DataSourceFlow";

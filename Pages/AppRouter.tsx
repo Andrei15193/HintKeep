@@ -1,13 +1,13 @@
 import React, { useLayoutEffect } from "react";
 import { createBrowserRouter, Outlet, useMatch, useNavigate } from "react-router";
-import { AccountAddPage, AccountDetailsPage, AccountsListPage } from "../Accounts";
-import { useUser } from "../Contexts/UserContext";
-import { HomePage } from "../Home";
-import { IndexedDatabaseScoped } from "../IndexedDatabaseScoped";
-import { Layout } from "../Layout";
-import { LoginPage } from "../Login";
-import { SignUpPage } from "../SignUp/SignUpPage";
-import { UserProfilePage } from "../User";
+import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
+import { AccountAddPage, AccountDetailsPage, AccountsListPage } from "./Accounts";
+import { HomePage } from "./Home";
+import { IndexedDatabaseScoped } from "./IndexedDatabaseScoped";
+import { Layout } from "./Layout";
+import { LoginPage } from "./Login";
+import { SignUpPage } from "./SignUp/SignUpPage";
+import { UserProfilePage } from "./User";
 
 export const AppRouter = createBrowserRouter([
     {
@@ -16,7 +16,7 @@ export const AppRouter = createBrowserRouter([
             {
                 path: "/",
                 Component() {
-                    const user = useUser();
+                    const { user } = useAuthentication();
                     const match = useMatch({
                         path: "/",
                         end: true
@@ -40,7 +40,7 @@ export const AppRouter = createBrowserRouter([
                         children: [
                             {
                                 Component() {
-                                    const user = useUser();
+                                    const { user } = useAuthentication();
                                     const navigate = useNavigate();
 
                                     useLayoutEffect(
@@ -69,7 +69,7 @@ export const AppRouter = createBrowserRouter([
                             },
                             {
                                 Component() {
-                                    const user = useUser();
+                                    const { user } = useAuthentication();
                                     const navigate = useNavigate();
 
                                     useLayoutEffect(
