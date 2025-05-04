@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { generatePath, Link, useParams } from "react-router";
-import { Checkbox, Label, TextArea, TextInput } from "../../Core/Forms/Components";
+import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useEditFlow } from "../../Core/PageFlows";
 import { useViewEditToggleContext } from "../../Core/ViewEditToggle";
 import { useShowConfirmationPrompt } from "../Prompt";
@@ -12,18 +13,13 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
     const { id } = useParams<{ readonly id: string }>();
     const { goToViewMode } = useViewEditToggleContext();
 
-    const {
-        form,
-        isLoading,
-        isFaulted,
-        isSubmitted,
-        submitAsync
-    } = useEditFlow({
+    const formFlow = useEditFlow({
         entityId: id!,
         dataSource: AccountDetailsDataSource,
         form: AccountForm,
         formHandler: AccountFormHandler
     });
+    const { form, isSubmitted } = formFlow;
 
     const discardChangesCallback = useShowConfirmationPrompt({
         onConfirm: goToViewMode
@@ -42,53 +38,43 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
             <h1>
                 Edit Account
             </h1>
-            {
-                isLoading
-                    ? "Loading"
-                    : isFaulted
-                        ? "Faulted"
-                        : (
-                            <form onSubmit={submitAsync}>
-                                <div>
-                                    <Label field={form.name} />
-                                    <TextInput field={form.name} />
-                                </div>
+            <Form pageFlow={formFlow}>
+                <FormField field={form.name}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                </FormField>
 
-                                <div>
-                                    <Label field={form.username} />
-                                    <TextInput field={form.username} />
-                                </div>
+                <FormField field={form.username}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                </FormField>
 
-                                <div>
-                                    <Label field={form.hint} />
-                                    <TextInput field={form.hint} />
-                                </div>
+                <FormField field={form.hint}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                </FormField>
 
-                                <div>
-                                    <Label field={form.pinned} />
-                                    <Checkbox field={form.pinned} />
-                                </div>
+                <FormField field={form.pinned}>
+                    <FormFieldLabel />
+                    <FormFieldCheckbox />
+                </FormField>
 
-                                <div>
-                                    <Label field={form.notes} />
-                                    <TextArea field={form.notes} />
-                                </div>
+                <FormField field={form.notes}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput multiline />
+                </FormField>
 
-                                <div>
-                                    <button type="submit">
-                                        Save
-                                    </button>
-                                    <Link
-                                        to={generatePath("/:id", { id: id || "" })}
-                                        onClick={discardChangesCallback}
-                                        replace
-                                    >
-                                        Cancel
-                                    </Link>
-                                </div>
-                            </form>
-                        )
-            }
+                <div>
+                    <SubmitButton text="Save" />
+                    <Link
+                        to={generatePath("/:id", { id: id || "" })}
+                        onClick={discardChangesCallback}
+                        replace
+                    >
+                        Cancel
+                    </Link>
+                </div>
+            </Form>
         </>
     );
 }

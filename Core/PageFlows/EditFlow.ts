@@ -17,7 +17,7 @@ export type IEditFlow<TEntity, TForm extends HintKeepForm, TResult> =
 export interface IEditFlowOptions<TEntity, TForm extends HintKeepForm, TResult> {
     readonly entityId: string;
     readonly dataSource: ResolvableSimpleDependency<IDataSource<IEntityScoped, TEntity>>;
-    readonly form: ViewModelType<TForm, [entity: TEntity, dependencyResolver: IDependencyResolver]>;
+    readonly form: ViewModelType<TForm, [entity: TEntity | undefined, dependencyResolver: IDependencyResolver]>;
     readonly formHandler: ResolvableSimpleDependency<IFormHandler<TForm, TResult>>;
 
     readonly skipConfirmationPrompt?: boolean;
@@ -39,13 +39,18 @@ export function useEditFlow<TEntity, TForm extends HintKeepForm, TResult>(option
         confirmationPrompt
     } = options;
 
+    if (formRef.current === null)
+        formRef.current = new FormType(undefined, dependencyResolver);
+
+    const dataSourceOptions = useMemo<IEntityScoped>(() => ({ id: entityId }), [entityId]);
+
     const {
         state: dataSourceFlowState,
-        entity,
+        result: entity,
         error: dataSourceFlowError,
         loadAsync
     } = useDataSourceFlow({
-        entityId,
+        options: dataSourceOptions,
         dataSource
     });
     const {
@@ -65,6 +70,7 @@ export function useEditFlow<TEntity, TForm extends HintKeepForm, TResult>(option
         () => {
             switch (dataSourceFlowState) {
                 case "loading":
+                    formRef.current = new FormType(undefined, dependencyResolver);
                     setState("loading");
                     break;
 
@@ -102,8 +108,8 @@ export function useEditFlow<TEntity, TForm extends HintKeepForm, TResult>(option
     const editFlow = useMemo<IEditFlowBaseState<TEntity, TForm, TResult>>(
         () => ({
             state,
-            entity: state === "loading" || state === "faulted" ? null : entity,
-            form: state === "loading" ? null : form,
+            entity: state === "loading" || state === "faulted" ? undefined : entity,
+            form,
 
             isProcessing: state === "loading" || state === "submitting",
 
@@ -131,8 +137,8 @@ export function useEditFlow<TEntity, TForm extends HintKeepForm, TResult>(option
 
 interface IEditFlowBaseState<TEntity, TForm extends HintKeepForm, TResult> {
     readonly state: "loading" | "ready" | "submitting" | "submitted" | "faulted";
-    readonly entity: TEntity | null;
-    readonly form: TForm | null;
+    readonly entity: TEntity | undefined;
+    readonly form: TForm;
 
     readonly isProcessing: boolean;
 
@@ -152,8 +158,7 @@ interface IEditFlowBaseState<TEntity, TForm extends HintKeepForm, TResult> {
 
 interface IEditFlowLoadingState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
     readonly state: "loading";
-    readonly entity: null;
-    readonly form: null;
+    readonly entity: undefined;
 
     readonly isProcessing: true;
 
@@ -171,7 +176,6 @@ interface IEditFlowLoadingState<TEntity, TForm extends HintKeepForm, TResult> ex
 interface IEditFlowReadyState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
     readonly state: "ready";
     readonly entity: TEntity;
-    readonly form: TForm;
 
     readonly isProcessing: false;
 
@@ -189,7 +193,6 @@ interface IEditFlowReadyState<TEntity, TForm extends HintKeepForm, TResult> exte
 interface IEditFlowSubmittingState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
     readonly state: "submitting";
     readonly entity: TEntity;
-    readonly form: TForm;
 
     readonly isProcessing: true;
 
@@ -207,7 +210,6 @@ interface IEditFlowSubmittingState<TEntity, TForm extends HintKeepForm, TResult>
 interface IEditFlowSubmittedState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
     readonly state: "submitted";
     readonly entity: TEntity;
-    readonly form: TForm;
 
     readonly isProcessing: false;
 
@@ -224,8 +226,7 @@ interface IEditFlowSubmittedState<TEntity, TForm extends HintKeepForm, TResult> 
 
 interface IEditFlowFaultedState<TEntity, TForm extends HintKeepForm, TResult> extends IEditFlowBaseState<TEntity, TForm, TResult> {
     readonly state: "faulted";
-    readonly entity: null;
-    readonly form: null;
+    readonly entity: undefined;
 
     readonly isProcessing: false;
 

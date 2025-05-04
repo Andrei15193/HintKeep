@@ -1,16 +1,17 @@
 import type { IAccountListItem } from "./Models/IAccountListItem";
-import React, { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { useDependency, useViewModelMemo } from "react-model-view-viewmodel";
+import React, { useCallback, useRef } from "react";
+import { useViewModelMemo } from "react-model-view-viewmodel";
 import { generatePath, Link } from "react-router";
 import { useAuthenticatedUser } from "../../Core/Contexts/AuthenticationContext";
-import { TextInput } from "../../Core/Forms/Components";
+import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { FormField, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { HintKeepFormField } from "../../Core/Forms/ViewModels";
-import { AccountsDataSource } from "./DataSources/AccountsDataSource";
+import { useDataSourceFlow } from "../../Core/PageFlows";
+import { type ISearchText, type IListResult, AccountsDataSource } from "./DataSources/AccountsDataSource";
 
 export function AccountsListPage(): React.JSX.Element {
     const { username } = useAuthenticatedUser()!;
-    const accountsDataSource = useDependency(AccountsDataSource);
-    const searchTextInputRef = useRef<HTMLInputElement | null>(null);
+
     const searchTextField = useViewModelMemo(
         () => new HintKeepFormField<string>({
             name: "search",
@@ -20,39 +21,35 @@ export function AccountsListPage(): React.JSX.Element {
         []
     );
 
-    const [isLoading, setIsLoading] = useState(true);
-    const accountsTotalCountRef = useRef(0);
-    const [accounts, setAccounts] = useState<readonly IAccountListItem[]>([]);
-
-    const loadAccountsAsyncCallback = useCallback(
-        async (searchText: string) => {
-            setIsLoading(true);
-            try {
-                const { items: accounts, totalCount } = await accountsDataSource.getDataAsync({ searchText });
-                accountsTotalCountRef.current = totalCount;
-                setAccounts(accounts);
-            }
-            finally {
-                setIsLoading(false);
-            }
-        },
-        [accountsDataSource]
+    const dataSourceFlowOptionsCallback = useCallback(
+        (): ISearchText => ({
+            searchText: searchTextField.value
+        }),
+        [searchTextField]
     );
+    const dataSourceFlow = useDataSourceFlow({
+        options: dataSourceFlowOptionsCallback,
+        dataSource: AccountsDataSource
+    });
 
-    const searchAccountsCallback = useCallback(
-        (event: FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            loadAccountsAsyncCallback(searchTextField.value);
-        },
-        [searchTextField, loadAccountsAsyncCallback]
-    );
+    const {
+        isLoading,
+        result
+    } = dataSourceFlow;
 
-    useEffect(
-        () => {
-            loadAccountsAsyncCallback("");
-        },
-        [accountsDataSource, loadAccountsAsyncCallback]
-    );
+    const resultRef = useRef<IListResult<IAccountListItem> | undefined>(undefined);
+    if (resultRef.current === undefined)
+        resultRef.current = {
+            items: [],
+            totalCount: 0
+        };
+    if (result !== undefined)
+        resultRef.current = result;
+
+    const {
+        items: accounts,
+        totalCount
+    } = resultRef.current;
 
     return (
         <>
@@ -63,7 +60,7 @@ export function AccountsListPage(): React.JSX.Element {
                 !
             </h1>
             {
-                accountsTotalCountRef.current === 0
+                totalCount === 0
                     ? (
                         <>
                             {
@@ -85,18 +82,15 @@ export function AccountsListPage(): React.JSX.Element {
                             <Link to="add">
                                 Add account
                             </Link>
-                            <form onSubmit={searchAccountsCallback}>
-                                <TextInput
-                                    ref={searchTextInputRef}
-                                    field={searchTextField}
-                                />
-                                <button
-                                    type="submit"
-                                    hidden
-                                >
-                                    Search
-                                </button>
-                            </form>
+                            <Form
+                                pageFlow={dataSourceFlow}
+                                withoutLoadingState
+                            >
+                                <FormField field={searchTextField}>
+                                    <FormFieldTextInput type="search" />
+                                </FormField>
+                                <SubmitButton text="Search" />
+                            </Form>
 
                             {
                                 isLoading

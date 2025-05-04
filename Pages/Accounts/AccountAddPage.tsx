@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { Checkbox, Label, TextArea, TextInput } from "../../Core/Forms/Components";
+import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../Core/PageFlows";
 import { AccountFormHandler } from "./FormHandlers/AccountFormHandler";
 import { AccountForm } from "./Forms/AccountForm";
@@ -8,12 +9,7 @@ import { AccountForm } from "./Forms/AccountForm";
 export function AccountAddPage(): React.JSX.Element {
     const navigate = useNavigate();
 
-    const {
-        form,
-        isSubmitting,
-        isSubmitted,
-        submitAsync
-    } = useFormFlow({
+    const formFlow = useFormFlow({
         form: AccountForm,
         formHandler: AccountFormHandler,
 
@@ -23,6 +19,7 @@ export function AccountAddPage(): React.JSX.Element {
             dismissButtonLabel: "No, continue adding hint"
         }
     });
+    const { form, isSubmitted } = formFlow;
 
     useEffect(
         () => {
@@ -37,47 +34,39 @@ export function AccountAddPage(): React.JSX.Element {
             <h1>
                 Add hint
             </h1>
-            {
-                isSubmitting
-                    ? "Loading"
-                    : (
-                        <form onSubmit={submitAsync}>
-                            <div>
-                                <Label field={form.name} />
-                                <TextInput field={form.name} />
-                            </div>
+            <Form pageFlow={formFlow}>
+                <FormField field={form.name}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                </FormField>
 
-                            <div>
-                                <Label field={form.username} />
-                                <TextInput field={form.username} />
-                            </div>
+                <FormField field={form.username}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                </FormField>
 
-                            <div>
-                                <Label field={form.hint} />
-                                <TextInput field={form.hint} />
-                            </div>
+                <FormField field={form.hint}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                </FormField>
 
-                            <div>
-                                <Label field={form.pinned} />
-                                <Checkbox field={form.pinned} />
-                            </div>
+                <FormField field={form.pinned}>
+                    <FormFieldLabel />
+                    <FormFieldCheckbox />
+                </FormField>
 
-                            <div>
-                                <Label field={form.notes} />
-                                <TextArea field={form.notes} />
-                            </div>
+                <FormField field={form.notes}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput multiline />
+                </FormField>
 
-                            <div>
-                                <button type="submit">
-                                    Save
-                                </button>
-                                <Link to="/">
-                                    Cancel
-                                </Link>
-                            </div>
-                        </form>
-                    )
-            }
+                <div>
+                    <SubmitButton text="Save" />
+                    <Link to="/">
+                        Cancel
+                    </Link>
+                </div>
+            </Form>
         </>
     );
 }

@@ -1,9 +1,8 @@
-import type { IAccountDetails } from "./Models/IAcountDetails";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useDependency, useViewModel } from "react-model-view-viewmodel";
-import { Link, useNavigate, useParams } from "react-router";
-import { isUniqueId } from "../../Core/Crypto";
-import { Checkbox, Label, TextArea, TextInput } from "../../Core/Forms/Components";
+import React from "react";
+import { Link, useParams } from "react-router";
+import { Form } from "../../Core/Forms/Components";
+import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
+import { useEditFlow } from "../../Core/PageFlows";
 import { useViewEditToggleContext } from "../../Core/ViewEditToggle";
 import { AccountDetailsDataSource } from "./DataSources/AccountDetailsDataSource";
 import { AccountForm } from "./Forms/AccountForm";
@@ -11,102 +10,62 @@ import { AccountForm } from "./Forms/AccountForm";
 export function AccountDetailsPageView(): React.JSX.Element {
     const { id } = useParams<{ readonly id: string }>();
     const { goToEditMode } = useViewEditToggleContext();
-    const navigate = useNavigate();
-    const accountDetailsRef = useRef<IAccountDetails | undefined>(undefined);
-    const [isLoading, setIsLoading] = useState(true);
 
-    const accountDetailsDataSource = useDependency(AccountDetailsDataSource);
-    const form = useViewModel(AccountForm, [accountDetailsRef.current]);
-
-    const loadAccountAsyncCallback = useCallback(
-        async () => {
-            if (!isUniqueId(id))
-                navigate("/");
-            else
-                try {
-                    setIsLoading(true);
-                    accountDetailsRef.current = await accountDetailsDataSource.getDataAsync({ id });
-                }
-                finally {
-                    setIsLoading(false);
-                }
-        },
-        [id, accountDetailsDataSource, accountDetailsRef, setIsLoading, navigate]
-    );
-
-    useEffect(
-        () => {
-            loadAccountAsyncCallback();
-        },
-        [loadAccountAsyncCallback]
-    );
+    const formFlow = useEditFlow({
+        entityId: id!,
+        dataSource: AccountDetailsDataSource,
+        form: AccountForm,
+        formHandler: null!,
+        skipConfirmationPrompt: true
+    });
+    const { form } = formFlow;
 
     return (
         <>
             <h1>
                 View Account
             </h1>
-            {
-                isLoading
-                    ? <p>
-                        Loading
-                    </p>
-                    : (
-                        <form>
-                            <div>
-                                <Label field={form.name} />
-                                <TextInput
-                                    field={form.name}
-                                    disabled
-                                />
-                            </div>
+            <Form
+                pageFlow={formFlow}
+                disabled
+            >
+                <FormField field={form.name}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                </FormField>
 
-                            <div>
-                                <Label field={form.username} />
-                                <TextInput
-                                    field={form.username}
-                                    disabled
-                                />
-                            </div>
+                <FormField field={form.username}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                </FormField>
 
-                            <div>
-                                <Label field={form.hint} />
-                                <TextInput
-                                    field={form.hint}
-                                    disabled
-                                />
-                            </div>
+                <FormField field={form.hint}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                </FormField>
 
-                            <div>
-                                <Label field={form.pinned} />
-                                <Checkbox
-                                    field={form.pinned}
-                                    disabled
-                                />
-                            </div>
+                <FormField field={form.pinned}>
+                    <FormFieldLabel />
+                    <FormFieldCheckbox />
+                </FormField>
 
-                            <div>
-                                <Label field={form.notes} />
-                                <TextArea
-                                    field={form.notes}
-                                    disabled
-                                />
-                            </div>
+                <FormField field={form.notes}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput multiline />
+                </FormField>
 
-                            <div>
-                                <button
-                                    type="button"
-                                    onClick={goToEditMode}
-                                >
-                                    Edit
-                                </button>
-                                <Link to="/">
-                                    Cancel
-                                </Link>
-                            </div>
-                        </form>
-                    )
-            }
+                <div>
+                    <button
+                        type="button"
+                        onClick={goToEditMode}
+                    >
+                        Edit
+                    </button>
+                    <Link to="/">
+                        Cancel
+                    </Link>
+                </div>
+            </Form>
         </>
     );
 }

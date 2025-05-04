@@ -1,0 +1,1 @@
+export { type IFormFieldLabelProps, FormFieldLabel } from "./FormFieldLabel";

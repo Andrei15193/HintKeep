@@ -1,4 +1,4 @@
-import type { HintKeepFormField } from "../ViewModels/HintKeepFormField";
+import type { HintKeepFormField } from "../../ViewModels";
 import React, { type PropsWithChildren } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
 

@@ -1,42 +1,47 @@
-import type { IDataSource, IEntityScoped } from "../DataSources";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { IDataSource } from "../DataSources";
+import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDependency, type ResolvableSimpleDependency } from "react-model-view-viewmodel";
 
-export type IDataSourceFlow<TEntity> =
-    IDataSourceFlowLoadingState<TEntity>
-    | IDataSourceFlowReadyState<TEntity>
-    | IDataSourceFlowFaultedState<TEntity>;
+export type IDataSourceFlow<TOptions, TResult> =
+    IDataSourceFlowLoadingState<TOptions, TResult>
+    | IDataSourceFlowReadyState<TOptions, TResult>
+    | IDataSourceFlowFaultedState<TOptions, TResult>;
 
-export interface IDataSourceFlowOptions<TEntity> {
-    readonly entityId: string;
-    readonly dataSource: ResolvableSimpleDependency<IDataSource<IEntityScoped, TEntity>>;
+export interface IDataSourceFlowOptions<TOptions extends object, TResult> {
+    readonly options: TOptions | (() => TOptions);
+    readonly dataSource: ResolvableSimpleDependency<IDataSource<TOptions, TResult>>;
 }
 
-export function useDataSourceFlow<TEntity>(options: IDataSourceFlowOptions<TEntity>): IDataSourceFlow<TEntity> {
+export function useDataSourceFlow<TOptions extends object, TResult>(options: IDataSourceFlowOptions<TOptions, TResult>): IDataSourceFlow<TOptions, TResult> {
     const {
-        entityId,
+        options: dataSourceOptions,
         dataSource: dataSourceDependency
     } = options;
 
     const dataSource = useDependency(dataSourceDependency);
 
-    const entityRef = useRef<TEntity | null>(null);
+    const resultRef = useRef<TResult | undefined>(undefined);
     const errorRef = useRef<Error | null>(null);
-    const [state, setState] = useState<IDataSourceFlow<TEntity>["state"]>("loading");
+    const [state, setState] = useState<IDataSourceFlow<TOptions, TResult>["state"]>("loading");
 
     const latestFetchTokenRef = useRef<unknown>(null);
     const loadAsyncCallback = useCallback(
-        async () => {
-            const fetchToken = latestFetchTokenRef.current = {};
+        async (event?: SyntheticEvent, optionOverwrites?: Partial<TOptions>) => {
+            event?.preventDefault();
 
+            const fetchToken = latestFetchTokenRef.current = {};
             try {
-                entityRef.current = null;
+                resultRef.current = undefined;
                 errorRef.current = null;
                 setState("loading");
-                const entity = await dataSource.getDataAsync({ id: entityId });
+                const result = await dataSource.getDataAsync(Object.assign(
+                    {},
+                    typeof dataSourceOptions === "function" ? dataSourceOptions() : dataSourceOptions,
+                    optionOverwrites
+                ));
 
                 if (latestFetchTokenRef.current === fetchToken) {
-                    entityRef.current = entity;
+                    resultRef.current = result;
                     setState("ready");
                 }
             }
@@ -47,7 +52,7 @@ export function useDataSourceFlow<TEntity>(options: IDataSourceFlowOptions<TEnti
                 }
             }
         },
-        [entityId, dataSource, entityRef, latestFetchTokenRef, setState]
+        [dataSourceOptions, dataSource, resultRef, latestFetchTokenRef, setState]
     );
 
     useEffect(
@@ -57,7 +62,7 @@ export function useDataSourceFlow<TEntity>(options: IDataSourceFlowOptions<TEnti
         [loadAsyncCallback]
     );
 
-    const dataSourceFlow = useMemo<IDataSourceFlowBaseState<TEntity>>(
+    const dataSourceFlow = useMemo<IDataSourceFlowBaseState<TOptions, TResult>>(
         () => ({
             state,
 
@@ -65,7 +70,7 @@ export function useDataSourceFlow<TEntity>(options: IDataSourceFlowOptions<TEnti
             isReady: state === "ready",
             isFaulted: state === "faulted",
 
-            entity: state === "ready" ? entityRef.current : null,
+            result: state === "ready" ? resultRef.current : undefined,
             error: state === "faulted" ? errorRef.current : null,
 
             loadAsync: loadAsyncCallback
@@ -73,51 +78,51 @@ export function useDataSourceFlow<TEntity>(options: IDataSourceFlowOptions<TEnti
         [state, loadAsyncCallback]
     );
 
-    return dataSourceFlow as IDataSourceFlow<TEntity>;
+    return dataSourceFlow as IDataSourceFlow<TOptions, TResult>;
 }
 
-interface IDataSourceFlowBaseState<TEntity> {
+interface IDataSourceFlowBaseState<TOptions, TResult> {
     readonly state: "loading" | "ready" | "faulted";
 
     readonly isLoading: boolean;
     readonly isReady: boolean;
     readonly isFaulted: boolean;
 
-    readonly entity: TEntity | null;
+    readonly result: TResult | undefined;
     readonly error: Error | null;
 
-    loadAsync(): Promise<void>;
+    loadAsync(event?: SyntheticEvent, options?: Partial<TOptions>): Promise<void>;
 }
 
-interface IDataSourceFlowLoadingState<TEntity> extends IDataSourceFlowBaseState<TEntity> {
+interface IDataSourceFlowLoadingState<TOptions, TResult> extends IDataSourceFlowBaseState<TOptions, TResult> {
     readonly state: "loading";
 
     readonly isLoading: true;
     readonly isReady: false;
     readonly isFaulted: false;
 
-    readonly entity: null;
+    readonly result: undefined;
     readonly error: null;
 }
 
-interface IDataSourceFlowReadyState<TEntity> extends IDataSourceFlowBaseState<TEntity> {
+interface IDataSourceFlowReadyState<TOptions, TResult> extends IDataSourceFlowBaseState<TOptions, TResult> {
     readonly state: "ready";
 
     readonly isLoading: false;
     readonly isReady: true;
     readonly isFaulted: false;
 
-    readonly entity: TEntity;
+    readonly result: TResult;
     readonly error: null;
 }
 
-interface IDataSourceFlowFaultedState<TEntity> extends IDataSourceFlowBaseState<TEntity> {
+interface IDataSourceFlowFaultedState<TOptions, TResult> extends IDataSourceFlowBaseState<TOptions, TResult> {
     readonly state: "faulted";
 
     readonly isLoading: false;
     readonly isReady: false;
     readonly isFaulted: true;
 
-    readonly entity: null;
+    readonly result: undefined;
     readonly error: Error;
 }

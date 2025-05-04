@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
-import { TextArea, TextInput } from "../../Core/Forms/Components";
+import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { FormField, FormFieldError, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../Core/PageFlows";
 import { SignUpFormHandler } from "./FormHandlers/SignUpFormHandler";
 import { SignUpForm } from "./Forms/SignUpForm";
@@ -9,16 +10,15 @@ import { SignUpForm } from "./Forms/SignUpForm";
 export function SignUpPage(): React.JSX.Element {
     const navigate = useNavigate();
     const { authenticate } = useAuthentication();
-    const {
-        form,
-        isSubmitting,
-        isSubmitted,
-        result: user,
-        submitAsync
-    } = useFormFlow({
+    const formFlow = useFormFlow({
         form: SignUpForm,
         formHandler: SignUpFormHandler
     });
+    const {
+        form,
+        isSubmitted,
+        result: user
+    } = formFlow;
 
     useEffect(
         () => {
@@ -40,62 +40,31 @@ export function SignUpPage(): React.JSX.Element {
                 Welcome to HintKeep, please provide the following information to start using the app!
             </p>
 
-            {
-                isSubmitting
-                    ? "Loading"
-                    : (
-                        <form onSubmit={submitAsync}>
-                            {
-                                form.isInvalid
-                                    ? (
-                                        <div>
-                                            {form.error}
-                                        </div>
-                                    )
-                                    : null
-                            }
+            <Form pageFlow={formFlow}>
+                <FormField field={form.username}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                    <FormFieldError />
+                </FormField>
 
-                            <div>
-                                <label htmlFor={form.username.name}>
-                                    Username
-                                </label>
-                                <TextInput
-                                    field={form.username}
-                                    isInvalid={form.error !== null}
-                                />
-                            </div>
+                <FormField field={form.password}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput type="password" />
+                    <FormFieldError />
+                </FormField>
 
-                            <div>
-                                <label htmlFor={form.password.name}>
-                                    Password
-                                </label>
-                                <TextInput
-                                    field={form.password}
-                                    type="password"
-                                    isInvalid={form.error !== null}
-                                />
-                            </div>
+                <FormField field={form.hint}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput multiline />
+                    <FormFieldError />
+                </FormField>
 
-                            <div>
-                                <label htmlFor={form.hint.name}>
-                                    Hint
-                                </label>
-                                <TextArea
-                                    field={form.hint}
-                                    isInvalid={form.error !== null}
-                                />
-                            </div>
+                <SubmitButton text="Sign Up" />
 
-                            <button type="submit">
-                                Sign Up
-                            </button>
-
-                            <Link to="/login">
-                                Cancel
-                            </Link>
-                        </form>
-                    )
-            }
+                <Link to="/login">
+                    Cancel
+                </Link>
+            </Form>
         </>
     );
 }

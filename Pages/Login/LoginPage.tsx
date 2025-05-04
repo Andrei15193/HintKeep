@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
-import { TextInput } from "../../Core/Forms/Components";
+import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { FormField, FormFieldError, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../Core/PageFlows";
 import { LoginFormHandler } from "./FormHandlers/LoginFormHandler";
 import { LoginForm } from "./Forms/LoginForm";
@@ -10,17 +11,17 @@ export function LoginPage(): React.JSX.Element {
     const navigate = useNavigate();
     const { authenticate } = useAuthentication();
 
-    const {
-        form,
-        isSubmitting,
-        isSubmitted,
-        result: user,
-        submitAsync
-    } = useFormFlow({
+    const formFlow = useFormFlow({
         form: LoginForm,
         formHandler: LoginFormHandler,
         skipConfirmationPrompt: true
     });
+
+    const {
+        form,
+        isSubmitted,
+        result: user
+    } = formFlow;
 
     useEffect(
         () => {
@@ -42,52 +43,25 @@ export function LoginPage(): React.JSX.Element {
                 Welcome to HintKeep, please provide your credentials to start using the app!
             </p>
 
-            {
-                isSubmitting
-                    ? "Loading"
-                    : (
-                        <form onSubmit={submitAsync}>
-                            {
-                                form.isInvalid
-                                    ? (
-                                        <div>
-                                            {form.error}
-                                        </div>
-                                    )
-                                    : null
-                            }
+            <Form pageFlow={formFlow}>
+                <FormField field={form.username}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput />
+                    <FormFieldError />
+                </FormField>
 
-                            <div>
-                                <label htmlFor={form.username.name}>
-                                    Username
-                                </label>
-                                <TextInput
-                                    field={form.username}
-                                    isInvalid={form.error !== null}
-                                />
-                            </div>
+                <FormField field={form.password}>
+                    <FormFieldLabel />
+                    <FormFieldTextInput type="password" />
+                    <FormFieldError />
+                </FormField>
 
-                            <div>
-                                <label htmlFor={form.password.name}>
-                                    Password
-                                </label>
-                                <TextInput
-                                    field={form.password}
-                                    type="password"
-                                    isInvalid={form.error !== null}
-                                />
-                            </div>
+                <SubmitButton text="Login" />
 
-                            <button type="submit">
-                                Login
-                            </button>
-
-                            <Link to="/">
-                                Cancel
-                            </Link>
-                        </form>
-                    )
-            }
+                <Link to="/">
+                    Cancel
+                </Link>
+            </Form>
 
             <div>
                 <a
