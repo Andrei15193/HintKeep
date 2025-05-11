@@ -43,7 +43,7 @@ export class SignUpFormHandler implements IFormHandler<SignUpForm, IUser | null>
         catch (error) {
             transaction.abort();
             if (error instanceof DOMException && error.name === "ConstraintError") {
-                form.error = "Duplicate account";
+                form.username.error = "Duplicate account";
 
                 return null;
             }

@@ -27,15 +27,14 @@ export function AccountsListPage(): React.JSX.Element {
         }),
         [searchTextField]
     );
-    const dataSourceFlow = useDataSourceFlow({
+    const {
+        isLoading,
+        result,
+        loadAsync
+    } = useDataSourceFlow({
         options: dataSourceFlowOptionsCallback,
         dataSource: AccountsDataSource
     });
-
-    const {
-        isLoading,
-        result
-    } = dataSourceFlow;
 
     const resultRef = useRef<IListResult<IAccountListItem> | undefined>(undefined);
     if (resultRef.current === undefined)
@@ -83,8 +82,8 @@ export function AccountsListPage(): React.JSX.Element {
                                 Add account
                             </Link>
                             <Form
-                                pageFlow={dataSourceFlow}
-                                withoutLoadingState
+                                isLoading={false}
+                                onSubmit={loadAsync}
                             >
                                 <FormField field={searchTextField}>
                                     <FormFieldTextInput type="search" />

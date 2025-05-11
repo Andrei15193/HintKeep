@@ -1,25 +1,29 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { Form, SubmitButton } from "../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../Core/PageFlows";
+import { usePromptedNavigate } from "../../Core/Prompt";
 import { AccountFormHandler } from "./FormHandlers/AccountFormHandler";
 import { AccountForm } from "./Forms/AccountForm";
 
 export function AccountAddPage(): React.JSX.Element {
-    const navigate = useNavigate();
-
-    const formFlow = useFormFlow({
+    const {
+        form,
+        isSubmitting,
+        isSubmitted,
+        submitAsync
+    } = useFormFlow({
         form: AccountForm,
-        formHandler: AccountFormHandler,
-
-        confirmationPrompt: {
-            message: "Any unsaved changes will be discarded, continue?",
-            confirmButtonLabel: "Yes, cancel",
-            dismissButtonLabel: "No, continue adding hint"
-        }
+        formHandler: AccountFormHandler
     });
-    const { form, isSubmitted } = formFlow;
+
+    const navigate = usePromptedNavigate({
+        blockNavigation: !isSubmitted,
+        message: "Any unsaved changes will be discarded, continue?",
+        confirmButtonLabel: "Yes, cancel",
+        dismissButtonLabel: "No, continue adding hint"
+    });
 
     useEffect(
         () => {
@@ -34,7 +38,10 @@ export function AccountAddPage(): React.JSX.Element {
             <h1>
                 Add hint
             </h1>
-            <Form pageFlow={formFlow}>
+            <Form
+                isLoading={isSubmitting}
+                onSubmit={submitAsync}
+            >
                 <FormField field={form.name}>
                     <FormFieldLabel />
                     <FormFieldTextInput />

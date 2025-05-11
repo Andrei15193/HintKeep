@@ -1,10 +1,9 @@
 import type { IFormHandler } from "../FormHandlers/IFormHandler";
 import type { HintKeepForm } from "../Forms/ViewModels";
-import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type SyntheticEvent, useCallback, useMemo, useRef, useState } from "react";
 import { type ResolvableSimpleDependency, useDependency } from "react-model-view-viewmodel";
-import { useBlocker } from "react-router";
-import { useShowConfirmationPrompt, type IConfirmationPromptOptions } from "../../Pages/Prompt";
 import { Notifications } from "../Notifications";
+import { useShowConfirmationPrompt, type IConfirmationPromptOptions } from "../Prompt";
 
 export type IFormFlow<TForm extends HintKeepForm, TResult> =
     IFormFlowReadyState<TForm, TResult>
@@ -16,7 +15,11 @@ export interface IFormFlowOptions<TForm extends HintKeepForm, TResult> {
     readonly form: ResolvableSimpleDependency<TForm>;
     readonly formHandler: ResolvableSimpleDependency<IFormHandler<TForm, TResult>>;
 
-    readonly skipConfirmationPrompt?: boolean;
+    readonly notifications?: {
+        readonly successMessage?: string;
+        readonly faultedMessage?: string;
+    };
+
     readonly confirmationPrompt?: IConfirmationPromptOptions;
 }
 
@@ -24,12 +27,13 @@ export function useFormFlow<TForm extends HintKeepForm, TResult>(options: IFormF
     const {
         form: formDependency,
         formHandler: formHandlerDependency,
-        skipConfirmationPrompt,
-        confirmationPrompt: {
-            onConfirm,
-            onDismiss,
-            ...otherConfirmationPromptOptions
-        } = {}
+
+        notifications: {
+            successMessage,
+            faultedMessage
+        } = {},
+
+        confirmationPrompt
     } = options;
     const notifications = useDependency(Notifications);
 
@@ -55,6 +59,9 @@ export function useFormFlow<TForm extends HintKeepForm, TResult>(options: IFormF
                     if (form.isValid && result !== null && result !== undefined) {
                         resultRef.current = result;
                         setState("submitted");
+
+                        if (successMessage !== null && successMessage !== undefined)
+                            notifications.add({ message: successMessage });
                     }
                     else {
                         setState("ready");
@@ -64,66 +71,36 @@ export function useFormFlow<TForm extends HintKeepForm, TResult>(options: IFormF
                     errorRef.current = error instanceof Error ? error : new Error(typeof error === "string" ? error : JSON.stringify(error));
                     setState("faulted");
 
-                    notifications.add({
-                        message: error instanceof DOMException ? error.message : error,
-                        type: "error"
-                    });
+                    if (faultedMessage !== null && faultedMessage !== undefined)
+                        notifications.add({
+                            message: faultedMessage,
+                            type: "error"
+                        });
+                    else
+                        notifications.add({
+                            message: error instanceof DOMException ? error.message : error,
+                            type: "error"
+                        });
                 }
         },
-        [form, formHandler, resultRef, notifications, setState]
+        [form, formHandler, resultRef, notifications, successMessage, faultedMessage, setState]
     );
 
-    const shouldBlockNavigation = !skipConfirmationPrompt && state !== "submitted";
-    const blocker = useBlocker(shouldBlockNavigation);
+    const onConfirm = confirmationPrompt?.onConfirm;
     const onConfirmCallback = useCallback(
         () => {
             onConfirm && onConfirm();
-            blocker.state === "blocked" && blocker.proceed();
+            submitAsyncCallback();
         },
-        [blocker, onConfirm]
-    );
-    const onDismissCallback = useCallback(
-        () => {
-            onDismiss && onDismiss();
-            blocker.state === "blocked" && blocker.reset();
-        },
-        [blocker, onDismiss]
+        [onConfirm, submitAsyncCallback]
     );
 
-    const showDiscardConfirmationPrompt = useShowConfirmationPrompt({
-        onConfirm: onConfirmCallback,
-        onDismiss: onDismissCallback,
-        ...otherConfirmationPromptOptions
+    const showConfirmationPrompt = useShowConfirmationPrompt({
+        ...confirmationPrompt,
+        onConfirm: onConfirmCallback
     });
 
-    useEffect(
-        () => {
-            if (shouldBlockNavigation) {
-                const beforeUnloadEventHandler = (event: BeforeUnloadEvent) => {
-                    event.preventDefault();
-                    event.returnValue = ""; // Chrome requires returnValue to be set.
-                };
-                window.addEventListener("beforeunload", beforeUnloadEventHandler);
-
-                return () => {
-                    window.removeEventListener("beforeunload", beforeUnloadEventHandler);
-                };
-            }
-            else
-                return undefined;
-        },
-        [shouldBlockNavigation]
-    );
-
-    useEffect(
-        () => {
-            if (blocker.state === "blocked")
-                showDiscardConfirmationPrompt();
-        },
-        [blocker, showDiscardConfirmationPrompt]
-    );
-
-    const editForm = useMemo<IFormFlowBaseState<TForm, TResult>>(
+    const formFlow = useMemo<IFormFlowBaseState<TForm, TResult>>(
         () => ({
             state,
 
@@ -139,12 +116,12 @@ export function useFormFlow<TForm extends HintKeepForm, TResult>(options: IFormF
             result: state === "submitted" ? resultRef.current : null,
             error: state === "faulted" ? errorRef.current : null,
 
-            submitAsync: submitAsyncCallback
+            submitAsync: confirmationPrompt ? showConfirmationPrompt : submitAsyncCallback
         }),
-        [state, form, resultRef, submitAsyncCallback]
+        [state, form, resultRef, confirmationPrompt, showConfirmationPrompt, submitAsyncCallback]
     );
 
-    return editForm as IFormFlow<TForm, TResult>;
+    return formFlow as IFormFlow<TForm, TResult>;
 }
 
 interface IFormFlowBaseState<TForm extends HintKeepForm, TResult> {

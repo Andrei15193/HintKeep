@@ -4,8 +4,8 @@ import { AuthenticationContextProvider } from "../Core/Contexts/AuthenticationCo
 import { IndexedDatabaseProvider } from "../Core/Data/IndexedDatabase";
 import { HintKeepDatabaseDefinition } from "../Core/Data/IndexedDatabase/HintKeep";
 import { HintKeepDependencyContainerProvider } from "../Core/Dependencies";
+import { ConfirmationPromptProvider } from "../Core/Prompt";
 import { AppRouter } from "./AppRouter";
-import { ConfirmationPromptProvider } from "./Prompt";
 
 export function Startup(): React.JSX.Element {
     return (

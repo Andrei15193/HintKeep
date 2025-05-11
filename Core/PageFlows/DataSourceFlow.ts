@@ -1,6 +1,7 @@
 import type { IDataSource } from "../DataSources";
 import { type SyntheticEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDependency, type ResolvableSimpleDependency } from "react-model-view-viewmodel";
+import { Notifications } from "../Notifications";
 
 export type IDataSourceFlow<TOptions, TResult> =
     IDataSourceFlowLoadingState<TOptions, TResult>
@@ -10,13 +11,24 @@ export type IDataSourceFlow<TOptions, TResult> =
 export interface IDataSourceFlowOptions<TOptions extends object, TResult> {
     readonly options: TOptions | (() => TOptions);
     readonly dataSource: ResolvableSimpleDependency<IDataSource<TOptions, TResult>>;
+
+    readonly notifications?: {
+        readonly successMessage?: string;
+        readonly faultedMessage?: string;
+    };
 }
 
 export function useDataSourceFlow<TOptions extends object, TResult>(options: IDataSourceFlowOptions<TOptions, TResult>): IDataSourceFlow<TOptions, TResult> {
     const {
         options: dataSourceOptions,
-        dataSource: dataSourceDependency
+        dataSource: dataSourceDependency,
+
+        notifications: {
+            successMessage,
+            faultedMessage
+        } = {}
     } = options;
+    const notifications = useDependency(Notifications);
 
     const dataSource = useDependency(dataSourceDependency);
 
@@ -43,16 +55,30 @@ export function useDataSourceFlow<TOptions extends object, TResult>(options: IDa
                 if (latestFetchTokenRef.current === fetchToken) {
                     resultRef.current = result;
                     setState("ready");
+
+                    if (successMessage !== null && successMessage !== undefined)
+                        notifications.add({ message: successMessage });
                 }
             }
             catch (error) {
                 if (latestFetchTokenRef.current === fetchToken) {
                     errorRef.current = error instanceof Error ? error : new Error(typeof error === "string" ? error : JSON.stringify(error));
                     setState("faulted");
+
+                    if (faultedMessage !== null && faultedMessage !== undefined)
+                        notifications.add({
+                            message: faultedMessage,
+                            type: "error"
+                        });
+                    else
+                        notifications.add({
+                            message: error instanceof DOMException ? error.message : error,
+                            type: "error"
+                        });
                 }
             }
         },
-        [dataSourceOptions, dataSource, resultRef, latestFetchTokenRef, setState]
+        [dataSourceOptions, dataSource, resultRef, latestFetchTokenRef, notifications, successMessage, faultedMessage, setState]
     );
 
     useEffect(

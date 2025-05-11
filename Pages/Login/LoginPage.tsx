@@ -11,26 +11,25 @@ export function LoginPage(): React.JSX.Element {
     const navigate = useNavigate();
     const { authenticate } = useAuthentication();
 
-    const formFlow = useFormFlow({
-        form: LoginForm,
-        formHandler: LoginFormHandler,
-        skipConfirmationPrompt: true
-    });
-
     const {
         form,
-        isSubmitted,
-        result: user
-    } = formFlow;
+        result: user,
+        isSubmitting: isLoggingIn,
+        isSubmitted: isLoggedIn,
+        submitAsync: logInAsync
+    } = useFormFlow({
+        form: LoginForm,
+        formHandler: LoginFormHandler
+    });
 
     useEffect(
         () => {
-            if (isSubmitted) {
+            if (isLoggedIn) {
                 authenticate(user);
                 navigate("/");
             }
         },
-        [isSubmitted, user, authenticate, navigate]
+        [isLoggedIn, user, authenticate, navigate]
     );
 
     return (
@@ -43,7 +42,10 @@ export function LoginPage(): React.JSX.Element {
                 Welcome to HintKeep, please provide your credentials to start using the app!
             </p>
 
-            <Form pageFlow={formFlow}>
+            <Form
+                isLoading={isLoggingIn}
+                onSubmit={logInAsync}
+            >
                 <FormField field={form.username}>
                     <FormFieldLabel />
                     <FormFieldTextInput />

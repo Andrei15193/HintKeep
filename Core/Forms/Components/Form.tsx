@@ -1,24 +1,27 @@
-import type { IDataSourceFlow, IEditFlow, IFormFlow } from "../../PageFlows";
-import type { HintKeepForm } from "../ViewModels";
-import React, { useMemo, type PropsWithChildren } from "react";
+import React, { type FormEvent, useMemo, type PropsWithChildren } from "react";
 import { FormContext, type IFormContext } from "./FormContext";
 
 export interface IFormProps {
-    readonly pageFlow: IFormFlow<HintKeepForm, unknown> | IEditFlow<unknown, HintKeepForm, unknown> | IDataSourceFlow<unknown, unknown>;
+    readonly isLoading: boolean;
 
-    readonly withoutLoadingState?: boolean;
     readonly className?: string;
     readonly disabled?: boolean;
+
+    onSubmit(event: FormEvent<HTMLFormElement>): void;
 }
 
-export function Form({ pageFlow, withoutLoadingState, className, disabled, children }: PropsWithChildren<IFormProps>): React.JSX.Element {
+export function blankSubmit(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+}
+
+export function Form(props: PropsWithChildren<IFormProps>): React.JSX.Element {
     const {
         isLoading,
-        isSubmitting,
-        isProcessing = isLoading || isSubmitting,
-        loadAsync,
-        submitAsync = loadAsync
-    } = pageFlow as IEditFlow<unknown, HintKeepForm, unknown>;
+        className,
+        disabled,
+        children,
+        onSubmit
+    } = props;
 
     const formContext = useMemo<IFormContext>(
         () => ({
@@ -27,7 +30,7 @@ export function Form({ pageFlow, withoutLoadingState, className, disabled, child
         [disabled]
     );
 
-    if (!withoutLoadingState && isProcessing)
+    if (isLoading)
         return (
             <>
                 Loading
@@ -39,7 +42,7 @@ export function Form({ pageFlow, withoutLoadingState, className, disabled, child
                 autoComplete="off"
                 autoCorrect="off"
                 className={className}
-                onSubmit={submitAsync}
+                onSubmit={onSubmit}
             >
                 <FormContext value={formContext}>
                     {children}

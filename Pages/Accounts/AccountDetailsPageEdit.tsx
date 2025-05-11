@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useViewModel } from "react-model-view-viewmodel";
 import { generatePath, Link, useParams } from "react-router";
-import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { Button, Form, SubmitButton } from "../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
-import { useEditFlow } from "../../Core/PageFlows";
+import { useDataSourceFlow, useFormFlow } from "../../Core/PageFlows";
+import { useShowConfirmationPrompt, usePromptedNavigate } from "../../Core/Prompt";
 import { useViewEditToggleContext } from "../../Core/ViewEditToggle";
-import { useShowConfirmationPrompt } from "../Prompt";
 import { AccountDetailsDataSource } from "./DataSources/AccountDetailsDataSource";
+import { AccountDeletionFormHandler } from "./FormHandlers/AccountDeletionFormHandler";
 import { AccountFormHandler } from "./FormHandlers/AccountFormHandler";
 import { AccountForm } from "./Forms/AccountForm";
 
@@ -13,13 +15,42 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
     const { id } = useParams<{ readonly id: string }>();
     const { goToViewMode } = useViewEditToggleContext();
 
-    const formFlow = useEditFlow({
-        entityId: id!,
-        dataSource: AccountDetailsDataSource,
-        form: AccountForm,
+    const dataSourceOptions = useMemo(() => ({ id }), [id]);
+    const { isLoading, result: account } = useDataSourceFlow({
+        options: dataSourceOptions,
+        dataSource: AccountDetailsDataSource
+    });
+
+    const form = useViewModel(AccountForm, [account]);
+    const {
+        isSubmitting: isSaving,
+        isSubmitted: isSaved,
+        submitAsync: saveAsync
+    } = useFormFlow({
+        form,
         formHandler: AccountFormHandler
     });
-    const { form, isSubmitted } = formFlow;
+    const {
+        isSubmitting: isDeleting,
+        isSubmitted: isDeleted,
+        submitAsync: deleteAsync
+    } = useFormFlow({
+        form,
+        formHandler: AccountDeletionFormHandler,
+
+        notifications: {
+            successMessage: `Account '${account?.name}' has been deleted.`
+        },
+
+        confirmationPrompt: {
+            message: "This action cannot be reversed, are you sure?",
+            confirmButtonLabel: "Yes, permanently delete the account",
+            dismissButtonLabel: "No, I do not want to delete the account"
+        }
+    });
+    const navigate = usePromptedNavigate({
+        blockNavigation: !isSaved && !isDeleted
+    });
 
     const discardChangesCallback = useShowConfirmationPrompt({
         onConfirm: goToViewMode
@@ -27,10 +58,12 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
 
     useEffect(
         () => {
-            if (isSubmitted)
+            if (isSaved)
                 goToViewMode();
+            if (isDeleted)
+                navigate("/");
         },
-        [isSubmitted, goToViewMode]
+        [isSaved, isDeleted, goToViewMode, navigate]
     );
 
     return (
@@ -38,7 +71,10 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
             <h1>
                 Edit Account
             </h1>
-            <Form pageFlow={formFlow}>
+            <Form
+                isLoading={isLoading || isSaving || isDeleting}
+                onSubmit={saveAsync}
+            >
                 <FormField field={form.name}>
                     <FormFieldLabel />
                     <FormFieldTextInput />
@@ -66,6 +102,10 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
 
                 <div>
                     <SubmitButton text="Save" />
+                    <Button
+                        text="Delete"
+                        onClick={deleteAsync}
+                    />
                     <Link
                         to={generatePath("/:id", { id: id || "" })}
                         onClick={discardChangesCallback}

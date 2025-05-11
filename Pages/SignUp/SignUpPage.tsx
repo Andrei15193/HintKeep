@@ -1,33 +1,42 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 import { Form, SubmitButton } from "../../Core/Forms/Components";
 import { FormField, FormFieldError, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../Core/PageFlows";
+import { usePromptedNavigate } from "../../Core/Prompt";
 import { SignUpFormHandler } from "./FormHandlers/SignUpFormHandler";
 import { SignUpForm } from "./Forms/SignUpForm";
 
 export function SignUpPage(): React.JSX.Element {
-    const navigate = useNavigate();
     const { authenticate } = useAuthentication();
-    const formFlow = useFormFlow({
+    const {
+        form,
+        result: user,
+        isSubmitting: isSigningUp,
+        isSubmitted: isSignedUp,
+        submitAsync: signUpAsync
+    } = useFormFlow({
         form: SignUpForm,
         formHandler: SignUpFormHandler
     });
-    const {
-        form,
-        isSubmitted,
-        result: user
-    } = formFlow;
+
+    const navigate = usePromptedNavigate({ blockNavigation: !isSignedUp });
 
     useEffect(
         () => {
-            if (isSubmitted) {
-                authenticate(user!);
-                navigate("/");
+            if (isSignedUp) {
+                const navigationResult = navigate("/");
+                if (navigationResult === true)
+                    authenticate(user);
+                else if (typeof navigationResult === "object")
+                    navigationResult.then((result) => {
+                        if (result)
+                            authenticate(user);
+                    });
             }
         },
-        [isSubmitted, user, authenticate, navigate]
+        [isSignedUp, user, authenticate, navigate]
     );
 
     return (
@@ -40,7 +49,10 @@ export function SignUpPage(): React.JSX.Element {
                 Welcome to HintKeep, please provide the following information to start using the app!
             </p>
 
-            <Form pageFlow={formFlow}>
+            <Form
+                isLoading={isSigningUp}
+                onSubmit={signUpAsync}
+            >
                 <FormField field={form.username}>
                     <FormFieldLabel />
                     <FormFieldTextInput />

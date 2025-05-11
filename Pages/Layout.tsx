@@ -4,7 +4,7 @@ import { Link, Outlet } from "react-router";
 import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
 import { useIndexedDatabase } from "../Core/Data/IndexedDatabase";
 import { GlobalNotificationsContainer, Notifications } from "../Core/Notifications";
-import { ConfirmationPromptContext } from "./Prompt/ConfirmationPromptContext";
+import { ConfirmationPromptContext } from "../Core/Prompt/ConfirmationPromptContext";
 
 export function Layout(): React.JSX.Element {
     useIndexedDatabaseErrorHandler();
