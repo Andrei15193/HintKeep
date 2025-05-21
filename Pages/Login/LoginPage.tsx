@@ -4,6 +4,7 @@ import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldError, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../Core/PageFlows";
+import { Content, Header } from "../../Core/PageParts";
 import { LoginFormHandler } from "./FormHandlers/LoginFormHandler";
 import { LoginForm } from "./Forms/LoginForm";
 
@@ -34,45 +35,47 @@ export function LoginPage(): React.JSX.Element {
 
     return (
         <>
-            <h2>
-                Login
-            </h2>
+            <Header>
+                HintKeep - Login
+            </Header>
 
-            <p>
-                Welcome to HintKeep, please provide your credentials to start using the app!
-            </p>
+            <Content>
+                <p>
+                    Welcome to HintKeep, please provide your credentials to start using the app!
+                </p>
 
-            <Form
-                isLoading={isLoggingIn}
-                onSubmit={logInAsync}
-            >
-                <FormField field={form.username}>
-                    <FormFieldLabel />
-                    <FormFieldTextInput />
-                    <FormFieldError />
-                </FormField>
+                <Form
+                    isLoading={isLoggingIn}
+                    onSubmit={logInAsync}
+                >
+                    <FormField field={form.username}>
+                        <FormFieldLabel />
+                        <FormFieldTextInput />
+                        <FormFieldError />
+                    </FormField>
 
-                <FormField field={form.password}>
-                    <FormFieldLabel />
-                    <FormFieldTextInput type="password" />
-                    <FormFieldError />
-                </FormField>
+                    <FormField field={form.password}>
+                        <FormFieldLabel />
+                        <FormFieldTextInput type="password" />
+                        <FormFieldError />
+                    </FormField>
 
-                <div className="toolbar">
-                    <Button
-                        type="submit"
-                        text="Login"
-                        processing={isLoggingIn}
-                    />
-                    <Link to="/sign-up">
-                        Sign up
-                    </Link>
+                    <div className="toolbar">
+                        <Button
+                            type="submit"
+                            text="Login"
+                            processing={isLoggingIn}
+                        />
+                        <Link to="/sign-up">
+                            Sign up
+                        </Link>
 
-                    <Link to="/">
-                        Cancel
-                    </Link>
-                </div>
-            </Form>
+                        <Link to="/">
+                            Cancel
+                        </Link>
+                    </div>
+                </Form>
+            </Content>
         </>
     );
 }

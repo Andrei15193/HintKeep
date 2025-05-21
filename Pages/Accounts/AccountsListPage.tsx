@@ -7,6 +7,7 @@ import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { HintKeepFormField } from "../../Core/Forms/ViewModels";
 import { useDataSourceFlow } from "../../Core/PageFlows";
+import { Content, Header } from "../../Core/PageParts";
 import { type ISearchText, type IListResult, AccountsDataSource } from "./DataSources/AccountsDataSource";
 
 export function AccountsListPage(): React.JSX.Element {
@@ -52,103 +53,105 @@ export function AccountsListPage(): React.JSX.Element {
 
     return (
         <>
-            <h1>
-                Hello
-                {" "}
-                {username}
-                !
-            </h1>
-            {
-                totalCount === 0
-                    ? (
-                        <>
-                            {
-                                isLoading
-                                    ? "Loading"
-                                    : (
-                                        <p>
-                                            Sadly, you do not like storing hints... Maybe we can change that!
-                                        </p>
-                                    )
-                            }
-                            <Link to="add">
-                                Add account
-                            </Link>
-                        </>
-                    )
-                    : (
-                        <>
-                            <Link to="add">
-                                Add account
-                            </Link>
-                            <Form
-                                isLoading={false}
-                                onSubmit={loadAsync}
-                            >
-                                <FormField field={searchTextField}>
-                                    <FormFieldTextInput type="search" />
-                                </FormField>
-                                <Button
-                                    type="submit"
-                                    text="Search"
-                                />
-                            </Form>
+            <Header>
+                {`Hello ${username}!`}
+            </Header>
 
-                            {
-                                isLoading
-                                    ? "Loading"
-                                    : (
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>
-                                                        Account
-                                                    </th>
-                                                    <th>
-                                                        Username
-                                                    </th>
-                                                    <th>
-                                                        Hint
-                                                    </th>
-                                                    <th>
-                                                        Pinned
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {
-                                                    accounts.length === 0
-                                                        ? <tr>
-                                                            <td colSpan={3}>
-                                                                No account match the search criteria.
-                                                            </td>
-                                                        </tr>
-                                                        : accounts.map((account) => (
-                                                            <tr key={account.id}>
-                                                                <td>
-                                                                    <Link to={generatePath("/:id", { id: account.id })}>
-                                                                        {account.name}
-                                                                    </Link>
-                                                                </td>
-                                                                <td>
-                                                                    {account.username}
-                                                                </td>
-                                                                <td>
-                                                                    {account.hint}
-                                                                </td>
-                                                                <td>
-                                                                    {account.isPinned ? "Yes" : "No"}
+            <Content>
+                {
+                    totalCount === 0
+                        ? (
+                            <>
+                                {
+                                    isLoading
+                                        ? "Loading"
+                                        : (
+                                            <p>
+                                                Sadly, you do not like storing hints... Maybe we can change that!
+                                            </p>
+                                        )
+                                }
+                                <Link to="add">
+                                    Add account
+                                </Link>
+                            </>
+                        )
+                        : (
+                            <>
+                                <Link to="add">
+                                    Add account
+                                </Link>
+                                <Form
+                                    isLoading={false}
+                                    onSubmit={loadAsync}
+                                >
+                                    <div className="toolbar">
+                                        <FormField field={searchTextField}>
+                                            <FormFieldTextInput type="search" />
+                                        </FormField>
+                                        <Button
+                                            type="submit"
+                                            text="Search"
+                                        />
+                                    </div>
+                                </Form>
+
+                                {
+                                    isLoading
+                                        ? "Loading"
+                                        : (
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            Account
+                                                        </th>
+                                                        <th>
+                                                            Username
+                                                        </th>
+                                                        <th>
+                                                            Hint
+                                                        </th>
+                                                        <th>
+                                                            Pinned
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {
+                                                        accounts.length === 0
+                                                            ? <tr>
+                                                                <td colSpan={3}>
+                                                                    No account match the search criteria.
                                                                 </td>
                                                             </tr>
-                                                        ))
-                                                }
-                                            </tbody>
-                                        </table>
-                                    )
-                            }
-                        </>
-                    )
-            }
+                                                            : accounts.map((account) => (
+                                                                <tr key={account.id}>
+                                                                    <td>
+                                                                        <Link to={generatePath("/:id", { id: account.id })}>
+                                                                            {account.name}
+                                                                        </Link>
+                                                                    </td>
+                                                                    <td>
+                                                                        {account.username}
+                                                                    </td>
+                                                                    <td>
+                                                                        {account.hint}
+                                                                    </td>
+                                                                    <td>
+                                                                        {account.isPinned ? "Yes" : "No"}
+                                                                    </td>
+                                                                </tr>
+                                                            ))
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        )
+                                }
+                            </>
+                        )
+                }
+            </Content>
         </>
     );
 }

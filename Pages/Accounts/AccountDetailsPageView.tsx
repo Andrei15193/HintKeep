@@ -83,7 +83,7 @@ export function AccountDetailsPageView(): React.JSX.Element {
                     <FormFieldTextInput multiline />
                 </FormField>
 
-                <div>
+                <div className="toolbar">
                     <Button
                         text="Edit"
                         onClick={goToEditMode}

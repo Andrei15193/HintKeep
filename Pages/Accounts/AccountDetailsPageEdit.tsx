@@ -100,7 +100,7 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
                     <FormFieldTextInput multiline />
                 </FormField>
 
-                <div>
+                <div className="toolbar">
                     <Button
                         type="submit"
                         text="Save"
@@ -115,9 +115,10 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
                         onClick={deleteAsync}
                     />
                     <Link
-                        to={generatePath("/:id", { id: id || "" })}
-                        onClick={discardChangesCallback}
                         replace
+                        to={generatePath("/:id", { id: id || "" })}
+                        className="danger"
+                        onClick={discardChangesCallback}
                     >
                         Cancel
                     </Link>
