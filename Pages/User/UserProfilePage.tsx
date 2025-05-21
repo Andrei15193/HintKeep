@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuthenticatedUser, useAuthentication } from "../../Core/Contexts/AuthenticationContext";
+import { Button } from "../../Core/Forms/Components";
 
 export function UserProfilePage(): React.JSX.Element {
     const user = useAuthenticatedUser();
@@ -12,9 +13,10 @@ export function UserProfilePage(): React.JSX.Element {
                 {" "}
                 profile
             </p>
-            <button onClick={logOut}>
-                Logout
-            </button>
+            <Button
+                text="Logout"
+                onClick={logOut}
+            />
         </>
     );
 }

@@ -1,5 +1,6 @@
 import type { INotification, NotificationType } from "./ViewModels/Notifications";
 import React, { useCallback } from "react";
+import { Button } from "../Forms/Components";
 
 export interface IGlobalNotificationProps {
     readonly notification: INotification;
@@ -23,9 +24,12 @@ export function GlobalNotification({ notification }: IGlobalNotificationProps): 
                             <div>
                                 {notification.message}
                             </div>
-                            <button onClick={dismissCallback}>
+                            <Button
+                                neutral
+                                onClick={dismissCallback}
+                            >
                                 Dismiss
-                            </button>
+                            </Button>
                         </>
                     )
             }

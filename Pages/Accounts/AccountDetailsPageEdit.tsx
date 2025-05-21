@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
 import { generatePath, Link, useParams } from "react-router";
-import { Button, Form, SubmitButton } from "../../Core/Forms/Components";
+import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useDataSourceFlow, useFormFlow } from "../../Core/PageFlows";
 import { useShowConfirmationPrompt, usePromptedNavigate } from "../../Core/Prompt";
@@ -101,9 +101,17 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
                 </FormField>
 
                 <div>
-                    <SubmitButton text="Save" />
+                    <Button
+                        type="submit"
+                        text="Save"
+                        processing={isSaving}
+                        disabled={isLoading || isSaving || isDeleting}
+                    />
                     <Button
                         text="Delete"
+                        danger
+                        processing={isDeleting}
+                        disabled={isLoading || isSaving || isDeleting}
                         onClick={deleteAsync}
                     />
                     <Link

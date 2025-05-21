@@ -1,6 +1,176 @@
+@keyframes hintkeep-button-processing-animation {
+    0% {
+        background: var(--hk-action-color);
+    }
+
+    100% {
+        background: var(--hk-action-color-hover);
+    }
+}
+
 div#app {
+    --hk-action-color: var(--hk---color-accent);
+    --hk-action-color-hover: var(--hk---color-accent-hover);
+    --hk-action-color-text: var(--hk---color-accent-text);
+
+    gap: var(--hk---spacing-narrow);
+
     .prevent-pointer-events {
         pointer-events: none;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0;
+    }
+
+
+    .danger {
+        --hk-action-color: var(--hk---color-danger);
+        --hk-action-color-hover: var(--hk---color-danger-hover);
+    }
+
+    .neutral {
+        --hk-action-color: var(--hk---color-neutral);
+        --hk-action-color-hover: var(--hk---color-neutral-hover);
+    }
+
+    a,
+    a:visited {
+        color: var(--hk-action-color);
+        text-decoration: underline;
+
+        &:hover {
+            color: var(--hk-action-color-hover);
+            text-decoration: underline;
+        }
+    }
+
+    button {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        word-wrap: normal;
+        word-break: keep-all;
+        white-space: nowrap;
+
+        border: none;
+        padding: var(--hk---spacing-narrow);
+
+        &:not(:disabled) {
+            color: var(--hk-action-color-text);
+            background: linear-gradient(-45deg, var(--hk-action-color), var(--hk-action-color-hover));
+
+            &:hover {
+                cursor: pointer;
+
+                background: var(--hk-action-color-hover);
+            }
+
+            .loader {
+                height: 0;
+                visibility: hidden;
+
+                svg {
+                    height: 1rem;
+                    fill: none;
+                    stroke: var(--hk---color-accent-text);
+                    stroke-width: 1rem;
+                }
+            }
+
+
+            &.processing {
+                cursor: progress;
+
+                animation-name: hintkeep-button-processing-animation;
+                animation-duration: 0.5s;
+                animation-timing-function: ease-in-out;
+                animation-iteration-count: infinite;
+                animation-direction: alternate-reverse;
+
+                span {
+                    height: 0;
+                    overflow: hidden;
+                }
+
+                .loader {
+                    height: 1rem;
+                    visibility: visible;
+                }
+            }
+        }
+
+        &:disabled {
+            color: var(--hk-action-color-text-disabled);
+            background-color: var(--hk-action-color-background-disabled);
+
+            &:hover {
+                cursor: not-allowed;
+
+                background-color: var(--hk-action-color-background-disabled);
+            }
+        }
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: inherit;
+
+        label {
+            vertical-align: top;
+        }
+
+        input,
+        textarea {
+            outline: 1px solid var(--hk---color-text);
+            border: none;
+            border-radius: 0;
+            padding: var(--hk---spacing-tiny);
+            color: var(--hk---color-text);
+
+            &:not(:disabled),
+            &:not([disabled]) {
+                outline: 1px solid var(--hk---color-text);
+                background-color: var(--hk---color-background);
+
+                &:focus {
+                    outline-color: var(--hk---color-accent);
+                }
+
+                &:hover,
+                &:focus:hover {
+                    outline-color: var(--hk---color-accent-hover);
+                }
+
+                &.invalid {
+                    border-color: var(--hk---color-danger);
+                }
+            }
+
+            &:disabled,
+            &[disabled] {
+                outline-color: var(--hk---color-background);
+                color: var(--hk---color-text);
+                background-color: var(--hk---color-background-app);
+            }
+        }
+
+        input[type="checkbox"] {
+            outline-width: 0;
+        }
+
+        textarea {
+            resize: vertical;
+        }
     }
 
     >.confirmation-prompt {
@@ -18,6 +188,8 @@ div#app {
             flex-direction: column;
             align-items: flex-start;
 
+            padding: var(--hk---spacing-normal);
+
             gap: var(--hk---spacing-narrow);
 
             >.confirmation-prompt-actions {
@@ -30,6 +202,25 @@ div#app {
         }
     }
 
+    >header {
+        position: sticky;
+        top: 0;
+    }
+
+    >main.content {
+        display: flex;
+        flex-direction: column;
+        gap: inherit;
+    }
+
+    .toolbar {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        gap: inherit;
+    }
+
     >aside.global-notifications {
         position: absolute;
         inset: 0;
@@ -38,7 +229,11 @@ div#app {
         flex-direction: column;
         align-items: flex-end;
 
+        margin: 0 auto;
         padding: var(--hk---spacing-normal);
+        width: calc(100% - 2 * var(--hk---spacing-normal));
+        max-width: 800px;
+
         gap: var(--hk---spacing-normal);
 
         pointer-events: none;
@@ -46,7 +241,7 @@ div#app {
         >div.global-notification-item {
             border-width: 1px;
             border-style: solid;
-            border-color: var(--hk---color-border);
+            border-color: var(--hk---color-text);
             padding: var(--hk---spacing-narrow);
             background-color: var(--hk---color-background);
 
@@ -59,18 +254,8 @@ div#app {
             pointer-events: all;
 
             &.error {
-                color: var(--hk---color-border-error);
-                border-color: var(--hk---color-border-error);
-            }
-        }
-    }
-
-    form {
-
-        input,
-        textarea {
-            &.invalid {
-                border-color: var(--hk---color-border-error);
+                color: var(--hk---color-danger);
+                border-color: var(--hk---color-danger);
             }
         }
     }

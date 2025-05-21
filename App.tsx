@@ -9,8 +9,10 @@ Promise
     ])
     .then(([{ createElement }, { createRoot }, { Startup }]) => {
         const appElement = document.getElementById("app")!;
+        Array
+            .from(appElement.children)
+            .forEach((childNode) => childNode.remove());
         appElement.removeAttribute("class");
-        appElement.childNodes.forEach((childNode) => childNode.remove());
 
         createRoot(appElement)
             .render(createElement(Startup));

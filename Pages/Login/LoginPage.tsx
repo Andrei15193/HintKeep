@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
-import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldError, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../Core/PageFlows";
 import { LoginFormHandler } from "./FormHandlers/LoginFormHandler";
@@ -58,27 +58,21 @@ export function LoginPage(): React.JSX.Element {
                     <FormFieldError />
                 </FormField>
 
-                <SubmitButton text="Login" />
+                <div className="toolbar">
+                    <Button
+                        type="submit"
+                        text="Login"
+                        processing={isLoggingIn}
+                    />
+                    <Link to="/sign-up">
+                        Sign up
+                    </Link>
 
-                <Link to="/">
-                    Cancel
-                </Link>
+                    <Link to="/">
+                        Cancel
+                    </Link>
+                </div>
             </Form>
-
-            <div>
-                <a
-                    href="#"
-                    title="Currently unavailable"
-                >
-                    Account recovery
-                </a>
-            </div>
-
-            <div>
-                <Link to="/sign-up">
-                    Sign up
-                </Link>
-            </div>
         </>
     );
 }

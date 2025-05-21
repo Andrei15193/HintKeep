@@ -1,65 +1,108 @@
 /* The contents of this file gets inline into the resulting `index.html` file. */
 :root {
+    --hk---spacing-tiny: 0.25rem; // normal / 4
     --hk---spacing-narrow: 0.5rem; // normal / 2
     --hk---spacing-normal: 1rem;
 
     @keyframes hintkeep-loader-active-animation {
         0% {
-            opacity: 1;
+            fill: var(--hk---color-accent);
+        }
+
+        50% {
+            fill: var(--hk---color-accent);
         }
 
         100% {
-            opacity: 0.6;
+            fill: var(--hk---color-accent-hover);
         }
     }
 
     body {
-        display: flex;
-        flex-direction: column;
-
         margin: 0;
         padding: 0;
-        height: 100vh;
-        width: 100vw;
 
         color: var(--hk---color-text);
         background-color: var(--hk---color-background);
 
+        >#app {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+
+            overflow: auto;
+
+            margin: 0 auto;
+            padding: var(--hk---spacing-normal);
+            width: calc(100vw - 2 * var(--hk---spacing-normal));
+            max-width: 600px;
+            height: calc(100vh - 2 * var(--hk---spacing-normal));
+
+            background-color: var(--hk---color-background-app);
+
+            &.loader {
+                flex: 1 1 auto;
+                font-size: 20rem;
+
+                svg {
+                    margin: 20%;
+
+                    path {
+                        stroke: var(--hk---color-text);
+                        stroke-width: 2px;
+                        fill: var(--hk---color-accent);
+
+                        animation-name: hintkeep-loader-active-animation;
+                        animation-duration: 1s;
+                        animation-timing-function: ease-in-out;
+                        animation-iteration-count: infinite;
+                        animation-direction: alternate;
+                    }
+                }
+            }
+        }
+
         &.light-theme {
-            --hk---color-text: black;
-            --hk---color-background: white;
+            --hk---color-text: rgb(0 0 0);
+            --hk---color-background: rgb(255 255 255);
+            --hk---color-background-app: rgb(250 250 250);
             --hk---color-background-overlay: rgb(255 255 255 / 0.7);
-            --hk---color-border: black;
-            --hk---color-border-error: red;
-            --hk---color-border-warning: orange;
+
+            --hk---color-accent: rgb(23 127 117);
+            --hk---color-accent-hover: rgb(33 182 168);
+            --hk---color-accent-text: rgb(255 255 255);
+
+            --hk---color-danger: rgb(182 33 45);
+            --hk---color-danger-hover: rgb(127 23 31);
+
+            --hk---color-neutral: rgb(135 135 135);
+            --hk---color-neutral-hover: rgb(110 110 110);
+
+            --hk-action-color-text-disabled: rgb(200 200 200);
+            --hk-action-color-background-disabled: rgb(90 90 90);
 
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
         &.dark-theme {
-            --hk---color-text: white;
-            --hk---color-background: black;
+            --hk---color-text: rgb(255 255 255);
+            --hk---color-background: rgb(0 0 0);
+            --hk---color-background-app: rgb(15 15 15);
             --hk---color-background-overlay: rgb(0 0 0 / 0.7);
-            --hk---color-border: darkgray;
-            --hk---color-border-error: red;
-            --hk---color-border-warning: orange;
+
+            --hk---color-accent: rgb(33 182 168);
+            --hk---color-accent-hover: rgb(23 127 117);
+
+            --hk---color-danger: rgb(127 23 31);
+            --hk---color-danger-hover: rgb(182 33 45);
+
+            --hk---color-neutral: rgb(110 110 110);
+            --hk---color-neutral-hover: rgb(135 135 135);
+
+            --hk-action-color-text-disabled: rgb(200 200 200);
+            --hk-action-color-background-disabled: rgb(90 90 90);
 
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-        }
-
-        .loader {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            flex: 1 1 auto;
-            font-size: 20rem;
-
-            animation-name: hintkeep-loader-active-animation;
-            animation-duration: 1s;
-            animation-timing-function: ease-in;
-            animation-iteration-count: infinite;
-            animation-direction: alternate;
         }
     }
 }

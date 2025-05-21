@@ -4,14 +4,13 @@ import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
 import { AccountAddPage, AccountDetailsPage, AccountsListPage } from "./Accounts";
 import { HomePage } from "./Home";
 import { IndexedDatabaseScoped } from "./IndexedDatabaseScoped";
-import { Layout } from "./Layout";
 import { LoginPage } from "./Login";
 import { SignUpPage } from "./SignUp/SignUpPage";
 import { UserProfilePage } from "./User";
 
 export const AppRouter = createBrowserRouter([
     {
-        Component: Layout,
+        Component: Outlet,
         children: [
             {
                 path: "/",

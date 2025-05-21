@@ -3,7 +3,7 @@ import React, { useCallback, useRef } from "react";
 import { useViewModelMemo } from "react-model-view-viewmodel";
 import { generatePath, Link } from "react-router";
 import { useAuthenticatedUser } from "../../Core/Contexts/AuthenticationContext";
-import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { HintKeepFormField } from "../../Core/Forms/ViewModels";
 import { useDataSourceFlow } from "../../Core/PageFlows";
@@ -88,7 +88,10 @@ export function AccountsListPage(): React.JSX.Element {
                                 <FormField field={searchTextField}>
                                     <FormFieldTextInput type="search" />
                                 </FormField>
-                                <SubmitButton text="Search" />
+                                <Button
+                                    type="submit"
+                                    text="Search"
+                                />
                             </Form>
 
                             {

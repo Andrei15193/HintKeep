@@ -3,6 +3,7 @@ import { useDependency } from "react-model-view-viewmodel";
 import { Link, Outlet } from "react-router";
 import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
 import { useIndexedDatabase } from "../Core/Data/IndexedDatabase";
+import { Button } from "../Core/Forms/Components";
 import { GlobalNotificationsContainer, Notifications } from "../Core/Notifications";
 import { ConfirmationPromptContext } from "../Core/Prompt/ConfirmationPromptContext";
 
@@ -64,18 +65,16 @@ export function ConfirmationPrompt(): React.JSX.Element | null {
                     {message}
                 </div>
                 <nav className="confirmation-prompt-actions">
-                    <button
-                        type="button"
+                    <Button
+                        danger
                         onClick={confirm}
-                    >
-                        {confirmButtonLabel}
-                    </button>
-                    <button
-                        type="button"
+                        text={confirmButtonLabel}
+                    />
+                    <Button
+                        neutral
                         onClick={dismiss}
-                    >
-                        {dismissButtonLabel}
-                    </button>
+                        text={dismissButtonLabel}
+                    />
                 </nav>
             </div>
         </aside>
@@ -97,9 +96,9 @@ export function useIndexedDatabaseErrorHandler(): void {
                                 <div>
                                     {error instanceof Error ? error.message : JSON.stringify(error)}
                                 </div>
-                                <button onClick={initializeAsync}>
+                                <Button onClick={initializeAsync}>
                                     Try again
-                                </button>
+                                </Button>
                             </>
                         );
                     }

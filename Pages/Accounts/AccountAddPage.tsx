@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router";
-import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../Core/PageFlows";
 import { usePromptedNavigate } from "../../Core/Prompt";
@@ -67,13 +67,18 @@ export function AccountAddPage(): React.JSX.Element {
                     <FormFieldTextInput multiline />
                 </FormField>
 
-                <div>
-                    <SubmitButton text="Save" />
+                <div className="toolbar">
+                    <Button
+                        type="submit"
+                        text="Save"
+                        processing={isSubmitting}
+                    />
                     <Link to="/">
                         Cancel
                     </Link>
                 </div>
             </Form>
+
         </>
     );
 }

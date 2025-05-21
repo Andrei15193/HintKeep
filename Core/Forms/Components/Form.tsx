@@ -25,28 +25,21 @@ export function Form(props: PropsWithChildren<IFormProps>): React.JSX.Element {
 
     const formContext = useMemo<IFormContext>(
         () => ({
-            disabled: !!disabled
+            disabled: isLoading || !!disabled
         }),
-        [disabled]
+        [isLoading, disabled]
     );
 
-    if (isLoading)
-        return (
-            <>
-                Loading
-            </>
-        );
-    else
-        return (
-            <form
-                autoComplete="off"
-                autoCorrect="off"
-                className={className}
-                onSubmit={onSubmit}
-            >
-                <FormContext value={formContext}>
-                    {children}
-                </FormContext>
-            </form>
-        );
+    return (
+        <form
+            autoComplete="off"
+            autoCorrect="off"
+            className={className}
+            onSubmit={onSubmit}
+        >
+            <FormContext value={formContext}>
+                {children}
+            </FormContext>
+        </form>
+    );
 }

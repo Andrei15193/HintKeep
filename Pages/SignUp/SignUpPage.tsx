@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router";
 import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
-import { Form, SubmitButton } from "../../Core/Forms/Components";
+import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldError, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../Core/PageFlows";
 import { usePromptedNavigate } from "../../Core/Prompt";
@@ -71,7 +71,11 @@ export function SignUpPage(): React.JSX.Element {
                     <FormFieldError />
                 </FormField>
 
-                <SubmitButton text="Sign Up" />
+                <Button
+                    type="submit"
+                    text="Sign Up"
+                    processing={isSigningUp}
+                />
 
                 <Link to="/login">
                     Cancel
