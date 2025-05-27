@@ -11,7 +11,7 @@ import { Content, Header } from "../../Core/PageParts";
 import { type ISearchText, type IListResult, AccountsDataSource } from "./DataSources/AccountsDataSource";
 
 export function AccountsListPage(): React.JSX.Element {
-    const { username } = useAuthenticatedUser()!;
+    const { username } = useAuthenticatedUser();
 
     const searchTextField = useViewModelMemo(
         () => new HintKeepFormField<string>({
@@ -54,8 +54,17 @@ export function AccountsListPage(): React.JSX.Element {
     return (
         <>
             <Header>
-                {`Hello ${username}!`}
+                {`HintKeep - ${username} Accounts`}
             </Header>
+
+            <nav>
+                <Link to="/">
+                    Accounts
+                </Link>
+                <Link to="/profile">
+                    Profile
+                </Link>
+            </nav>
 
             <Content>
                 {
@@ -71,29 +80,28 @@ export function AccountsListPage(): React.JSX.Element {
                                             </p>
                                         )
                                 }
-                                <Link to="add">
+                                <Link to="/add">
                                     Add account
                                 </Link>
                             </>
                         )
                         : (
                             <>
-                                <Link to="add">
-                                    Add account
-                                </Link>
                                 <Form
                                     isLoading={false}
                                     onSubmit={loadAsync}
+                                    className="toolbar"
                                 >
-                                    <div className="toolbar">
-                                        <FormField field={searchTextField}>
-                                            <FormFieldTextInput type="search" />
-                                        </FormField>
-                                        <Button
-                                            type="submit"
-                                            text="Search"
-                                        />
-                                    </div>
+                                    <Link to="add">
+                                        Add account
+                                    </Link>
+                                    <FormField field={searchTextField}>
+                                        <FormFieldTextInput type="search" />
+                                    </FormField>
+                                    <Button
+                                        type="submit"
+                                        text="Search"
+                                    />
                                 </Form>
 
                                 {

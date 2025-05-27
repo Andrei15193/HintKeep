@@ -120,56 +120,140 @@ div#app {
         }
     }
 
+    table {
+        border-collapse: collapse;
+
+        thead tr th {
+            padding-bottom: var(--hk---spacing-tiny);
+            border-bottom: 1px solid var(--hk---color-text);
+
+            width: 33%;
+
+            &:nth-child(4) {
+                width: 4rem;
+            }
+        }
+
+        tbody {
+            tr:nth-child(2n + 1) {
+                background-color: var(--hk---color-background-overlay);
+            }
+
+            tr {
+                td {
+                    padding: var(--hk---spacing-tiny);
+
+                    &:nth-child(4) {
+                        text-align: center;
+                    }
+                }
+
+                &:hover {
+                    background-color: var(--hk---color-accent-hover);
+
+                    td {
+                        --hk-action-color: var(--hk---color-background);
+                        --hk-action-color-text: var(--hk---color-background);
+                        --hk-action-color-hover: var(--hk---color-background-overlay);
+                    }
+                }
+            }
+        }
+    }
+
     form {
         display: flex;
         flex-direction: column;
         gap: inherit;
 
-        label {
-            vertical-align: top;
+        .form-field-group {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: inherit;
         }
 
-        input,
-        textarea {
-            outline: 1px solid var(--hk---color-text);
-            border: none;
-            border-radius: 0;
-            padding: var(--hk---spacing-tiny);
-            color: var(--hk---color-text);
+        div.form-field {
+            flex: 1 1 0;
 
-            &:not(:disabled),
-            &:not([disabled]) {
-                outline: 1px solid var(--hk---color-text);
-                background-color: var(--hk---color-background);
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: inherit;
 
-                &:focus {
-                    outline-color: var(--hk---color-accent);
-                }
-
-                &:hover,
-                &:focus:hover {
-                    outline-color: var(--hk---color-accent-hover);
-                }
-
-                &.invalid {
-                    border-color: var(--hk---color-danger);
-                }
+            label {
+                vertical-align: top;
+                width: 6rem;
             }
 
-            &:disabled,
-            &[disabled] {
-                outline-color: var(--hk---color-background);
-                color: var(--hk---color-text);
-                background-color: var(--hk---color-background-app);
+            div.input-container {
+                flex: 1 1 0;
+                min-width: 8rem;
+
+                display: flex;
+                flex-direction: column;
+
+                .input-container-error {
+                    font-size: 0.85rem;
+                    color: var(--hk---color-danger);
+                }
+
+                input,
+                textarea {
+                    flex: 1 1 auto;
+
+                    outline: 1px solid var(--hk---color-text);
+                    border: none;
+                    border-radius: 0;
+                    padding: var(--hk---spacing-tiny);
+                    color: var(--hk---color-text);
+
+                    &:not(:disabled),
+                    &:not([disabled]) {
+                        outline: 1px solid var(--hk---color-text);
+                        background-color: var(--hk---color-background);
+
+                        &:not(.invalid) {
+                            &:focus {
+                                outline-color: var(--hk---color-accent);
+                            }
+
+                            &:hover,
+                            &:focus:hover {
+                                outline-color: var(--hk---color-accent-hover);
+                            }
+                        }
+
+                        &.invalid {
+                            outline-color: var(--hk---color-danger);
+
+                            &:hover,
+                            &:focus:hover {
+                                outline-color: var(--hk---color-danger-hover);
+                            }
+                        }
+                    }
+
+                    &:disabled,
+                    &[disabled] {
+                        outline-color: var(--hk---color-background);
+                        color: var(--hk---color-text);
+                        background-color: var(--hk---color-background-app);
+                    }
+                }
+
+                input[type="checkbox"] {
+                    outline-width: 0;
+                    align-self: flex-start;
+                }
+
+                textarea {
+                    resize: vertical;
+                    min-height: 3rem;
+                    font-size: 1rem;
+                    font-family: var(--hk---font-family);
+                }
             }
-        }
-
-        input[type="checkbox"] {
-            outline-width: 0;
-        }
-
-        textarea {
-            resize: vertical;
         }
     }
 
@@ -205,6 +289,12 @@ div#app {
     >header {
         position: sticky;
         top: 0;
+    }
+
+    >nav {
+        display: flex;
+        flex-direction: row;
+        gap: inherit;
     }
 
     >main.content {

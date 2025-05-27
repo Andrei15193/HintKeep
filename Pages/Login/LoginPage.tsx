@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 import { Form, Button } from "../../Core/Forms/Components";
-import { FormField, FormFieldError, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
+import { FormField, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
+import { FormFieldGroup } from "../../Core/Forms/Components/FormFields/FormField";
 import { useFormFlow } from "../../Core/PageFlows";
 import { Content, Header } from "../../Core/PageParts";
 import { LoginFormHandler } from "./FormHandlers/LoginFormHandler";
@@ -48,17 +49,20 @@ export function LoginPage(): React.JSX.Element {
                     isLoading={isLoggingIn}
                     onSubmit={logInAsync}
                 >
-                    <FormField field={form.username}>
-                        <FormFieldLabel />
-                        <FormFieldTextInput />
-                        <FormFieldError />
-                    </FormField>
+                    <FormFieldGroup>
+                        <FormField field={form.username}>
+                            <FormFieldLabel />
+                            <FormFieldTextInput placeholder="name1983" />
+                        </FormField>
 
-                    <FormField field={form.password}>
-                        <FormFieldLabel />
-                        <FormFieldTextInput type="password" />
-                        <FormFieldError />
-                    </FormField>
+                        <FormField field={form.password}>
+                            <FormFieldLabel />
+                            <FormFieldTextInput
+                                type="password"
+                                placeholder="admin"
+                            />
+                        </FormField>
+                    </FormFieldGroup>
 
                     <div className="toolbar">
                         <Button

@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { Link } from "react-router";
 import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 import { Form, Button } from "../../Core/Forms/Components";
-import { FormField, FormFieldError, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
+import { FormField, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
+import { FormFieldGroup } from "../../Core/Forms/Components/FormFields/FormField";
 import { useFormFlow } from "../../Core/PageFlows";
 import { Content, Header } from "../../Core/PageParts";
 import { usePromptedNavigate } from "../../Core/Prompt";
@@ -55,22 +56,27 @@ export function SignUpPage(): React.JSX.Element {
                     isLoading={isSigningUp}
                     onSubmit={signUpAsync}
                 >
-                    <FormField field={form.username}>
-                        <FormFieldLabel />
-                        <FormFieldTextInput />
-                        <FormFieldError />
-                    </FormField>
+                    <FormFieldGroup>
+                        <FormField field={form.username}>
+                            <FormFieldLabel />
+                            <FormFieldTextInput placeholder="hello2077" />
+                        </FormField>
 
-                    <FormField field={form.password}>
-                        <FormFieldLabel />
-                        <FormFieldTextInput type="password" />
-                        <FormFieldError />
-                    </FormField>
+                        <FormField field={form.password}>
+                            <FormFieldLabel />
+                            <FormFieldTextInput
+                                type="password"
+                                placeholder="super admin"
+                            />
+                        </FormField>
+                    </FormFieldGroup>
 
                     <FormField field={form.hint}>
                         <FormFieldLabel />
-                        <FormFieldTextInput multiline />
-                        <FormFieldError />
+                        <FormFieldTextInput
+                            multiline
+                            placeholder="sudo"
+                        />
                     </FormField>
 
                     <div className="toolbar">

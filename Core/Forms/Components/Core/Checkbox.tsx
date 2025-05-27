@@ -1,6 +1,8 @@
 import type { HintKeepFormField } from "../../ViewModels";
 import React, { type ChangeEvent, useCallback } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
+import { InputContainer } from "./InputContainer";
+import { shouldShowError } from "./ShouldShowError";
 
 export interface ICheckboxProps {
     readonly field: HintKeepFormField<boolean>;
@@ -8,7 +10,8 @@ export interface ICheckboxProps {
 }
 
 export function Checkbox({ field, disabled }: ICheckboxProps): React.JSX.Element {
-    useViewModel(field);
+    const { name, value, error } = useViewModel(field);
+    const showError = shouldShowError(field);
 
     const onChangedCallback = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
@@ -25,15 +28,20 @@ export function Checkbox({ field, disabled }: ICheckboxProps): React.JSX.Element
     );
 
     return (
-        <input
-            id={field.name}
-            name={field.name}
-            checked={field.value}
-            type="checkbox"
-            onBlur={onBlurCallback}
-            onChange={onChangedCallback}
-            className={field.wasTouched && field.isInvalid ? "invalid" : ""}
-            disabled={disabled}
-        />
+        <InputContainer
+            showError={showError}
+            error={error}
+        >
+            <input
+                id={name}
+                name={name}
+                checked={value}
+                type="checkbox"
+                onBlur={onBlurCallback}
+                onChange={onChangedCallback}
+                className={showError ? "invalid" : ""}
+                disabled={disabled}
+            />
+        </InputContainer>
     );
 }

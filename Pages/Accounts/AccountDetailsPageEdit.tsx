@@ -4,6 +4,7 @@ import { generatePath, Link, useParams } from "react-router";
 import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useDataSourceFlow, useFormFlow } from "../../Core/PageFlows";
+import { Header } from "../../Core/PageParts";
 import { useShowConfirmationPrompt, usePromptedNavigate } from "../../Core/Prompt";
 import { useViewEditToggleContext } from "../../Core/ViewEditToggle";
 import { AccountDetailsDataSource } from "./DataSources/AccountDetailsDataSource";
@@ -68,9 +69,10 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
 
     return (
         <>
-            <h1>
-                Edit Account
-            </h1>
+            <Header>
+                {`HintKeep - Edit ${form.name.value} Account`}
+            </Header>
+
             <Form
                 isLoading={isLoading || isSaving || isDeleting}
                 onSubmit={saveAsync}
@@ -87,7 +89,7 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
 
                 <FormField field={form.hint}>
                     <FormFieldLabel />
-                    <FormFieldTextInput />
+                    <FormFieldTextInput multiline />
                 </FormField>
 
                 <FormField field={form.pinned}>

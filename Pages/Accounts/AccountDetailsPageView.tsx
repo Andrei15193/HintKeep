@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import { blankSubmit, Button, Form } from "../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { useDataSourceFlow, useFormFlow } from "../../Core/PageFlows";
+import { Header } from "../../Core/PageParts";
 import { useViewEditToggleContext } from "../../Core/ViewEditToggle";
 import { AccountDetailsDataSource } from "./DataSources/AccountDetailsDataSource";
 import { AccountDeletionFormHandler } from "./FormHandlers/AccountDeletionFormHandler";
@@ -50,9 +51,10 @@ export function AccountDetailsPageView(): React.JSX.Element {
 
     return (
         <>
-            <h1>
-                View Account
-            </h1>
+            <Header>
+                {`HintKeep - View ${form.name.value} Account`}
+            </Header>
+
             <Form
                 isLoading={isLoading || isDeleting}
                 onSubmit={blankSubmit}
@@ -70,7 +72,7 @@ export function AccountDetailsPageView(): React.JSX.Element {
 
                 <FormField field={form.hint}>
                     <FormFieldLabel />
-                    <FormFieldTextInput />
+                    <FormFieldTextInput multiline />
                 </FormField>
 
                 <FormField field={form.pinned}>
@@ -91,6 +93,7 @@ export function AccountDetailsPageView(): React.JSX.Element {
                     <Button
                         text="Delete"
                         onClick={deleteAsync}
+                        danger
                     />
                     <Link to="/">
                         Cancel

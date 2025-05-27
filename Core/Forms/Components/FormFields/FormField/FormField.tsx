@@ -12,7 +12,7 @@ export function FormField<TValue>({ field, children }: PropsWithChildren<IFormFi
 
     return (
         <FormFieldContext value={formFieldContext}>
-            <div>
+            <div className="form-field">
                 {children}
             </div>
         </FormFieldContext>
