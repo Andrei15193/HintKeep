@@ -1,3 +1,13 @@
+@keyframes hintkeep-loading-content-animation {
+    0% {
+        stroke: var(--hk-action-color);
+    }
+
+    100% {
+        stroke: var(--hk-action-color-hover);
+    }
+}
+
 @keyframes hintkeep-button-processing-animation {
     0% {
         background: var(--hk-action-color);
@@ -28,7 +38,6 @@ div#app {
     h6 {
         margin: 0;
     }
-
 
     .danger {
         --hk-action-color: var(--hk---color-danger);
@@ -301,6 +310,22 @@ div#app {
         display: flex;
         flex-direction: column;
         gap: inherit;
+
+        svg.loading-content-loader {
+            margin: var(--hk---spacing-wide);
+            width: 20rem;
+
+            align-self: center;
+
+            fill: none;
+            stroke-width: var(--hk---spacing-tiny);
+
+            animation-name: hintkeep-loading-content-animation;
+            animation-duration: 0.5s;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+            animation-direction: alternate-reverse;
+        }
     }
 
     .toolbar {

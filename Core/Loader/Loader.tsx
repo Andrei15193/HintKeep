@@ -1,8 +1,15 @@
 import React from "react";
 
-export function Loader(): React.JSX.Element {
+export interface ILoaderProps {
+    readonly className?: string;
+}
+
+export function Loader({ className }: ILoaderProps): React.JSX.Element {
     return (
-        <svg viewBox="0 0 350 223">
+        <svg
+            viewBox="0 0 350 223"
+            className={className}
+        >
             <path
                 d=" M 4.00,4.00
                     C 4.00,4.00 71.00,4.00 71.00,4.00

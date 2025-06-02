@@ -1,46 +1,9 @@
 import React, { useContext, useEffect } from "react";
 import { useDependency } from "react-model-view-viewmodel";
-import { Link, Outlet } from "react-router";
-import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
 import { useIndexedDatabase } from "../Core/Data/IndexedDatabase";
 import { Button } from "../Core/Forms/Components";
-import { GlobalNotificationsContainer, Notifications } from "../Core/Notifications";
+import { Notifications } from "../Core/Notifications";
 import { ConfirmationPromptContext } from "../Core/Prompt/ConfirmationPromptContext";
-
-export function Layout(): React.JSX.Element {
-    useIndexedDatabaseErrorHandler();
-    const { user } = useAuthentication();
-
-    return (
-        <>
-            <header>
-                <div>
-                    <h1>
-                        HintKeep
-                    </h1>
-                </div>
-            </header>
-            <nav>
-                {
-                    user === null
-                        ? null
-                        : (
-                            <Link to="/profile">
-                                Profile
-                            </Link>
-                        )
-                }
-            </nav>
-            <main>
-                <Outlet />
-            </main>
-            <ConfirmationPrompt />
-            <aside className="global-notifications">
-                <GlobalNotificationsContainer />
-            </aside>
-        </>
-    );
-}
 
 export function ConfirmationPrompt(): React.JSX.Element | null {
     const { confirmationPrompt } = useContext(ConfirmationPromptContext);

@@ -7,7 +7,7 @@ import { HintKeepDependencyContainerProvider } from "../Core/Dependencies";
 import { GlobalNotificationsContainer } from "../Core/Notifications";
 import { ConfirmationPromptProvider } from "../Core/Prompt";
 import { AppRouter } from "./AppRouter";
-import { ConfirmationPrompt } from "./Layout";
+import { ConfirmationPrompt } from "./ConfirmationPrompt";
 
 export function Startup(): React.JSX.Element {
     return (

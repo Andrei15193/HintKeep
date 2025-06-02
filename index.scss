@@ -3,6 +3,7 @@
     --hk---spacing-tiny: 0.25rem; // normal / 4
     --hk---spacing-narrow: 0.5rem; // normal / 2
     --hk---spacing-normal: 1rem;
+    --hk---spacing-wide: 2rem; // normal * 2
 
     @keyframes hintkeep-loader-active-animation {
         0% {
@@ -19,6 +20,8 @@
     }
 
     body {
+        --hk---font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+
         margin: 0;
         padding: 0;
 
@@ -82,8 +85,6 @@
 
             --hk-action-color-text-disabled: rgb(200 200 200);
             --hk-action-color-background-disabled: rgb(90 90 90);
-
-            --hk---font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
         &.dark-theme {
@@ -103,8 +104,6 @@
 
             --hk-action-color-text-disabled: rgb(200 200 200);
             --hk-action-color-background-disabled: rgb(90 90 90);
-
-            --hk---font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
     }
 }
