@@ -1,18 +1,16 @@
 import React, { useEffect, useMemo } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
 import { Link, useNavigate, useParams } from "react-router";
-import { blankSubmit, Button, Form } from "../../Core/Forms/Components";
-import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
-import { useDataSourceFlow, useFormFlow } from "../../Core/PageFlows";
-import { Header } from "../../Core/PageParts";
-import { useViewEditToggleContext } from "../../Core/ViewEditToggle";
-import { AccountDetailsDataSource } from "./DataSources/AccountDetailsDataSource";
-import { AccountDeletionFormHandler } from "./FormHandlers/AccountDeletionFormHandler";
-import { AccountForm } from "./Forms/AccountForm";
+import { blankSubmit, Button, Form } from "../../../../Core/Forms/Components";
+import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../../../Core/Forms/Components/FormFields";
+import { useDataSourceFlow, useFormFlow } from "../../../../Core/PageFlows";
+import { Header } from "../../../../Core/PageParts";
+import { AccountDetailsDataSource } from "../../DataSources/AccountDetailsDataSource";
+import { AccountDeletionFormHandler } from "../../FormHandlers/AccountDeletionFormHandler";
+import { AccountForm } from "../../Forms/AccountForm";
 
-export function AccountDetailsPageView(): React.JSX.Element {
+export function ArchivedAccountDetailsPageView(): React.JSX.Element {
     const { id } = useParams<{ readonly id: string }>();
-    const { goToEditMode } = useViewEditToggleContext();
     const navigate = useNavigate();
 
     const dataSourceOptions = useMemo(() => ({ id }), [id]);
@@ -22,24 +20,6 @@ export function AccountDetailsPageView(): React.JSX.Element {
     });
 
     const form = useViewModel(AccountForm, [account]);
-    const {
-        isSubmitting: isArchiving,
-        isSubmitted: isArchived,
-        submitAsync: archiveAsync
-    } = useFormFlow({
-        form,
-        formHandler: AccountDeletionFormHandler,
-
-        notifications: {
-            successMessage: `Account '${account?.name}' has been archived.`
-        },
-
-        confirmationPrompt: {
-            message: "Archived accounts are still available, but not easily accessible, do you wish to continue?",
-            confirmButtonLabel: "Yes, archive the account",
-            dismissButtonLabel: "No, I do not want to archive the account"
-        }
-    });
     const {
         isSubmitting: isDeleting,
         isSubmitted: isDeleted,
@@ -61,20 +41,20 @@ export function AccountDetailsPageView(): React.JSX.Element {
 
     useEffect(
         () => {
-            if (isArchived || isDeleted)
-                navigate("/");
+            if (isDeleted)
+                navigate("/archived");
         },
-        [isArchived, isDeleted, navigate]
+        [isDeleted, navigate]
     );
 
     return (
         <>
             <Header>
-                {`HintKeep - View ${form.name.value} Account`}
+                {`HintKeep - View ${form.name.value} Archived Account`}
             </Header>
 
             <Form
-                isLoading={isLoading || isArchiving || isDeleting}
+                isLoading={isLoading || isDeleting}
                 onSubmit={blankSubmit}
                 disabled
             >
@@ -105,20 +85,11 @@ export function AccountDetailsPageView(): React.JSX.Element {
 
                 <div className="toolbar">
                     <Button
-                        text="Edit"
-                        onClick={goToEditMode}
-                    />
-                    <Button
-                        text="Archive"
-                        onClick={archiveAsync}
-                        neutral
-                    />
-                    <Button
                         text="Delete"
                         onClick={deleteAsync}
                         danger
                     />
-                    <Link to="/">
+                    <Link to="/archived">
                         Cancel
                     </Link>
                 </div>

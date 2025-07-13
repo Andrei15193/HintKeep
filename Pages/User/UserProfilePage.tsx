@@ -44,10 +44,15 @@ export function UserProfilePage(): React.JSX.Element {
                 <Link to="/">
                     Accounts
                 </Link>
+                <Link to="/archived">
+                    Archived Accounts
+                </Link>
                 <Link to="/profile">
                     Profile
                 </Link>
             </nav>
+
+            <hr />
 
             <p>
                 We are sorry to see you go so soon, hope you had a good time!

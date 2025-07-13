@@ -1,17 +1,17 @@
-import type { IAccountListItem } from "./Models/IAccountListItem";
+import type { IAccountListItem } from "../../Models/IAccountListItem";
 import React, { useCallback, useRef } from "react";
 import { useViewModelMemo } from "react-model-view-viewmodel";
 import { generatePath, Link } from "react-router";
-import { useAuthenticatedUser } from "../../Core/Contexts/AuthenticationContext";
-import { Form, Button } from "../../Core/Forms/Components";
-import { FormField, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
-import { HintKeepFormField } from "../../Core/Forms/ViewModels";
-import { LoadingContent } from "../../Core/Loader";
-import { useDataSourceFlow } from "../../Core/PageFlows";
-import { Content, Header } from "../../Core/PageParts";
-import { type ISearchText, type IListResult, AccountsDataSource } from "./DataSources/AccountsDataSource";
+import { useAuthenticatedUser } from "../../../../Core/Contexts/AuthenticationContext";
+import { Form, Button } from "../../../../Core/Forms/Components";
+import { FormField, FormFieldTextInput } from "../../../../Core/Forms/Components/FormFields";
+import { HintKeepFormField } from "../../../../Core/Forms/ViewModels";
+import { LoadingContent } from "../../../../Core/Loader";
+import { useDataSourceFlow } from "../../../../Core/PageFlows";
+import { Content, Header } from "../../../../Core/PageParts";
+import { type ISearchText, type IListResult, type IStatus, AccountsDataSource } from "../../DataSources/AccountsDataSource";
 
-export function AccountsListPage(): React.JSX.Element {
+export function ArchivedAccountsListPage(): React.JSX.Element {
     const { username } = useAuthenticatedUser();
 
     const searchTextField = useViewModelMemo(
@@ -24,8 +24,9 @@ export function AccountsListPage(): React.JSX.Element {
     );
 
     const dataSourceFlowOptionsCallback = useCallback(
-        (): ISearchText => ({
-            searchText: searchTextField.value
+        (): ISearchText & IStatus => ({
+            searchText: searchTextField.value,
+            status: "archvied"
         }),
         [searchTextField]
     );
@@ -55,17 +56,22 @@ export function AccountsListPage(): React.JSX.Element {
     return (
         <>
             <Header>
-                {`HintKeep - ${username} Accounts`}
+                {`HintKeep - ${username} Archived Accounts`}
             </Header>
 
             <nav>
                 <Link to="/">
                     Accounts
                 </Link>
+                <Link to="/archived">
+                    Archived Accounts
+                </Link>
                 <Link to="/profile">
                     Profile
                 </Link>
             </nav>
+
+            <hr />
 
             <Content>
                 {
@@ -75,9 +81,6 @@ export function AccountsListPage(): React.JSX.Element {
                             onSubmit={loadAsync}
                             className="toolbar"
                         >
-                            <Link to="add">
-                                Add account
-                            </Link>
                             <FormField field={searchTextField}>
                                 <FormFieldTextInput type="search" />
                             </FormField>
@@ -94,11 +97,8 @@ export function AccountsListPage(): React.JSX.Element {
                             ? (
                                 <>
                                     <p>
-                                        Sadly, you do not like storing hints... Maybe we can change that!
+                                        All of your accounts are active, none of them are archived.
                                     </p>
-                                    <Link to="/add">
-                                        Add account
-                                    </Link>
                                 </>
                             )
                             : (
@@ -130,7 +130,7 @@ export function AccountsListPage(): React.JSX.Element {
                                                 : accounts.map((account) => (
                                                     <tr key={account.id}>
                                                         <td>
-                                                            <Link to={generatePath("/:id", { id: account.id })}>
+                                                            <Link to={generatePath("/archived/:id", { id: account.id })}>
                                                                 {account.name}
                                                             </Link>
                                                         </td>

@@ -9,12 +9,16 @@ export interface ISearchText {
     readonly searchText: string;
 }
 
+export interface IStatus {
+    readonly status: "active" | "archvied";
+}
+
 export interface IListResult<TItem> {
     readonly items: readonly TItem[];
     readonly totalCount: number;
 }
 
-export class AccountsDataSource implements IDataSource<ISearchText, IListResult<IAccountListItem>> {
+export class AccountsDataSource implements IDataSource<ISearchText & IStatus, IListResult<IAccountListItem>> {
     private readonly _user: IUser;
     private readonly _database: IDBDatabase;
 
@@ -23,7 +27,7 @@ export class AccountsDataSource implements IDataSource<ISearchText, IListResult<
         this._database = resolve(IndexedDatabase);
     }
 
-    public async getDataAsync({ searchText }: ISearchText): Promise<IListResult<IAccountListItem>> {
+    public async getDataAsync({ searchText, status }: ISearchText & IStatus): Promise<IListResult<IAccountListItem>> {
         const transaction = this._database.transaction("Accounts", "readonly");
 
         try {
@@ -31,7 +35,12 @@ export class AccountsDataSource implements IDataSource<ISearchText, IListResult<
                 .objectStore("Accounts")
                 .index("UserAccountsStatus");
 
-            const accountObjects = await mapDbRequestToPromise<readonly IAccountObject[]>(userAccountsIndex.getAll([this._user.id, "active"]));
+            const accountObjects = await mapDbRequestToPromise<readonly IAccountObject[]>(
+                userAccountsIndex.getAll([
+                    this._user.id,
+                    status === "active" ? "active" : "archived"
+                ])
+            );
             transaction.commit();
 
             const searchTerms = searchText

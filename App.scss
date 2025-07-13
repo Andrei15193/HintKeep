@@ -39,6 +39,10 @@ div#app {
         margin: 0;
     }
 
+    hr {
+        width: 100%;
+    }
+
     .danger {
         --hk-action-color: var(--hk---color-danger);
         --hk-action-color-hover: var(--hk---color-danger-hover);
@@ -259,7 +263,7 @@ div#app {
                 textarea {
                     resize: vertical;
                     min-height: 3rem;
-                    font-size: 1rem;
+                    font-size: 0.856rem;
                     font-family: var(--hk---font-family);
                 }
             }

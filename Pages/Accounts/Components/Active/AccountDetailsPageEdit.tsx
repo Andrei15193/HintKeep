@@ -1,16 +1,17 @@
 import React, { useEffect, useMemo } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
 import { generatePath, Link, useParams } from "react-router";
-import { Form, Button } from "../../Core/Forms/Components";
-import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
-import { useDataSourceFlow, useFormFlow } from "../../Core/PageFlows";
-import { Header } from "../../Core/PageParts";
-import { useShowConfirmationPrompt, usePromptedNavigate } from "../../Core/Prompt";
-import { useViewEditToggleContext } from "../../Core/ViewEditToggle";
-import { AccountDetailsDataSource } from "./DataSources/AccountDetailsDataSource";
-import { AccountDeletionFormHandler } from "./FormHandlers/AccountDeletionFormHandler";
-import { AccountFormHandler } from "./FormHandlers/AccountFormHandler";
-import { AccountForm } from "./Forms/AccountForm";
+import { Form, Button } from "../../../../Core/Forms/Components";
+import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../../../Core/Forms/Components/FormFields";
+import { useDataSourceFlow, useFormFlow } from "../../../../Core/PageFlows";
+import { Header } from "../../../../Core/PageParts";
+import { useShowConfirmationPrompt, usePromptedNavigate } from "../../../../Core/Prompt";
+import { useViewEditToggleContext } from "../../../../Core/ViewEditToggle";
+import { AccountDetailsDataSource } from "../../DataSources/AccountDetailsDataSource";
+import { AccountArchivalFormHandler } from "../../FormHandlers/AccountArchivalFormHandler";
+import { AccountDeletionFormHandler } from "../../FormHandlers/AccountDeletionFormHandler";
+import { AccountFormHandler } from "../../FormHandlers/AccountFormHandler";
+import { AccountForm } from "../../Forms/AccountForm";
 
 export function AccountDetailsPageEdit(): React.JSX.Element {
     const { id } = useParams<{ readonly id: string }>();
@@ -24,12 +25,20 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
 
     const form = useViewModel(AccountForm, [account]);
     const {
+        isSubmitting: isSaving,
+        isSubmitted: isSaved,
+        submitAsync: saveAsync
+    } = useFormFlow({
+        form,
+        formHandler: AccountFormHandler
+    });
+    const {
         isSubmitting: isArchiving,
         isSubmitted: isArchived,
         submitAsync: archiveAsync
     } = useFormFlow({
         form,
-        formHandler: AccountDeletionFormHandler,
+        formHandler: AccountArchivalFormHandler,
 
         notifications: {
             successMessage: `Account '${account?.name}' has been archived.`
@@ -40,14 +49,6 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
             confirmButtonLabel: "Yes, archive the account",
             dismissButtonLabel: "No, I do not want to archive the account"
         }
-    });
-    const {
-        isSubmitting: isSaving,
-        isSubmitted: isSaved,
-        submitAsync: saveAsync
-    } = useFormFlow({
-        form,
-        formHandler: AccountFormHandler
     });
     const {
         isSubmitting: isDeleting,

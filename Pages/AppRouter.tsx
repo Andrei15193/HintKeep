@@ -1,7 +1,8 @@
 import React, { useLayoutEffect } from "react";
 import { createBrowserRouter, Outlet, useMatch, useNavigate } from "react-router";
 import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
-import { AccountAddPage, AccountDetailsPage, AccountsListPage } from "./Accounts";
+import { ActiveAccountAddPage, ActiveAccountDetailsPage, ActiveAccountsListPage, ArchivedAccountsListPage } from "./Accounts";
+import { ArchivedAccountDetailsPageView } from "./Accounts/Components/Archived/ArchivedAccountDetailsPageView";
 import { HomePage } from "./Home";
 import { IndexedDatabaseScoped } from "./IndexedDatabaseScoped";
 import { LoginPage } from "./Login";
@@ -27,7 +28,7 @@ export const AppRouter = createBrowserRouter([
                         else
                             return (
                                 <IndexedDatabaseScoped>
-                                    <AccountsListPage />
+                                    <ActiveAccountsListPage />
                                 </IndexedDatabaseScoped>
                             );
                     else
@@ -90,12 +91,20 @@ export const AppRouter = createBrowserRouter([
                                         Component: UserProfilePage
                                     },
                                     {
+                                        path: "archived",
+                                        Component: ArchivedAccountsListPage
+                                    },
+                                    {
+                                        path: "archived/:id",
+                                        Component: ArchivedAccountDetailsPageView
+                                    },
+                                    {
                                         path: "add",
-                                        Component: AccountAddPage
+                                        Component: ActiveAccountAddPage
                                     },
                                     {
                                         path: ":id",
-                                        Component: AccountDetailsPage
+                                        Component: ActiveAccountDetailsPage
                                     }
                                 ]
                             }
