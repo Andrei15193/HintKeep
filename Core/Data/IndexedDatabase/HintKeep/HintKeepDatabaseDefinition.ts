@@ -24,6 +24,10 @@ export const HintKeepDatabaseDefinition: IIndexedDatabaseDefinition = {
                     })
                     .createIndex("UserAccounts", "userId", {
                         unique: false
+                    })
+                    .objectStore
+                    .createIndex("UserAccountsStatus", ["userId", "status"], {
+                        unique: false
                     });
             }
         }

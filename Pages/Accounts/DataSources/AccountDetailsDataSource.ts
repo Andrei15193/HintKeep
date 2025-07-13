@@ -27,6 +27,7 @@ export class AccountDetailsDataSource implements IDataSource<IEntityScoped, IAcc
 
             return {
                 id: accountObject.id,
+                isArchived: accountObject.status === "archived",
                 name: accountObject.name,
                 username: accountObject.username,
                 hint: accountObject.hint,

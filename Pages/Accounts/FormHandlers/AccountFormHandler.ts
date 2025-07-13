@@ -30,8 +30,9 @@ export class AccountFormHandler implements IFormHandler<AccountForm, IAccountDet
                 while (await mapDbRequestToPromise(accountsStore.getKey(accountId)));
 
             const accountObject: IAccountObject = {
-                userId: this._user.id,
                 id: accountId,
+                userId: this._user.id,
+                status: form.archived ? "archived" : "active",
                 name: form.name.value,
                 username: form.username.value,
                 hint: form.hint.value,
@@ -48,7 +49,8 @@ export class AccountFormHandler implements IFormHandler<AccountForm, IAccountDet
                 username: form.username.value,
                 hint: form.hint.value,
                 isPinned: form.pinned.value,
-                notes: form.notes.value
+                notes: form.notes.value,
+                isArchived: form.archived
             };
         }
         catch (error) {

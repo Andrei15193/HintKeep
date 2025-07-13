@@ -24,6 +24,24 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
 
     const form = useViewModel(AccountForm, [account]);
     const {
+        isSubmitting: isArchiving,
+        isSubmitted: isArchived,
+        submitAsync: archiveAsync
+    } = useFormFlow({
+        form,
+        formHandler: AccountDeletionFormHandler,
+
+        notifications: {
+            successMessage: `Account '${account?.name}' has been archived.`
+        },
+
+        confirmationPrompt: {
+            message: "Archived accounts are still available, but not easily accessible, do you wish to continue?",
+            confirmButtonLabel: "Yes, archive the account",
+            dismissButtonLabel: "No, I do not want to archive the account"
+        }
+    });
+    const {
         isSubmitting: isSaving,
         isSubmitted: isSaved,
         submitAsync: saveAsync
@@ -50,7 +68,7 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
         }
     });
     const navigate = usePromptedNavigate({
-        blockNavigation: !isSaved && !isDeleted
+        blockNavigation: !isSaved && !isArchived && !isDeleted
     });
 
     const discardChangesCallback = useShowConfirmationPrompt({
@@ -61,10 +79,10 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
         () => {
             if (isSaved)
                 goToViewMode();
-            if (isDeleted)
+            if (isArchived || isDeleted)
                 navigate("/");
         },
-        [isSaved, isDeleted, goToViewMode, navigate]
+        [isSaved, isArchived, isDeleted, goToViewMode, navigate]
     );
 
     return (
@@ -74,7 +92,7 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
             </Header>
 
             <Form
-                isLoading={isLoading || isSaving || isDeleting}
+                isLoading={isLoading || isSaving || isArchiving || isDeleting}
                 onSubmit={saveAsync}
             >
                 <FormField field={form.name}>
@@ -108,6 +126,11 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
                         text="Save"
                         processing={isSaving}
                         disabled={isLoading || isSaving || isDeleting}
+                    />
+                    <Button
+                        text="Archive"
+                        onClick={archiveAsync}
+                        neutral
                     />
                     <Button
                         text="Delete"

@@ -23,6 +23,24 @@ export function AccountDetailsPageView(): React.JSX.Element {
 
     const form = useViewModel(AccountForm, [account]);
     const {
+        isSubmitting: isArchiving,
+        isSubmitted: isArchived,
+        submitAsync: archiveAsync
+    } = useFormFlow({
+        form,
+        formHandler: AccountDeletionFormHandler,
+
+        notifications: {
+            successMessage: `Account '${account?.name}' has been archived.`
+        },
+
+        confirmationPrompt: {
+            message: "Archived accounts are still available, but not easily accessible, do you wish to continue?",
+            confirmButtonLabel: "Yes, archive the account",
+            dismissButtonLabel: "No, I do not want to archive the account"
+        }
+    });
+    const {
         isSubmitting: isDeleting,
         isSubmitted: isDeleted,
         submitAsync: deleteAsync
@@ -43,10 +61,10 @@ export function AccountDetailsPageView(): React.JSX.Element {
 
     useEffect(
         () => {
-            if (isDeleted)
+            if (isArchived || isDeleted)
                 navigate("/");
         },
-        [isDeleted, navigate]
+        [isArchived, isDeleted, navigate]
     );
 
     return (
@@ -56,7 +74,7 @@ export function AccountDetailsPageView(): React.JSX.Element {
             </Header>
 
             <Form
-                isLoading={isLoading || isDeleting}
+                isLoading={isLoading || isArchiving || isDeleting}
                 onSubmit={blankSubmit}
                 disabled
             >
@@ -89,6 +107,11 @@ export function AccountDetailsPageView(): React.JSX.Element {
                     <Button
                         text="Edit"
                         onClick={goToEditMode}
+                    />
+                    <Button
+                        text="Archive"
+                        onClick={archiveAsync}
+                        neutral
                     />
                     <Button
                         text="Delete"

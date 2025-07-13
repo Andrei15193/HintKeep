@@ -29,9 +29,9 @@ export class AccountsDataSource implements IDataSource<ISearchText, IListResult<
         try {
             const userAccountsIndex = transaction
                 .objectStore("Accounts")
-                .index("UserAccounts");
+                .index("UserAccountsStatus");
 
-            const accountObjects = await mapDbRequestToPromise<readonly IAccountObject[]>(userAccountsIndex.getAll(this._user.id));
+            const accountObjects = await mapDbRequestToPromise<readonly IAccountObject[]>(userAccountsIndex.getAll([this._user.id, "active"]));
             transaction.commit();
 
             const searchTerms = searchText

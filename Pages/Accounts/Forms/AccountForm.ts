@@ -41,6 +41,7 @@ export class AccountForm extends HintKeepForm {
     }
 
     public readonly id: string | null;
+    public readonly archived: boolean;
     public readonly name: HintKeepFormField<string>;
     public readonly username: HintKeepFormField<string>;
     public readonly hint: HintKeepFormField<string>;

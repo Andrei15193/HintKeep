@@ -1,13 +1,17 @@
+import type { IAccountObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
 import type { IFormHandler } from "../../../Core/FormHandlers/IFormHandler";
 import type { AccountForm } from "../Forms/AccountForm";
 import type { IAccountDetails } from "../Models/IAcountDetails";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
 import { IndexedDatabase, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
+import { type IUser, User } from "../../../Core/Models";
 
-export class AccountDeletionFormHandler implements IFormHandler<AccountForm, IAccountDetails> {
+export class AccountArchivalFormHandler implements IFormHandler<AccountForm, IAccountDetails> {
+    private readonly _user: IUser;
     private readonly _database: IDBDatabase;
 
     public constructor({ resolve }: IDependencyResolver) {
+        this._user = resolve(User);
         this._database = resolve(IndexedDatabase);
     }
 
@@ -16,8 +20,21 @@ export class AccountDeletionFormHandler implements IFormHandler<AccountForm, IAc
 
         try {
             const accountsStore = transaction.objectStore("Accounts");
-            if (form.id !== null)
-                await mapDbRequestToPromise(accountsStore.delete(form.id));
+
+            if (form.id !== null) {
+                const accountObject: IAccountObject = {
+                    id: form.id,
+                    userId: this._user.id,
+                    status: "archived",
+                    name: form.name.initialValue,
+                    username: form.username.initialValue,
+                    hint: form.hint.initialValue,
+                    isPinned: form.pinned.initialValue,
+                    notes: form.notes.initialValue
+                };
+
+                await mapDbRequestToPromise(accountsStore.put(accountObject));
+            }
             transaction.commit();
 
             return {
@@ -27,7 +44,7 @@ export class AccountDeletionFormHandler implements IFormHandler<AccountForm, IAc
                 hint: form.hint.value,
                 isPinned: form.pinned.value,
                 notes: form.notes.value,
-                isArchived: form.archived
+                isArchived: true
             };
         }
         catch (error) {

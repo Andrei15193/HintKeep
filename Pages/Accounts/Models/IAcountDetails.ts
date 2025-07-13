@@ -5,4 +5,5 @@ export interface IAccountDetails {
     readonly hint: string;
     readonly isPinned: boolean;
     readonly notes: string;
+    readonly isArchived: boolean;
 }
