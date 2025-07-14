@@ -196,6 +196,8 @@ div#app {
 
             label {
                 vertical-align: top;
+
+                padding: var(--hk---spacing-tiny) 0;
                 width: 6rem;
             }
 
@@ -220,6 +222,7 @@ div#app {
                     border-radius: 0;
                     padding: var(--hk---spacing-tiny);
                     color: var(--hk---color-text);
+                    font-size: 1rem;
 
                     &:not(:disabled),
                     &:not([disabled]) {
@@ -263,7 +266,6 @@ div#app {
                 textarea {
                     resize: vertical;
                     min-height: 3rem;
-                    font-size: 0.856rem;
                     font-family: var(--hk---font-family);
                 }
             }
