@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router";
+import { type NonIndexRouteObject, Link } from "react-router";
 import { Form, Button } from "../../../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../../../Core/Forms/Components/FormFields";
 import { useFormFlow } from "../../../../Core/PageFlows";
@@ -8,7 +8,12 @@ import { usePromptedNavigate } from "../../../../Core/Prompt";
 import { AccountFormHandler } from "../../FormHandlers/AccountFormHandler";
 import { AccountForm } from "../../Forms/AccountForm";
 
-export function ActiveAccountAddPage(): React.JSX.Element {
+export const ActiveAccountAddRoute: NonIndexRouteObject = {
+    path: "/add",
+    Component: ActiveAccountAddPage
+};
+
+function ActiveAccountAddPage(): React.JSX.Element {
     const {
         form,
         isSubmitting,

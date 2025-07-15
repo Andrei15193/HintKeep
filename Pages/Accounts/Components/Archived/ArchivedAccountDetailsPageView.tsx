@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
-import { Link, useNavigate, useParams } from "react-router";
+import { type NonIndexRouteObject, Link, useNavigate, useParams } from "react-router";
 import { blankSubmit, Button, Form } from "../../../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../../../Core/Forms/Components/FormFields";
 import { useDataSourceFlow, useFormFlow } from "../../../../Core/PageFlows";
@@ -9,7 +9,12 @@ import { AccountDetailsDataSource } from "../../DataSources/AccountDetailsDataSo
 import { AccountDeletionFormHandler } from "../../FormHandlers/AccountDeletionFormHandler";
 import { AccountForm } from "../../Forms/AccountForm";
 
-export function ArchivedAccountDetailsPageView(): React.JSX.Element {
+export const ArchivedAccountDetailsRoute: NonIndexRouteObject = {
+    path: "/archived/:id",
+    Component: ArchivedAccountDetailsPageView
+};
+
+function ArchivedAccountDetailsPageView(): React.JSX.Element {
     const { id } = useParams<{ readonly id: string }>();
     const navigate = useNavigate();
 

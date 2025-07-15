@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router";
+import { type NonIndexRouteObject, Link } from "react-router";
 import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
@@ -10,7 +10,12 @@ import { usePromptedNavigate } from "../../Core/Prompt";
 import { SignUpFormHandler } from "./FormHandlers/SignUpFormHandler";
 import { SignUpForm } from "./Forms/SignUpForm";
 
-export function SignUpPage(): React.JSX.Element {
+export const SignUpRoute: NonIndexRouteObject = {
+    path: "/sign-up",
+    Component: SignUpPage
+};
+
+function SignUpPage(): React.JSX.Element {
     const { authenticate } = useAuthentication();
     const {
         form,

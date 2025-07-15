@@ -1,7 +1,7 @@
 import type { IAccountListItem } from "../../Models/IAccountListItem";
 import React, { useCallback, useRef } from "react";
 import { useViewModelDependency } from "react-model-view-viewmodel";
-import { generatePath, Link } from "react-router";
+import { type NonIndexRouteObject, generatePath, Link } from "react-router";
 import { useAuthenticatedUser } from "../../../../Core/Contexts/AuthenticationContext";
 import { AccountsSearchTextFieldToken } from "../../../../Core/Dependencies";
 import { Form, Button } from "../../../../Core/Forms/Components";
@@ -11,7 +11,12 @@ import { useDataSourceFlow } from "../../../../Core/PageFlows";
 import { Content, Header } from "../../../../Core/PageParts";
 import { type ISearchText, type IListResult, type IStatus, AccountsDataSource } from "../../DataSources/AccountsDataSource";
 
-export function ActiveAccountsListPage(): React.JSX.Element {
+export const ActiveAccountsRoute: NonIndexRouteObject = {
+    path: "/",
+    Component: ActiveAccountsListPage
+};
+
+function ActiveAccountsListPage(): React.JSX.Element {
     const { username } = useAuthenticatedUser();
 
     const searchTextField = useViewModelDependency(AccountsSearchTextFieldToken);

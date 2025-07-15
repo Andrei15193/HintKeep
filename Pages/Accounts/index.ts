@@ -1,5 +1,6 @@
-export { ActiveAccountsListPage } from "./Components/Active/AccountsListPage";
-export { ActiveAccountAddPage } from "./Components/Active/AccountAddPage";
-export { ActiveAccountDetailsPage } from "./Components/Active/AccountDetailsPage";
+export { ActiveAccountsRoute } from "./Components/Active/AccountsListPage";
+export { ActiveAccountAddRoute } from "./Components/Active/AccountAddPage";
+export { ActiveAccountDetailsRoute } from "./Components/Active/AccountDetailsPage";
 
-export { ArchivedAccountsListPage } from "./Components/Archived/ArchivedAccountsListPage";
+export { ArchivedAccountsRoute } from "./Components/Archived/ArchivedAccountsListPage";
+export { ArchivedAccountDetailsRoute } from "./Components/Archived/ArchivedAccountDetailsPageView";

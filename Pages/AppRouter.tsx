@@ -1,113 +1,50 @@
-import React, { useLayoutEffect } from "react";
-import { createBrowserRouter, Outlet, useMatch, useNavigate } from "react-router";
+import React from "react";
+import { createBrowserRouter, Navigate, Outlet, useMatch } from "react-router";
 import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
-import { ActiveAccountAddPage, ActiveAccountDetailsPage, ActiveAccountsListPage, ArchivedAccountsListPage } from "./Accounts";
-import { ArchivedAccountDetailsPageView } from "./Accounts/Components/Archived/ArchivedAccountDetailsPageView";
+import { ActiveAccountAddRoute, ActiveAccountDetailsRoute, ActiveAccountsRoute, ArchivedAccountDetailsRoute, ArchivedAccountsRoute } from "./Accounts";
 import { HomePage } from "./Home";
 import { IndexedDatabaseScoped } from "./IndexedDatabaseScoped";
-import { LoginPage } from "./Login";
-import { SignUpPage } from "./SignUp/SignUpPage";
-import { UserProfilePage } from "./User";
+import { LoginRoute } from "./Login";
+import { SignUpRoute } from "./SignUp";
+import { UserProfileRoute } from "./User";
 
 export const AppRouter = createBrowserRouter([
     {
-        Component: Outlet,
+        path: "/",
+        Component() {
+            const { user } = useAuthentication();
+            const match = useMatch({
+                path: "/",
+                end: true
+            });
+
+            if (match && user === null)
+                return <HomePage />;
+
+            return <Outlet />;
+        },
         children: [
             {
-                path: "/",
-                Component() {
-                    const { user } = useAuthentication();
-                    const match = useMatch({
-                        path: "/",
-                        end: true
-                    });
-
-                    if (match)
-                        if (user === null)
-                            return <HomePage />;
-                        else
-                            return (
-                                <IndexedDatabaseScoped>
-                                    <ActiveAccountsListPage />
-                                </IndexedDatabaseScoped>
-                            );
-                    else
-                        return <Outlet />;
-                },
+                Component: IndexedDatabaseScoped,
                 children: [
+                    LoginRoute,
+                    SignUpRoute,
                     {
-                        Component: IndexedDatabaseScoped,
+                        Component() {
+                            const { user } = useAuthentication();
+
+                            if (user === null)
+                                return <Navigate to="/" />;
+
+                            return <Outlet />;
+                        },
                         children: [
-                            {
-                                Component() {
-                                    const { user } = useAuthentication();
-                                    const navigate = useNavigate();
-
-                                    useLayoutEffect(
-                                        () => {
-                                            if (user !== null)
-                                                navigate("/");
-                                        },
-                                        [user, navigate]
-                                    );
-
-                                    if (user === null)
-                                        return <Outlet />;
-
-                                    return null;
-                                },
-                                children: [
-                                    {
-                                        path: "login",
-                                        Component: LoginPage
-                                    },
-                                    {
-                                        path: "sign-up",
-                                        Component: SignUpPage
-                                    }
-                                ]
-                            },
-                            {
-                                Component() {
-                                    const { user } = useAuthentication();
-                                    const navigate = useNavigate();
-
-                                    useLayoutEffect(
-                                        () => {
-                                            if (user === null)
-                                                navigate("/");
-                                        },
-                                        [user, navigate]
-                                    );
-
-                                    if (user !== null)
-                                        return <Outlet />;
-
-                                    return null;
-                                },
-                                children: [
-                                    {
-                                        path: "profile",
-                                        Component: UserProfilePage
-                                    },
-                                    {
-                                        path: "archived",
-                                        Component: ArchivedAccountsListPage
-                                    },
-                                    {
-                                        path: "archived/:id",
-                                        Component: ArchivedAccountDetailsPageView
-                                    },
-                                    {
-                                        path: "add",
-                                        Component: ActiveAccountAddPage
-                                    },
-                                    {
-                                        path: ":id",
-                                        Component: ActiveAccountDetailsPage
-                                    }
-                                ]
-                            }
+                            ActiveAccountsRoute,
+                            UserProfileRoute,
+                            ArchivedAccountsRoute,
+                            ArchivedAccountDetailsRoute,
+                            ActiveAccountAddRoute,
+                            ActiveAccountDetailsRoute
                         ]
                     }
                 ]
@@ -116,17 +53,6 @@ export const AppRouter = createBrowserRouter([
     },
     {
         path: "*",
-        Component() {
-            const navigate = useNavigate();
-
-            useLayoutEffect(
-                () => {
-                    navigate("/");
-                },
-                [navigate]
-            );
-
-            return null;
-        }
+        element: <Navigate to="/" />
     }
 ]);

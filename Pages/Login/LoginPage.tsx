@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { type NonIndexRouteObject, Link, useNavigate } from "react-router";
 import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
@@ -9,7 +9,12 @@ import { Content, Header } from "../../Core/PageParts";
 import { LoginFormHandler } from "./FormHandlers/LoginFormHandler";
 import { LoginForm } from "./Forms/LoginForm";
 
-export function LoginPage(): React.JSX.Element {
+export const LoginRoute: NonIndexRouteObject = {
+    path: "/login",
+    Component: LoginPage
+};
+
+function LoginPage(): React.JSX.Element {
     const navigate = useNavigate();
     const { authenticate } = useAuthentication();
 

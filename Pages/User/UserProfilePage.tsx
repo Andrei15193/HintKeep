@@ -1,11 +1,16 @@
 import React, { useCallback } from "react";
-import { Link, useNavigate } from "react-router";
+import { type NonIndexRouteObject, Link, useNavigate } from "react-router";
 import { useAuthenticatedUser, useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 import { Button } from "../../Core/Forms/Components";
 import { Header } from "../../Core/PageParts";
 import { useShowConfirmationPrompt } from "../../Core/Prompt";
 
-export function UserProfilePage(): React.JSX.Element {
+export const UserProfileRoute: NonIndexRouteObject = {
+    path: "profile",
+    Component: UserProfilePage
+};
+
+function UserProfilePage(): React.JSX.Element {
     const { username } = useAuthenticatedUser();
     const { logOut } = useAuthentication();
     const navigate = useNavigate();
