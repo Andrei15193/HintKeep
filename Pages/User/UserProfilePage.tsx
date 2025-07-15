@@ -1,9 +1,10 @@
 import React, { useCallback } from "react";
-import { type NonIndexRouteObject, Link, useNavigate } from "react-router";
+import { type NonIndexRouteObject, useNavigate } from "react-router";
 import { useAuthenticatedUser, useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 import { Button } from "../../Core/Forms/Components";
 import { Header } from "../../Core/PageParts";
 import { useShowConfirmationPrompt } from "../../Core/Prompt";
+import { GlobalNavigation } from "../GlobalNavigation";
 
 export const UserProfileRoute: NonIndexRouteObject = {
     path: "profile",
@@ -45,17 +46,7 @@ function UserProfilePage(): React.JSX.Element {
                 {`HintKeep - ${username} Profile`}
             </Header>
 
-            <nav>
-                <Link to="/">
-                    Accounts
-                </Link>
-                <Link to="/archived">
-                    Archived Accounts
-                </Link>
-                <Link to="/profile">
-                    Profile
-                </Link>
-            </nav>
+            <GlobalNavigation />
 
             <hr />
 

@@ -9,6 +9,7 @@ import { FormField, FormFieldTextInput } from "../../../../Core/Forms/Components
 import { LoadingContent } from "../../../../Core/Loader";
 import { useDataSourceFlow } from "../../../../Core/PageFlows";
 import { Content, Header } from "../../../../Core/PageParts";
+import { GlobalNavigation } from "../../../GlobalNavigation";
 import { type ISearchText, type IListResult, type IStatus, AccountsDataSource } from "../../DataSources/AccountsDataSource";
 
 export const ArchivedAccountsRoute: NonIndexRouteObject = {
@@ -57,17 +58,7 @@ function ArchivedAccountsListPage(): React.JSX.Element {
                 {`HintKeep - ${username} Archived Accounts`}
             </Header>
 
-            <nav>
-                <Link to="/">
-                    Accounts
-                </Link>
-                <Link to="/archived">
-                    Archived Accounts
-                </Link>
-                <Link to="/profile">
-                    Profile
-                </Link>
-            </nav>
+            <GlobalNavigation />
 
             <hr />
 
