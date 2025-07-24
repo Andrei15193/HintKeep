@@ -1,7 +1,8 @@
 import React from "react";
 import { createBrowserRouter, Navigate, Outlet, useMatch } from "react-router";
 import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
-import { ActiveAccountAddRoute, ActiveAccountDetailsRoute, ActiveAccountsRoute, ArchivedAccountDetailsRoute, ArchivedAccountsRoute } from "./Accounts";
+import { ActiveAccountHintsRoute } from "./AccountHints";
+import { AccountAddRoute, ActiveAccountDetailsRoute, ActiveAccountsRoute, ArchivedAccountDetailsRoute, ArchivedAccountsRoute } from "./Accounts";
 import { HomePage } from "./Home";
 import { IndexedDatabaseScoped } from "./IndexedDatabaseScoped";
 import { LoginRoute } from "./Login";
@@ -43,8 +44,9 @@ export const AppRouter = createBrowserRouter([
                             UserProfileRoute,
                             ArchivedAccountsRoute,
                             ArchivedAccountDetailsRoute,
-                            ActiveAccountAddRoute,
-                            ActiveAccountDetailsRoute
+                            AccountAddRoute,
+                            ActiveAccountDetailsRoute,
+                            ActiveAccountHintsRoute
                         ]
                     }
                 ]

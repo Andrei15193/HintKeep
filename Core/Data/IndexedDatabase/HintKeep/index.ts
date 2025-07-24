@@ -1,1 +1,1 @@
-export { HintKeepDatabaseDefinition } from "./HintKeepDatabaseDefinition";
+export { type AccountObjectStoreKey, HintKeepDatabaseDefinition } from "./HintKeepDatabaseDefinition";

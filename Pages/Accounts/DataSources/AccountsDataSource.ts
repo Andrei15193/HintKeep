@@ -1,4 +1,4 @@
-import type { IAccountObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
+import type { IAccountSummaryObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
 import type { IDataSource } from "../../../Core/DataSources";
 import type { IAccountListItem } from "../Models/IAccountListItem";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
@@ -35,7 +35,7 @@ export class AccountsDataSource implements IDataSource<ISearchText & IStatus, IL
                 .objectStore("Accounts")
                 .index("UserAccountsStatus");
 
-            const accountObjects = await mapDbRequestToPromise<readonly IAccountObject[]>(
+            const accountObjects = await mapDbRequestToPromise<readonly IAccountSummaryObject[]>(
                 userAccountsIndex.getAll([
                     this._user.id,
                     status === "active" ? "active" : "archived"

@@ -1,4 +1,7 @@
 import type { IIndexedDatabaseDefinition } from "../IIndexedDatabaseDefinition";
+import type { AccountObjectType, IAccountObject } from "./Model/IAccountObject";
+
+export type AccountObjectStoreKey = readonly [userId: string, id: string, type: AccountObjectType];
 
 export const HintKeepDatabaseDefinition: IIndexedDatabaseDefinition = {
     name: "HintKeep",
@@ -20,13 +23,17 @@ export const HintKeepDatabaseDefinition: IIndexedDatabaseDefinition = {
 
                 database
                     .createObjectStore("Accounts", {
-                        keyPath: "id"
+                        keyPath: ["userId", "id", "type"] satisfies (keyof IAccountObject)[]
                     })
                     .createIndex("UserAccounts", "userId", {
                         unique: false
                     })
                     .objectStore
                     .createIndex("UserAccountsStatus", ["userId", "status"], {
+                        unique: false
+                    })
+                    .objectStore
+                    .createIndex("AccountHints", ["userId", "accountId", "type"], {
                         unique: false
                     });
             }

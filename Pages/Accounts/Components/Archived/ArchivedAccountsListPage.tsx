@@ -91,7 +91,7 @@ function ArchivedAccountsListPage(): React.JSX.Element {
                                 </>
                             )
                             : (
-                                <table>
+                                <table className="accounts">
                                     <thead>
                                         <tr>
                                             <th>

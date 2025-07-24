@@ -1,4 +1,4 @@
-import type { IAccountObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
+import type { AccountObjectType, IAccountHintObject, IAccountSummaryObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
 import type { IFormHandler } from "../../../Core/FormHandlers/IFormHandler";
 import type { AccountForm } from "../Forms/AccountForm";
 import type { IAccountDetails } from "../Models/IAcountDetails";
@@ -27,11 +27,18 @@ export class AccountFormHandler implements IFormHandler<AccountForm, IAccountDet
             else
                 do
                     accountId = crypto.randomUUID();
-                while (await mapDbRequestToPromise(accountsStore.getKey(accountId)));
+                while (await mapDbRequestToPromise(accountsStore.getKey([accountId, "summary" satisfies AccountObjectType])));
 
-            const accountObject: IAccountObject = {
-                id: accountId,
+            let hintId: string;
+            do
+                hintId = crypto.randomUUID();
+            while (await mapDbRequestToPromise(accountsStore.getKey([hintId, "hint" satisfies AccountObjectType])));
+
+            const accountObject: IAccountSummaryObject = {
                 userId: this._user.id,
+                id: accountId,
+                type: "summary",
+
                 status: form.archived ? "archived" : "active",
                 name: form.name.value,
                 username: form.username.value,
@@ -41,6 +48,20 @@ export class AccountFormHandler implements IFormHandler<AccountForm, IAccountDet
             };
 
             await mapDbRequestToPromise(accountsStore.put(accountObject));
+
+            if (form.hint.hasChanged) {
+                const accountHintObject: IAccountHintObject = {
+                    userId: this._user.id,
+                    id: hintId,
+                    type: "hint",
+
+                    accountId: accountId,
+                    hint: form.hint.value,
+                    dateAdded: new Date()
+                        .toISOString()
+                };
+                await mapDbRequestToPromise(accountsStore.put(accountHintObject));
+            }
             transaction.commit();
 
             return {

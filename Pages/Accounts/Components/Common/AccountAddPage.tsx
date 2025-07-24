@@ -8,12 +8,12 @@ import { usePromptedNavigate } from "../../../../Core/Prompt";
 import { AccountFormHandler } from "../../FormHandlers/AccountFormHandler";
 import { AccountForm } from "../../Forms/AccountForm";
 
-export const ActiveAccountAddRoute: NonIndexRouteObject = {
+export const AccountAddRoute: NonIndexRouteObject = {
     path: "/add",
-    Component: ActiveAccountAddPage
+    Component: AccountAddPage
 };
 
-function ActiveAccountAddPage(): React.JSX.Element {
+function AccountAddPage(): React.JSX.Element {
     const {
         form,
         isSubmitting,

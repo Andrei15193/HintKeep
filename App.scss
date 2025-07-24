@@ -139,12 +139,6 @@ div#app {
         thead tr th {
             padding-bottom: var(--hk---spacing-tiny);
             border-bottom: 1px solid var(--hk---color-text);
-
-            width: 33%;
-
-            &:nth-child(4) {
-                width: 4rem;
-            }
         }
 
         tbody {
@@ -155,10 +149,6 @@ div#app {
             tr {
                 td {
                     padding: var(--hk---spacing-tiny);
-
-                    &:nth-child(4) {
-                        text-align: center;
-                    }
                 }
 
                 &:hover {
@@ -169,6 +159,41 @@ div#app {
                         --hk-action-color-text: var(--hk---color-background);
                         --hk-action-color-hover: var(--hk---color-background-overlay);
                     }
+                }
+            }
+        }
+
+        &.accounts {
+            thead tr th {
+                width: 33%;
+
+                &:nth-child(4) {
+                    width: 4rem;
+                }
+            }
+
+            tbody tr td:nth-child(4) {
+                text-align: center;
+            }
+        }
+
+        &.account-hints {
+            thead tr th {
+                &:nth-child(1) {
+                    width: 100%;
+                    text-align: left;
+                }
+
+                &:nth-child(2) {
+                    white-space: nowrap;
+                    text-align: center;
+                }
+            }
+
+            tbody tr td {
+                &:nth-child(2) {
+                    white-space: nowrap;
+                    text-align: center;
                 }
             }
         }

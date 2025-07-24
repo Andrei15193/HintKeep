@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
-import { Link, useNavigate, useParams } from "react-router";
+import { generatePath, Link, useNavigate, useParams } from "react-router";
 import { blankSubmit, Button, Form } from "../../../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../../../Core/Forms/Components/FormFields";
 import { useDataSourceFlow, useFormFlow } from "../../../../Core/PageFlows";
@@ -121,6 +121,9 @@ export function AccountDetailsPageView(): React.JSX.Element {
                     />
                     <Link to="/">
                         Cancel
+                    </Link>
+                    <Link to={generatePath("/:id/hints", { id: id! })}>
+                        History
                     </Link>
                 </div>
             </Form>

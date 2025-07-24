@@ -1,5 +1,5 @@
 import { type IValidator, type ValidatorCallback, type IFormFieldConfig, FormField } from "react-model-view-viewmodel";
-import { type EqualityComparer, areValuesEqual } from "../../Comparison";
+import { type EqualityComparer, areValuesEqual as defaultAreValuesEqual } from "../../Comparison";
 
 export interface IHintKeepFormFieldConfig<TValue> extends IFormFieldConfig<TValue> {
     readonly label: string;
@@ -7,7 +7,7 @@ export interface IHintKeepFormFieldConfig<TValue> extends IFormFieldConfig<TValu
 
     readonly validators?: readonly (IValidator<HintKeepFormField<TValue>> | ValidatorCallback<HintKeepFormField<TValue>>)[];
 
-    hasChanged?: EqualityComparer<TValue>;
+    areValuesEqual?: EqualityComparer<TValue>;
 }
 
 export class HintKeepFormField<TValue> extends FormField<TValue> {
@@ -15,7 +15,7 @@ export class HintKeepFormField<TValue> extends FormField<TValue> {
     private _wasTouched: boolean;
     private _isRequired: boolean;
     private _hasChanged: boolean;
-    private _hasChangedCallback: EqualityComparer<any>;
+    private _areValuesEqual: EqualityComparer<any>;
 
     public constructor(fieldConfig: IHintKeepFormFieldConfig<TValue>) {
         super(fieldConfig);
@@ -23,15 +23,15 @@ export class HintKeepFormField<TValue> extends FormField<TValue> {
         const {
             label,
             wasTouched = false,
-            hasChanged = areValuesEqual
+            areValuesEqual = defaultAreValuesEqual
         } = fieldConfig;
 
         this.label = label;
         this.wasTouched = wasTouched;
         this._isRequired = !!this._isRequired;
 
-        this._hasChangedCallback = hasChanged;
-        this._hasChanged = this._hasChangedCallback(this.value, this.initialValue);
+        this._areValuesEqual = areValuesEqual;
+        this._hasChanged = !this._areValuesEqual(this.value, this.initialValue);
     }
 
     public get label(): string {
@@ -78,7 +78,7 @@ export class HintKeepFormField<TValue> extends FormField<TValue> {
     public override set value(value: TValue) {
         super.value = value;
 
-        const hasChanged = this._hasChangedCallback(this.value, this.initialValue);
+        const hasChanged = !this._areValuesEqual(this.value, this.initialValue);
         if (this._hasChanged !== hasChanged) {
             this._hasChanged = hasChanged;
             this.notifyPropertiesChanged("hasChanged");
@@ -92,7 +92,7 @@ export class HintKeepFormField<TValue> extends FormField<TValue> {
     public override set initialValue(value: TValue) {
         super.initialValue = value;
 
-        const hasChanged = this._hasChangedCallback(this.value, this.initialValue);
+        const hasChanged = !this._areValuesEqual(this.value, this.initialValue);
         if (this._hasChanged !== hasChanged) {
             this._hasChanged = hasChanged;
             this.notifyPropertiesChanged("hasChanged");
