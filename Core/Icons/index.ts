@@ -1,0 +1,1 @@
+export { type IInfoIconProps, InfoIcon } from "./InfoIcon";

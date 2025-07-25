@@ -66,7 +66,7 @@ export function AccountHints(): React.JSX.Element {
                                             {accountHint.hint}
                                         </td>
                                         <td>
-                                            {accountHint.dateAdded.toLocaleDateString(undefined, { dateStyle: "medium" })}
+                                            {accountHint.dateAdded.toLocaleDateString("en-GB", { dateStyle: "medium" })}
                                         </td>
                                     </tr>
                                 ))

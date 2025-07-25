@@ -53,6 +53,41 @@ div#app {
         --hk-action-color-hover: var(--hk---color-neutral-hover);
     }
 
+    svg.info-icon {
+        --hk-icon-color: var(--hk---color-text);
+        --hk-icon-color-hover: var(--hk---color-text);
+
+        height: 1rem;
+        fill: none;
+
+        *.fill {
+            fill: var(--hk-icon-color);
+        }
+
+        *.stroke {
+            stroke: var(--hk-icon-color);
+        }
+
+        &:hover {
+            *.fill {
+                fill: var(--hk-icon-color-hover);
+            }
+
+            *.stroke {
+                stroke: var(--hk-icon-color-hover);
+            }
+        }
+
+        &.action {
+            --hk-icon-color: var(--hk-action-color);
+            --hk-icon-color-hover: var(--hk-action-color-hover);
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+
     a,
     a:visited {
         color: var(--hk-action-color);
