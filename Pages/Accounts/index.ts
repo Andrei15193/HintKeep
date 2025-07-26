@@ -1,5 +1,5 @@
 export { ActiveAccountsRoute } from "./Components/Active/ActiveAccountsListPage";
-export { AccountAddRoute } from "./Components/Common/AccountAddPage";
+export { AccountAddRoute } from "./Components/AccountAddPage";
 export { ActiveAccountDetailsRoute } from "./Components/Active/ActiveAccountDetailsPage";
 
 export { ArchivedAccountsRoute } from "./Components/Archived/ArchivedAccountsListPage";

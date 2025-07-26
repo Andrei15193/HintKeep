@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import { InfoIcon } from "../Core/Icons";
+import { InfoIcon } from "../Icons";
 
 export function GlobalNavigation(): React.JSX.Element {
     return (

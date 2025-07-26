@@ -2,14 +2,12 @@ import type { IAccountListItem } from "../../Models/IAccountListItem";
 import React, { useCallback, useRef } from "react";
 import { useViewModelDependency } from "react-model-view-viewmodel";
 import { type NonIndexRouteObject, generatePath, Link } from "react-router";
-import { useAuthenticatedUser } from "../../../../Core/Contexts/AuthenticationContext";
 import { AccountsSearchTextFieldToken } from "../../../../Core/Dependencies";
 import { Form, Button } from "../../../../Core/Forms/Components";
 import { FormField, FormFieldTextInput } from "../../../../Core/Forms/Components/FormFields";
 import { LoadingContent } from "../../../../Core/Loader";
 import { useDataSourceFlow } from "../../../../Core/PageFlows";
-import { Content, Header } from "../../../../Core/PageParts";
-import { GlobalNavigation } from "../../../GlobalNavigation";
+import { Breadcrumbs, Content, GlobalNavigation, Header } from "../../../../Core/PageParts";
 import { type ISearchText, type IListResult, type IStatus, AccountsDataSource } from "../../DataSources/AccountsDataSource";
 
 export const ActiveAccountsRoute: NonIndexRouteObject = {
@@ -18,8 +16,6 @@ export const ActiveAccountsRoute: NonIndexRouteObject = {
 };
 
 function ActiveAccountsListPage(): React.JSX.Element {
-    const { username } = useAuthenticatedUser();
-
     const searchTextField = useViewModelDependency(AccountsSearchTextFieldToken);
 
     const dataSourceFlowOptionsCallback = useCallback(
@@ -55,12 +51,12 @@ function ActiveAccountsListPage(): React.JSX.Element {
     return (
         <>
             <Header>
-                {`HintKeep - ${username} Accounts`}
+                HintKeep - Accounts
             </Header>
 
             <GlobalNavigation />
 
-            <hr />
+            <Breadcrumbs items={["Accounts"]} />
 
             <Content>
                 {

@@ -19,11 +19,20 @@ export interface IUserContextProviderProps {
 }
 
 export function AuthenticationContextProvider({ children }: PropsWithChildren<IUserContextProviderProps>): React.JSX.Element {
-    const [user, setUser] = useState<IUser | null>(null);
+    const [user, setUser] = useState<IUser | null>(JSON.parse(sessionStorage.getItem("user") ?? "null"));
+
+    const authenticateCallback = useCallback(
+        (user: IUser) => {
+            setUser(user);
+            sessionStorage.setItem("user", JSON.stringify(user));
+        },
+        [setUser]
+    );
 
     const logOutCallback = useCallback(
         () => {
             setUser(null);
+            sessionStorage.removeItem("user");
         },
         [setUser]
     );
@@ -31,10 +40,10 @@ export function AuthenticationContextProvider({ children }: PropsWithChildren<IU
     const authenticationContext = useMemo<IAuthenticationContext>(
         () => ({
             user,
-            authenticate: setUser,
+            authenticate: authenticateCallback,
             logOut: logOutCallback
         }),
-        [user, logOutCallback, setUser]
+        [user, authenticateCallback, logOutCallback]
     );
 
     return (

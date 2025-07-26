@@ -1,8 +1,8 @@
 import type { NonIndexRouteObject } from "react-router";
 import React from "react";
 import { ViewEditToggle } from "../../../../Core/ViewEditToggle";
-import { AccountDetailsPageEdit } from "../Common/AccountDetailsPageEdit";
-import { AccountDetailsPageView } from "../Common/AccountDetailsPageView";
+import { ActiveAccountDetailsPageEdit } from "./ActiveAccountDetailsPageEdit";
+import { ActiveAccountDetailsPageView } from "./ActiveAccountDetailsPageView";
 
 export const ActiveAccountDetailsRoute: NonIndexRouteObject = {
     path: "/:id",
@@ -12,8 +12,8 @@ export const ActiveAccountDetailsRoute: NonIndexRouteObject = {
 function ActiveAccountDetailsPage(): React.JSX.Element {
     return (
         <ViewEditToggle
-            viewComponent={AccountDetailsPageView}
-            editComponent={AccountDetailsPageEdit}
+            viewComponent={ActiveAccountDetailsPageView}
+            editComponent={ActiveAccountDetailsPageEdit}
         />
     );
 }

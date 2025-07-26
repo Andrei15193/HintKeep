@@ -1,10 +1,9 @@
 import React, { useCallback } from "react";
 import { type NonIndexRouteObject, useNavigate } from "react-router";
-import { useAuthenticatedUser, useAuthentication } from "../../Core/Contexts/AuthenticationContext";
+import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
 import { Button } from "../../Core/Forms/Components";
-import { Header } from "../../Core/PageParts";
+import { Breadcrumbs, GlobalNavigation, Header } from "../../Core/PageParts";
 import { useShowConfirmationPrompt } from "../../Core/Prompt";
-import { GlobalNavigation } from "../GlobalNavigation";
 
 export const UserProfileRoute: NonIndexRouteObject = {
     path: "profile",
@@ -12,7 +11,6 @@ export const UserProfileRoute: NonIndexRouteObject = {
 };
 
 function UserProfilePage(): React.JSX.Element {
-    const { username } = useAuthenticatedUser();
     const { logOut } = useAuthentication();
     const navigate = useNavigate();
 
@@ -43,12 +41,12 @@ function UserProfilePage(): React.JSX.Element {
     return (
         <>
             <Header>
-                {`HintKeep - ${username} Profile`}
+                HintKeep - Profile
             </Header>
 
             <GlobalNavigation />
 
-            <hr />
+            <Breadcrumbs items={["Profile"]} />
 
             <p>
                 We are sorry to see you go so soon, hope you had a good time!

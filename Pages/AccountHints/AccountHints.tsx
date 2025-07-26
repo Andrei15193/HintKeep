@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { generatePath, Link, type NonIndexRouteObject, useParams } from "react-router";
 import { LoadingContent } from "../../Core/Loader";
 import { useDataSourceFlow } from "../../Core/PageFlows";
-import { Content, Header } from "../../Core/PageParts";
+import { Breadcrumbs, Content, Header } from "../../Core/PageParts";
 import { AccountHintsDataSource, type IAccountScoped } from "./DataSources/AccountHintsDataSource";
 
 export const ActiveAccountHintsRoute: NonIndexRouteObject = {
@@ -34,16 +34,14 @@ export function AccountHints(): React.JSX.Element {
     return (
         <>
             <Header>
-                {`HintKeep - ${accountHints?.account.name} Hints`}
+                HintKeep - View Account History
             </Header>
 
-            <nav>
+            <Breadcrumbs items={["Accounts", accountHints?.account.name && `${accountHints?.account.name} Account`, "History"]}>
                 <Link to={generatePath("/:id", { id: accountId! })}>
                     Back
                 </Link>
-            </nav>
-
-            <hr />
+            </Breadcrumbs>
 
             <Content>
                 <LoadingContent isLoading={isLoading}>

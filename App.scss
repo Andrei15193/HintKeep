@@ -39,10 +39,6 @@ div#app {
         margin: 0;
     }
 
-    hr {
-        width: 100%;
-    }
-
     .danger {
         --hk-action-color: var(--hk---color-danger);
         --hk-action-color-hover: var(--hk---color-danger-hover);
@@ -370,6 +366,41 @@ div#app {
         display: flex;
         flex-direction: row;
         gap: inherit;
+
+        font-size: 1.1rem;
+    }
+
+    >aside.breadcrumbs {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: var(--hk---spacing-narrow) 0;
+
+        border-top: 1px solid black;
+
+        >ul {
+            margin: 0;
+            padding: 0;
+
+            list-style: none;
+            font-size: 0.8rem;
+            vertical-align: middle;
+
+            >li {
+                display: inline-block;
+
+                &:not(:last-child),
+                &:first-child {
+                    &::after {
+                        content: '/';
+
+                        margin: 0 0.1rem 0 0.2rem;
+                    }
+                }
+            }
+        }
     }
 
     >main.content {
@@ -400,6 +431,10 @@ div#app {
         align-items: center;
 
         gap: inherit;
+
+        .account-history-link {
+            margin-left: auto;
+        }
     }
 
     >aside.global-notifications {

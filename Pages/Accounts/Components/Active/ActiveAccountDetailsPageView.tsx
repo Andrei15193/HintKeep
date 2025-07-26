@@ -1,21 +1,20 @@
 import React, { useEffect, useMemo } from "react";
 import { useViewModel } from "react-model-view-viewmodel";
-import { generatePath, Link, useParams } from "react-router";
-import { Form, Button } from "../../../../Core/Forms/Components";
+import { generatePath, Link, useNavigate, useParams } from "react-router";
+import { blankSubmit, Button, Form } from "../../../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../../../Core/Forms/Components/FormFields";
 import { useDataSourceFlow, useFormFlow } from "../../../../Core/PageFlows";
-import { Header } from "../../../../Core/PageParts";
-import { useShowConfirmationPrompt, usePromptedNavigate } from "../../../../Core/Prompt";
+import { Breadcrumbs, Header } from "../../../../Core/PageParts";
 import { useViewEditToggleContext } from "../../../../Core/ViewEditToggle";
 import { AccountDetailsDataSource } from "../../DataSources/AccountDetailsDataSource";
 import { AccountArchivalFormHandler } from "../../FormHandlers/AccountArchivalFormHandler";
 import { AccountDeletionFormHandler } from "../../FormHandlers/AccountDeletionFormHandler";
-import { AccountFormHandler } from "../../FormHandlers/AccountFormHandler";
 import { AccountForm } from "../../Forms/AccountForm";
 
-export function AccountDetailsPageEdit(): React.JSX.Element {
+export function ActiveAccountDetailsPageView(): React.JSX.Element {
     const { id } = useParams<{ readonly id: string }>();
-    const { goToViewMode } = useViewEditToggleContext();
+    const { goToEditMode } = useViewEditToggleContext();
+    const navigate = useNavigate();
 
     const dataSourceOptions = useMemo(() => ({ id }), [id]);
     const { isLoading, result: account } = useDataSourceFlow({
@@ -24,14 +23,6 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
     });
 
     const form = useViewModel(AccountForm, [account]);
-    const {
-        isSubmitting: isSaving,
-        isSubmitted: isSaved,
-        submitAsync: saveAsync
-    } = useFormFlow({
-        form,
-        formHandler: AccountFormHandler
-    });
     const {
         isSubmitting: isArchiving,
         isSubmitted: isArchived,
@@ -68,33 +59,31 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
             dismissButtonLabel: "No, I do not want to delete the account"
         }
     });
-    const navigate = usePromptedNavigate({
-        blockNavigation: !isSaved && !isArchived && !isDeleted
-    });
-
-    const discardChangesCallback = useShowConfirmationPrompt({
-        onConfirm: goToViewMode
-    });
 
     useEffect(
         () => {
-            if (isSaved)
-                goToViewMode();
             if (isArchived || isDeleted)
                 navigate("/");
         },
-        [isSaved, isArchived, isDeleted, goToViewMode, navigate]
+        [isArchived, isDeleted, navigate]
     );
 
     return (
         <>
             <Header>
-                {`HintKeep - Edit ${form.name.value} Account`}
+                HintKeep - View Account
             </Header>
 
+            <Breadcrumbs items={["Accounts", account?.name && `${account?.name} Account`]}>
+                <Link to="/">
+                    Back
+                </Link>
+            </Breadcrumbs>
+
             <Form
-                isLoading={isLoading || isSaving || isArchiving || isDeleting}
-                onSubmit={saveAsync}
+                isLoading={isLoading || isArchiving || isDeleting}
+                onSubmit={blankSubmit}
+                disabled
             >
                 <FormField field={form.name}>
                     <FormFieldLabel />
@@ -123,10 +112,8 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
 
                 <div className="toolbar">
                     <Button
-                        type="submit"
-                        text="Save"
-                        processing={isSaving}
-                        disabled={isLoading || isSaving || isDeleting}
+                        text="Edit"
+                        onClick={goToEditMode}
                     />
                     <Button
                         text="Archive"
@@ -135,18 +122,14 @@ export function AccountDetailsPageEdit(): React.JSX.Element {
                     />
                     <Button
                         text="Delete"
-                        danger
-                        processing={isDeleting}
-                        disabled={isLoading || isSaving || isDeleting}
                         onClick={deleteAsync}
+                        danger
                     />
                     <Link
-                        replace
-                        to={generatePath("/:id", { id: id || "" })}
-                        className="danger"
-                        onClick={discardChangesCallback}
+                        to={generatePath("/:id/hints", { id: id! })}
+                        className="account-history-link"
                     >
-                        Cancel
+                        History
                     </Link>
                 </div>
             </Form>

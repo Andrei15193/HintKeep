@@ -4,7 +4,7 @@ import { type NonIndexRouteObject, Link, useNavigate, useParams } from "react-ro
 import { blankSubmit, Button, Form } from "../../../../Core/Forms/Components";
 import { FormField, FormFieldCheckbox, FormFieldLabel, FormFieldTextInput } from "../../../../Core/Forms/Components/FormFields";
 import { useDataSourceFlow, useFormFlow } from "../../../../Core/PageFlows";
-import { Header } from "../../../../Core/PageParts";
+import { Breadcrumbs, Header } from "../../../../Core/PageParts";
 import { AccountDetailsDataSource } from "../../DataSources/AccountDetailsDataSource";
 import { AccountDeletionFormHandler } from "../../FormHandlers/AccountDeletionFormHandler";
 import { AccountForm } from "../../Forms/AccountForm";
@@ -55,8 +55,14 @@ function ArchivedAccountDetailsPageView(): React.JSX.Element {
     return (
         <>
             <Header>
-                {`HintKeep - View ${form.name.value} Archived Account`}
+                HintKeep - View Archived Account
             </Header>
+
+            <Breadcrumbs items={["Archived Accounts", account?.name && `${account?.name} Account`]}>
+                <Link to="/archived">
+                    Back
+                </Link>
+            </Breadcrumbs>
 
             <Form
                 isLoading={isLoading || isDeleting}
@@ -94,9 +100,6 @@ function ArchivedAccountDetailsPageView(): React.JSX.Element {
                         onClick={deleteAsync}
                         danger
                     />
-                    <Link to="/archived">
-                        Cancel
-                    </Link>
                 </div>
             </Form>
         </>
