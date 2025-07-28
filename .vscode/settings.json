@@ -1,4 +1,10 @@
 {
+    "files.watcherExclude": {
+        "**/bin/**/*": true,
+        "**/obj/**/*": true,
+        "**/node_modules/**/*": true,
+        "WebClient/**/*": true
+    },
     "eslint.format.enable": true,
     "eslint.workingDirectories": [
         "Client"
