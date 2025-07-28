@@ -2,34 +2,75 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "npm: dev",
+            "label": "WebClient | npm: dev",
+            "icon": {
+                "id": "browser",
+                "color": "terminal.ansiMagenta"
+            },
             "type": "npm",
             "script": "dev",
-            "group": {
-                "kind": "build",
-                "isDefault": true
+            "path": "WebClient",
+            "detail": "webpack",
+            "problemMatcher": []
+        },
+        {
+            "label": "WebClient | npm: test",
+            "icon": {
+                "id": "run-errors",
+                "color": "terminal.ansiMagenta"
             },
-            "detail": "webpack",
-            "problemMatcher": []
-        },
-        {
-            "label": "npm: build-dev",
-            "type": "npm",
-            "script": "build-dev",
-            "group": "build",
-            "detail": "webpack",
-            "problemMatcher": []
-        },
-        {
-            "label": "npm: test",
             "type": "npm",
             "script": "test",
+            "path": "WebClient",
             "group": {
                 "kind": "test",
                 "isDefault": true
             },
             "detail": "webpack",
             "problemMatcher": []
+        },
+        {
+            "label": "GraphQL | npm: dev",
+            "icon": {
+                "id": "server",
+                "color": "terminal.ansiCyan"
+            },
+            "type": "npm",
+            "script": "dev",
+            "path": "GraphQL",
+            "detail": "dotnet",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "GraphQL | npm: azurite",
+            "icon": {
+                "id": "database",
+                "color": "terminal.ansiCyan"
+            },
+            "isBackground": true,
+            "type": "npm",
+            "script": "azurite",
+            "path": "GraphQL",
+            "detail": "azurite",
+            "problemMatcher": []
+        },
+        {
+            "label": "HintKeep | npm: dev",
+            "icon": {
+                "id": "run-all",
+                "color": "terminal.ansiGreen"
+            },
+            "dependsOrder": "parallel",
+            "dependsOn": [
+                "GraphQL | npm: azurite",
+                "GraphQL | npm: dev",
+                "WebClient | npm: dev"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "[WebClient, GraphQL] npm: dev",
         }
     ]
 }

@@ -1,0 +1,33 @@
+{
+  "name": "hintkeep.graphql",
+  "version": "2.0.0",
+  "description": "Store hints, not passwords",
+  "license": "MIT",
+  "author": "Andrei15193",
+  "keywords": [
+    "password",
+    "hint",
+    "manager"
+  ],
+  "homepage": "https://github.com/Andrei15193/HintKeep",
+  "bugs": {
+    "url": "https://github.com/Andrei15193/HintKeep/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Andrei15193/HintKeep.git"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "dotnet watch run --configuration Debug",
+    "build-dev": "dotnet build --configuration Debug",
+    "build-release": "dotnet build --configuration Release",
+    "test": "dotnet test",
+
+    "azurite": "azurite --disableTelemetry --location .data"
+  },
+  "devDependencies": {
+    "azure-functions-core-tools": "^4.1.0",
+    "azurite": "^3.34.0"
+  }
+}

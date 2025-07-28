@@ -23,23 +23,27 @@ jobs:
         with:
           node-version: 22.x
 
-      - name: Restore
+      - name: WebClient | Restore
+        working-directory: WebClient
         run: npm install
         
-      - name: Build
+      - name: WebClient | Build
+        working-directory: WebClient
         run: npm run build-release
         
-      - name: Test
+      - name: WebClient | Test
+        working-directory: WebClient
         run: npm run test
 
-      - name: Pack
+      - name: WebClient | Pack
         shell: pwsh
+        working-directory: WebClient
         run: |
           $ErrorActionPreference = 'Stop'
 
-          Get-ChildItem -Path bin `
+          Get-ChildItem -Path 'bin' `
           | Compress-Archive `
-            -DestinationPath build.zip `
+            -DestinationPath (Join-Path '..' 'WebClient.zip') `
             -CompressionLevel Optimal `
           | Out-Null
 
@@ -47,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build
-          path: build.zip
+          path: WebClient.zip
 
   deployment:
     needs: build
@@ -71,5 +75,5 @@ jobs:
             -ContentType 'application/zip' `
             -Authentication Bearer `
             -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.DEPLOY_TOKEN }}') `
-            -InFile build.zip `
+            -InFile WebClient.zip `
           | Out-Null

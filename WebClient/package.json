@@ -1,5 +1,5 @@
 {
-  "name": "hintkeep",
+  "name": "hintkeep.webclient",
   "version": "2.0.0",
   "description": "Store hints, not passwords",
   "license": "MIT",
@@ -30,6 +30,12 @@
     "testMatch": [
       "**/*.test.ts"
     ]
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-model-view-viewmodel": "^3.0.2",
+    "react-router": "^7.6.3"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.1.0",
@@ -67,11 +73,5 @@
     "webpack": "^5.100.1",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.2"
-  },
-  "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-model-view-viewmodel": "^3.0.2",
-    "react-router": "^7.6.3"
   }
 }

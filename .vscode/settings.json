@@ -1,5 +1,8 @@
 {
     "eslint.format.enable": true,
+    "eslint.workingDirectories": [
+        "Client"
+    ],
     "[typescript]": {
         "editor.indentSize": 4,
         "editor.detectIndentation": false,
