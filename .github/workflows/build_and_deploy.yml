@@ -41,7 +41,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
 
-          Get-ChildItem -Path 'bin' `
+          Get-ChildItem -Path 'publish' `
           | Compress-Archive `
             -DestinationPath (Join-Path '..' 'WebClient.zip') `
             -CompressionLevel Optimal `

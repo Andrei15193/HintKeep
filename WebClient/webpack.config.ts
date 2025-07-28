@@ -27,6 +27,7 @@ export default function (_: any, { mode = "development" }: IBuildOptions): Confi
         },
         output: {
             clean: true,
+            path: path.resolve(__dirname, "publish"),
             filename: mode === "production" ? "[name].[contenthash].js" : "[name].js",
             chunkFilename(pathData) {
                 const chunkId = pathData.chunk?.id;
@@ -55,8 +56,7 @@ export default function (_: any, { mode = "development" }: IBuildOptions): Confi
                     else
                         return `${generatedChunkId}.js`;
                 }
-            },
-            path: path.resolve(__dirname, "bin")
+            }
         },
         module: {
             rules: [
