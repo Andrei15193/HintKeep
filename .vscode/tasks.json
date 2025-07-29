@@ -39,6 +39,11 @@
             "script": "dev",
             "path": "GraphQL",
             "detail": "dotnet",
+            "options": {
+                "env": {
+                    "DOTNET_USE_POLLING_FILE_WATCHER": "true"
+                }
+            },
             "problemMatcher": "$msCompile"
         },
         {
