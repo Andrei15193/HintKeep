@@ -2,6 +2,7 @@
     "recommendations": [
         "dbaeumer.vscode-eslint",
         "ms-azuretools.vscode-azurefunctions",
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "ms-azuretools.vscode-bicep"
     ]
 }
