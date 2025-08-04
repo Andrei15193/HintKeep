@@ -58,7 +58,16 @@ function ArchivedAccountDetailsPageView(): React.JSX.Element {
                 HintKeep - View Archived Account
             </Header>
 
-            <Breadcrumbs items={["Archived Accounts", account?.name && `${account?.name} Account`]}>
+            <Breadcrumbs
+                items={
+                    [
+                        <Link to="/archived">
+                            Archived Accounts
+                        </Link>,
+                        account?.name && `${account?.name} Account`
+                    ]
+                }
+            >
                 <Link to="/archived">
                     Back
                 </Link>

@@ -74,7 +74,16 @@ export function ActiveAccountDetailsPageView(): React.JSX.Element {
                 HintKeep - View Account
             </Header>
 
-            <Breadcrumbs items={["Accounts", account?.name && `${account?.name} Account`]}>
+            <Breadcrumbs
+                items={
+                    [
+                        <Link to="/">
+                            Accounts
+                        </Link>,
+                        account?.name && `${account?.name} Account`
+                    ]
+                }
+            >
                 <Link to="/">
                     Back
                 </Link>

@@ -92,7 +92,20 @@ export function ActiveAccountDetailsPageEdit(): React.JSX.Element {
                 HintKeep - Edit Account
             </Header>
 
-            <Breadcrumbs items={["Accounts", account?.name && `${account?.name} Account`]}>
+            <Breadcrumbs
+                items={
+                    [
+
+                        <Link
+                            to="/"
+                            className="danger"
+                        >
+                            Accounts
+                        </Link>,
+                        account?.name && `${account?.name} Account`
+                    ]
+                }
+            >
                 <Link
                     replace
                     to={generatePath("/:id", { id: id || "" })}

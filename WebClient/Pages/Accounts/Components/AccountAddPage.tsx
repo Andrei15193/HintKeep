@@ -45,7 +45,19 @@ function AccountAddPage(): React.JSX.Element {
                 HintKeep - Add Account
             </Header>
 
-            <Breadcrumbs items={["Accounts", "Add Account"]} />
+            <Breadcrumbs
+                items={
+                    [
+                        <Link
+                            to="/"
+                            className="danger"
+                        >
+                            Accounts
+                        </Link>,
+                        "Add Account"
+                    ]
+                }
+            />
 
             <Form
                 isLoading={isSubmitting}

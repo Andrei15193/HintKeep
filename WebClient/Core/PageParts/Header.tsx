@@ -5,9 +5,11 @@ export function Header({ children }: PropsWithChildren<{}>): React.JSX.Element {
         <header>
             {
                 typeof children === "string"
-                    ? <h1>
-                        {children}
-                    </h1>
+                    ? (
+                        <h1>
+                            {children}
+                        </h1>
+                    )
                     : children
             }
         </header>

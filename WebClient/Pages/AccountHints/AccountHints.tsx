@@ -37,7 +37,21 @@ export function AccountHints(): React.JSX.Element {
                 HintKeep - View Account History
             </Header>
 
-            <Breadcrumbs items={["Accounts", accountHints?.account.name && `${accountHints?.account.name} Account`, "History"]}>
+            <Breadcrumbs
+                items={
+                    [
+                        <Link to="/">
+                            Accounts
+                        </Link>,
+                        accountHints?.account.name && (
+                            <Link to={generatePath("/:id", { id: accountHints.account.id })}>
+                                {`${accountHints?.account.name} Account`}
+                            </Link>
+                        ),
+                        "History"
+                    ]
+                }
+            >
                 <Link to={generatePath("/:id", { id: accountId! })}>
                     Back
                 </Link>

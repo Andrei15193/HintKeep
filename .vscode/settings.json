@@ -7,7 +7,7 @@
     },
     "eslint.format.enable": true,
     "eslint.workingDirectories": [
-        "Client"
+        "WebClient"
     ],
     "[typescript]": {
         "editor.indentSize": 4,

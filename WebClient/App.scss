@@ -357,11 +357,6 @@ div#app {
         }
     }
 
-    >header {
-        position: sticky;
-        top: 0;
-    }
-
     >nav {
         display: flex;
         flex-direction: row;
@@ -371,6 +366,11 @@ div#app {
     }
 
     >aside.breadcrumbs {
+        position: sticky;
+        // This is due to parent element being display: flex
+        // remove the gap and the border
+        top: calc(-2 * var(--hk---spacing-narrow) - 1px);
+
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -378,7 +378,9 @@ div#app {
 
         padding: var(--hk---spacing-narrow) 0;
 
-        border-top: 1px solid black;
+        border-top: 1px solid var(--hk---color-text);
+
+        background-color: var(--hk---color-background-app);
 
         >ul {
             margin: 0;
@@ -396,7 +398,7 @@ div#app {
                     &::after {
                         content: '/';
 
-                        margin: 0 0.1rem 0 0.2rem;
+                        margin: 0 var(--hk---spacing-tiny) 0;
                     }
                 }
             }
