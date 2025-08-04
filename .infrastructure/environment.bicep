@@ -4,8 +4,7 @@ param environmentName string
 
 @export()
 var tableNames = [
-  'table1'
-  'table2'
+  'Users'
 ]
 
 resource StorageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {

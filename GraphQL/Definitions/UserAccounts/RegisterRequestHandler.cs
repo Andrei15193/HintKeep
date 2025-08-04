@@ -3,8 +3,9 @@ using System.ComponentModel.DataAnnotations;
 namespace HintKeep.GraphQL.Definitions.UserAccounts;
 
 public record RegisterRequest(
-    [property: MinLength(6, ErrorMessage = "Usernames are at least 6 characters long.")]
+    [property: MinLength(6, ErrorMessage = "Usernames must be at least 6 characters long.")]
     string Username,
+    [property: Required(ErrorMessage = "A password is required.")]
     string Password
 );
 

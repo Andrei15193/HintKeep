@@ -2,6 +2,12 @@
     "IsEncrypted": false,
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+
+        "AzureWebJobsStorage__accountName": "devstoreaccount1",
+        "AzureWebJobsStorage__credential": "managedidentity",
+        "AzureWebJobsStorage__blobServiceUri": "http://127.0.0.1:10000",
+        "AzureWebJobsStorage__queueServiceUri": "http://127.0.0.1:10001",
+        "AzureWebJobsStorage__tableServiceUri": "http://127.0.0.1:10002",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
         "DOTNET_ENVIRONMENT": "Development"
     },

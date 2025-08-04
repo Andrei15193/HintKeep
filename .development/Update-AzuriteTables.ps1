@@ -10,11 +10,12 @@ function Update-AzuriteTables {
     | Select-Object -ExpandProperty variables `
     | Select-Object -ExpandProperty tableNames `
     | ForEach-Object {
-        Write-Host "Ensuring '$_' exists"
+        Write-Host "    Ensuring '$_' exists"
 
         az storage table create `
             --name $_ `
             --connection-string $azuriteConnectionString `
         | Out-Null
     }
+    Write-Host "Ensured Azure Storage Tables Exist"
 }

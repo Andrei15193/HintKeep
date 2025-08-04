@@ -1,18 +1,23 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Azure.Data.Tables;
+using Azure.Identity;
 using GraphQL;
 using GraphQL.Conversion;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Definitions;
 using HintKeep.GraphQL.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-var mutationFieldTypeKey = new object();
+var mutatoinFieldTypeKey = new object();
 
 var builder = FunctionsApplication
     .CreateBuilder(args)
@@ -23,13 +28,9 @@ builder
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
+// Request handlers
 foreach (var type in typeof(Program).Assembly.DefinedTypes)
 {
-    if (typeof(IGraphType).IsAssignableFrom(type))
-        builder.Services.AddSingleton(type, type);
-    if (typeof(FieldType).IsAssignableFrom(type) && type.GetCustomAttribute<MutationFieldAttribute>() is not null)
-        builder.Services.AddKeyedSingleton(typeof(FieldType), mutationFieldTypeKey, type);
-
     var requestHandlerConcreteInterfaces = type
         .ImplementedInterfaces
         .Where(implementedInterface => implementedInterface.IsGenericType && implementedInterface.GetGenericTypeDefinition() == typeof(IRequestHandler<,>));
@@ -37,8 +38,36 @@ foreach (var type in typeof(Program).Assembly.DefinedTypes)
         builder.Services.AddScoped(requestHandlerConcreteInterface, type);
 }
 
+// GraphQL & Serialization
+foreach (var type in typeof(Program).Assembly.DefinedTypes)
+{
+    if (typeof(IGraphType).IsAssignableFrom(type))
+        builder.Services.AddSingleton(type, type);
+    if (typeof(FieldType).IsAssignableFrom(type) && type.GetCustomAttribute<MutationFieldAttribute>() is not null)
+        builder.Services.AddKeyedSingleton(typeof(FieldType), mutatoinFieldTypeKey, type);
+}
+
 builder
     .Services
+    .AddSingleton<ISchema>(resolver =>
+    {
+        var mutaitonGraphObject = new ObjectGraphType
+        {
+            Name = "HintKeepMutations",
+            Description = "Contains all of HintKeep mutations for performing create, update or delete operations."
+        };
+        foreach (var mutationField in resolver.GetKeyedServices<FieldType>(mutatoinFieldTypeKey))
+            mutaitonGraphObject.AddField(mutationField);
+
+        return new Schema
+        {
+            Description = "HintKeep GraphQL API",
+            NameConverter = CamelCaseNameConverter.Instance,
+            Query = resolver.GetRequiredService<QueryGraphDefinition>(),
+            Mutation = mutaitonGraphObject
+        };
+    })
+    .AddSingleton<IGraphQLTextSerializer, GraphQLSerializer>()
     .AddSingleton(new JsonSerializerOptions
     {
         WriteIndented = builder.Environment.IsDevelopment(),
@@ -67,20 +96,34 @@ builder
             new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false),
             new UtcDateTimeConverter()
         }
-    })
-    .AddSingleton<IGraphQLTextSerializer, GraphQLSerializer>()
-    .AddSingleton<ISchema>(resolver => {
-        var mutaitonGraphObject = new ObjectGraphType();
-        foreach (var mutationField in resolver.GetKeyedServices<FieldType>(mutationFieldTypeKey))
-            mutaitonGraphObject.AddField(mutationField);
+    });
 
-        return new Schema
+// Azure Storage
+builder
+    .Services
+    .AddSingleton<HintKeepTableStorage>()
+    .AddSingleton(services =>
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        var configuration = services.GetRequiredService<IConfiguration>();
+        var connectionString = configuration.GetValue<string>("AzureWebJobsStorage");
+        var tableStorageUri = configuration.GetValue<string>("AzureWebJobsStorage__tableServiceUri");
+
+        if (!string.IsNullOrWhiteSpace(connectionString))
         {
-            Description = "HintKeep GraphQL API",
-            NameConverter = CamelCaseNameConverter.Instance,
-            Query = resolver.GetRequiredService<QueryGraphDefinition>(),
-            Mutation = mutaitonGraphObject
-        };
+            logger.LogInformation("Using connection string for TableServiceClient.");
+            return new TableServiceClient(connectionString);
+        }
+        else if (!string.IsNullOrWhiteSpace(tableStorageUri))
+        {
+            logger.LogInformation("Using managed identity for TableServiceClient.");
+            return new TableServiceClient(new Uri(tableStorageUri), new DefaultAzureCredential());
+        }
+        else
+        {
+            logger.LogCritical("Neither AzureWebJobsStorage (connection string) nor AzureWebJobsStorage__tableServiceUri (managed identity) have been configured for TableServiceClient.");
+            throw new InvalidOperationException("Expected either AzureWebJobsStorage (connection string) or AzureWebJobsStorage__tableServiceUri (managed identity) to be configured");
+        }
     });
 
 builder
