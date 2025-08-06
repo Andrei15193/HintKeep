@@ -81,7 +81,7 @@ export default function (_: any, { mode = "development" }: IBuildOptions): Confi
                 patterns: [
                     {
                         from: path.resolve(__dirname, "_redirects"),
-                        to: path.resolve(__dirname, "bin")
+                        to: path.resolve(__dirname, "publish")
                     }
                 ]
             }),
