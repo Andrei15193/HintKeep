@@ -108,7 +108,7 @@ builder
         var logger = services.GetRequiredService<ILogger<Program>>();
         var configuration = services.GetRequiredService<IConfiguration>();
         var connectionString = configuration.GetValue<string>("AzureWebJobsStorage");
-        var tableStorageUri = configuration.GetValue<string>("AzureWebJobsStorage__tableServiceUri");
+        var tableStorageUri = configuration.GetSection("AzureWebJobsStorage").GetValue<string>("tableServiceUri");
 
         if (!string.IsNullOrWhiteSpace(connectionString))
         {

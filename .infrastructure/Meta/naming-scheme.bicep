@@ -3,3 +3,6 @@ func resourceGroupName(environmentName string) string => toLower('hintkeep-${env
 
 @export()
 func storageAccountName(environmentName string) string => toLower('hintkeepstorage${environmentName}')
+
+@export()
+func functionsAppName(environmentName string) string => toLower('hintkeep-webapp-${environmentName}')

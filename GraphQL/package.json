@@ -20,10 +20,6 @@
   "private": true,
   "scripts": {
     "dev": "dotnet watch run --configuration Debug",
-    "build-dev": "dotnet build --configuration Debug",
-    "build-release": "dotnet build --configuration Release",
-    "test": "dotnet test",
-
     "azurite": "azurite --disableTelemetry --location .data"
   },
   "devDependencies": {

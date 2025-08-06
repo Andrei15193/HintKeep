@@ -1,3 +1,4 @@
 using '../environment-group.bicep'
 
-param environmentName = 'test'
+param name = 'test'
+param type = 'development'

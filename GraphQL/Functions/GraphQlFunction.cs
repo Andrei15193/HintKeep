@@ -28,7 +28,7 @@ public class GraphQlFunction(
 )
 {
     [Function("graphql")]
-    public async Task<HttpResponseData> Run([HttpTrigger("get", "post")] HttpRequestData request)
+    public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData request)
     {
         var response = request.CreateResponse();
         response.Headers.Add("Cache-Control", "no-store");

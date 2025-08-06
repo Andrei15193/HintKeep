@@ -4,15 +4,14 @@ on:
   push:
     branches:
       - vNext
-      - vNext_cd
 
 concurrency:
   group: test
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build
+  buildWebClient:
+    name: Build WebClient
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,25 +22,26 @@ jobs:
         with:
           node-version: 22.x
 
-      - name: WebClient | Restore
+      - name: Restore
         working-directory: WebClient
         run: npm install
-        
-      - name: WebClient | Build
-        working-directory: WebClient
-        run: npm run build-release
-        
-      - name: WebClient | Test
+
+      - name: Test
         working-directory: WebClient
         run: npm run test
 
-      - name: WebClient | Pack
+      - name: Build
+        working-directory: WebClient
+        run: npm run build-release
+
+      - name: Pack
         shell: pwsh
         working-directory: WebClient
         run: |
           $ErrorActionPreference = 'Stop'
 
-          Get-ChildItem -Path 'publish' `
+          Get-ChildItem `
+            -Path 'publish' `
           | Compress-Archive `
             -DestinationPath (Join-Path '..' 'WebClient.zip') `
             -CompressionLevel Optimal `
@@ -53,8 +53,73 @@ jobs:
           name: build
           path: WebClient.zip
 
+  buildGraphQL:
+    name: Build GraphQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dotnet 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.x
+
+      - name: Restore
+        working-directory: GraphQL
+        run: dotnet restore
+
+      - name: Test
+        shell: pwsh
+        working-directory: GraphQL
+        run: |
+          dotnet test `
+            --configuration Debug `
+            --no-restore
+
+      - name: Build
+        shell: pwsh
+        working-directory: GraphQL
+        run: |
+          dotnet publish ./HintKeep.GraphQL.csproj `
+            --configuration Release `
+            --runtime linux-x64 `
+            --no-self-contained `
+            --no-restore `
+            --output publish
+
+      - name: Pack
+        shell: pwsh
+        working-directory: GraphQL
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          Get-ChildItem `
+            -Path 'publish' `
+          | Compress-Archive `
+            -DestinationPath (Join-Path '..' 'GraphQL.zip') `
+            -CompressionLevel Optimal `
+          | Out-Null
+
+          Get-ChildItem `
+            -Path 'publish' `
+            -Hidden `
+          | Compress-Archive `
+            -DestinationPath (Join-Path '..' 'GraphQL.zip') `
+            -CompressionLevel Optimal `
+            -Update `
+          | Out-Null
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: GraphQL.zip
+
   deployment:
-    needs: build
+    needs:
+      - buildWebClient
+      - buildGraphQL
     name: Deployment on Test
     runs-on: ubuntu-latest
     environment: Test
@@ -64,7 +129,28 @@ jobs:
         with:
           name: build
 
-      - name: Deploy
+      # REQUIRED: setup service principal for deploying bicep & function apps
+      #
+      # - name: Deploy GraphQL
+      #   shell: pwsh
+      #   run: |
+      #     $ErrorActionPreference = 'Stop'
+
+      #     $azureResources = az deployment sub create `
+      #       --name 'hintkeep-test' `
+      #       --location 'westeurope' `
+      #       --parameters (Join-Path '.infrastructure' 'Environments' 'test.bicepparam') `
+      #       --query 'properties.outputs' `
+      #     | ConvertFrom-Json
+
+      #     az functionapp deployment source config-zip `
+      #       --name $azureResources.functionsAppName.value `
+      #       --resource-group $azureResources.resourceGroupName.value `
+      #       --src ./GraphQL.zip `
+      #       --build-remote false `
+      #     | Out-Null
+
+      - name: Deploy WebClient
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
