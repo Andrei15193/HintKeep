@@ -7,6 +7,7 @@ using GraphQL;
 using GraphQL.Conversion;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using HintKeep.GraphQL;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Definitions;
 using HintKeep.GraphQL.Json;
@@ -125,6 +126,37 @@ builder
             throw new InvalidOperationException("Expected either AzureWebJobsStorage (connection string) or AzureWebJobsStorage__tableServiceUri (managed identity) to be configured");
         }
     });
+
+// Logging
+builder
+    .UseMiddleware(
+        async (context, next) =>
+        {
+            var correlationId = context.InstanceServices.GetRequiredKeyedService<Guid>(ServiceKeys.CorrelationId);
+            var logger = context.InstanceServices.GetRequiredService<ILogger<Program>>();
+
+            using (logger.BeginScope(new
+            {
+                context.FunctionId,
+                FunctionName = context.FunctionDefinition.Name,
+                FunctionEntry = context.FunctionDefinition.EntryPoint,
+                CorrelationId = correlationId
+            }))
+                try
+                {
+                    logger.LogInformation("Executing '{functionName}' ('{functionId}') with '{correlationId}' correlation ID.", context.FunctionDefinition.Name, context.FunctionId, correlationId);
+                    await next();
+                    logger.LogInformation("Executed '{functionName}' ('{functionId}') with '{correlationId}' correlation ID.", context.FunctionDefinition.Name, context.FunctionId, correlationId);
+                }
+                catch (Exception exception)
+                {
+                    logger.LogError(exception, "Execution failed '{functionName}' ('{functionId}') with '{correlationId}' correlation ID.", context.FunctionDefinition.Name, context.FunctionId, correlationId);
+                    throw;
+                }
+        })
+    .Services
+    .AddKeyedScoped(typeof(Guid), ServiceKeys.CorrelationId, delegate { return Guid.NewGuid(); });
+
 
 builder
     .Build()

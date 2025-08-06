@@ -1,12 +1,5 @@
 {
     "version": "2.0",
-    "extensions": {
-        "timers": {
-            "scheduleMonitor": {
-                "enabled": true
-            }
-        }
-    },
     "logging": {
         "logLevel": {
             "default": "Warning",
