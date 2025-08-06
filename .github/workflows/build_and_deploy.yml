@@ -4,55 +4,13 @@ on:
   push:
     branches:
       - vNext
+      - vNextCD
 
 concurrency:
   group: test
   cancel-in-progress: true
 
 jobs:
-  buildWebClient:
-    name: Build WebClient
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.x
-
-      - name: Restore
-        working-directory: WebClient
-        run: npm install
-
-      - name: Test
-        working-directory: WebClient
-        run: npm run test
-
-      - name: Build
-        working-directory: WebClient
-        run: npm run build-release
-
-      - name: Pack
-        shell: pwsh
-        working-directory: WebClient
-        run: |
-          $ErrorActionPreference = 'Stop'
-
-          Get-ChildItem `
-            -Path 'publish' `
-          | Compress-Archive `
-            -DestinationPath (Join-Path '..' 'WebClient.zip') `
-            -CompressionLevel Optimal `
-          | Out-Null
-
-      - name: Publish Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: WebClient.zip
-
   buildGraphQL:
     name: Build GraphQL
     runs-on: ubuntu-latest
@@ -80,35 +38,46 @@ jobs:
             --configuration Release `
             --runtime linux-x64 `
             --no-self-contained `
-            --output publish
-
-      - name: Pack
-        shell: pwsh
-        working-directory: GraphQL
-        run: |
-          $ErrorActionPreference = 'Stop'
-
-          Get-ChildItem `
-            -Path 'publish' `
-          | Compress-Archive `
-            -DestinationPath (Join-Path '..' 'GraphQL.zip') `
-            -CompressionLevel Optimal `
-          | Out-Null
-
-          Get-ChildItem `
-            -Path 'publish' `
-            -Hidden `
-          | Compress-Archive `
-            -DestinationPath (Join-Path '..' 'GraphQL.zip') `
-            -CompressionLevel Optimal `
-            -Update `
-          | Out-Null
+            --output 'publish'
 
       - name: Publish Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build
-          path: GraphQL.zip
+          name: GraphQL
+          path: ./GraphQL/publish
+          compression-level: 9
+          include-hidden-files: true
+
+  buildWebClient:
+    name: Build WebClient
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Restore
+        working-directory: WebClient
+        run: npm install
+
+      - name: Test
+        working-directory: WebClient
+        run: npm run test
+
+      - name: Build
+        working-directory: WebClient
+        run: npm run build-release
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebClient
+          path: ./WebClient/publish
+          compression-level: 9
 
   deployment:
     needs:
@@ -118,10 +87,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: Test
     steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build
+      - name: Download Artifacts
+        uses: actions/download-artifact@v5
 
       # REQUIRED: setup service principal for deploying bicep & function apps
       #
@@ -130,24 +97,47 @@ jobs:
       #   run: |
       #     $ErrorActionPreference = 'Stop'
 
-      #     $azureResources = az deployment sub create `
-      #       --name 'hintkeep-test' `
-      #       --location 'westeurope' `
-      #       --parameters (Join-Path '.infrastructure' 'Environments' 'test.bicepparam') `
-      #       --query 'properties.outputs' `
-      #     | ConvertFrom-Json
-
-      #     az functionapp deployment source config-zip `
-      #       --name $azureResources.functionsAppName.value `
-      #       --resource-group $azureResources.resourceGroupName.value `
-      #       --src ./GraphQL.zip `
-      #       --build-remote false `
+      #     Get-ChildItem `
+      #       -Path 'GraphQL' `
+      #     | Compress-Archive `
+      #       -DestinationPath 'GraphQL.zip' `
+      #       -CompressionLevel Optimal `
       #     | Out-Null
+
+      #     Get-ChildItem `
+      #       -Path 'GraphQL' `
+      #       -Hidden `
+      #     | Compress-Archive `
+      #       -DestinationPath 'GraphQL.zip' `
+      #       -CompressionLevel Optimal `
+      #       -Update `
+      #     | Out-Null
+
+      #     # $azureResources = az deployment sub create `
+      #     #   --name 'hintkeep-test' `
+      #     #   --location 'westeurope' `
+      #     #   --parameters (Join-Path '.infrastructure' 'Environments' 'test.bicepparam') `
+      #     #   --query 'properties.outputs' `
+      #     # | ConvertFrom-Json
+
+      #     # az functionapp deployment source config-zip `
+      #     #   --name $azureResources.functionsAppName.value `
+      #     #   --resource-group $azureResources.resourceGroupName.value `
+      #     #   --src ./GraphQL.zip `
+      #     #   --build-remote false `
+      #     # | Out-Null
 
       - name: Deploy WebClient
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+
+          Get-ChildItem `
+            -Path 'WebClient' `
+          | Compress-Archive `
+            -DestinationPath 'WebClient.zip' `
+            -CompressionLevel Optimal `
+          | Out-Null
 
           Invoke-RestMethod `
             -Method Post `
