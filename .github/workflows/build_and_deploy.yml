@@ -65,17 +65,12 @@ jobs:
         with:
           dotnet-version: 9.x
 
-      - name: Restore
-        working-directory: GraphQL
-        run: dotnet restore
-
       - name: Test
         shell: pwsh
         working-directory: GraphQL
         run: |
           dotnet test `
-            --configuration Debug `
-            --no-restore
+            --configuration Debug
 
       - name: Build
         shell: pwsh
@@ -85,7 +80,6 @@ jobs:
             --configuration Release `
             --runtime linux-x64 `
             --no-self-contained `
-            --no-restore `
             --output publish
 
       - name: Pack
