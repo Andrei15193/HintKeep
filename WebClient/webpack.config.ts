@@ -28,6 +28,7 @@ export default function (_: any, { mode = "development" }: IBuildOptions): Confi
         output: {
             clean: true,
             path: path.resolve(__dirname, "publish"),
+            publicPath: "/",
             filename: mode === "production" ? "[name].[contenthash].js" : "[name].js",
             chunkFilename(pathData) {
                 const chunkId = pathData.chunk?.id;
@@ -99,11 +100,11 @@ export default function (_: any, { mode = "development" }: IBuildOptions): Confi
                 }
             }),
             new HtmlInlineScriptPlugin({
-                scriptMatchPattern: [/^index(\.\w+)?\.js$/]
+                scriptMatchPattern: [/^\/?index(\.\w+)?\.js$/]
             }),
             new HtmlInlineCSSWebpackPlugin({
                 filter(fileName) {
-                    return /^index(\.[a-z0-9]+)?\.(css|html)$/i.test(fileName);
+                    return /^\/?index(\.[a-z0-9]+)?\.(css|html)$/i.test(fileName);
                 }
             }),
             new MiniCssExtractPlugin({
