@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Dotnet 9
         uses: actions/setup-dotnet@v4
@@ -54,6 +56,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
@@ -86,46 +90,163 @@ jobs:
     name: Deployment on Test
     runs-on: ubuntu-latest
     environment: Test
+    permissions:
+      id-token: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: .infrastructure
+
       - name: Download Artifacts
         uses: actions/download-artifact@v5
 
-      # REQUIRED: setup service principal for deploying bicep & function apps
-      #
-      # - name: Deploy GraphQL
-      #   shell: pwsh
-      #   run: |
-      #     $ErrorActionPreference = 'Stop'
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          
 
-      #     Get-ChildItem `
-      #       -Path 'GraphQL' `
-      #     | Compress-Archive `
-      #       -DestinationPath 'GraphQL.zip' `
-      #       -CompressionLevel Optimal `
-      #     | Out-Null
+      - name: Deploy GraphQL
+        id: deploy-graphQL
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
 
-      #     Get-ChildItem `
-      #       -Path 'GraphQL' `
-      #       -Hidden `
-      #     | Compress-Archive `
-      #       -DestinationPath 'GraphQL.zip' `
-      #       -CompressionLevel Optimal `
-      #       -Update `
-      #     | Out-Null
+          Get-ChildItem `
+            -Path 'GraphQL' `
+          | Compress-Archive `
+            -DestinationPath 'GraphQL.zip' `
+            -CompressionLevel Optimal `
+          | Out-Null
 
-      #     # $azureResources = az deployment sub create `
-      #     #   --name 'hintkeep-test' `
-      #     #   --location 'westeurope' `
-      #     #   --parameters (Join-Path '.infrastructure' 'Environments' 'test.bicepparam') `
-      #     #   --query 'properties.outputs' `
-      #     # | ConvertFrom-Json
+          Get-ChildItem `
+            -Path 'GraphQL' `
+            -Hidden `
+          | Compress-Archive `
+            -DestinationPath 'GraphQL.zip' `
+            -CompressionLevel Optimal `
+            -Update `
+          | Out-Null
 
-      #     # az functionapp deployment source config-zip `
-      #     #   --name $azureResources.functionsAppName.value `
-      #     #   --resource-group $azureResources.resourceGroupName.value `
-      #     #   --src ./GraphQL.zip `
-      #     #   --build-remote false `
-      #     # | Out-Null
+          $azureResources = az deployment sub create `
+            --name 'hintkeep-test' `
+            --location 'westeurope' `
+            --parameters (Join-Path '.infrastructure' 'Environments' 'test.bicepparam') `
+            --query 'properties.outputs' `
+          | ConvertFrom-Json
+
+          az functionapp deployment source config-zip `
+            --name $azureResources.functionsAppName.value `
+            --resource-group $azureResources.resourceGroupName.value `
+            --src ./GraphQL.zip `
+            --build-remote false `
+          | Out-Null
+
+          Write-Output "GraphQL_URL=$($azureResources.functionsAppUrl.value)" `
+          | Out-File -Append $env:GITHUB_OUTPUT
+
+      - name: Ensure WebClient Settings
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          [hashtable] $netlifySettings = @{
+            HINTKEEP_API_URL = '${{ steps.deploy-graphQL.outputs.GraphQL_URL }}'
+          }
+
+          $netlifySettings.GetEnumerator() | ForEach-Object -Parallel {
+            Invoke-RestMethod `
+              -Method Patch `
+              -Uri "https://api.netlify.com/api/v1/accounts/${{ vars.NETLIFY_ACCOUNT_ID }}/env/$($_.key)?site_id=${{ vars.NETLIFY_SITE_ID }}" `
+              -ContentType 'application/json' `
+              -Authentication Bearer `
+              -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.NETLIFY_DEPLOY_TOKEN }}') `
+              -Body (@{
+                context = 'production'
+                value = $_.value
+              } | ConvertTo-Json -Compress) `
+            | Out-Null
+          }
+      - name: Ensure WebClient Post-Processing Scripts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          [System.IO.FileInfo[]] $postProcessScripts = Get-ChildItem -File `
+            (Join-Path '.infrastructure' 'Netlify' 'Post-Processing Scripts' '*.liquid')
+
+          $netlifySnippets = Invoke-RestMethod `
+            -Method Get `
+            -Uri "https://api.netlify.com/api/v1/sites/${{ vars.NETLIFY_SITE_ID }}/snippets" `
+            -Authentication Bearer `
+            -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.NETLIFY_DEPLOY_TOKEN }}')
+
+          $netlifySnippets `
+          | Where-Object {
+            [string] $scriptTitle = $_.title
+
+            [System.IO.FileInfo] $matchingScript = $postProcessScripts `
+            | Where-Object { $_.BaseName -ieq $scriptTitle } `
+            | Select-Object -First 1
+
+            return $null -eq $matchingScript
+          } `
+          | Sort-Object -Property id -Descending `
+          | ForEach-Object {
+            Write-Output "Deleting '$($_.title)' post-process script"
+
+            Invoke-RestMethod `
+              -Method Delete `
+              -Uri "https://api.netlify.com/api/v1/sites/${{ vars.NETLIFY_SITE_ID }}/snippets/$($_.id)" `
+              -Authentication Bearer `
+              -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.NETLIFY_DEPLOY_TOKEN }}') `
+            | Out-Null
+          }
+
+          $postProcessScripts | ForEach-Object {
+            [string] $scriptTitle = $_.BaseName
+
+            $matchingSnippet = $netlifySnippets `
+            | Where-Object { $_.title -ieq $scriptTitle } `
+            | Select-Object -First 1
+
+            if ($null -eq $matchingSnippet) {
+              Write-Output "Creating '$scriptTitle' post-process script"
+
+              Invoke-RestMethod `
+                -Method Post `
+                -Uri "https://api.netlify.com/api/v1/sites/${{ vars.NETLIFY_SITE_ID }}/snippets" `
+                -ContentType 'application/json' `
+                -Authentication Bearer `
+                -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.NETLIFY_DEPLOY_TOKEN }}') `
+                -Body (@{
+                  title = $_.BaseName
+                  general = Get-Content $_.FullName
+                  general_position = 'head'
+                } | ConvertTo-Json -Compress) `
+              | Out-Null
+            }
+            else {
+              Write-Output "Updating '$scriptTitle' post-process script"
+
+              Invoke-RestMethod `
+                -Method Put `
+                -Uri "https://api.netlify.com/api/v1/sites/${{ vars.NETLIFY_SITE_ID }}/snippets/$($matchingSnippet.id)" `
+                -ContentType 'application/json' `
+                -Authentication Bearer `
+                -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.NETLIFY_DEPLOY_TOKEN }}') `
+                -Body (@{
+                  title = $scriptTitle
+                  general = Get-Content $_.FullName
+                  general_position = 'head'
+                } | ConvertTo-Json -Compress) `
+              | Out-Null
+            }
+          }
 
       - name: Deploy WebClient
         shell: pwsh
@@ -141,9 +262,9 @@ jobs:
 
           Invoke-RestMethod `
             -Method Post `
-            -Uri 'https://api.netlify.com/api/v1/sites/${{ vars.SITE_ID }}/deploys' `
+            -Uri 'https://api.netlify.com/api/v1/sites/${{ vars.NETLIFY_SITE_ID }}/deploys' `
             -ContentType 'application/zip' `
             -Authentication Bearer `
-            -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.DEPLOY_TOKEN }}') `
+            -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.NETLIFY_DEPLOY_TOKEN }}') `
             -InFile WebClient.zip `
           | Out-Null

@@ -1,8 +1,10 @@
 import { buildInRoles } from './Meta/build-in-roles.bicep'
+import { resourceTags } from './Meta/resource-tags.bicep'
 import { storageAccountName, functionsAppName } from './Meta/naming-scheme.bicep'
 
 param name string
 param type EnvironmentType
+param publishUrls string[]
 
 @export()
 type EnvironmentType = 'development' | 'production'
@@ -11,6 +13,11 @@ type EnvironmentType = 'development' | 'production'
 var tableNames = [
   'Users'
 ]
+
+resource PersonalAppPlan 'Microsoft.Web/serverfarms@2024-11-01' existing = {
+  name: 'Personal'
+  scope: resourceGroup('Personal')
+}
 
 resource StorageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
   name: storageAccountName(name)
@@ -25,9 +32,7 @@ resource StorageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
   }
-  tags: {
-    project: 'hintkeep'
-  }
+  tags: resourceTags
 
   resource Identifier 'tableServices' = {
     name: 'default'
@@ -40,17 +45,10 @@ resource StorageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
   }
 }
 
-resource PersonalAppPlan 'Microsoft.Web/serverfarms@2024-11-01' existing = {
-  name: 'Personal'
-  scope: resourceGroup('Personal')
-}
-
 resource FunctionsApp 'Microsoft.Web/sites@2024-11-01' = {
   name: functionsAppName(name)
   location: resourceGroup().location
-  tags: {
-    project: 'HintKeep'
-  }
+  tags: resourceTags
   kind: 'functionapp'
   identity: {
     type: 'SystemAssigned'
@@ -60,12 +58,17 @@ resource FunctionsApp 'Microsoft.Web/sites@2024-11-01' = {
     httpsOnly: true
     siteConfig: {
       alwaysOn: true
-      http20Enabled: false
-      acrUseManagedIdentityCreds: false
+      http20Enabled: true
       minTlsVersion: '1.2'
+      acrUseManagedIdentityCreds: false
+      ftpsState: 'Disabled'
+      scmType: 'None'
       linuxFxVersion: 'DOTNET-ISOLATED|9.0'
-      functionAppScaleLimit: 0
-      minimumElasticInstanceCount: 1
+
+      defaultDocuments: ['index.html']
+      cors: {
+        allowedOrigins: publishUrls
+      }
 
       appSettings: [
         // HintKeep Config
@@ -86,6 +89,10 @@ resource FunctionsApp 'Microsoft.Web/sites@2024-11-01' = {
         {
           name: 'WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED'
           value: '1'
+        }
+        {
+          name: 'AzureWebJobsDisableHomepage'
+          value: 'true'
         }
 
         // Managed Identity
@@ -108,17 +115,30 @@ resource FunctionsApp 'Microsoft.Web/sites@2024-11-01' = {
       ]
     }
   }
+
+  resource LogsConfiguration 'config' = {
+    name: 'logs'
+    properties: {
+      httpLogs: {
+        fileSystem: {
+          enabled: true
+          retentionInDays: 7
+          retentionInMb: 100
+        }
+      }
+    }
+  }
 }
 
 resource ManagedIdentityRoleAssignments 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = [
-  for roleGuid in [
+  for roleId in [
     buildInRoles.storage.storageAccount.blob.dataContributor
     buildInRoles.storage.storageAccount.table.dataContributor
   ]: {
-    name: guid(resourceGroup().name, FunctionsApp.name, roleGuid)
+    name: guid(resourceGroup().name, StorageAccount.name, roleId)
     scope: StorageAccount
     properties: {
-      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleGuid)
+      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleId)
       principalId: FunctionsApp.identity.principalId
       principalType: 'ServicePrincipal'
     }
@@ -127,3 +147,4 @@ resource ManagedIdentityRoleAssignments 'Microsoft.Authorization/roleAssignments
 
 output storageAccountName string = StorageAccount.name
 output functionsAppName string = FunctionsApp.name
+output functionsAppUrl string = 'https://${FunctionsApp.name}.azurewebsites.net'

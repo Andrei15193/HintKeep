@@ -21,11 +21,11 @@ using Microsoft.Extensions.Primitives;
 namespace HintKeep.GraphQL.Functions;
 
 public class GraphQlFunction(
-    IHostEnvironment environment,
-    ILogger<GraphQlFunction> logger,
-    ISchema schema,
-    IGraphQLTextSerializer serializer
-)
+        IHostEnvironment environment,
+        ILogger<GraphQlFunction> logger,
+        ISchema schema,
+        IGraphQLTextSerializer serializer
+    )
 {
     [Function("graphql")]
     public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData request)

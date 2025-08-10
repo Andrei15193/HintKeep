@@ -157,7 +157,6 @@ builder
     .Services
     .AddKeyedScoped(typeof(Guid), ServiceKeys.CorrelationId, delegate { return Guid.NewGuid(); });
 
-
 builder
     .Build()
     .Run();

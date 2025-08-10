@@ -2,9 +2,16 @@
 <html>
 
 <head>
+    {{#if isDevelopment}}
+    <script>
+        {{#each developmentEnvironmentVariables}}
+            const {{@key}} = "{{ this }}";
+        {{/each}}
+    </script>
+    {{/if}}
 </head>
 
-<body {{#if bodyClassName}}class="{{ bodyClassName }}" {{/if}} lang="en-GB">
+<body {{#if isDevelopment}}class="light-theme" {{/if}} lang="en-GB">
     <div id="app" class="loader">
         <svg viewBox="0 0 350 223">
             <path d="   M 4.00,4.00

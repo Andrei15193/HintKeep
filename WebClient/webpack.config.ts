@@ -11,6 +11,17 @@ interface IBuildOptions {
     readonly mode?: "development" | "production";
 }
 
+/**
+ * Must match with environment variables on Netlify to ensure consistency.
+ * These are only included in the bundle for development builds, for release
+ * builds make sure there is a post-process script added that injects the information.
+ *
+ * Related post-process script can be found in `WebClient.Config.liquid` under `.infrastructure`.
+ */
+const developmentEnvironmentVariables: Readonly<Record<string, string>> = {
+    HINTKEEP_API_URL: "http://localhost:8081/"
+};
+
 let lastGeneratedChunkId = 0;
 const chunkNamesById: Record<string | number, number> = {};
 
@@ -89,8 +100,9 @@ export default function (_: any, { mode = "development" }: IBuildOptions): Confi
             new HtmlWebpackPlugin({
                 template: "!!handlebars-loader!index.hbs",
                 templateParameters: {
-                    mode,
-                    bodyClassName: mode === "development" && "light-theme"
+                    isDevelopment: mode === "development",
+                    isProduction: mode !== "development",
+                    developmentEnvironmentVariables
                 },
                 title: "HintKeep",
                 inject: "body",
