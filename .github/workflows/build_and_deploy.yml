@@ -124,8 +124,9 @@ jobs:
             --query 'properties.outputs' `
           | ConvertFrom-Json
 
-          Write-Output "GraphQL_URL=$($azureResources.functionsAppUrl.value)" `
-          | Out-File -Append $env:GITHUB_OUTPUT
+          Write-Output "GraphQL_AppName=$($azureResources.functionsAppName.value)" | Out-File -Append $env:GITHUB_OUTPUT
+          Write-Output "GraphQL_ResourceGroup=$($azureResources.resourceGroupName.value)" | Out-File -Append $env:GITHUB_OUTPUT
+          Write-Output "GraphQL_URL=$($azureResources.functionsAppUrl.value)" | Out-File -Append $env:GITHUB_OUTPUT
 
       - name: Deploy GraphQL
         shell: pwsh
@@ -149,8 +150,8 @@ jobs:
           | Out-Null
 
           az functionapp deployment source config-zip `
-            --name $azureResources.functionsAppName.value `
-            --resource-group $azureResources.resourceGroupName.value `
+            --name '${{ steps.ensure-graphQL-environment.outputs.GraphQL_AppName }}' `
+            --resource-group '${{ steps.ensure-graphQL-environment.outputs.GraphQL_ResourceGroup }}' `
             --src ./GraphQL.zip `
             --build-remote false `
           | Out-Null
