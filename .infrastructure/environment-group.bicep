@@ -7,6 +7,9 @@ param name string
 param type EnvironmentType
 param publishUrls string[]
 
+@secure()
+param hashAlgoritmKey string
+
 resource ResourceGroup 'Microsoft.Resources/resourceGroups@2025-04-01' = {
   name: resourceGroupName(name)
   location: deployment().location
@@ -20,6 +23,8 @@ module Environment './environment.bicep' = {
     name: name
     type: type
     publishUrls: publishUrls
+    
+    hashAlgoritmKey: hashAlgoritmKey
   }
 }
 

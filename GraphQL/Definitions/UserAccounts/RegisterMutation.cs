@@ -19,6 +19,10 @@ public class RegisterMutation : RequestFieldType<RegisterRequest, string>
             new QueryArgument<StringGraphType>
             {
                 Name = nameof(RegisterRequest.Password)
+            },
+            new QueryArgument<StringGraphType>
+            {
+                Name = nameof(RegisterRequest.EmailAddress)
             }
         ];
         Type = typeof(StringGraphType);
@@ -27,6 +31,7 @@ public class RegisterMutation : RequestFieldType<RegisterRequest, string>
     protected override RegisterRequest GetInput(IResolveFieldContext context)
         => new(
             Username: context.GetArgument<string>(nameof(RegisterRequest.Username)),
-            Password: context.GetArgument<string>(nameof(RegisterRequest.Password))
+            Password: context.GetArgument<string>(nameof(RegisterRequest.Password)),
+            EmailAddress: context.GetArgument<string>(nameof(RegisterRequest.EmailAddress))
         );
 }

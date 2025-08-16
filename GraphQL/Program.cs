@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Azure.Data.Tables;
@@ -38,6 +40,27 @@ foreach (var type in typeof(Program).Assembly.DefinedTypes)
     foreach (var requestHandlerConcreteInterface in requestHandlerConcreteInterfaces)
         builder.Services.AddScoped(requestHandlerConcreteInterface, type);
 }
+
+// Hashing
+builder
+    .Services
+    .AddTransient<HashAlgorithm>(services =>
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        var configuration = services.GetRequiredService<IConfiguration>();
+        var hashKey = configuration.GetValue<string>("HINTKEEP_HASH_KEY");
+
+        if (string.IsNullOrWhiteSpace(hashKey))
+        {
+            logger.LogCritical("HINTKEEP_HASH_KEY has not been configured.");
+            throw new InvalidOperationException("Expected HINTKEEP_HASH_KEY to be configured.");
+        }
+
+        return new HMACSHA256(Encoding.UTF8.GetBytes(hashKey));
+    })
+    .AddKeyedScoped<HashAlgorithm>(ServiceKeys.UsernameHashAlgorithm, (services, _) => services.GetRequiredService<HashAlgorithm>())
+    .AddKeyedScoped<HashAlgorithm>(ServiceKeys.PasswordHashAlgorithm, (services, _) => services.GetRequiredService<HashAlgorithm>())
+    .AddKeyedScoped<HashAlgorithm>(ServiceKeys.EmailAddressHashAlgorithm, (services, _) => services.GetRequiredService<HashAlgorithm>());
 
 // GraphQL & Serialization
 foreach (var type in typeof(Program).Assembly.DefinedTypes)
@@ -123,7 +146,7 @@ builder
         else
         {
             logger.LogCritical("Neither AzureWebJobsStorage (connection string) nor AzureWebJobsStorage__tableServiceUri (managed identity) have been configured for TableServiceClient.");
-            throw new InvalidOperationException("Expected either AzureWebJobsStorage (connection string) or AzureWebJobsStorage__tableServiceUri (managed identity) to be configured");
+            throw new InvalidOperationException("Expected either AzureWebJobsStorage (connection string) or AzureWebJobsStorage__tableServiceUri (managed identity) to be configured.");
         }
     });
 

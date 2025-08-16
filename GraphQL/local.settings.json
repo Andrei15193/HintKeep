@@ -1,6 +1,9 @@
 {
     "IsEncrypted": false,
     "Values": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "HINTKEEP_HASH_KEY": "if you know what's good for you, you will generate a proper hash key for remote environments",
+
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
 
         "AzureWebJobsStorage__accountName": "devstoreaccount1",
@@ -8,8 +11,8 @@
         "AzureWebJobsStorage__blobServiceUri": "http://127.0.0.1:10000",
         "AzureWebJobsStorage__queueServiceUri": "http://127.0.0.1:10001",
         "AzureWebJobsStorage__tableServiceUri": "http://127.0.0.1:10002",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "DOTNET_ENVIRONMENT": "Development"
+
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
     },
     "Host": {
         "LocalHttpPort": 8081

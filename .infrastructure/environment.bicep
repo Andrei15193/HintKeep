@@ -6,6 +6,9 @@ param name string
 param type EnvironmentType
 param publishUrls string[]
 
+@secure()
+param hashAlgoritmKey string
+
 @export()
 type EnvironmentType = 'development' | 'production'
 
@@ -75,6 +78,10 @@ resource FunctionsApp 'Microsoft.Web/sites@2024-11-01' = {
         {
           name: 'DOTNET_ENVIRONMENT'
           value: type == 'development' ? 'Development' : 'Production'
+        }
+        {
+          name: 'HINTKEEP_HASH_KEY'
+          value: hashAlgoritmKey
         }
 
         // Functions App Config

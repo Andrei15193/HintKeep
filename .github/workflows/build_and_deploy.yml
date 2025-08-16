@@ -132,6 +132,8 @@ jobs:
             -Update `
           | Out-Null
 
+          $env:HINTKEEP_HASH_KEY = '${{ secrets.HINTKEEP_HASH_KEY }}'
+
           $azureResources = az deployment sub create `
             --name 'hintkeep-test' `
             --location 'westeurope' `
