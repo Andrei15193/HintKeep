@@ -17,7 +17,7 @@ public record struct UserUniqueEntity(string UsernameHash) : ITableEntityProvide
         => new()
         {
             { TableEntityCommon.TypeProperty, Type },
-            { nameof(TableEntity.PartitionKey), UsernameHash.ToLowerInvariant() },
+            { nameof(TableEntity.PartitionKey), UsernameHash },
             { nameof(TableEntity.RowKey), RowKey }
         };
 }
