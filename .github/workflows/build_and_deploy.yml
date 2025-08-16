@@ -108,10 +108,26 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          
+
+      - name: Ensure GraphQL Environment
+        id: ensure-graphQL-environment
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $env:HINTKEEP_HASH_KEY = '${{ secrets.HINTKEEP_HASH_KEY }}'
+
+          $azureResources = az deployment sub create `
+            --name 'hintkeep-test' `
+            --location 'westeurope' `
+            --parameters (Join-Path '.infrastructure' 'Environments' 'test.bicepparam') `
+            --query 'properties.outputs' `
+          | ConvertFrom-Json
+
+          Write-Output "GraphQL_URL=$($azureResources.functionsAppUrl.value)" `
+          | Out-File -Append $env:GITHUB_OUTPUT
 
       - name: Deploy GraphQL
-        id: deploy-graphQL
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -132,15 +148,6 @@ jobs:
             -Update `
           | Out-Null
 
-          $env:HINTKEEP_HASH_KEY = '${{ secrets.HINTKEEP_HASH_KEY }}'
-
-          $azureResources = az deployment sub create `
-            --name 'hintkeep-test' `
-            --location 'westeurope' `
-            --parameters (Join-Path '.infrastructure' 'Environments' 'test.bicepparam') `
-            --query 'properties.outputs' `
-          | ConvertFrom-Json
-
           az functionapp deployment source config-zip `
             --name $azureResources.functionsAppName.value `
             --resource-group $azureResources.resourceGroupName.value `
@@ -148,16 +155,13 @@ jobs:
             --build-remote false `
           | Out-Null
 
-          Write-Output "GraphQL_URL=$($azureResources.functionsAppUrl.value)" `
-          | Out-File -Append $env:GITHUB_OUTPUT
-
       - name: Ensure WebClient Settings
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
 
           [hashtable] $netlifySettings = @{
-            HINTKEEP_API_URL = '${{ steps.deploy-graphQL.outputs.GraphQL_URL }}'
+            HINTKEEP_API_URL = '${{ steps.ensure-graphQL-environment.outputs.GraphQL_URL }}'
           }
 
           $netlifySettings.GetEnumerator() | ForEach-Object -Parallel {
