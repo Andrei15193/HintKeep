@@ -4,7 +4,7 @@ namespace HintKeep.GraphQL.Data.Users;
 
 public record struct UserIdUniqueEntity(Guid UserId, string UsernameHash) : ITableEntityProvider
 {
-    public const string RowKey = "unique";
+    public const string PartitionKey = "unique-id";
     public const string UsernameHashProperty = "usernameHash";
     public const string Type = "user-id-unique";
 
@@ -19,8 +19,8 @@ public record struct UserIdUniqueEntity(Guid UserId, string UsernameHash) : ITab
         => new()
         {
             { TableEntityCommon.TypeProperty, Type },
-            { nameof(TableEntity.PartitionKey), UserId.ToString("D") },
-            { nameof(TableEntity.RowKey), RowKey },
+            { nameof(TableEntity.PartitionKey), PartitionKey },
+            { nameof(TableEntity.RowKey), UserId.ToString("D") },
             { UsernameHashProperty, UsernameHash }
         };
 }
