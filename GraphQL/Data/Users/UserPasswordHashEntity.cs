@@ -5,7 +5,7 @@ namespace HintKeep.GraphQL.Data.Users;
 public record struct UserPasswordHashEntity(string UsernameHash, string PasswordHash, Guid UserId, string DisplayName) : ITableEntityProvider
 {
     public const string RowKeyPrefix = "password-hash:";
-    public const string UserIdProperty = "displayName";
+    public const string UserIdProperty = "userId";
     public const string DisplayNameProperty = "displayName";
     public const string Type = "user-password-hash";
 
