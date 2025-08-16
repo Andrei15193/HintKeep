@@ -50,7 +50,7 @@ public class RegisterRequestHandler(
                 ),
                 new TableTransactionAction(
                     TableTransactionActionType.Add,
-                    new UserEmailAddressHashEntity(request.Username, emailAddressHash).ToTableEntity()
+                    new UserEmailAddressHashEntity(usernameHash, emailAddressHash).ToTableEntity()
                 )
                 ],
                 cancellationToken
