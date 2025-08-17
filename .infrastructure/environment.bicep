@@ -37,7 +37,7 @@ resource StorageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
   }
   tags: resourceTags
 
-  resource Identifier 'tableServices' = {
+  resource TableServices 'tableServices' = {
     name: 'default'
 
     resource Tables 'tables' = [
