@@ -168,7 +168,7 @@ jobs:
           $netlifySettings.GetEnumerator() | ForEach-Object -Parallel {
             Invoke-RestMethod `
               -Method Patch `
-              -Uri "https://api.netlify.com/api/v1/accounts/${{ vars.NETLIFY_ACCOUNT_ID }}/env/$($_.key)?site_id=${{ vars.NETLIFY_SITE_ID }}" `
+              -Uri "https://api.netlify.com/api/v1/accounts/${{ vars.NETLIFY_TEAM_ID }}/env/$($_.key)?site_id=${{ vars.NETLIFY_SITE_ID }}" `
               -ContentType 'application/json' `
               -Authentication Bearer `
               -Token (ConvertTo-SecureString -AsPlainText '${{ secrets.NETLIFY_DEPLOY_TOKEN }}') `
