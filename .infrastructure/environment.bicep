@@ -7,6 +7,8 @@ param type EnvironmentType
 param publishUrls string[]
 
 @secure()
+param signingKey string
+@secure()
 param hashAlgoritmKey string
 
 @export()
@@ -78,6 +80,10 @@ resource FunctionsApp 'Microsoft.Web/sites@2024-11-01' = {
         {
           name: 'DOTNET_ENVIRONMENT'
           value: type == 'development' ? 'Development' : 'Production'
+        }
+        {
+          name: 'HINTKEEP_SIGNING_KEY'
+          value: signingKey
         }
         {
           name: 'HINTKEEP_HASH_KEY'

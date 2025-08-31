@@ -4,7 +4,7 @@ using GraphQL.Types;
 namespace HintKeep.GraphQL.Definitions.UserAccounts;
 
 [MutationField]
-public class RegisterMutation : RequestFieldType<RegisterRequest, string>
+public class RegisterMutation : RequestFieldType<RegisterRequest, RegisterResult>
 {
     public RegisterMutation()
     {
@@ -25,7 +25,7 @@ public class RegisterMutation : RequestFieldType<RegisterRequest, string>
                 Name = nameof(RegisterRequest.EmailAddress)
             }
         ];
-        Type = typeof(StringGraphType);
+        Type = typeof(AutoRegisteringObjectGraphType<RegisterResult>);
     }
 
     protected override RegisterRequest GetInput(IResolveFieldContext context)

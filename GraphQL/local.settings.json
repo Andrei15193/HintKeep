@@ -3,6 +3,7 @@
     "Values": {
         "DOTNET_ENVIRONMENT": "Development",
         "HINTKEEP_HASH_KEY": "if you know what's good for you, you will generate a proper hash key for remote environments",
+        "HINTKEEP_SIGNING_KEY": "if you know what's good for you, you will generate a proper hash key for remote environments",
 
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
 

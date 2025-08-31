@@ -19,16 +19,23 @@ public record RegisterRequest(
 
     [property: Required(ErrorMessage = "An email address is required.")]
     string EmailAddress
+) : IRequest<RegisterResult>;
+
+public record RegisterResult(
+    Guid UserId,
+    string Username,
+    string JsonWebToken
 );
 
 public class RegisterRequestHandler(
     HintKeepTableStorage hintKeepTableStorage,
     [FromKeyedServices(ServiceKeys.UsernameHashAlgorithm)] HashAlgorithm usernameHashAlgorithm,
     [FromKeyedServices(ServiceKeys.PasswordHashAlgorithm)] HashAlgorithm passwordHashAlgorithm,
-    [FromKeyedServices(ServiceKeys.EmailAddressHashAlgorithm)] HashAlgorithm emailHashAlgorithm
-) : IRequestHandler<RegisterRequest, string>
+    [FromKeyedServices(ServiceKeys.EmailAddressHashAlgorithm)] HashAlgorithm emailHashAlgorithm,
+    IRequestHandler<JsonWebTokenRequest, string> requestDispatcher
+) : IRequestHandler<RegisterRequest, RegisterResult>
 {
-    public async ValueTask<string> ExecuteAsync(RegisterRequest request, CancellationToken cancellationToken)
+    public async ValueTask<RegisterResult> ExecuteAsync(RegisterRequest request, CancellationToken cancellationToken)
     {
         var usernameHash = Convert.ToHexString(usernameHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Username.ToLowerInvariant())));
         var passwordHash = Convert.ToHexString(passwordHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
@@ -41,17 +48,17 @@ public class RegisterRequestHandler(
             await hintKeepTableStorage.Users.SubmitTransactionAsync(
                 [
                     new TableTransactionAction(
-                    TableTransactionActionType.Add,
-                    new UserUniqueEntity(usernameHash).ToTableEntity()
-                ),
-                new TableTransactionAction(
-                    TableTransactionActionType.Add,
-                    new UserPasswordHashEntity(usernameHash, passwordHash, userId, request.Username).ToTableEntity()
-                ),
-                new TableTransactionAction(
-                    TableTransactionActionType.Add,
-                    new UserEmailAddressHashEntity(usernameHash, emailAddressHash).ToTableEntity()
-                )
+                        TableTransactionActionType.Add,
+                        new UserUniqueEntity(usernameHash).ToTableEntity()
+                    ),
+                    new TableTransactionAction(
+                        TableTransactionActionType.Add,
+                        new UserPasswordHashEntity(usernameHash, passwordHash, userId, request.Username).ToTableEntity()
+                    ),
+                    new TableTransactionAction(
+                        TableTransactionActionType.Add,
+                        new UserEmailAddressHashEntity(usernameHash, emailAddressHash).ToTableEntity()
+                    )
                 ],
                 cancellationToken
             );
@@ -61,7 +68,13 @@ public class RegisterRequestHandler(
             throw new ValidationException(new ValidationResult("Usernames must be unique.", [nameof(RegisterRequest.Username)]), null, null);
         }
 
-        return request.Username;
+        var jsonWebToken = await requestDispatcher.ExecuteAsync(new JsonWebTokenRequest(UserId: userId), default);
+
+        return new RegisterResult(
+            UserId: userId,
+            Username: request.Username,
+            JsonWebToken: jsonWebToken
+        );
     }
 
     private async ValueTask<Guid> _ReserveUserIdAsync(string usernameHash, CancellationToken cancellationToken)

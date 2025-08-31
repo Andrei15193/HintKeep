@@ -8,6 +8,8 @@ param type EnvironmentType
 param publishUrls string[]
 
 @secure()
+param signingKey string
+@secure()
 param hashAlgoritmKey string
 
 resource ResourceGroup 'Microsoft.Resources/resourceGroups@2025-04-01' = {
@@ -23,7 +25,8 @@ module Environment './environment.bicep' = {
     name: name
     type: type
     publishUrls: publishUrls
-    
+
+    signingKey: signingKey
     hashAlgoritmKey: hashAlgoritmKey
   }
 }

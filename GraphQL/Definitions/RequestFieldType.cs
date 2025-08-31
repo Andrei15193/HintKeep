@@ -11,7 +11,7 @@ using ObjectValidator = System.ComponentModel.DataAnnotations.Validator;
 namespace HintKeep.GraphQL.Definitions;
 
 public abstract class RequestFieldType<TRequest, TResult> : FieldType
-    where TRequest : class
+    where TRequest : IRequest<TResult>
 {
     public RequestFieldType()
     {
@@ -35,8 +35,8 @@ public abstract class RequestFieldType<TRequest, TResult> : FieldType
                         logger.LogInformation("Executing '{requestTypeName}' request", typeof(TRequest).Name);
 
                         var result = await context
-                            .RequestServices
-                            !.GetRequiredService<IRequestHandler<TRequest, TResult?>>()
+                            .RequestServices!
+                            .GetRequiredService<IRequestHandler<TRequest, TResult>>()
                             .ExecuteAsync(GetInput(context), context.CancellationToken);
 
                         logger.LogInformation("Executed '{requestTypeName}' request", typeof(TRequest).Name);

@@ -118,6 +118,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
 
           $env:HINTKEEP_HASH_KEY = '${{ secrets.HINTKEEP_HASH_KEY }}'
+          $env:HINTKEEP_SIGNING_KEY = '${{ secrets.HINTKEEP_SIGNING_KEY }}'
 
           $azureResources = az deployment sub create `
             --name 'hintkeep-test' `

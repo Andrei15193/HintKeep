@@ -1,4 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -12,13 +14,17 @@ using GraphQL.Types;
 using HintKeep.GraphQL;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Definitions;
+using HintKeep.GraphQL.Definitions.UserAccounts;
 using HintKeep.GraphQL.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 var mutatoinFieldTypeKey = new object();
 
@@ -32,14 +38,58 @@ builder
     .ConfigureFunctionsApplicationInsights();
 
 // Request handlers
-foreach (var type in typeof(Program).Assembly.DefinedTypes)
-{
-    var requestHandlerConcreteInterfaces = type
-        .ImplementedInterfaces
-        .Where(implementedInterface => implementedInterface.IsGenericType && implementedInterface.GetGenericTypeDefinition() == typeof(IRequestHandler<,>));
-    foreach (var requestHandlerConcreteInterface in requestHandlerConcreteInterfaces)
-        builder.Services.AddScoped(requestHandlerConcreteInterface, type);
-}
+var requestHandlers =
+    from type in typeof(Program).Assembly.DefinedTypes
+    where type.IsClass
+    from implementedInterface in type.ImplementedInterfaces
+    where implementedInterface.IsConstructedGenericType && implementedInterface.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)
+    select (RequestHandlerInterface: implementedInterface, RequestHandlerImplementation: type);
+
+foreach (var (requestHandlerInterface, requestHandlerImplementation) in requestHandlers)
+    builder.Services.AddScoped(requestHandlerInterface, requestHandlerImplementation);
+
+// JSON Web Tokens
+builder
+    .Services
+    .AddSingleton<SecurityKey>(services =>
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        var configuration = services.GetRequiredService<IConfiguration>();
+        var signingKey = configuration.GetValue<string>("HINTKEEP_SIGNING_KEY");
+
+        if (string.IsNullOrWhiteSpace(signingKey))
+        {
+            logger.LogCritical("HINTKEEP_SIGNING_KEY has not been configured.");
+            throw new InvalidOperationException("Expected HINTKEEP_SIGNING_KEY to be configured.");
+        }
+
+        return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
+    })
+    .AddSingleton<SigningCredentials>(services =>
+    {
+        return new SigningCredentials(services.GetRequiredService<SecurityKey>(), SecurityAlgorithms.HmacSha256)
+        {
+            CryptoProviderFactory = new CryptoProviderFactory
+            {
+                CacheSignatureProviders = false
+            }
+        };
+    })
+    .AddSingleton<JwtSecurityTokenHandler>()
+    .AddSingleton<TokenValidationParameters>(services => new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = "hintkeep",
+        ValidateAudience = true,
+        ValidAudience = "graphql",
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = services.GetRequiredService<SecurityKey>(),
+        ClockSkew = TimeSpan.Zero
+    })
+    .AddSingleton<IPostConfigureOptions<JwtBearerOptions>, JwtBearerPostConfigure>()
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme);
 
 // Hashing
 builder
@@ -155,6 +205,7 @@ builder
     .UseMiddleware(
         async (context, next) =>
         {
+            var httpContext = context.GetHttpContext();
             var correlationId = context.InstanceServices.GetRequiredKeyedService<Guid>(ServiceKeys.CorrelationId);
             var logger = context.InstanceServices.GetRequiredService<ILogger<Program>>();
 
@@ -163,7 +214,9 @@ builder
                 context.FunctionId,
                 FunctionName = context.FunctionDefinition.Name,
                 FunctionEntry = context.FunctionDefinition.EntryPoint,
-                CorrelationId = correlationId
+                CorrelationId = correlationId,
+                httpContext?.Request.Headers.UserAgent,
+                RequestPath = httpContext?.Request.Path
             }))
                 try
                 {
@@ -183,3 +236,27 @@ builder
 builder
     .Build()
     .Run();
+
+internal class JwtBearerPostConfigure(ILogger<Program> logger, TokenValidationParameters tokenValidationParameters) : IPostConfigureOptions<JwtBearerOptions>
+{
+    public void PostConfigure(string? name, JwtBearerOptions options)
+    {
+        options.TokenValidationParameters = tokenValidationParameters;
+        options.Events.OnAuthenticationFailed += context =>
+        {
+            var userId = context.Principal?.FindFirstValue(HintKeepClaims.UserId);
+            var tokenId = context.Principal?.FindFirstValue(HintKeepClaims.TokenId);
+            logger.LogWarning("Failed to authenticate JWT '{tokenId}' having user ID '{userId}' with error '{error}'.", tokenId, userId, context.Exception.Message);
+
+            return Task.CompletedTask;
+        };
+        options.Events.OnTokenValidated += context =>
+        {
+            var userId = context.Principal?.FindFirstValue(HintKeepClaims.UserId);
+            var tokenId = context.Principal?.FindFirstValue(HintKeepClaims.TokenId);
+            logger.LogInformation("Authenticated JWT '{tokenId}' having user ID '{userId}'.", tokenId, userId);
+
+            return Task.CompletedTask;
+        };
+    }
+}
