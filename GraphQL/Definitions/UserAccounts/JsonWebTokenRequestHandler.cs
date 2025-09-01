@@ -15,8 +15,8 @@ public class JsonWebTokenRequestHandler(SigningCredentials signingCredentials, T
             issuer: tokenValidationParameters.ValidIssuer,
             audience: tokenValidationParameters.ValidAudience,
             claims: [
-                new Claim(HintKeepClaims.UserId, request.UserId.ToString("D")),
-                new Claim(HintKeepClaims.TokenId, Guid.NewGuid().ToString("D"))
+                new Claim(HintKeepClaims.UserId, request.UserId.ToString(HintKeepClaims.GuidFormatString)),
+                new Claim(HintKeepClaims.TokenId, Guid.NewGuid().ToString(HintKeepClaims.GuidFormatString))
             ],
             expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: signingCredentials

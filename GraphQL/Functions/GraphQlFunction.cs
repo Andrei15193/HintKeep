@@ -9,11 +9,15 @@ using GraphQL;
 using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Transport;
 using GraphQL.Types;
+using GraphQL.Validation;
+using HintKeep.GraphQL.Definitions;
+using HintKeep.GraphQL.Definitions.UserAccounts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -105,6 +109,7 @@ public class GraphQlFunction(
                 serializer,
                 options =>
                 {
+                    options.User = new ClaimsPrincipal(request.Identities);
                     options.OperationName = graphQlRequest.OperationName;
                     options.Query = graphQlRequest.Query;
                     options.Variables = graphQlRequest.Variables;
@@ -113,6 +118,7 @@ public class GraphQlFunction(
 
                     options.Root = new object();
                     options.RequestServices = request.FunctionContext.InstanceServices;
+                    options.ValidationRules = request.FunctionContext.InstanceServices.GetServices<IValidationRule>();
                 }
             );
 

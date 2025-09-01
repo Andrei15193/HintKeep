@@ -8,14 +8,17 @@ using System.Text.Json.Serialization;
 using Azure.Data.Tables;
 using Azure.Identity;
 using GraphQL;
+using GraphQL.Authorization;
 using GraphQL.Conversion;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using GraphQL.Validation;
 using HintKeep.GraphQL;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Definitions;
 using HintKeep.GraphQL.Definitions.UserAccounts;
 using HintKeep.GraphQL.Json;
+using HintKeep.GraphQL.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
@@ -48,8 +51,9 @@ var requestHandlers =
 foreach (var (requestHandlerInterface, requestHandlerImplementation) in requestHandlers)
     builder.Services.AddScoped(requestHandlerInterface, requestHandlerImplementation);
 
-// JSON Web Tokens
+// Authentication (JSON Web Tokens)
 builder
+    .UseMiddleware<AuthenticationMiddleware>()
     .Services
     .AddSingleton<SecurityKey>(services =>
     {
@@ -75,7 +79,15 @@ builder
             }
         };
     })
-    .AddSingleton<JwtSecurityTokenHandler>()
+    .AddSingleton<JwtSecurityTokenHandler>(services =>
+    {
+        var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+
+        jwtSecurityTokenHandler.InboundClaimTypeMap.Clear();
+        jwtSecurityTokenHandler.OutboundClaimTypeMap.Clear();
+
+        return jwtSecurityTokenHandler;
+    })
     .AddSingleton<TokenValidationParameters>(services => new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -87,9 +99,7 @@ builder
         IssuerSigningKey = services.GetRequiredService<SecurityKey>(),
         ClockSkew = TimeSpan.Zero
     })
-    .AddSingleton<IPostConfigureOptions<JwtBearerOptions>, JwtBearerPostConfigure>()
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme);
+    .AddSingleton<IPostConfigureOptions<JwtBearerOptions>, JwtBearerPostConfigure>();
 
 // Hashing
 builder
@@ -123,21 +133,59 @@ foreach (var type in typeof(Program).Assembly.DefinedTypes)
 
 builder
     .Services
-    .AddSingleton<ISchema>(resolver =>
+    .AddSingleton<AuthorizationSettings>(services =>
     {
+        var authorizationSettings = new AuthorizationSettings();
+        authorizationSettings.AddPolicy(
+            "authenticatedUser",
+            policy => policy
+                .RequireAuthenticatedUser()
+                .RequireClaim(HintKeepClaims.UserId)
+                .AddRequirement(new GuidRequirement(HintKeepClaims.UserId, "Expected '" + HintKeepClaims.UserId + "' to be a GUID."))
+        );
+
+        return authorizationSettings;
+    })
+    .AddSingleton<IAuthorizationEvaluator, AuthorizationEvaluator>()
+    .AddSingleton<IValidationRule, AuthorizationValidationRule>()
+    .AddSingleton<ISchema>(services =>
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        var defaultAuthorization = new AuthorizeAttribute("authenticatedUser");
         var mutaitonGraphObject = new ObjectGraphType
         {
             Name = "HintKeepMutations",
             Description = "Contains all of HintKeep mutations for performing create, update or delete operations."
         };
-        foreach (var mutationField in resolver.GetKeyedServices<FieldType>(mutatoinFieldTypeKey))
-            mutaitonGraphObject.AddField(mutationField);
+        foreach (var mutationField in services.GetKeyedServices<FieldType>(mutatoinFieldTypeKey))
+        {
+            var mutationFieldBuilder = mutaitonGraphObject.AddField(mutationField);
+            var mutationFieldAttribute = mutationField.GetType().GetCustomAttribute<MutationFieldAttribute>();
+            var authorizeAttributes = mutationField
+                .GetType()
+                .GetCustomAttributes<AuthorizeAttribute>()
+                .OrderBy(authorizeAttribute => authorizeAttribute.Priority)
+                .AsEnumerable();
+            if (mutationFieldAttribute?.AllowAnonymous is false)
+                authorizeAttributes = authorizeAttributes.DefaultIfEmpty(defaultAuthorization);
+
+            foreach (var authorizeAttribute in authorizeAttributes)
+            {
+                if (!string.IsNullOrWhiteSpace(authorizeAttribute.Roles))
+                {
+                    logger.LogCritical("Authorization roles are not supported at this time.");
+                    throw new InvalidOperationException("Authorization roles are not supported at this time.");
+                }
+                if (!string.IsNullOrWhiteSpace(authorizeAttribute.Policy))
+                    mutationFieldBuilder.AuthorizeWithPolicy(authorizeAttribute.Policy);
+            }
+        }
 
         return new Schema
         {
             Description = "HintKeep GraphQL API",
             NameConverter = CamelCaseNameConverter.Instance,
-            Query = resolver.GetRequiredService<QueryGraphDefinition>(),
+            Query = services.GetRequiredService<QueryGraphDefinition>(),
             Mutation = mutaitonGraphObject
         };
     })
@@ -258,5 +306,18 @@ internal class JwtBearerPostConfigure(ILogger<Program> logger, TokenValidationPa
 
             return Task.CompletedTask;
         };
+    }
+}
+
+class GuidRequirement(string claim, string errorMessage) : IAuthorizationRequirement
+{
+    public Task Authorize(AuthorizationContext context)
+    {
+        var claimValue = context.User?.FindFirstValue(claim);
+
+        if (string.IsNullOrWhiteSpace(claimValue) || !Guid.TryParse(claimValue, out var _))
+            context.ReportError(errorMessage);
+
+        return Task.CompletedTask;
     }
 }

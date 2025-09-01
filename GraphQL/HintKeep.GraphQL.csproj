@@ -21,6 +21,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="GraphQL" Version="8.5.0" />
+    <PackageReference Include="GraphQL.Authorization" Version="8.0.0" />
     <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="8.3.0" />
     <PackageReference Include="GraphQL.SystemTextJson" Version="8.5.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.23.0" />
