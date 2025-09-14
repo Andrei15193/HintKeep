@@ -1,7 +1,7 @@
 using GraphQL;
 using GraphQL.Types;
 
-namespace HintKeep.GraphQL.Definitions.UserAccounts;
+namespace HintKeep.GraphQL.Definitions.Users.Accounts;
 
 [MutationField(AllowAnonymous = true)]
 public class RegisterMutation : RequestFieldType<RegisterRequest, RegisterResult>

@@ -1,0 +1,111 @@
+using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using Azure;
+using Azure.Data.Tables;
+using HintKeep.GraphQL.Data;
+using HintKeep.GraphQL.Data.Users;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+
+namespace HintKeep.GraphQL.Definitions.Users.Sessions;
+
+public record BeginSessionRequest(
+    [property: Required(ErrorMessage = "Session ticket is missing.")]
+    string? SessionTicket
+) : IRequest<BeginSessionResult>;
+
+public record BeginSessionResult(
+    Guid UserId,
+    Guid SessionId,
+    string Username,
+    string SessionToken,
+    DateTime SessionTokenExpiration,
+    string SessionTicket,
+    DateTime SessionTicketExpiration
+);
+
+public class BeginSessionRequestHandler(
+    IHostEnvironment environment,
+    ILogger<BeginSessionRequestHandler> logger,
+    HintKeepTableStorage hintKeepTableStorage,
+
+    TokenValidationParameters tokenValidationParameters,
+    JwtSecurityTokenHandler jsonWebTokenHandler,
+
+    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> ensureSessionTicketRequestHandler,
+    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler
+) : IRequestHandler<BeginSessionRequest, BeginSessionResult>
+{
+    public async ValueTask<BeginSessionResult> ExecuteAsync(BeginSessionRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            jsonWebTokenHandler.ValidateToken(request.SessionTicket, tokenValidationParameters, out var _);
+        }
+        catch (SecurityTokenException securityTokenException)
+        {
+            logger.LogWarning(securityTokenException, "Invalid Session Ticket JSON Web Token '{jwt}'.", request.SessionTicket);
+
+            var validationErrorMessage = environment.IsDevelopment()
+                ? $"Invalid session ticket. {securityTokenException}"
+                : "Invalid session ticket.";
+            throw new ValidationException(new ValidationResult(validationErrorMessage, [nameof(BeginSessionRequest.SessionTicket)]), null, null);
+        }
+
+        var sessionTicketSecurityToken = jsonWebTokenHandler.ReadJwtToken(request.SessionTicket);
+        var userId = sessionTicketSecurityToken.GetUserId();
+        var ticketId = sessionTicketSecurityToken.GetTokenId();
+
+        var userSessionTicketEntity = await hintKeepTableStorage
+            .Users
+            .GetEntityIfExistsAsync<TableEntity>(UserSessionTicketEntity.GetEntityKey(userId, ticketId), cancellationToken)
+            .ToUserSessionTicketEntity()
+            ?? throw new ValidationException(
+                new ValidationResult("Session ticket expired.", [nameof(BeginSessionRequest.SessionTicket)]),
+                null,
+                null
+            );
+        await hintKeepTableStorage
+            .Users
+            .DeleteEntityAsync(userSessionTicketEntity.ToTableEntity(), ETag.All, cancellationToken);
+
+        if (userSessionTicketEntity.TicketExpiration <= DateTime.UtcNow)
+            throw new ValidationException(
+                new ValidationResult("Session ticket expired.", [nameof(BeginSessionRequest.SessionTicket)]),
+                null,
+                null
+            );
+
+        var userEntity = await hintKeepTableStorage
+            .Users
+            .GetEntityIfExistsAsync<TableEntity>(UserIdUniqueEntity.GetEntityKey(userId), cancellationToken)
+            .ToUserIdUniqueEntity()
+            ?? throw new ValidationException(
+                new ValidationResult("Session ticket expired.", [nameof(BeginSessionRequest.SessionTicket)]),
+                null,
+                null
+            );
+
+        var (sessionTicket, sessionTicketExpiration) = await ensureSessionTicketRequestHandler.ExecuteAsync(
+            new CreateSessionTicketRequest(userId).EnsureValid(),
+            cancellationToken
+        );
+
+        var (sessionToken, sessionId, sessionExpiration) = await sessionTokenRequestHandler.ExecuteAsync(
+            new CreateSessionTokenRequest(userId).EnsureValid(),
+            cancellationToken
+        );
+
+        return new BeginSessionResult(
+            UserId: userId,
+            SessionId: sessionId,
+            Username: userEntity.Username,
+            SessionToken: sessionToken,
+            SessionTokenExpiration: sessionExpiration,
+            SessionTicket: sessionTicket,
+            SessionTicketExpiration: sessionTicketExpiration
+        );
+    }
+}

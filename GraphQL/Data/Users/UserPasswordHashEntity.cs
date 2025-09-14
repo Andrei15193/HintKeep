@@ -1,30 +1,46 @@
+using Azure;
 using Azure.Data.Tables;
 
 namespace HintKeep.GraphQL.Data.Users;
 
-public record struct UserPasswordHashEntity(string UsernameHash, string PasswordHash, Guid UserId, string DisplayName) : ITableEntityProvider
+public record struct UserPasswordHashEntity(string UsernameHash, string PasswordHash, Guid UserId, ETag ETag = default) : ITableEntityProvider
 {
+    public const string Type = "user-password-hash";
     public const string RowKeyPrefix = "password-hash:";
     public const string UserIdProperty = "userId";
-    public const string DisplayNameProperty = "displayName";
-    public const string Type = "user-password-hash";
+
+    public static TableEntityKey GetEntityKey(string usernameHash, string passwordHash)
+        => new(usernameHash, RowKeyPrefix + passwordHash);
 
     public UserPasswordHashEntity(TableEntity tableEntity)
         : this(
             UsernameHash: tableEntity.GetString(nameof(TableEntity.PartitionKey)),
             PasswordHash: tableEntity.RowKey[RowKeyPrefix.Length..],
-            UserId: tableEntity.GetGuid(UserIdProperty)!.Value,
-            DisplayName: tableEntity.GetString(DisplayNameProperty)
+            UserId: tableEntity.GetGuid(UserIdProperty)!.Value
         )
         => TableEntityCommon.ValidateType(tableEntity, Type);
 
     public readonly TableEntity ToTableEntity()
         => new()
         {
-            { TableEntityCommon.TypeProperty, Type },
-            { nameof(TableEntity.PartitionKey), UsernameHash },
-            { nameof(TableEntity.RowKey), RowKeyPrefix + PasswordHash },
-            { UserIdProperty, UserId },
-            { DisplayNameProperty, DisplayName }
+            [TableEntityCommon.TypeProperty] = Type,
+
+            PartitionKey = UsernameHash,
+            RowKey = RowKeyPrefix + PasswordHash,
+            ETag = ETag,
+
+            [UserIdProperty] = UserId
         };
+}
+
+public static class UserPasswordHashEntityExtensions
+{
+    public static async ValueTask<UserPasswordHashEntity?> ToUserPasswordHashEntity(this Task<NullableResponse<TableEntity>> queryNullableResponse)
+    {
+        var result = await queryNullableResponse;
+        if (result.HasValue)
+            return new(result.Value!);
+        else
+            return default;
+    }
 }

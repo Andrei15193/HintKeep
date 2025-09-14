@@ -2,8 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using HintKeep.GraphQL.Definitions.UserAccounts;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using HintKeep.GraphQL.Definitions.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -16,6 +15,7 @@ namespace HintKeep.GraphQL.Middlewares;
 public class AuthenticationMiddleware(
     IHostEnvironment environment,
     ILogger<AuthenticationMiddleware> logger,
+
     JwtSecurityTokenHandler jwtSecurityTokenHandler,
     TokenValidationParameters tokenValidationParameters
 ) : IFunctionsWorkerMiddleware
@@ -30,30 +30,45 @@ public class AuthenticationMiddleware(
             logger.LogInformation("Authenticating user.");
 
             Exception? authException = null;
-            if (httpContext.Request.Headers.Authorization.Count == 0)
-                logger.LogInformation("User is not authenticated, proceeding as anonymous.");
+            var sessionToken = string.Empty;
+
+            var hintKeepSessionHeaderValues = httpContext.Request.Headers[HintKeepHttp.SessionIdHeaderName];
+            if (hintKeepSessionHeaderValues.Count == 0)
+            {
+                if (environment.IsDevelopment())
+                    httpContext.Request.Cookies.TryGetValue(HintKeepHttp.DevSessionTokenCookieName, out sessionToken);
+            }
             else
             {
-                var jsonWebToken = httpContext.Request.Headers.Authorization
-                    .Where(authorizationHeaderValue => !string.IsNullOrWhiteSpace(authorizationHeaderValue))
-                    .Select(authorizationHeaderValue => authorizationHeaderValue!.Replace(JwtBearerDefaults.AuthenticationScheme + " ", string.Empty))
-                    .First();
+                sessionToken = hintKeepSessionHeaderValues
+                    .Select(sessionIdString => (
+                        Guid.TryParseExact(sessionIdString, HintKeepHttp.SessionTokenIdFormat, out var sessionId)
+                        ? httpContext.Request.Cookies.TryGetValue(HintKeepHttp.SessionTokenCookieName(sessionId), out var sessionToken)
+                            ? sessionToken
+                            : null
+                        : null
+                    ))
+                    .FirstOrDefault(sessionId => sessionId is not null);
+            }
+
+            if (string.IsNullOrWhiteSpace(sessionToken))
+                logger.LogInformation("User is not authenticated, proceeding as anonymous.");
+            else
                 try
                 {
-                    httpContext.User = jwtSecurityTokenHandler.ValidateToken(jsonWebToken, tokenValidationParameters, out var _);
+                    httpContext.User = jwtSecurityTokenHandler.ValidateToken(sessionToken, tokenValidationParameters, out var _);
                     logger.LogInformation("User is authenticated with '{userId}' user ID.", httpContext.User.FindFirstValue(HintKeepClaims.UserId));
                 }
                 catch (SecurityTokenException securityTokenException)
                 {
-                    logger.LogWarning(securityTokenException, "Invalid JSON Web Token '{jwt}'", jsonWebToken);
+                    logger.LogWarning(securityTokenException, "Invalid JSON Web Token '{jwt}'", sessionToken);
                     authException = securityTokenException;
                 }
                 catch (Exception exception)
                 {
-                    logger.LogError(exception, "Invalid JSON Web Token '{jwt}'.", jsonWebToken);
+                    logger.LogError(exception, "Invalid JSON Web Token '{jwt}'.", sessionToken);
                     authException = exception;
                 }
-            }
 
             if (authException is null)
                 await next(context);

@@ -16,7 +16,7 @@ using GraphQL.Validation;
 using HintKeep.GraphQL;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Definitions;
-using HintKeep.GraphQL.Definitions.UserAccounts;
+using HintKeep.GraphQL.Definitions.Users;
 using HintKeep.GraphQL.Json;
 using HintKeep.GraphQL.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -79,6 +79,8 @@ builder
             }
         };
     })
+    .AddKeyedSingleton<SigningCredentials>(ServiceKeys.SessionTokenSigningKey, (services, _) => services.GetRequiredService<SigningCredentials>())
+    .AddKeyedSingleton<SigningCredentials>(ServiceKeys.SessionTicketSigningKey, (services, _) => services.GetRequiredService<SigningCredentials>())
     .AddSingleton<JwtSecurityTokenHandler>(services =>
     {
         var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
@@ -142,6 +144,9 @@ builder
                 .RequireAuthenticatedUser()
                 .RequireClaim(HintKeepClaims.UserId)
                 .AddRequirement(new GuidRequirement(HintKeepClaims.UserId, "Expected '" + HintKeepClaims.UserId + "' to be a GUID."))
+                .RequireClaim(HintKeepClaims.TokenId)
+                .AddRequirement(new GuidRequirement(HintKeepClaims.TokenId, "Expected '" + HintKeepClaims.TokenId + "' to be a GUID."))
+                .AddRequirement(new GuidRequirement(HintKeepClaims.SessionId, "Expected '" + HintKeepClaims.SessionId + "' to be a GUID."))
         );
 
         return authorizationSettings;
@@ -315,7 +320,7 @@ class GuidRequirement(string claim, string errorMessage) : IAuthorizationRequire
     {
         var claimValue = context.User?.FindFirstValue(claim);
 
-        if (string.IsNullOrWhiteSpace(claimValue) || !Guid.TryParse(claimValue, out var _))
+        if (claimValue is not null && (string.IsNullOrWhiteSpace(claimValue) || !Guid.TryParseExact(claimValue, HintKeepClaims.GuidFormatString, out var _)))
             context.ReportError(errorMessage);
 
         return Task.CompletedTask;

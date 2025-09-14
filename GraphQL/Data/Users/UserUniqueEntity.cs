@@ -1,11 +1,12 @@
+using Azure;
 using Azure.Data.Tables;
 
 namespace HintKeep.GraphQL.Data.Users;
 
-public record struct UserUniqueEntity(string UsernameHash) : ITableEntityProvider
+public record struct UserUniqueEntity(string UsernameHash, ETag ETag = default) : ITableEntityProvider
 {
-    public const string RowKey = "unique";
     public const string Type = "user-unique";
+    public const string RowKey = "unique";
 
     public UserUniqueEntity(TableEntity tableEntity)
         : this(
@@ -16,8 +17,23 @@ public record struct UserUniqueEntity(string UsernameHash) : ITableEntityProvide
     public readonly TableEntity ToTableEntity()
         => new()
         {
-            { TableEntityCommon.TypeProperty, Type },
-            { nameof(TableEntity.PartitionKey), UsernameHash },
-            { nameof(TableEntity.RowKey), RowKey }
+            [TableEntityCommon.TypeProperty] = Type,
+
+            PartitionKey = UsernameHash,
+            RowKey = RowKey,
+            ETag = ETag
         };
+}
+
+
+public static class UserUniqueEntityExtensions
+{
+    public static async ValueTask<UserUniqueEntity?> ToUserUniqueEntity(this Task<NullableResponse<TableEntity>> queryNullableResponse)
+    {
+        var result = await queryNullableResponse;
+        if (result.HasValue)
+            return new(result.Value!);
+        else
+            return default;
+    }
 }
