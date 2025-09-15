@@ -17,6 +17,7 @@ type EnvironmentType = 'development' | 'production'
 @export()
 var tableNames = [
   'Users'
+  'UserSession'
 ]
 
 resource PersonalAppPlan 'Microsoft.Web/serverfarms@2024-11-01' existing = {
@@ -147,6 +148,7 @@ resource ManagedIdentityRoleAssignments 'Microsoft.Authorization/roleAssignments
   for roleId in [
     buildInRoles.storage.storageAccount.blob.dataContributor
     buildInRoles.storage.storageAccount.table.dataContributor
+    buildInRoles.storage.storageAccount.queue.dataContributor
   ]: {
     name: guid(resourceGroup().name, StorageAccount.name, roleId)
     scope: StorageAccount
