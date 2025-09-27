@@ -30,7 +30,7 @@ public class CreateSessionTokenRequestHandler(
         do
             try
             {
-                await hintKeepTableStorage.Users.AddEntityAsync(
+                await hintKeepTableStorage.UserSessions.AddEntityAsync(
                     new UserSessionEntity(
                         UserId: request.UserId,
                         SessionId: sessionId

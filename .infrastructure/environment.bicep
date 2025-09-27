@@ -17,7 +17,7 @@ type EnvironmentType = 'development' | 'production'
 @export()
 var tableNames = [
   'Users'
-  'UserSession'
+  'UserSessions'
 ]
 
 resource PersonalAppPlan 'Microsoft.Web/serverfarms@2024-11-01' existing = {

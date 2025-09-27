@@ -5,7 +5,7 @@ function Update-AzuriteTables {
     param ()
 
     Write-Host "Ensuring Azure Storage Tables Exist"
-    az bicep build --file (Path-Join $PSScriptRoot '..' '.infrastructure' 'environment.bicep') --stdout `
+    az bicep build --file (Join-Path $PSScriptRoot '..' '.infrastructure' 'environment.bicep') --stdout `
     | ConvertFrom-Json `
     | Select-Object -ExpandProperty variables `
     | Select-Object -ExpandProperty tableNames `

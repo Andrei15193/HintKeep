@@ -50,7 +50,7 @@ public class BeginSessionRequestHandler(
         var ticketId = sessionTicketSecurityToken.GetTokenId();
 
         var userSessionTicketEntity = await hintKeepTableStorage
-            .Users
+            .UserSessions
             .GetEntityIfExistsAsync<TableEntity>(UserSessionTicketEntity.GetEntityKey(userId, ticketId), cancellationToken)
             .ToUserSessionTicketEntity()
             ?? throw new ValidationException(
@@ -59,7 +59,7 @@ public class BeginSessionRequestHandler(
                 null
             );
         await hintKeepTableStorage
-            .Users
+            .UserSessions
             .DeleteEntityAsync(userSessionTicketEntity.ToTableEntity(), ETag.All, cancellationToken);
 
         if (userSessionTicketEntity.TicketExpiration <= DateTime.UtcNow)

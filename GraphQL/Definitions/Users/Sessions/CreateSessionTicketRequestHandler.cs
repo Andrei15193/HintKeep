@@ -30,7 +30,7 @@ public class CreateSessionTicketRequestHandler(
         do
             try
             {
-                await hintKeepTableStorage.Users.AddEntityAsync(
+                await hintKeepTableStorage.UserSessions.AddEntityAsync(
                     new UserSessionTicketEntity(
                         UserId: request.UserId,
                         TicketId: ticketId,
