@@ -3,7 +3,12 @@ using Azure.Data.Tables;
 
 namespace HintKeep.GraphQL.Data.Users;
 
-public record struct UserEmailAddressHashEntity(string UsernameHash, string EmailAddressHash, ETag ETag = default) : ITableEntityProvider
+public record struct UserEmailAddressHashEntity(
+    string UsernameHash,
+    string EmailAddressHash,
+    ETag ETag = default
+) :
+    ITableEntityProvider
 {
     public const string Type = "user-email-address-hash";
     public const string RowKeyPrefix = "email-hash:";

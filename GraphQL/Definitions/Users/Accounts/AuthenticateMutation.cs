@@ -8,15 +8,15 @@ public class AuthenticateMutation : RequestFieldType<AuthenticationRequest, Auth
 {
     public AuthenticateMutation()
     {
-        Name = "authenticate";
+        Name = "Authenticate";
 
         Arguments =
         [
-            new QueryArgument<StringGraphType>
+            new QueryArgument<NonNullGraphType<StringGraphType>>
             {
                 Name = nameof(AuthenticationRequest.Username)
             },
-            new QueryArgument<StringGraphType>
+            new QueryArgument<NonNullGraphType<StringGraphType>>
             {
                 Name = nameof(AuthenticationRequest.Password)
             }
@@ -39,6 +39,8 @@ public class AuthenticationResultGraphType : ObjectGraphType<AuthenticationResul
             .Resolve(context => _EnsureAuthenticationCookies(context).Source.UserId);
         Field<NonNullGraphType<GuidGraphType>>(nameof(AuthenticationResult.SessionId))
             .Resolve(context => _EnsureAuthenticationCookies(context).Source.SessionId);
+        Field<NonNullGraphType<StringGraphType>>(nameof(AuthenticationResult.SessionRenewToken))
+            .Resolve(context => _EnsureAuthenticationCookies(context).Source.SessionRenewToken);
         Field<NonNullGraphType<StringGraphType>>(nameof(AuthenticationResult.Username))
             .Resolve(context => _EnsureAuthenticationCookies(context).Source.Username);
     }

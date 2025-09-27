@@ -3,7 +3,13 @@ using Azure.Data.Tables;
 
 namespace HintKeep.GraphQL.Data.Users;
 
-public record struct UserSessionTicketEntity(Guid UserId, Guid TicketId, DateTime TicketExpiration, ETag ETag = default) : ITableEntityProvider
+public record struct UserSessionTicketEntity(
+    Guid UserId,
+    Guid TicketId,
+    DateTime TicketExpiration,
+    ETag ETag = default
+) :
+    ITableEntityProvider
 {
     public const string Type = "user-session-ticket";
     public const string RowKeyRefix = "session-ticket:";

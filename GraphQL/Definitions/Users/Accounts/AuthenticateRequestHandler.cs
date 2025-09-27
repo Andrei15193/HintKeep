@@ -15,14 +15,18 @@ public record AuthenticationRequest(
 
     [property: Required(ErrorMessage = "A password is required.")]
     string Password
-) : IRequest<AuthenticationResult>;
+) :
+    IRequest<AuthenticationResult>;
 
 public record AuthenticationResult(
     Guid UserId,
     Guid SessionId,
     string Username,
+
     string SessionToken,
+    string SessionRenewToken,
     DateTime SessionTokenExpiration,
+
     string SessionTicket,
     DateTime SessionTicketExpiration
 );
@@ -33,9 +37,10 @@ public class AuthenticateRequestHandler(
     [FromKeyedServices(ServiceKeys.UsernameHashAlgorithm)] HashAlgorithm usernameHashAlgorithm,
     [FromKeyedServices(ServiceKeys.PasswordHashAlgorithm)] HashAlgorithm passwordHashAlgorithm,
 
-    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler,
-    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler
-) : IRequestHandler<AuthenticationRequest, AuthenticationResult>
+    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler,
+    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler
+) :
+    IRequestHandler<AuthenticationRequest, AuthenticationResult>
 {
     public async ValueTask<AuthenticationResult> ExecuteAsync(AuthenticationRequest request, CancellationToken cancellationToken)
     {
@@ -62,12 +67,17 @@ public class AuthenticateRequestHandler(
                 null
             );
 
-        var sessionTokenResult = await sessionTokenRequestHandler.ExecuteAsync(
-            new CreateSessionTokenRequest(UserId: userEntity.UserId).EnsureValid(),
+        var sessionTicketResult = await sessionTicketRequestHandler.ExecuteAsync(
+            new CreateSessionTicketRequest(
+                UserId: userEntity.UserId
+            ).EnsureValid(),
             cancellationToken
         );
-        var sessionTicketResult = await sessionTicketRequestHandler.ExecuteAsync(
-            new CreateSessionTicketRequest(UserId: userEntity.UserId).EnsureValid(),
+        var sessionTokenResult = await sessionTokenRequestHandler.ExecuteAsync(
+            new CreateSessionTokenRequest(
+                UserId: userEntity.UserId,
+                SessionTicketId: sessionTicketResult.TicketId
+            ).EnsureValid(),
             cancellationToken
         );
 
@@ -75,8 +85,11 @@ public class AuthenticateRequestHandler(
             UserId: userEntity.UserId,
             SessionId: sessionTokenResult.SessionId,
             Username: userEntity.Username,
+
             SessionToken: sessionTokenResult.SessionToken,
+            SessionRenewToken: sessionTokenResult.SessionRenewToken,
             SessionTokenExpiration: sessionTokenResult.SessionTokenExpiration,
+
             SessionTicket: sessionTicketResult.Ticket,
             SessionTicketExpiration: sessionTicketResult.TicketExpiration
         );

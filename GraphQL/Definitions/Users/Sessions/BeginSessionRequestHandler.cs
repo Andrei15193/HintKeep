@@ -15,7 +15,8 @@ namespace HintKeep.GraphQL.Definitions.Users.Sessions;
 public record BeginSessionRequest(
     [property: Required(ErrorMessage = "Session ticket is missing.")]
     string? SessionTicket
-) : IRequest<AuthenticationResult>;
+) :
+    IRequest<AuthenticationResult>;
 
 public class BeginSessionRequestHandler(
     IHostEnvironment environment,
@@ -25,9 +26,10 @@ public class BeginSessionRequestHandler(
     TokenValidationParameters tokenValidationParameters,
     JwtSecurityTokenHandler jsonWebTokenHandler,
 
-    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler,
-    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler
-) : IRequestHandler<BeginSessionRequest, AuthenticationResult>
+    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler,
+    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler
+) :
+    IRequestHandler<BeginSessionRequest, AuthenticationResult>
 {
     public async ValueTask<AuthenticationResult> ExecuteAsync(BeginSessionRequest request, CancellationToken cancellationToken)
     {
@@ -80,11 +82,16 @@ public class BeginSessionRequestHandler(
             );
 
         var sessionTokenResult = await sessionTokenRequestHandler.ExecuteAsync(
-            new CreateSessionTokenRequest(userId).EnsureValid(),
+            new CreateSessionTokenRequest(
+                UserId: userId,
+                SessionTicketId: ticketId
+            ).EnsureValid(),
             cancellationToken
         );
         var sessionTicketResult = await sessionTicketRequestHandler.ExecuteAsync(
-            new CreateSessionTicketRequest(userId).EnsureValid(),
+            new CreateSessionTicketRequest(
+                UserId: userId
+            ).EnsureValid(),
             cancellationToken
         );
 
@@ -92,8 +99,11 @@ public class BeginSessionRequestHandler(
             UserId: userId,
             SessionId: sessionTokenResult.SessionId,
             Username: userEntity.Username,
+
             SessionToken: sessionTokenResult.SessionToken,
+            SessionRenewToken: sessionTokenResult.SessionRenewToken,
             SessionTokenExpiration: sessionTokenResult.SessionTokenExpiration,
+
             SessionTicket: sessionTicketResult.Ticket,
             SessionTicketExpiration: sessionTicketResult.TicketExpiration
         );

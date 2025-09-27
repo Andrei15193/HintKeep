@@ -1,39 +1,54 @@
-
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
-using System.Security.Claims;
 using Azure;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Data.Users;
-using Microsoft.IdentityModel.Tokens;
 
 namespace HintKeep.GraphQL.Definitions.Users.Sessions;
 
-public record CreateSessionTokenRequest(Guid UserId) : IRequest<CreateSessionTokenResult>;
+public record CreateSessionTokenRequest(
+    Guid UserId,
+    Guid SessionTicketId
+) :
+    IRequest<CreateSessionTokenResult>;
 
-public record CreateSessionTokenResult(string SessionToken, Guid SessionId, DateTime SessionTokenExpiration);
+public record CreateSessionTokenResult(
+    string SessionToken,
+    Guid SessionId,
+    string SessionRenewToken,
+    DateTime SessionTokenExpiration
+);
 
 public class CreateSessionTokenRequestHandler(
     HintKeepTableStorage hintKeepTableStorage,
 
-    SigningCredentials signingCredentials,
-    TokenValidationParameters tokenValidationParameters,
-    JwtSecurityTokenHandler jsonWebTokenHandler
-) : IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult>
+    IRequestHandler<GenerateSessionTokenRequest, GenerateSessionTokenResult> generateSessionTokenRequestHandler
+) :
+    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult>
 {
     public async ValueTask<CreateSessionTokenResult> ExecuteAsync(CreateSessionTokenRequest request, CancellationToken cancellationToken)
     {
         var hasSessionId = false;
         var sessionId = Guid.NewGuid();
-        var sessionExpiration = DateTime.UtcNow.AddHours(1);
+        GenerateSessionTokenResult generateSessionTokenResult;
 
         do
+        {
+            generateSessionTokenResult = await generateSessionTokenRequestHandler.ExecuteAsync(
+                new GenerateSessionTokenRequest(
+                    UserId: request.UserId,
+                    SessionId: sessionId
+                ).EnsureValid(),
+                cancellationToken
+            );
             try
             {
                 await hintKeepTableStorage.UserSessions.AddEntityAsync(
                     new UserSessionEntity(
                         UserId: request.UserId,
-                        SessionId: sessionId
+                        SessionId: sessionId,
+                        SessionTicketId: request.SessionTicketId,
+                        RenewToken: generateSessionTokenResult.SessionRenewToken,
+                        TokenExpiration: generateSessionTokenResult.SessionTokenExpiration
                     ).ToTableEntity(),
                     cancellationToken
                 );
@@ -43,24 +58,14 @@ public class CreateSessionTokenRequestHandler(
             {
                 sessionId = Guid.NewGuid();
             }
-        while (!hasSessionId);
+        } while (!hasSessionId);
 
-        var token = jsonWebTokenHandler.WriteToken(new JwtSecurityToken(
-            issuer: tokenValidationParameters.ValidIssuer,
-            audience: tokenValidationParameters.ValidAudience,
-            claims: [
-                new Claim(HintKeepClaims.UserId, request.UserId.ToString(HintKeepClaims.GuidFormatString)),
-                new Claim(HintKeepClaims.SessionId, sessionId.ToString(HintKeepClaims.GuidFormatString)),
-                new Claim(HintKeepClaims.TokenId, Guid.NewGuid().ToString(HintKeepClaims.GuidFormatString))
-            ],
-            expires: sessionExpiration,
-            signingCredentials: signingCredentials
-        ));
 
         return new CreateSessionTokenResult(
-            SessionToken: token,
+            SessionToken: generateSessionTokenResult.SessionToken,
             SessionId: sessionId,
-            SessionTokenExpiration: sessionExpiration
+            SessionRenewToken: generateSessionTokenResult.SessionRenewToken,
+            SessionTokenExpiration: generateSessionTokenResult.SessionTokenExpiration
         );
     }
 }

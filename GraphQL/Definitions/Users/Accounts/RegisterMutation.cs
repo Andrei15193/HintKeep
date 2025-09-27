@@ -8,19 +8,19 @@ public class RegisterMutation : RequestFieldType<RegisterRequest, Authentication
 {
     public RegisterMutation()
     {
-        Name = "register";
+        Name = "Register";
 
         Arguments =
         [
-            new QueryArgument<StringGraphType>
+            new QueryArgument<NonNullGraphType<StringGraphType>>
             {
                 Name = nameof(RegisterRequest.Username)
             },
-            new QueryArgument<StringGraphType>
+            new QueryArgument<NonNullGraphType<StringGraphType>>
             {
                 Name = nameof(RegisterRequest.Password)
             },
-            new QueryArgument<StringGraphType>
+            new QueryArgument<NonNullGraphType<StringGraphType>>
             {
                 Name = nameof(RegisterRequest.EmailAddress)
             }

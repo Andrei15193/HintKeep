@@ -3,7 +3,13 @@ using Azure.Data.Tables;
 
 namespace HintKeep.GraphQL.Data.Users;
 
-public record struct UserPasswordHashEntity(string UsernameHash, string PasswordHash, Guid UserId, ETag ETag = default) : ITableEntityProvider
+public record struct UserPasswordHashEntity(
+    string UsernameHash,
+    string PasswordHash,
+    Guid UserId,
+    ETag ETag = default
+) :
+    ITableEntityProvider
 {
     public const string Type = "user-password-hash";
     public const string RowKeyPrefix = "password-hash:";
@@ -16,7 +22,8 @@ public record struct UserPasswordHashEntity(string UsernameHash, string Password
         : this(
             UsernameHash: tableEntity.GetString(nameof(TableEntity.PartitionKey)),
             PasswordHash: tableEntity.RowKey[RowKeyPrefix.Length..],
-            UserId: tableEntity.GetGuid(UserIdProperty)!.Value
+            UserId: tableEntity.GetGuid(UserIdProperty)!.Value,
+            ETag: tableEntity.ETag
         )
         => TableEntityCommon.ValidateType(tableEntity, Type);
 

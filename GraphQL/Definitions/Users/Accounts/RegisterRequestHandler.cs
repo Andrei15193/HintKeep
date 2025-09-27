@@ -20,7 +20,8 @@ public record RegisterRequest(
 
     [property: Required(ErrorMessage = "An email address is required.")]
     string EmailAddress
-) : IRequest<AuthenticationResult>;
+) :
+    IRequest<AuthenticationResult>;
 
 public class RegisterRequestHandler(
     HintKeepTableStorage hintKeepTableStorage,
@@ -29,9 +30,10 @@ public class RegisterRequestHandler(
     [FromKeyedServices(ServiceKeys.PasswordHashAlgorithm)] HashAlgorithm passwordHashAlgorithm,
     [FromKeyedServices(ServiceKeys.EmailAddressHashAlgorithm)] HashAlgorithm emailHashAlgorithm,
 
-    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler,
-    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler
-) : IRequestHandler<RegisterRequest, AuthenticationResult>
+    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler,
+    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler
+) :
+    IRequestHandler<RegisterRequest, AuthenticationResult>
 {
     public async ValueTask<AuthenticationResult> ExecuteAsync(RegisterRequest request, CancellationToken cancellationToken)
     {
@@ -49,7 +51,10 @@ public class RegisterRequestHandler(
                 [
                     new TableTransactionAction(
                         TableTransactionActionType.Add,
-                        new UserUniqueEntity(usernameHash).ToTableEntity()
+                        new UserUniqueEntity(
+                            UsernameHash: usernameHash,
+                            UserId: userId
+                        ).ToTableEntity()
                     ),
                     new TableTransactionAction(
                         TableTransactionActionType.Add,
@@ -68,15 +73,29 @@ public class RegisterRequestHandler(
             throw new ValidationException(new ValidationResult("Usernames must be unique.", [nameof(RegisterRequest.Username)]), null, null);
         }
 
-        var sessionTokenResult = await sessionTokenRequestHandler.ExecuteAsync(new CreateSessionTokenRequest(UserId: userId).EnsureValid(), cancellationToken);
-        var sessionTicketResult = await sessionTicketRequestHandler.ExecuteAsync(new CreateSessionTicketRequest(UserId: userId).EnsureValid(), cancellationToken);
+        var sessionTicketResult = await sessionTicketRequestHandler.ExecuteAsync(
+            new CreateSessionTicketRequest(
+                UserId: userId
+            ).EnsureValid(),
+            cancellationToken
+        );
+        var sessionTokenResult = await sessionTokenRequestHandler.ExecuteAsync(
+            new CreateSessionTokenRequest(
+                UserId: userId,
+                SessionTicketId: sessionTicketResult.TicketId
+            ).EnsureValid(),
+            cancellationToken
+        );
 
         return new AuthenticationResult(
             UserId: userId,
             SessionId: sessionTokenResult.SessionId,
             Username: request.Username,
+
             SessionToken: sessionTokenResult.SessionToken,
+            SessionRenewToken: sessionTokenResult.SessionRenewToken,
             SessionTokenExpiration: sessionTokenResult.SessionTokenExpiration,
+
             SessionTicket: sessionTicketResult.Ticket,
             SessionTicketExpiration: sessionTicketResult.TicketExpiration
         );

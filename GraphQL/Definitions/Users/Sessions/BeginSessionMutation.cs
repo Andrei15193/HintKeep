@@ -8,7 +8,7 @@ public class BeginSessionMutation : RequestFieldType<BeginSessionRequest, Authen
 {
     public BeginSessionMutation()
     {
-        Name = "beginSession";
+        Name = "BeginSession";
 
         Arguments = [];
         Type = typeof(AuthenticationResultGraphType);

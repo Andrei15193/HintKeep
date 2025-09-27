@@ -3,14 +3,21 @@ using Azure.Data.Tables;
 
 namespace HintKeep.GraphQL.Data.Users;
 
-public record struct UserUniqueEntity(string UsernameHash, ETag ETag = default) : ITableEntityProvider
+public record struct UserUniqueEntity(
+    string UsernameHash,
+    Guid UserId,
+    ETag ETag = default
+) :
+    ITableEntityProvider
 {
     public const string Type = "user-unique";
     public const string RowKey = "unique";
+    public const string UserIdProperty = "userId";
 
     public UserUniqueEntity(TableEntity tableEntity)
         : this(
-            UsernameHash: tableEntity.GetString(nameof(TableEntity.PartitionKey))
+            UsernameHash: tableEntity.GetString(nameof(TableEntity.PartitionKey)),
+            UserId: tableEntity.GetGuid(UserIdProperty)!.Value
         )
         => TableEntityCommon.ValidateType(tableEntity, Type);
 
@@ -21,7 +28,9 @@ public record struct UserUniqueEntity(string UsernameHash, ETag ETag = default) 
 
             PartitionKey = UsernameHash,
             RowKey = RowKey,
-            ETag = ETag
+            ETag = ETag,
+
+            [UserIdProperty] = UserId
         };
 }
 
