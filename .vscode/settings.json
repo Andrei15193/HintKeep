@@ -3,7 +3,8 @@
         "**/bin/**/*": true,
         "**/obj/**/*": true,
         "**/node_modules/**/*": true,
-        "WebClient/**/*": true
+        "WebClient/**/*": true,
+        "GraphQL/./data/**/*": true
     },
     "eslint.format.enable": true,
     "eslint.workingDirectories": [
