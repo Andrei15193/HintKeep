@@ -10,6 +10,7 @@ using Azure.Identity;
 using GraphQL;
 using GraphQL.Authorization;
 using GraphQL.Conversion;
+using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -17,9 +18,12 @@ using HintKeep.GraphQL;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Definitions;
 using HintKeep.GraphQL.Definitions.Users;
+using HintKeep.GraphQL.Functions;
 using HintKeep.GraphQL.Json;
 using HintKeep.GraphQL.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
@@ -53,7 +57,6 @@ foreach (var (requestHandlerInterface, requestHandlerImplementation) in requestH
 
 // Authentication (JSON Web Tokens)
 builder
-    .UseMiddleware<AuthenticationMiddleware>()
     .Services
     .AddSingleton<SecurityKey>(services =>
     {
@@ -255,36 +258,14 @@ builder
 
 // Logging
 builder
-    .UseMiddleware(
-        async (context, next) =>
-        {
-            var httpContext = context.GetHttpContext();
-            var correlationId = context.InstanceServices.GetRequiredKeyedService<Guid>(ServiceKeys.CorrelationId);
-            var logger = context.InstanceServices.GetRequiredService<ILogger<Program>>();
-
-            using (logger.BeginScope(new
-            {
-                context.FunctionId,
-                FunctionName = context.FunctionDefinition.Name,
-                FunctionEntry = context.FunctionDefinition.EntryPoint,
-                CorrelationId = correlationId,
-                httpContext?.Request.Headers.UserAgent,
-                RequestPath = httpContext?.Request.Path
-            }))
-                try
-                {
-                    logger.LogInformation("Executing '{functionName}' ('{functionId}') with '{correlationId}' correlation ID.", context.FunctionDefinition.Name, context.FunctionId, correlationId);
-                    await next();
-                    logger.LogInformation("Executed '{functionName}' ('{functionId}') with '{correlationId}' correlation ID.", context.FunctionDefinition.Name, context.FunctionId, correlationId);
-                }
-                catch (Exception exception)
-                {
-                    logger.LogError(exception, "Execution failed '{functionName}' ('{functionId}') with '{correlationId}' correlation ID.", context.FunctionDefinition.Name, context.FunctionId, correlationId);
-                    throw;
-                }
-        })
     .Services
     .AddKeyedScoped(typeof(Guid), ServiceKeys.CorrelationId, delegate { return Guid.NewGuid(); });
+
+// Middleware
+builder
+    .UseMiddleware<LoggingMiddleware>()
+    .UseMiddleware<AuthenticationMiddleware>()
+    .UseMiddleware<GraphiQLMiddlewareAdapter>();
 
 builder
     .Build()

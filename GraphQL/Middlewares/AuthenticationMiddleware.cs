@@ -6,22 +6,23 @@ using HintKeep.GraphQL.Definitions.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HintKeep.GraphQL.Middlewares;
 
-public class AuthenticationMiddleware(
-    IHostEnvironment environment,
-    ILogger<AuthenticationMiddleware> logger,
-
-    JwtSecurityTokenHandler jwtSecurityTokenHandler,
-    TokenValidationParameters tokenValidationParameters
-) : IFunctionsWorkerMiddleware
+public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
 {
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
+        var environment = context.InstanceServices.GetRequiredService<IHostEnvironment>();
+        var logger = context.InstanceServices.GetRequiredService<ILogger<AuthenticationMiddleware>>();
+
+        var jwtSecurityTokenHandler = context.InstanceServices.GetRequiredService<JwtSecurityTokenHandler>();
+        var tokenValidationParameters = context.InstanceServices.GetRequiredService<TokenValidationParameters>();
+
         var httpContext = context.GetHttpContext();
         if (httpContext is null)
             await next(context);
