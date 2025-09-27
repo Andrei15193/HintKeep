@@ -4,6 +4,7 @@ using Azure;
 using Azure.Data.Tables;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Data.Users;
+using HintKeep.GraphQL.Definitions.Users.Accounts;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,17 +15,7 @@ namespace HintKeep.GraphQL.Definitions.Users.Sessions;
 public record BeginSessionRequest(
     [property: Required(ErrorMessage = "Session ticket is missing.")]
     string? SessionTicket
-) : IRequest<BeginSessionResult>;
-
-public record BeginSessionResult(
-    Guid UserId,
-    Guid SessionId,
-    string Username,
-    string SessionToken,
-    DateTime SessionTokenExpiration,
-    string SessionTicket,
-    DateTime SessionTicketExpiration
-);
+) : IRequest<AuthenticationResult>;
 
 public class BeginSessionRequestHandler(
     IHostEnvironment environment,
@@ -34,11 +25,11 @@ public class BeginSessionRequestHandler(
     TokenValidationParameters tokenValidationParameters,
     JwtSecurityTokenHandler jsonWebTokenHandler,
 
-    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> ensureSessionTicketRequestHandler,
-    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler
-) : IRequestHandler<BeginSessionRequest, BeginSessionResult>
+    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler,
+    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler
+) : IRequestHandler<BeginSessionRequest, AuthenticationResult>
 {
-    public async ValueTask<BeginSessionResult> ExecuteAsync(BeginSessionRequest request, CancellationToken cancellationToken)
+    public async ValueTask<AuthenticationResult> ExecuteAsync(BeginSessionRequest request, CancellationToken cancellationToken)
     {
         try
         {
@@ -88,24 +79,23 @@ public class BeginSessionRequestHandler(
                 null
             );
 
-        var (sessionTicket, sessionTicketExpiration) = await ensureSessionTicketRequestHandler.ExecuteAsync(
+        var sessionTokenResult = await sessionTokenRequestHandler.ExecuteAsync(
+            new CreateSessionTokenRequest(userId).EnsureValid(),
+            cancellationToken
+        );
+        var sessionTicketResult = await sessionTicketRequestHandler.ExecuteAsync(
             new CreateSessionTicketRequest(userId).EnsureValid(),
             cancellationToken
         );
 
-        var (sessionToken, sessionId, sessionExpiration) = await sessionTokenRequestHandler.ExecuteAsync(
-            new CreateSessionTokenRequest(userId).EnsureValid(),
-            cancellationToken
-        );
-
-        return new BeginSessionResult(
+        return new AuthenticationResult(
             UserId: userId,
-            SessionId: sessionId,
+            SessionId: sessionTokenResult.SessionId,
             Username: userEntity.Username,
-            SessionToken: sessionToken,
-            SessionTokenExpiration: sessionExpiration,
-            SessionTicket: sessionTicket,
-            SessionTicketExpiration: sessionTicketExpiration
+            SessionToken: sessionTokenResult.SessionToken,
+            SessionTokenExpiration: sessionTokenResult.SessionTokenExpiration,
+            SessionTicket: sessionTicketResult.Ticket,
+            SessionTicketExpiration: sessionTicketResult.TicketExpiration
         );
     }
 }

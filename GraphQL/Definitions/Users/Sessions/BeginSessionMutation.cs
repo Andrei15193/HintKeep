@@ -1,17 +1,17 @@
 using GraphQL;
-using GraphQL.Types;
+using HintKeep.GraphQL.Definitions.Users.Accounts;
 
 namespace HintKeep.GraphQL.Definitions.Users.Sessions;
 
 [MutationField(AllowAnonymous = true)]
-public class BeginSessionMutation : RequestFieldType<BeginSessionRequest, BeginSessionResult>
+public class BeginSessionMutation : RequestFieldType<BeginSessionRequest, AuthenticationResult>
 {
     public BeginSessionMutation()
     {
         Name = "beginSession";
 
         Arguments = [];
-        Type = typeof(BeginSessionMutationResultGraphType);
+        Type = typeof(AuthenticationResultGraphType);
     }
 
     protected override BeginSessionRequest GetInput(IResolveFieldContext context)
@@ -22,39 +22,4 @@ public class BeginSessionMutation : RequestFieldType<BeginSessionRequest, BeginS
                 .SingleOrDefault(cookie => cookie.Name == HintKeepHttp.SessionTicketCookieName)
                 ?.Value
         );
-
-    protected override async ValueTask<BeginSessionResult?> ResolveAsync(IResolveFieldContext context)
-    {
-        var result = await base.ResolveAsync(context);
-        if (context.Errors.Count == 0 && result is not null)
-        {
-            context.SetHttpResponseCookie(
-                HintKeepHttp.SessionTicketCookieName,
-                result.SessionTicket,
-                result.SessionTicketExpiration
-            );
-            context.SetHttpResponseCookie(
-                HintKeepHttp.SessionTokenCookieName(result.SessionId),
-                result.SessionToken,
-                result.SessionTokenExpiration
-            );
-            context.SetDevHttpResponseCookie(
-                HintKeepHttp.DevSessionTokenCookieName,
-                result.SessionToken,
-                result.SessionTokenExpiration
-            );
-        }
-
-        return result;
-    }
-
-    private class BeginSessionMutationResultGraphType : ObjectGraphType<BeginSessionResult>
-    {
-        public BeginSessionMutationResultGraphType()
-        {
-            Field(x => x.UserId);
-            Field(x => x.SessionId);
-            Field(x => x.Username);
-        }
-    }
 }

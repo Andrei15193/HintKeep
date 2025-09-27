@@ -9,15 +9,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HintKeep.GraphQL.Definitions.Users.Accounts;
 
-public record AuthenticateRequest(
+public record AuthenticationRequest(
     [property: Required(ErrorMessage = "A username is required.")]
     string Username,
 
     [property: Required(ErrorMessage = "A password is required.")]
     string Password
-) : IRequest<AuthenticateResult>;
+) : IRequest<AuthenticationResult>;
 
-public record AuthenticateResult(
+public record AuthenticationResult(
     Guid UserId,
     Guid SessionId,
     string Username,
@@ -34,10 +34,10 @@ public class AuthenticateRequestHandler(
     [FromKeyedServices(ServiceKeys.PasswordHashAlgorithm)] HashAlgorithm passwordHashAlgorithm,
 
     IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler,
-    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> ensureSessionTicketRequestHandler
-) : IRequestHandler<AuthenticateRequest, AuthenticateResult>
+    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler
+) : IRequestHandler<AuthenticationRequest, AuthenticationResult>
 {
-    public async ValueTask<AuthenticateResult> ExecuteAsync(AuthenticateRequest request, CancellationToken cancellationToken)
+    public async ValueTask<AuthenticationResult> ExecuteAsync(AuthenticationRequest request, CancellationToken cancellationToken)
     {
         var usernameHash = Convert.ToHexString(usernameHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Username.ToLowerInvariant())));
         var passwordHash = Convert.ToHexString(passwordHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
@@ -47,7 +47,7 @@ public class AuthenticateRequestHandler(
             .GetEntityIfExistsAsync<TableEntity>(UserPasswordHashEntity.GetEntityKey(usernameHash, passwordHash), cancellationToken)
             .ToUserPasswordHashEntity()
             ?? throw new ValidationException(
-                new ValidationResult("Invalid credentials.", [nameof(AuthenticateRequest.Username), nameof(AuthenticateRequest.Password)]),
+                new ValidationResult("Invalid credentials.", [nameof(AuthenticationRequest.Username), nameof(AuthenticationRequest.Password)]),
                 null,
                 null
             );
@@ -57,28 +57,28 @@ public class AuthenticateRequestHandler(
             .GetEntityIfExistsAsync<TableEntity>(UserIdUniqueEntity.GetEntityKey(userPasswordHashEntity.UserId), cancellationToken)
             .ToUserIdUniqueEntity()
             ?? throw new ValidationException(
-                new ValidationResult("Invalid credentials.", [nameof(AuthenticateRequest.Username), nameof(AuthenticateRequest.Password)]),
+                new ValidationResult("Invalid credentials.", [nameof(AuthenticationRequest.Username), nameof(AuthenticationRequest.Password)]),
                 null,
                 null
             );
 
-        var (sessionToken, sessionId, sessionTokenExpiration) = await sessionTokenRequestHandler.ExecuteAsync(
+        var sessionTokenResult = await sessionTokenRequestHandler.ExecuteAsync(
             new CreateSessionTokenRequest(UserId: userEntity.UserId).EnsureValid(),
             cancellationToken
         );
-        var (sessionTicket, sessionTicketExpiration) = await ensureSessionTicketRequestHandler.ExecuteAsync(
+        var sessionTicketResult = await sessionTicketRequestHandler.ExecuteAsync(
             new CreateSessionTicketRequest(UserId: userEntity.UserId).EnsureValid(),
             cancellationToken
         );
 
-        return new AuthenticateResult(
+        return new AuthenticationResult(
             UserId: userEntity.UserId,
-            SessionId: sessionId,
+            SessionId: sessionTokenResult.SessionId,
             Username: userEntity.Username,
-            SessionToken: sessionToken,
-            SessionTokenExpiration: sessionTokenExpiration,
-            SessionTicket: sessionTicket,
-            SessionTicketExpiration: sessionTicketExpiration
+            SessionToken: sessionTokenResult.SessionToken,
+            SessionTokenExpiration: sessionTokenResult.SessionTokenExpiration,
+            SessionTicket: sessionTicketResult.Ticket,
+            SessionTicketExpiration: sessionTicketResult.TicketExpiration
         );
     }
 }

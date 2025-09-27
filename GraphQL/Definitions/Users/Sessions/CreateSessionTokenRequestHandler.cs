@@ -11,7 +11,7 @@ namespace HintKeep.GraphQL.Definitions.Users.Sessions;
 
 public record CreateSessionTokenRequest(Guid UserId) : IRequest<CreateSessionTokenResult>;
 
-public record CreateSessionTokenResult(string SessionToken, Guid SessionId, DateTime SessionExpiration);
+public record CreateSessionTokenResult(string SessionToken, Guid SessionId, DateTime SessionTokenExpiration);
 
 public class CreateSessionTokenRequestHandler(
     HintKeepTableStorage hintKeepTableStorage,
@@ -60,7 +60,7 @@ public class CreateSessionTokenRequestHandler(
         return new CreateSessionTokenResult(
             SessionToken: token,
             SessionId: sessionId,
-            SessionExpiration: sessionExpiration
+            SessionTokenExpiration: sessionExpiration
         );
     }
 }

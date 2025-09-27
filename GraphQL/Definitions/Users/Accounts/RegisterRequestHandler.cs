@@ -6,6 +6,7 @@ using Azure;
 using Azure.Data.Tables;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Data.Users;
+using HintKeep.GraphQL.Definitions.Users.Sessions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HintKeep.GraphQL.Definitions.Users.Accounts;
@@ -19,22 +20,20 @@ public record RegisterRequest(
 
     [property: Required(ErrorMessage = "An email address is required.")]
     string EmailAddress
-) : IRequest<RegisterResult>;
-
-public record RegisterResult(
-    Guid UserId,
-    string Username
-);
+) : IRequest<AuthenticationResult>;
 
 public class RegisterRequestHandler(
     HintKeepTableStorage hintKeepTableStorage,
 
     [FromKeyedServices(ServiceKeys.UsernameHashAlgorithm)] HashAlgorithm usernameHashAlgorithm,
     [FromKeyedServices(ServiceKeys.PasswordHashAlgorithm)] HashAlgorithm passwordHashAlgorithm,
-    [FromKeyedServices(ServiceKeys.EmailAddressHashAlgorithm)] HashAlgorithm emailHashAlgorithm
-) : IRequestHandler<RegisterRequest, RegisterResult>
+    [FromKeyedServices(ServiceKeys.EmailAddressHashAlgorithm)] HashAlgorithm emailHashAlgorithm,
+
+    IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler,
+    IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler
+) : IRequestHandler<RegisterRequest, AuthenticationResult>
 {
-    public async ValueTask<RegisterResult> ExecuteAsync(RegisterRequest request, CancellationToken cancellationToken)
+    public async ValueTask<AuthenticationResult> ExecuteAsync(RegisterRequest request, CancellationToken cancellationToken)
     {
         var usernameHash = Convert.ToHexString(usernameHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Username.ToLowerInvariant())));
         var passwordHash = Convert.ToHexString(passwordHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
@@ -69,9 +68,17 @@ public class RegisterRequestHandler(
             throw new ValidationException(new ValidationResult("Usernames must be unique.", [nameof(RegisterRequest.Username)]), null, null);
         }
 
-        return new RegisterResult(
+        var sessionTokenResult = await sessionTokenRequestHandler.ExecuteAsync(new CreateSessionTokenRequest(UserId: userId).EnsureValid(), cancellationToken);
+        var sessionTicketResult = await sessionTicketRequestHandler.ExecuteAsync(new CreateSessionTicketRequest(UserId: userId).EnsureValid(), cancellationToken);
+
+        return new AuthenticationResult(
             UserId: userId,
-            Username: request.Username
+            SessionId: sessionTokenResult.SessionId,
+            Username: request.Username,
+            SessionToken: sessionTokenResult.SessionToken,
+            SessionTokenExpiration: sessionTokenResult.SessionTokenExpiration,
+            SessionTicket: sessionTicketResult.Ticket,
+            SessionTicketExpiration: sessionTicketResult.TicketExpiration
         );
     }
 

@@ -4,7 +4,7 @@ using GraphQL.Types;
 namespace HintKeep.GraphQL.Definitions.Users.Accounts;
 
 [MutationField(AllowAnonymous = true)]
-public class AuthenticateMutation : RequestFieldType<AuthenticateRequest, AuthenticateResult>
+public class AuthenticateMutation : RequestFieldType<AuthenticationRequest, AuthenticationResult>
 {
     public AuthenticateMutation()
     {
@@ -14,27 +14,41 @@ public class AuthenticateMutation : RequestFieldType<AuthenticateRequest, Authen
         [
             new QueryArgument<StringGraphType>
             {
-                Name = nameof(AuthenticateRequest.Username)
+                Name = nameof(AuthenticationRequest.Username)
             },
             new QueryArgument<StringGraphType>
             {
-                Name = nameof(AuthenticateRequest.Password)
+                Name = nameof(AuthenticationRequest.Password)
             }
         ];
-        Type = typeof(AuthenticateMutationResultGraphType);
+        Type = typeof(AuthenticationResultGraphType);
     }
 
-    protected override AuthenticateRequest GetInput(IResolveFieldContext context)
+    protected override AuthenticationRequest GetInput(IResolveFieldContext context)
         => new(
-            Username: context.GetArgument<string>(nameof(AuthenticateRequest.Username)),
-            Password: context.GetArgument<string>(nameof(AuthenticateRequest.Password))
+            Username: context.GetArgument<string>(nameof(AuthenticationRequest.Username)),
+            Password: context.GetArgument<string>(nameof(AuthenticationRequest.Password))
         );
+}
 
-
-    protected override async ValueTask<AuthenticateResult?> ResolveAsync(IResolveFieldContext context)
+public class AuthenticationResultGraphType : ObjectGraphType<AuthenticationResult>
+{
+    public AuthenticationResultGraphType()
     {
-        var result = await base.ResolveAsync(context);
-        if (context.Errors.Count == 0 && result is not null)
+        Field<NonNullGraphType<GuidGraphType>>(nameof(AuthenticationResult.UserId))
+            .Resolve(context => _EnsureAuthenticationCookies(context).Source.UserId);
+        Field<NonNullGraphType<GuidGraphType>>(nameof(AuthenticationResult.SessionId))
+            .Resolve(context => _EnsureAuthenticationCookies(context).Source.SessionId);
+        Field<NonNullGraphType<StringGraphType>>(nameof(AuthenticationResult.Username))
+            .Resolve(context => _EnsureAuthenticationCookies(context).Source.Username);
+    }
+
+    private IResolveFieldContext<AuthenticationResult> _EnsureAuthenticationCookies(IResolveFieldContext<AuthenticationResult> context)
+    {
+        const string authenticationCookiesMarker = "hint-keep-auth-cookies-handled";
+
+        var result = context.Source;
+        if (result is not null && !context.UserContext.ContainsKey(authenticationCookiesMarker) && context.Errors.Count == 0)
         {
             context.SetHttpResponseCookie(
                 HintKeepHttp.SessionTicketCookieName,
@@ -51,18 +65,10 @@ public class AuthenticateMutation : RequestFieldType<AuthenticateRequest, Authen
                 result.SessionToken,
                 result.SessionTokenExpiration
             );
+
+            context.UserContext.Add(authenticationCookiesMarker, null);
         }
 
-        return result;
-    }
-
-    private class AuthenticateMutationResultGraphType : ObjectGraphType<AuthenticateResult>
-    {
-        public AuthenticateMutationResultGraphType()
-        {
-            Field(x => x.UserId);
-            Field(x => x.SessionId);
-            Field(x => x.Username);
-        }
+        return context;
     }
 }
