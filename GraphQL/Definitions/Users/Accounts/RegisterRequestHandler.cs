@@ -44,7 +44,8 @@ public class RegisterRequestHandler(
         if (
             await hintKeepTableStorage
                 .Users
-                .GetEntityIfExistsAsync<TableEntity>(UserUniqueEntity.GetEntityKey(usernameHash), cancellationToken) is not null
+                .GetEntityIfExistsAsync<TableEntity>(UserUniqueEntity.GetEntityKey(usernameHash), cancellationToken)
+                .ToUserUniqueEntity() is not null
         )
             throw new ValidationException(new ValidationResult("Usernames must be unique.", [nameof(RegisterRequest.Username)]), null, null);
 

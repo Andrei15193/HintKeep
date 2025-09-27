@@ -18,8 +18,8 @@ public record GenerateSessionTicketResult(
 );
 
 public class GenerateSessionTicketRequestHandler(
-    [FromKeyedServices(ServiceKeys.SessionTicketSigningKey)] SigningCredentials signingCredentials,
-    TokenValidationParameters tokenValidationParameters,
+    [FromKeyedServices(ServiceKeys.SessionTicket)] SigningCredentials signingCredentials,
+    [FromKeyedServices(ServiceKeys.SessionTicket)] TokenValidationParameters tokenValidationParameters,
     JwtSecurityTokenHandler jsonWebTokenHandler
 ) :
     IRequestHandler<GenerateSessionTicketRequest, GenerateSessionTicketResult>

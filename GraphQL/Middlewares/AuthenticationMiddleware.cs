@@ -21,7 +21,7 @@ public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
         var logger = context.InstanceServices.GetRequiredService<ILogger<AuthenticationMiddleware>>();
 
         var jwtSecurityTokenHandler = context.InstanceServices.GetRequiredService<JwtSecurityTokenHandler>();
-        var tokenValidationParameters = context.InstanceServices.GetRequiredService<TokenValidationParameters>();
+        var tokenValidationParameters = context.InstanceServices.GetRequiredKeyedService<TokenValidationParameters>(ServiceKeys.SessionToken);
 
         var httpContext = context.GetHttpContext();
         if (httpContext is null)

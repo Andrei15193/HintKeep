@@ -1,6 +1,7 @@
 
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HintKeep.GraphQL.Definitions.Users.Sessions;
@@ -18,8 +19,8 @@ public record GenerateSessionTokenResult(
 );
 
 public class GenerateSessionTokenRequestHandler(
-    SigningCredentials signingCredentials,
-    TokenValidationParameters tokenValidationParameters,
+    [FromKeyedServices(ServiceKeys.SessionToken)] SigningCredentials signingCredentials,
+    [FromKeyedServices(ServiceKeys.SessionToken)] TokenValidationParameters tokenValidationParameters,
     JwtSecurityTokenHandler jsonWebTokenHandler
 ) :
     IRequestHandler<GenerateSessionTokenRequest, GenerateSessionTokenResult>

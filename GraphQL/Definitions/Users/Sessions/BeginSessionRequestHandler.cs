@@ -6,6 +6,7 @@ using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Data.Users;
 using HintKeep.GraphQL.Definitions.Users.Accounts;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -23,7 +24,7 @@ public class BeginSessionRequestHandler(
     ILogger<BeginSessionRequestHandler> logger,
     HintKeepTableStorage hintKeepTableStorage,
 
-    TokenValidationParameters tokenValidationParameters,
+    [FromKeyedServices(ServiceKeys.SessionToken)] TokenValidationParameters tokenValidationParameters,
     JwtSecurityTokenHandler jsonWebTokenHandler,
 
     IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler,

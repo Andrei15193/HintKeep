@@ -8,7 +8,7 @@ public static class ServiceKeys
     public const string PasswordHashAlgorithm = "password-hash-algorithm";
     public const string EmailAddressHashAlgorithm = "email-address-hash-algorithm";
 
-    public const string SessionTokenSigningKey = "session-token-signing-key";
+    public const string SessionToken = "session-token";
 
-    public const string SessionTicketSigningKey = "session-ticket-signing-key";
+    public const string SessionTicket = "session-ticket";
 }
