@@ -14,6 +14,9 @@ public record struct UserUniqueEntity(
     public const string RowKey = "unique";
     public const string UserIdProperty = "userId";
 
+    public static TableEntityKey GetEntityKey(string usernameHash)
+        => new(usernameHash, RowKey);
+
     public UserUniqueEntity(TableEntity tableEntity)
         : this(
             UsernameHash: tableEntity.GetString(nameof(TableEntity.PartitionKey)),

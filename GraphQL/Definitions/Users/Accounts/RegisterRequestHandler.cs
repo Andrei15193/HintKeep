@@ -41,7 +41,12 @@ public class RegisterRequestHandler(
         var passwordHash = Convert.ToHexString(passwordHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
         var emailAddressHash = Convert.ToHexString(emailHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.EmailAddress)));
 
-        // quick username hash check (avoid user ID reservation flooding through DDoS)
+        if (
+            await hintKeepTableStorage
+                .Users
+                .GetEntityIfExistsAsync<TableEntity>(UserUniqueEntity.GetEntityKey(usernameHash), cancellationToken) is not null
+        )
+            throw new ValidationException(new ValidationResult("Usernames must be unique.", [nameof(RegisterRequest.Username)]), null, null);
 
         var userId = await _ReserveUserIdAsync(usernameHash, request.Username, cancellationToken);
 
