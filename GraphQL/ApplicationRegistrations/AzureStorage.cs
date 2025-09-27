@@ -11,7 +11,7 @@ public static class AzureStorage
 {
     public const string ConnectionConfigurationName = "AzureWebJobsStorage";
 
-    public static IServiceCollection AddAzureTableStorage(this IServiceCollection services)
+    public static IServiceCollection AddAzureStorage(this IServiceCollection services)
         => services
             .AddSingleton<HintKeepTableStorage>()
             .AddSingleton(services =>

@@ -24,9 +24,6 @@ builder
     .ConfigureFunctionsApplicationInsights()
     .AddCorrelationId()
 
-// Request handlers
-    .AddRequestHandlers()
-
 // Hashing
     .AddHmacSha256HashAlgorithm(ServiceKeys.UsernameHashAlgorithm, "HINTKEEP_HASH_KEY")
     .AddHmacSha256HashAlgorithm(ServiceKeys.PasswordHashAlgorithm, "HINTKEEP_HASH_KEY")
@@ -43,8 +40,11 @@ builder
     .AddAuthenticatedUserPolicy(out var defaultAuthorizationPolicyName)
     .AddGraphQL(defaultAuthorizationPolicyName)
 
+// Request handlers
+    .AddRequestHandlers()
+
 // Azure Storage
-    .AddAzureTableStorage();
+    .AddAzureStorage();
 
 builder
     .Build()
