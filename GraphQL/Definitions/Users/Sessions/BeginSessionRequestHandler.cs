@@ -24,7 +24,7 @@ public class BeginSessionRequestHandler(
     ILogger<BeginSessionRequestHandler> logger,
     HintKeepTableStorage hintKeepTableStorage,
 
-    [FromKeyedServices(ServiceKeys.SessionToken)] TokenValidationParameters tokenValidationParameters,
+    [FromKeyedServices(ServiceKeys.SessionTicket)] TokenValidationParameters tokenValidationParameters,
     JwtSecurityTokenHandler jsonWebTokenHandler,
 
     IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler,
