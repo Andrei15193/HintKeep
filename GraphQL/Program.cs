@@ -1,12 +1,12 @@
 using GraphQL;
 using HintKeep.GraphQL;
-using HintKeep.GraphQL.Middlewares;
-using HintKeep.GraphQL.ApplicationRegistrations;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using HintKeep.GraphQL.AuthorizationPolicies;
+using HintKeep.GraphQL.AppSetup.Middlewares;
+using HintKeep.GraphQL.AppSetup.Registrations;
 
 var builder = FunctionsApplication
     .CreateBuilder(args)

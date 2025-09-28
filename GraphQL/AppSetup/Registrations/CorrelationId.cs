@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HintKeep.GraphQL.ApplicationRegistrations;
+namespace HintKeep.GraphQL.AppSetup.Registrations;
 
 public static class CorrelationId
 {

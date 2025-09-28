@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace HintKeep.GraphQL.Middlewares;
+namespace HintKeep.GraphQL.AppSetup.Middlewares;
 
 public class GraphiQLMiddlewareAdapter : IFunctionsWorkerMiddleware
 {

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HintKeep.GraphQL.Middlewares;
+namespace HintKeep.GraphQL.AppSetup.Middlewares;
 
 public class AuthenticationMiddleware : IFunctionsWorkerMiddleware
 {

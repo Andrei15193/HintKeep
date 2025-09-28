@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HintKeep.GraphQL.ApplicationRegistrations;
+namespace HintKeep.GraphQL.AppSetup.Registrations;
 
 public static class JsonWebTokens
 {
