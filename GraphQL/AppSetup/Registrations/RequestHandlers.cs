@@ -9,7 +9,7 @@ public static class RequestHandlers
     {
         var requestHandlers =
             from type in typeof(Program).Assembly.DefinedTypes
-            where type.IsClass
+            where type.IsClass && !type.IsAbstract
             from implementedInterface in type.ImplementedInterfaces
             where implementedInterface.IsConstructedGenericType && implementedInterface.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)
             select (RequestHandlerInterface: implementedInterface, RequestHandlerImplementation: type);
