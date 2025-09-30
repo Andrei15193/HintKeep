@@ -74,7 +74,7 @@ Everything looks great so far, except, when executing a request handler there is
 For this, I have defined a marker interface, very original of me I know. Using generic constraints the result is enforced throughout the infrastructure.
 
 ```c#
-public interface IRequest<out TResult> : IRequest
+public interface IRequest<out TResult>
 {
 }
 ```
