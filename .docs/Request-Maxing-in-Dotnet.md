@@ -37,7 +37,7 @@ Following the 2nd use case, a user logs into the application, they get their use
 
 Wait a minute, in both cases a JWT is generated and it needs to be the same to ensure consistent behavior between the two use cases. If one claim is added to one, it needs to be added to the other, expiration needs to be the same.
 
-How would this be solved? Quite simply, extract to common part, the one that generates the token into a separate _service_ which is an object exposing one or more methods for a specific purpose. Now we have the common part in one place, testable and reused in both request handlers.
+How would this be solved? Quite simply, extract the common part, the one that generates the token into a separate _service_ which is an object exposing one or more methods for a specific purpose. Now we have the common part in one place, testable and reused in both request handlers.
 
 ## Maxing
 
@@ -117,12 +117,12 @@ public record RegisterRequest(
 
 The `property` keyword here is mandatory, the dotnet validator only looks at properties and without specifying this the attribute would get set on the constructor parameters rather than the generated properties.
 
-The next step is invoking the validator, this can be done in a controller or GraphQL mutation. If all fields are valid the handler is called, otherwise a list of errors are returned.
+The next step is invoking the validator, this can be done in a controller or GraphQL mutation. If all fields are valid the handler is called, otherwise a list of errors is returned.
 
 ```c#
 var request = new RegisterRequest("username", "password", "email address");
 var validationResults = new List<ValidationResult>();
-var validationContext = new ValidationContext(request, default, default);
+var validationContext = new ValidationContext(request);
 // from System.ComponentModel.DataAnnotations
 if (
     Validator.TryValidateObject(
@@ -144,7 +144,7 @@ else
 
 ## Extensions
 
-In the beginning I made an exception to request maxing and that was extension methods. If we are to strictly follow this pattern then whenever we would want to validate a request we would need a separate handler just for that, however this is unnecessary as it would make code rather complicated than easier to follow.
+In the beginning I made an exception to request maxing and that was extension methods. If we are to strictly follow this pattern then whenever we would want to validate a request we would need a separate handler just for that, however this is unnecessary as it would make code rather more complicated than easier to follow.
 
 A useful utility could be defined to ensure a request is valid, this will allow the use of data validation attributes at any level and before making a call to a dependent handler.
 
@@ -179,7 +179,8 @@ public static class RequestExtensions
 The extension method is now ready, it will either forward the instance or throw an exception. When generating requests from another handler they should generally be valid. There is little feedback that can be provided to a user at this point as we have gotten past the initial request.
 
 ```c#
-IRequestHandler<RegisterRequest, AuthenticationResult> registerRequestHandler = ...;
+IRequestHandler<RegisterRequest, AuthenticationResult> registerRequestHandler;
+
 await registerRequestHandler.HandleAsync(
     new RegisterRequest("username", "password", "email address").EnsureValid(),
     cancellationToken
@@ -194,4 +195,4 @@ A trade-off that needs to be considered is between explicit vs implicit dependen
 
 HintKeep is a small project, just about any approach will work, however there is a high likelihood that _request maxing_ can work even on large projects as long as a clear structure is implemented along side request handlers, having an unstructured mix of types makes code much harder to navigate.
 
-As a final thought, I do want to include dependency chains in the wiki, preferably have this generated automatically. Having a list of request handlers and if they have any such dependencies is useful for a high-level overview or just to see how different parts communicate with one another.
+As a final thought, I do want to include dependency chains in the wiki, preferably have this generated automatically. Having a list of request handlers and if they have any such subsequent dependencies is useful for a high-level overview or just to see how different parts communicate with one another.
