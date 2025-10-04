@@ -1,4 +1,4 @@
-# Hint Keep Stories: Request-Maxing in Dotnet
+# HintKeep Stories: Request-Maxing in Dotnet
 
 This is a typical setup for a modern backend, handling queries or commands through requests, generally this would be done using MediatR however they have joined a somewhat current trend of adding licensing to a once completely free and beloved library.
 
