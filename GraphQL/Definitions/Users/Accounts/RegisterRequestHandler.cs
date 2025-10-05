@@ -99,7 +99,7 @@ public class RegisterRequestHandler(
             Username: request.Username,
 
             SessionToken: sessionTokenResult.SessionToken,
-            SessionRenewToken: sessionTokenResult.SessionRenewToken,
+            SessionRenewTicket: sessionTokenResult.SessionRenewTicket,
             SessionTokenExpiration: sessionTokenResult.SessionTokenExpiration,
 
             SessionTicket: sessionTicketResult.Ticket,

@@ -102,7 +102,7 @@ public class BeginSessionRequestHandler(
             Username: userEntity.Username,
 
             SessionToken: sessionTokenResult.SessionToken,
-            SessionRenewToken: sessionTokenResult.SessionRenewToken,
+            SessionRenewTicket: sessionTokenResult.SessionRenewTicket,
             SessionTokenExpiration: sessionTokenResult.SessionTokenExpiration,
 
             SessionTicket: sessionTicketResult.Ticket,

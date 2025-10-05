@@ -14,7 +14,7 @@ public record CreateSessionTokenRequest(
 public record CreateSessionTokenResult(
     string SessionToken,
     Guid SessionId,
-    string SessionRenewToken,
+    string SessionRenewTicket,
     DateTime SessionTokenExpiration
 );
 
@@ -47,7 +47,7 @@ public class CreateSessionTokenRequestHandler(
                         UserId: request.UserId,
                         SessionId: sessionId,
                         SessionTicketId: request.SessionTicketId,
-                        RenewToken: generateSessionTokenResult.SessionRenewToken,
+                        RenewTicket: generateSessionTokenResult.SessionRenewTicket,
                         TokenExpiration: generateSessionTokenResult.SessionTokenExpiration
                     ).ToTableEntity(),
                     cancellationToken
@@ -64,7 +64,7 @@ public class CreateSessionTokenRequestHandler(
         return new CreateSessionTokenResult(
             SessionToken: generateSessionTokenResult.SessionToken,
             SessionId: sessionId,
-            SessionRenewToken: generateSessionTokenResult.SessionRenewToken,
+            SessionRenewTicket: generateSessionTokenResult.SessionRenewTicket,
             SessionTokenExpiration: generateSessionTokenResult.SessionTokenExpiration
         );
     }

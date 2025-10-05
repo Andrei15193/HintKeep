@@ -11,14 +11,14 @@ public record RenewSessionRequest(
     Guid SessionId,
 
     [property: Required(ErrorMessage = "Session ticket is missing.")]
-    string SessionRenewToken
+    string SessionRenewTicket
 ) :
     IRequest<RenewSessionResult>;
 
 public record RenewSessionResult(
     string SessionToken,
     Guid SessionId,
-    string SessionRenewToken,
+    string SessionRenewTicket,
     DateTime SessionTokenExpiration,
 
     string SessionTicket,
@@ -46,7 +46,7 @@ public class RenewSessionRequestHandler(
             );
         if (
             userSession.TokenExpiration <= DateTime.UtcNow
-            || userSession.RenewToken != request.SessionRenewToken
+            || userSession.RenewTicket != request.SessionRenewTicket
         )
             throw new ValidationException(
                 new ValidationResult("Session expired.", [nameof(RenewSessionRequest.SessionId)]),
@@ -82,7 +82,7 @@ public class RenewSessionRequestHandler(
                 userSession with
                 {
                     SessionTicketId = createSessionTicketResult.TicketId,
-                    RenewToken = generateSessionTokenResult.SessionRenewToken,
+                    RenewTicket = generateSessionTokenResult.SessionRenewTicket,
                     TokenExpiration = generateSessionTokenResult.SessionTokenExpiration
                 }
             ).ToTableEntity(),
@@ -94,7 +94,7 @@ public class RenewSessionRequestHandler(
         return new RenewSessionResult(
             SessionToken: generateSessionTokenResult.SessionToken,
             SessionId: request.SessionId,
-            SessionRenewToken: generateSessionTokenResult.SessionRenewToken,
+            SessionRenewTicket: generateSessionTokenResult.SessionRenewTicket,
             SessionTokenExpiration: generateSessionTokenResult.SessionTokenExpiration,
 
             SessionTicket: createSessionTicketResult.Ticket,

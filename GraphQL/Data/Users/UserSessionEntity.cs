@@ -7,7 +7,7 @@ public record struct UserSessionEntity(
     Guid UserId,
     Guid SessionId,
     Guid SessionTicketId,
-    string RenewToken,
+    string RenewTicket,
     DateTime TokenExpiration,
     ETag ETag = default
 ) :
@@ -16,7 +16,7 @@ public record struct UserSessionEntity(
     public const string Type = "user-session";
     public const string RowKeyPrefix = "session:";
     public const string SessionTicketIdTokenProperty = "sessionTicketId";
-    public const string SessionRenewTokenProperty = "renewToken";
+    public const string SessionRenewTicketProperty = "renewTicket";
     public const string TokenExpirationProperty = "tokenExpiration";
 
     public static TableEntityKey GetEntityKey(Guid userId, Guid sessionId)
@@ -27,7 +27,7 @@ public record struct UserSessionEntity(
             UserId: Guid.ParseExact(tableEntity.GetString(nameof(TableEntity.PartitionKey)), "D"),
             SessionId: Guid.ParseExact(tableEntity.GetString(nameof(TableEntity.RowKey))[RowKeyPrefix.Length..], "D"),
             SessionTicketId: tableEntity.GetGuid(SessionTicketIdTokenProperty)!.Value,
-            RenewToken: tableEntity.GetString(SessionRenewTokenProperty),
+            RenewTicket: tableEntity.GetString(SessionRenewTicketProperty),
             TokenExpiration: tableEntity.GetDateTime(TokenExpirationProperty)!.Value,
             ETag: tableEntity.ETag
         )
@@ -43,7 +43,7 @@ public record struct UserSessionEntity(
             ETag = ETag,
 
             [SessionTicketIdTokenProperty] = SessionTicketId,
-            [SessionRenewTokenProperty] = RenewToken,
+            [SessionRenewTicketProperty] = RenewTicket,
             [TokenExpirationProperty] = TokenExpiration
         };
 }

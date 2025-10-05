@@ -14,7 +14,7 @@ public class RenewSessionMutation : RequestFieldType<RenewSessionRequest, RenewS
         Arguments = [
             new QueryArgument<NonNullGraphType<StringGraphType>>
             {
-                Name = nameof(RenewSessionRequest.SessionRenewToken)
+                Name = nameof(RenewSessionRequest.SessionRenewTicket)
             }
         ];
         Type = typeof(RenewSessionResultGraphType);
@@ -24,7 +24,7 @@ public class RenewSessionMutation : RequestFieldType<RenewSessionRequest, RenewS
         => new(
             UserId: context.User.GetUserId(),
             SessionId: context.User.GetSessionId(),
-            SessionRenewToken: context.GetArgument<string>(nameof(RenewSessionRequest.SessionRenewToken))
+            SessionRenewTicket: context.GetArgument<string>(nameof(RenewSessionRequest.SessionRenewTicket))
         );
 }
 
@@ -32,8 +32,8 @@ public class RenewSessionResultGraphType : ObjectGraphType<RenewSessionResult>
 {
     public RenewSessionResultGraphType()
     {
-        Field<NonNullGraphType<StringGraphType>>(nameof(RenewSessionResult.SessionRenewToken))
-            .Resolve(context => _EnsureAuthenticationCookies(context).Source.SessionRenewToken);
+        Field<NonNullGraphType<StringGraphType>>(nameof(RenewSessionResult.SessionRenewTicket))
+            .Resolve(context => _EnsureAuthenticationCookies(context).Source.SessionRenewTicket);
     }
 
     private IResolveFieldContext<RenewSessionResult> _EnsureAuthenticationCookies(IResolveFieldContext<RenewSessionResult> context)

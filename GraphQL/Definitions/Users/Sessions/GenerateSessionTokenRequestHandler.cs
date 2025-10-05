@@ -14,7 +14,7 @@ public record GenerateSessionTokenRequest(
 
 public record GenerateSessionTokenResult(
     string SessionToken,
-    string SessionRenewToken,
+    string SessionRenewTicket,
     DateTime SessionTokenExpiration
 );
 
@@ -27,7 +27,7 @@ public class GenerateSessionTokenRequestHandler(
 {
     public ValueTask<GenerateSessionTokenResult> ExecuteAsync(GenerateSessionTokenRequest request, CancellationToken cancellationToken)
     {
-        var sessionRenewToken = $"{Guid.NewGuid():N}{Guid.NewGuid():N}";
+        var sessionRenewTicket = $"{Guid.NewGuid():N}{Guid.NewGuid():N}";
         var sessionTokenExpiration = DateTime.UtcNow.AddHours(1);
 
         var sessionToken = jsonWebTokenHandler.WriteToken(new JwtSecurityToken(
@@ -44,7 +44,7 @@ public class GenerateSessionTokenRequestHandler(
 
         return ValueTask.FromResult(new GenerateSessionTokenResult(
             SessionToken: sessionToken,
-            SessionRenewToken: sessionRenewToken,
+            SessionRenewTicket: sessionRenewTicket,
             SessionTokenExpiration: sessionTokenExpiration
         ));
     }

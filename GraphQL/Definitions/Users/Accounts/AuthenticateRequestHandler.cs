@@ -24,7 +24,7 @@ public record AuthenticationResult(
     string Username,
 
     string SessionToken,
-    string SessionRenewToken,
+    string SessionRenewTicket,
     DateTime SessionTokenExpiration,
 
     string SessionTicket,
@@ -87,7 +87,7 @@ public class AuthenticateRequestHandler(
             Username: userEntity.Username,
 
             SessionToken: sessionTokenResult.SessionToken,
-            SessionRenewToken: sessionTokenResult.SessionRenewToken,
+            SessionRenewTicket: sessionTokenResult.SessionRenewTicket,
             SessionTokenExpiration: sessionTokenResult.SessionTokenExpiration,
 
             SessionTicket: sessionTicketResult.Ticket,
