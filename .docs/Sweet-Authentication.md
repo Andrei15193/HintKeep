@@ -60,7 +60,7 @@ The challenge of supporting multiple sessions simultaneously remains. While this
 To distinguish between sessions, a unique ID is appended to the cookie name that stores the authentication token. Authenticating a user now involves two headers.
 
 * A cookie sent automatically by the browser
-* An ~X-HintKeep-Session-Id~ header containing the session ID associated with the token
+* An `X-HintKeep-Session-Id` header containing the session ID associated with the token
 
 This allows application code to target the correct session cookie, even if multiple are present from past logins or page refreshes. These cookies should clear out quickly though.
 
