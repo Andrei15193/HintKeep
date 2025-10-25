@@ -70,9 +70,13 @@ jobs:
         working-directory: WebClient
         run: npm install
 
-      - name: Test
+      - name: Test Units
         working-directory: WebClient
-        run: npm run test
+        run: npm run test:units
+
+      - name: Test Features
+        working-directory: WebClient
+        run: npm run test:features
 
       - name: Build
         working-directory: WebClient

@@ -10,6 +10,14 @@
     "eslint.workingDirectories": [
         "WebClient"
     ],
+    "cucumber.features": [
+        "Features/**/*.feature"
+    ],
+    "cucumber.glue": [
+        // "*specs*/**/*.cs",
+        "WebClient/Features/**/*.feature.ts",
+        "WebClient/Features/**/*.feature.tsx",
+    ],
     "[typescript]": {
         "editor.indentSize": 4,
         "editor.detectIndentation": false,
