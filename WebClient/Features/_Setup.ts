@@ -1,13 +1,23 @@
-import type { RenderResult } from "@testing-library/react";
-import { World, setWorldConstructor } from "@cucumber/cucumber";
+import type { render as renderFunc, RenderResult } from "@testing-library/react";
+import { type IWorldOptions, World, setWorldConstructor } from "@cucumber/cucumber";
+import { IDBFactory } from "fake-indexeddb";
 import { JSDOM } from "jsdom";
 import { type PropsWithChildren, createElement } from "react";
 import { WindowContext } from "../Pages/WindowContext";
 
 // Define scenario context
 export class JSDomWorld extends World {
+    public constructor(options: IWorldOptions<any>) {
+        super(options);
+    }
+
     public readonly dom: JSDOM = new JSDOM("<!DOCTYPE html><html><body></body></html>", {
-        url: "http://localhost/"
+        url: "http://localhost/",
+        beforeParse(window) {
+            Object.assign(window, {
+                indexedDB: new IDBFactory()
+            });
+        }
     });
 
     public get container(): HTMLElement {
@@ -15,7 +25,7 @@ export class JSDomWorld extends World {
     }
 
     public render(element: React.JSX.Element): RenderResult {
-        const { render } = require("@testing-library/react");
+        const render: typeof renderFunc = require("@testing-library/react").render;
 
         return render(element, {
             container: this.container,
