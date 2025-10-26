@@ -1,10 +1,18 @@
 {
     "files.watcherExclude": {
+        "**/.git/**/*": true,
         "**/bin/**/*": true,
         "**/obj/**/*": true,
         "**/node_modules/**/*": true,
         "WebClient/**/*": true,
         "GraphQL/./data/**/*": true
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/bin": true,
+        "**/obj": true,
+        "**/node_modules": true,
+        "GraphQL/.data/": true
     },
     "eslint.format.enable": true,
     "eslint.workingDirectories": [

@@ -1,10 +1,14 @@
-Feature: demo
+Feature: Authentication
 
   As a user
-  I want to have features clearly defined
-  So that I know what this app should be doing
+  I want to be able to log in
+  So that I can use the app
 
-  Scenario: Check if there's a button
+  Scenario: Login with missing account
     Given the landing page
-    When I look at the page
-    Then I see a "Use application locally" link
+    And I click on "Use application locally"
+    And I see "HintKeep - Login"
+    When I enter "test" for "Username"
+    And I enter "pa$$w0rd123" for "Password"
+    And I click on 'Login'
+    Then I see the "Wrong credentials. Try again or follow the password recovery steps." error message for "Username"

@@ -1,42 +1,9 @@
-import type { render as renderFunc, RenderResult } from "@testing-library/react";
-import { type IWorldOptions, World, setWorldConstructor } from "@cucumber/cucumber";
-import { IDBFactory } from "fake-indexeddb";
-import { JSDOM } from "jsdom";
-import { type PropsWithChildren, createElement } from "react";
-import { WindowContext } from "../Pages/WindowContext";
+import { setDefaultTimeout, setWorldConstructor } from "@cucumber/cucumber";
+import { JSDomWorld } from "./_JSDomWorld";
 
-// Define scenario context
-export class JSDomWorld extends World {
-    public constructor(options: IWorldOptions<any>) {
-        super(options);
-    }
-
-    public readonly dom: JSDOM = new JSDOM("<!DOCTYPE html><html><body></body></html>", {
-        url: "http://localhost/",
-        beforeParse(window) {
-            Object.assign(window, {
-                indexedDB: new IDBFactory()
-            });
-        }
-    });
-
-    public get container(): HTMLElement {
-        return this.dom.window.document.body;
-    }
-
-    public render(element: React.JSX.Element): RenderResult {
-        const render: typeof renderFunc = require("@testing-library/react").render;
-
-        return render(element, {
-            container: this.container,
-            wrapper: ({ children }: PropsWithChildren<{}>): React.JSX.Element => createElement(
-                WindowContext.Provider,
-                { value: this.dom.window as any },
-                children
-            )
-        });
-    }
-}
+// CucumberJS Config
+setWorldConstructor(JSDomWorld);
+setDefaultTimeout(60 * 1000);
 
 // Declare the context globally
 declare module "@cucumber/cucumber" {
@@ -48,16 +15,3 @@ declare global {
     var window: Window & typeof globalThis;
     var document: Document;
 }
-
-setWorldConstructor(JSDomWorld);
-
-// React Testing Library bootstrap
-// When importing the library it requires window and document to be defined
-const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>", {
-    url: "http://localhost/"
-});
-
-global.window = dom.window as any;
-global.document = dom.window.document;
-global.sessionStorage = dom.window.sessionStorage;
-global.localStorage = dom.window.localStorage;

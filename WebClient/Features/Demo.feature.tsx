@@ -1,6 +1,5 @@
-import assert from "assert";
 import { Given, When, Then } from "@cucumber/cucumber";
-import { findByText } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import React from "react";
 import { Startup } from "../Pages/Startup";
 
@@ -8,15 +7,23 @@ Given("the landing page", async function () {
     this.render(<Startup />);
 });
 
-When("I look at the page", () => {
+Given("I click on {string}", async function (text: string) {
+    const element = await this.findByTextAsync(text);
+    fireEvent.click(element);
 });
 
-Then("I see a \"Use application locally\" link", async function () {
-    const element = await findByText(this.container, "Use application locally", {
-        collapseWhitespace: true,
-        exact: true
-    });
+Given("I see {string}", async function (text: string) {
+    await this.findByTextAsync(text);
+});
 
-    assert.equal(element.tagName, "A");
-    assert.equal(element.attributes.getNamedItem("href")?.value, "/login");
+When("I enter {string} for {string}", async function (value: string, inputLabel: string) {
+    const input = await this.findInputByLabelTextAsync(inputLabel);
+
+    fireEvent.change(input, { target: { value } });
+});
+
+Then("I see the {string} error message for {string}", async function (error: string, inputLabel: string) {
+    const labelElement = await this.findByTextAsync(inputLabel);
+
+    await this.findByTextAsync(error, labelElement.parentElement);
 });
