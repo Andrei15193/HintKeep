@@ -25,6 +25,8 @@
         // "*specs*/**/*.cs",
         "WebClient/Features/**/*.feature.ts",
         "WebClient/Features/**/*.feature.tsx",
+
+        // ".docs/FeatureMarkdownWriter/**/*.feature.cs",
     ],
     "[csharp]": {
         "editor.defaultFormatter": "ms-dotnettools.csharp"

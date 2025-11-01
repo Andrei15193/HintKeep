@@ -118,6 +118,13 @@ jobs:
         run: |
           Import-Module (Join-Path '.' 'src' 'dev-tools.psm1')
 
+          Get-ChildItem `
+            -Path 'wiki' `
+            -Include "Features-`u{2010}-*.md" `
+            -File `
+            -Recurse `
+          | Remove-Item
+
           Convert-FeaturesToMarkdown `
             -SourceUrl 'https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/Features' `
             -SourceDirectory 'src/Features' `
