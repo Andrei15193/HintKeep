@@ -102,6 +102,7 @@ jobs:
           fetch-depth: 0
           path: 'src'
           sparse-checkout: |
+            dev-tools.psm1
             .development
             .docs
             Features
