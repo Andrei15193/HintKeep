@@ -25,7 +25,7 @@ var parser = new Parser();
 foreach (var featureFileInfo in sourceDirectory.EnumerateFiles("*.feature", SearchOption.AllDirectories))
 {
     var document = parser.Parse(featureFileInfo.FullName);
-    var featureMarkdownFilePath = Path.Join(destinationDirectory.FullName, $"Features-—-{document.Feature.Name.Replace(' ', '-')}.md");
+    var featureMarkdownFilePath = Path.Join(destinationDirectory.FullName, $"Features - {document.Feature.Name}.md");
 
     Console.WriteLine($"Generating '{featureMarkdownFilePath}' from '{featureFileInfo.FullName}'.");
     using var featureMarkdownTextWriter = new StreamWriter(
