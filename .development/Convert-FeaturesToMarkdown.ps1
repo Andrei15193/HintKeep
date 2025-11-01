@@ -3,7 +3,7 @@ function Convert-FeaturesToMarkdown
     [OutputType([void])]
     param(
         [Parameter(Mandatory = $true)]
-        [string] $GitRef,
+        [string] $SourceUrl,
 
         [Parameter(Mandatory = $true)]
         [string] $SourceDirectory,
@@ -20,7 +20,7 @@ function Convert-FeaturesToMarkdown
     dotnet run `
         --project (Join-Path $PSScriptRoot '..' '.docs' 'FeatureMarkdownWriter') `
         --no-launch-profile `
-        $GitRef `
+        $SourceUrl `
         (Resolve-Path $SourceDirectory) `
         (Resolve-Path $DestinationDirectory)
 }

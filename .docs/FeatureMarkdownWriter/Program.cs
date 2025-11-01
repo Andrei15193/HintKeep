@@ -5,11 +5,11 @@ using Gherkin.Ast;
 
 if (args.Length < 3)
 {
-    Console.WriteLine("Expected git ref, source and destination directories to be specified.");
+    Console.WriteLine("Expected source url, source and destination directories to be specified.");
     Environment.Exit(1);
 }
 
-var gitRef = args[0];
+var sourceUrl = args[0];
 var sourceDirectory = new DirectoryInfo(args[1]);
 var destinationDirectory = new DirectoryInfo(args[2]);
 
@@ -25,7 +25,7 @@ var parser = new Parser();
 foreach (var featureFileInfo in sourceDirectory.EnumerateFiles("*.feature", SearchOption.AllDirectories))
 {
     var document = parser.Parse(featureFileInfo.FullName);
-    var featureMarkdownFilePath = Path.Join(destinationDirectory.FullName, $"Features---{document.Feature.Name.Replace(' ', '-')}.md");
+    var featureMarkdownFilePath = Path.Join(destinationDirectory.FullName, $"Features-—-{document.Feature.Name.Replace(' ', '-')}.md");
 
     Console.WriteLine($"Generating '{featureMarkdownFilePath}' from '{featureFileInfo.FullName}'.");
     using var featureMarkdownTextWriter = new StreamWriter(
@@ -45,12 +45,12 @@ foreach (var featureFileInfo in sourceDirectory.EnumerateFiles("*.feature", Sear
         .Replace('\\', '/')
         .Trim('/');
 
-    WriteFeature(featureMarkdownTextWriter, document.Feature, gitRef, sourceRelativePath);
+    WriteFeature(featureMarkdownTextWriter, document.Feature, sourceUrl, sourceRelativePath);
 }
 
-static void WriteFeature(TextWriter featureMarkdownTextWriter, Feature feature, string gitRef, string sourceRelativePath)
+static void WriteFeature(TextWriter featureMarkdownTextWriter, Feature feature, string sourceUrl, string sourceRelativePath)
 {
-    featureMarkdownTextWriter.Write($"**Source document:** [{sourceRelativePath}](https://github.com/Andrei15193/HintKeep/tree/{gitRef}/{sourceRelativePath}).");
+    featureMarkdownTextWriter.Write($"**Source document:** [{sourceRelativePath}]({sourceUrl}/{sourceRelativePath}).");
     if (feature.Tags.Any())
     {
         featureMarkdownTextWriter.WriteLine("  ");

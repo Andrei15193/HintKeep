@@ -117,8 +117,8 @@ jobs:
           Import-Module (Join-Path '.' 'src' 'dev-tools.psm1')
 
           Convert-FeaturesToMarkdown `
-            -GitRef '${{ github.ref_name }}' `
-            -SourceDirectory 'src' `
+            -SourceUrl 'https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/Features' `
+            -SourceDirectory 'src/Features' `
             -DestinationDirectory 'wiki'
 
           Set-Location wiki
