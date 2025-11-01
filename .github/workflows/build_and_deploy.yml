@@ -118,7 +118,7 @@ jobs:
 
           Convert-FeaturesToMarkdown `
             -GitRef '${{ github.ref_name }}' `
-            -SourceDirectory (Join-Path 'src' 'Features') `
+            -SourceDirectory 'src' `
             -DestinationDirectory 'wiki'
 
           Set-Location wiki
