@@ -93,7 +93,7 @@ jobs:
     needs:
       - buildWebClient
       - buildGraphQL
-    name: Update Wiki Documentation
+    name: Update Documentation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -122,7 +122,7 @@ jobs:
           Import-Module ./src/dev-tools.psm1
 
           Convert-FeaturesToMarkdown `
-            -GitRef ${{ github.ref_name }}
+            -GitRef ${{ github.ref_name }} `
             -SourceDirectory (Join-Path 'src' 'Features') `
             -DestinationDirectory (Join-Path 'wiki')
 
