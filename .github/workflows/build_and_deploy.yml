@@ -124,7 +124,7 @@ jobs:
           Convert-FeaturesToMarkdown `
             -GitRef ${{ github.ref_name }} `
             -SourceDirectory (Join-Path 'src' 'Features') `
-            -DestinationDirectory (Join-Path 'wiki')
+            -DestinationDirectory 'wiki'
 
           git add --all
           if (git diff-index --quiet HEAD) {
