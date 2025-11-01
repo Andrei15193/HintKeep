@@ -30,14 +30,14 @@ jobs:
         shell: pwsh
         working-directory: GraphQL
         run: |
-          dotnet test `
+          dotnet test 'HintKeep.GraphQL.csproj' `
             --configuration Debug
 
       - name: Build
         shell: pwsh
         working-directory: GraphQL
         run: |
-          dotnet publish ./HintKeep.GraphQL.csproj `
+          dotnet publish 'HintKeep.GraphQL.csproj' `
             --configuration Release `
             --runtime linux-x64 `
             --no-self-contained `
@@ -134,8 +134,7 @@ jobs:
 
   deploy:
     needs:
-      - buildWebClient
-      - buildGraphQL
+      - updateDocumentation
     name: Deploy on Test
     runs-on: ubuntu-latest
     environment: Test
