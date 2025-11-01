@@ -18,8 +18,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          sparse-checkout: GraphQL
+          sparse-checkout: |
+            GraphQL
 
       - name: Setup Dotnet 9
         uses: actions/setup-dotnet@v4
@@ -58,8 +58,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          sparse-checkout: WebClient
+          sparse-checkout: |
+            WebClient
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
@@ -99,10 +99,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           path: 'src'
           sparse-checkout: |
-            dev-tools.psm1
+            .
             .development
             .docs
             Features
@@ -111,7 +110,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository }}.wiki
-          fetch-depth: 0
           path: 'wiki'
 
       - name: Update Wiki
@@ -147,8 +145,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          sparse-checkout: .infrastructure
+          sparse-checkout: |
+            .infrastructure
 
       - name: Download Artifacts
         uses: actions/download-artifact@v5
