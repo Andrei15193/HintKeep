@@ -117,17 +117,18 @@ jobs:
           Import-Module (Join-Path '.' 'src' 'dev-tools.psm1')
 
           Convert-FeaturesToMarkdown `
-            -GitRef ${{ github.ref_name }} `
+            -GitRef '${{ github.ref_name }}' `
             -SourceDirectory (Join-Path 'src' 'Features') `
             -DestinationDirectory 'wiki'
 
           Set-Location wiki
 
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.name 'GitHub Action'
+          git config --local user.email 'action@github.com'
 
           git add --all
-          if (git diff-index --quiet HEAD) {
+          git diff-index --quiet HEAD
+          if ($LASTEXITCODE) {
             git commit --message "Updated documentation"
             git push
           }
