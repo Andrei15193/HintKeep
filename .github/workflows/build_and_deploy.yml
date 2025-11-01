@@ -116,15 +116,17 @@ jobs:
       - name: Update Wiki
         shell: pwsh
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-          Import-Module ./src/dev-tools.psm1
+          Import-Module (Join-Path 'src' 'dev-tools.psm1')
 
           Convert-FeaturesToMarkdown `
             -GitRef ${{ github.ref_name }} `
             -SourceDirectory (Join-Path 'src' 'Features') `
             -DestinationDirectory 'wiki'
+
+          Set-Location wiki
+
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
 
           git add --all
           if (git diff-index --quiet HEAD) {
