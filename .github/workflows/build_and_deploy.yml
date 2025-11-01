@@ -101,7 +101,6 @@ jobs:
         with:
           path: 'src'
           sparse-checkout: |
-            .
             .development
             .docs
             Features
@@ -115,7 +114,7 @@ jobs:
       - name: Update Wiki
         shell: pwsh
         run: |
-          Import-Module (Join-Path 'src' 'dev-tools.psm1')
+          Import-Module (Join-Path '.' 'src' 'dev-tools.psm1')
 
           Convert-FeaturesToMarkdown `
             -GitRef ${{ github.ref_name }} `
