@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - vNext
-      - vNextCD
+      - vNext-bdd
 
 concurrency:
   group: test
@@ -89,11 +89,54 @@ jobs:
           path: ./WebClient/publish
           compression-level: 9
 
-  deployment:
+  updateDocumentation:
     needs:
       - buildWebClient
       - buildGraphQL
-    name: Deployment on Test
+    name: Update Wiki Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: 'src'
+          sparse-checkout: |
+            .development
+            .docs
+            Features
+
+      - name: Checkout Wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          fetch-depth: 0
+          path: 'wiki'
+
+      - name: Update Wiki
+        shell: pwsh
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          Import-Module ./src/dev-tools.psm1
+
+          Convert-FeaturesToMarkdown `
+            -GitRef ${{ github.ref_name }}
+            -SourceDirectory (Join-Path 'src' 'Features') `
+            -DestinationDirectory (Join-Path 'wiki')
+
+          git add --all
+          if (git diff-index --quiet HEAD) {
+            git commit --message "Updated documentation"
+            git push
+          }
+
+  deploy:
+    needs:
+      - buildWebClient
+      - buildGraphQL
+    name: Deploy on Test
     runs-on: ubuntu-latest
     environment: Test
     permissions:
@@ -185,6 +228,7 @@ jobs:
               } | ConvertTo-Json -Compress) `
             | Out-Null
           }
+
       - name: Ensure WebClient Post-Processing Scripts
         shell: pwsh
         run: |

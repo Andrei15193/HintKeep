@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HintKeep.GraphQL", "HintKeep.GraphQL.csproj", "{3FCE8873-5C64-4DB1-BF2F-63864355AFA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeatureMarkdownWriter", "..\.docs\FeatureMarkdownWriter\FeatureMarkdownWriter.csproj", "{C0841F95-9C24-42C9-8499-77C78A710103}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{3FCE8873-5C64-4DB1-BF2F-63864355AFA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FCE8873-5C64-4DB1-BF2F-63864355AFA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FCE8873-5C64-4DB1-BF2F-63864355AFA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0841F95-9C24-42C9-8499-77C78A710103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0841F95-9C24-42C9-8499-77C78A710103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0841F95-9C24-42C9-8499-77C78A710103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0841F95-9C24-42C9-8499-77C78A710103}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

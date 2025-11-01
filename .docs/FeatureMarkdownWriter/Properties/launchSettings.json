@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Debug": {
+      "commandName": "Project",
+      "commandLineArgs": "dev . Output",
+      "workingDirectory": "."
+    }
+  }
+}

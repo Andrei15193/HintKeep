@@ -26,6 +26,9 @@
         "WebClient/Features/**/*.feature.ts",
         "WebClient/Features/**/*.feature.tsx",
     ],
+    "[csharp]": {
+        "editor.defaultFormatter": "ms-dotnettools.csharp"
+    },
     "[typescript]": {
         "editor.indentSize": 4,
         "editor.detectIndentation": false,
