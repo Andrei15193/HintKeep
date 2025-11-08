@@ -35,6 +35,13 @@ internal static class HintKeepHttp
         => (IHttpCookieHandler)context.UserContext[nameof(IHttpCookieHandler)]!;
 
 
+    /// <remarks>
+    /// The <see cref="IHttpCookieHandler"/> interface was added to accomodate for integration tests,
+    /// the test host uses the ASP.NET pipeline and in consequence its own <c>HttpContext</c> which
+    /// is different than the Azure Functions HTTP objects.
+    /// 
+    /// This abstracts HTTP cookie handling allowing them to be added regardless of runtime.
+    /// </remarks>
     internal interface IHttpCookieHandler
     {
         string? Get(string name);
