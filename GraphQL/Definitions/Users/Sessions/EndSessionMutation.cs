@@ -17,11 +17,7 @@ public class EndSessionMutation : RequestFieldType<EndSessionRequest, EndSession
     {
         var userId = context.User.GetUserId();
         var sessionId = context.User.GetSessionId();
-        var sessionTicket = context
-            .GetHttpRequestData()
-            .Cookies
-            .SingleOrDefault(cookie => cookie.Name == HintKeepHttp.SessionTicketCookieName)
-            ?.Value;
+        var sessionTicket = context.GetHttpCookie(HintKeepHttp.SessionTicketCookieName);
 
         return new EndSessionRequest(
             UserId: userId,
@@ -32,17 +28,17 @@ public class EndSessionMutation : RequestFieldType<EndSessionRequest, EndSession
 
     protected override ValueTask<EndSessionResult?> ResolveAsync(IResolveFieldContext context)
     {
-        context.SetHttpResponseCookie(
+        context.SetHttpCookie(
             HintKeepHttp.SessionTicketCookieName,
             string.Empty,
             DateTime.UtcNow
         );
-        context.SetHttpResponseCookie(
+        context.SetHttpCookie(
             HintKeepHttp.SessionTokenCookieName(context.User.GetSessionId()),
             string.Empty,
             DateTime.UtcNow
         );
-        context.SetDevHttpResponseCookie(
+        context.SetDevHttpCookie(
             HintKeepHttp.DevSessionTokenCookieName,
             string.Empty,
             DateTime.UtcNow

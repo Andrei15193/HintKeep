@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HintKeep.GraphQL.AppSetup.Registrations;
 
-public static class CorrelationId
+internal static class CorrelationId
 {
     public static IServiceCollection AddCorrelationId(this IServiceCollection services)
         => services

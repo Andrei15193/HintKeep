@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace HintKeep.GraphQL.AppSetup.Registrations;
 
-public static class JsonSerialization
+internal static class JsonSerialization
 {
     public static IServiceCollection AddJsonSerialization(this IServiceCollection services)
         => services

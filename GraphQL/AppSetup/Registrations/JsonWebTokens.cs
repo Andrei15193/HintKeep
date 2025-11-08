@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace HintKeep.GraphQL.AppSetup.Registrations;
 
-public static class JsonWebTokens
+internal static class JsonWebTokens
 {
     public static IServiceCollection AddJsonWebTokens(this IServiceCollection services, string serviceKey, string signingKeyConfigurationName)
         => services

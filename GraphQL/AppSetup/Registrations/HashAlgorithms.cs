@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace HintKeep.GraphQL.AppSetup.Registrations;
 
-public static class HashAlgorithms
+internal static class HashAlgorithms
 {
     public static IServiceCollection AddHmacSha256HashAlgorithm(this IServiceCollection services, string serviceKey, string hashKeyConfigurationName)
         => services

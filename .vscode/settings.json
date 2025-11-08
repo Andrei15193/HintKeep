@@ -22,7 +22,7 @@
         "Features/**/*.feature"
     ],
     "cucumber.glue": [
-        // "*specs*/**/*.cs",
+        "GraphQL/**/*feature.cs",
         "WebClient/Features/**/*.feature.ts",
         "WebClient/Features/**/*.feature.tsx",
 

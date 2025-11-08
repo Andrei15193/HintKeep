@@ -52,17 +52,17 @@ public class AuthenticationResultGraphType : ObjectGraphType<AuthenticationResul
         var result = context.Source;
         if (result is not null && !context.UserContext.ContainsKey(authenticationCookiesMarker) && context.Errors.Count == 0)
         {
-            context.SetHttpResponseCookie(
+            context.SetHttpCookie(
                 HintKeepHttp.SessionTicketCookieName,
                 result.SessionTicket,
                 result.SessionTicketExpiration
             );
-            context.SetHttpResponseCookie(
+            context.SetHttpCookie(
                 HintKeepHttp.SessionTokenCookieName(result.SessionId),
                 result.SessionToken,
                 result.SessionTokenExpiration
             );
-            context.SetDevHttpResponseCookie(
+            context.SetDevHttpCookie(
                 HintKeepHttp.DevSessionTokenCookieName,
                 result.SessionToken,
                 result.SessionTokenExpiration

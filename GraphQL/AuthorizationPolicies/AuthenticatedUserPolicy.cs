@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HintKeep.GraphQL.AuthorizationPolicies;
 
-public static class AuthenticatedUserPolicy
+internal static class AuthenticatedUserPolicy
 {
     public static IServiceCollection AddAuthenticatedUserPolicy(this IServiceCollection services, out string name)
         => services.AddAuthorizationPolicy(
