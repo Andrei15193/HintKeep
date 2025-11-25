@@ -23,7 +23,7 @@
     "azurite": "azurite --disableTelemetry --location .data"
   },
   "devDependencies": {
-    "azure-functions-core-tools": "^4.1.0",
-    "azurite": "^3.34.0"
+    "azure-functions-core-tools": "^4.3.0",
+    "azurite": "^3.35.0"
   }
 }
