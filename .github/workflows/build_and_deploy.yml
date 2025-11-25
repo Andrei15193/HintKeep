@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - vNext
-      - vNextCD
 
 concurrency:
   group: test
@@ -18,8 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          sparse-checkout: GraphQL
+          sparse-checkout: |
+            Features
+            GraphQL
 
       - name: Setup Dotnet 9
         uses: actions/setup-dotnet@v4
@@ -30,14 +30,14 @@ jobs:
         shell: pwsh
         working-directory: GraphQL
         run: |
-          dotnet test `
+          dotnet test 'HintKeep.GraphQL.csproj' `
             --configuration Debug
 
       - name: Build
         shell: pwsh
         working-directory: GraphQL
         run: |
-          dotnet publish ./HintKeep.GraphQL.csproj `
+          dotnet publish 'HintKeep.GraphQL.csproj' `
             --configuration Release `
             --runtime linux-x64 `
             --no-self-contained `
@@ -58,8 +58,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          sparse-checkout: WebClient
+          sparse-checkout: |
+            Features
+            WebClient
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
@@ -70,9 +71,13 @@ jobs:
         working-directory: WebClient
         run: npm install
 
-      - name: Test
+      - name: Test Units
         working-directory: WebClient
-        run: npm run test
+        run: npm run test:units
+
+      - name: Test Features
+        working-directory: WebClient
+        run: npm run test:features
 
       - name: Build
         working-directory: WebClient
@@ -85,11 +90,65 @@ jobs:
           path: ./WebClient/publish
           compression-level: 9
 
-  deployment:
+  updateDocumentation:
     needs:
       - buildWebClient
       - buildGraphQL
-    name: Deployment on Test
+    name: Update Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: 'src'
+          sparse-checkout: |
+            .development
+            .docs
+            Features
+
+      - name: Checkout Wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: 'wiki'
+
+      - name: Update Wiki
+        shell: pwsh
+        run: |
+          Import-Module (Join-Path '.' 'src' 'dev-tools.psm1')
+
+          Get-ChildItem `
+            -Path 'wiki' `
+            -Include "Features-`u{2010}-*.md" `
+            -File `
+            -Recurse `
+          | Remove-Item
+
+          Convert-FeaturesToMarkdown `
+            -SourceUrl 'https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/Features' `
+            -SourceDirectory 'src/Features' `
+            -DestinationDirectory 'wiki'
+
+          Convert-HandlebarsToMarkdown `
+            -TemplatesDirectory 'src/.docs' `
+            -DestinationDirectory 'wiki'
+
+          Set-Location wiki
+
+          git config --local user.name 'GitHub Action'
+          git config --local user.email 'action@github.com'
+
+          git add --all
+          git diff-index --quiet HEAD
+          if ($LASTEXITCODE) {
+            git commit --message "Updated documentation"
+            git push
+          }
+
+  deploy:
+    needs:
+      - updateDocumentation
+    name: Deploy on Test
     runs-on: ubuntu-latest
     environment: Test
     permissions:
@@ -98,8 +157,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          sparse-checkout: .infrastructure
+          sparse-checkout: |
+            .infrastructure
 
       - name: Download Artifacts
         uses: actions/download-artifact@v5
@@ -181,6 +240,7 @@ jobs:
               } | ConvertTo-Json -Compress) `
             | Out-Null
           }
+
       - name: Ensure WebClient Post-Processing Scripts
         shell: pwsh
         run: |

@@ -4,7 +4,7 @@ using HintKeep.GraphQL.Definitions.Users;
 
 namespace HintKeep.GraphQL.AuthorizationPolicies;
 
-public class GuidRequirement(string claim, string errorMessage) : IAuthorizationRequirement
+internal class GuidRequirement(string claim, string errorMessage) : IAuthorizationRequirement
 {
     public Task Authorize(AuthorizationContext context)
     {

@@ -3,12 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HintKeep.GraphQL.AuthorizationPolicies;
 
-public interface INamedAuthorizationPolicy : IAuthorizationPolicy
+internal interface INamedAuthorizationPolicy : IAuthorizationPolicy
 {
     string Name { get; }
 }
 
-public static class NamedAuthorizationPolicyHelper
+internal static class NamedAuthorizationPolicyHelper
 {
     public static IServiceCollection AddAuthorizationPolicy(this IServiceCollection services, string name, Action<AuthorizationPolicyBuilder> configure)
     {

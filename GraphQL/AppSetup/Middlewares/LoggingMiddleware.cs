@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace HintKeep.GraphQL.AppSetup.Middlewares;
 
-public class LoggingMiddleware : IFunctionsWorkerMiddleware
+internal class LoggingMiddleware : IFunctionsWorkerMiddleware
 {
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {

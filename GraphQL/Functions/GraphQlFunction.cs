@@ -79,8 +79,7 @@ public class GraphQlFunction(
                 options =>
                 {
                     options.User = new ClaimsPrincipal(request.Identities);
-                    options.SetHttpRequestData(request);
-                    options.SetHttpResponseData(response);
+                    options.SetHttpCookieHandler(new HintKeepHttp.FunctionsHttpCookieHandler(request, response));
 
                     options.OperationName = graphQlRequest.OperationName;
                     options.Query = graphQlRequest.Query;

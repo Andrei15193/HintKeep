@@ -16,38 +16,57 @@ internal static class HintKeepHttp
     public const string SessionTicketCookieName = "session-ticket";
     public const string SessionIdHeaderName = "X-HintKeep-Session";
 
-    public static void SetHttpResponseCookie(this IResolveFieldContext context, string name, string value, DateTime expiration)
-    {
-        var httpResponseData = context.GetHttpResponseData();
+    public static string? GetHttpCookie(this IResolveFieldContext context, string name)
+        => context.GetHttpCookieHandler().Get(name);
 
-        httpResponseData.Headers.Add(
-            HeaderNames.SetCookie,
-            new SetCookieHeaderValue(name, value)
-            {
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                HttpOnly = true,
-                Expires = expiration
-            }.ToString()
-        );
+    public static void SetHttpCookie(this IResolveFieldContext context, string name, string value, DateTime expiration)
+        => context.GetHttpCookieHandler().Set(name, value, expiration);
+
+    public static void SetDevHttpCookie(this IResolveFieldContext context, string name, string value, DateTime expiration)
+    {
+        if (context.RequestServices!.GetRequiredService<IHostEnvironment>().IsDevelopment())
+            context.SetHttpCookie(name, value, expiration);
     }
 
-    public static void SetDevHttpResponseCookie(this IResolveFieldContext context, string name, string value, DateTime expiration)
+    internal static void SetHttpCookieHandler(this ExecutionOptions options, IHttpCookieHandler cookieHandler)
+         => options.UserContext[nameof(IHttpCookieHandler)] = cookieHandler;
+
+    private static IHttpCookieHandler GetHttpCookieHandler(this IResolveFieldContext context)
+        => (IHttpCookieHandler)context.UserContext[nameof(IHttpCookieHandler)]!;
+
+
+    /// <remarks>
+    /// The <see cref="IHttpCookieHandler"/> interface was added to accomodate for integration tests,
+    /// the test host uses the ASP.NET pipeline and in consequence its own <c>HttpContext</c> which
+    /// is different than the Azure Functions HTTP objects.
+    /// 
+    /// This abstracts HTTP cookie handling allowing them to be added regardless of runtime.
+    /// </remarks>
+    internal interface IHttpCookieHandler
     {
-        var environment = context.RequestServices!.GetRequiredService<IHostEnvironment>();
-        if (environment.IsDevelopment())
-            context.SetHttpResponseCookie(name, value, expiration);
+        string? Get(string name);
+
+        void Set(string name, string value, DateTime expiration);
     }
 
-    internal static HttpRequestData GetHttpRequestData(this IResolveFieldContext context)
-        => (HttpRequestData)context.UserContext[nameof(HttpRequestData)]!;
+    internal class FunctionsHttpCookieHandler(HttpRequestData httpRequestData, HttpResponseData httpResponseData) : IHttpCookieHandler
+    {
+        public string? Get(string name)
+            => httpRequestData
+                .Cookies
+                .SingleOrDefault(cookie => cookie.Name == name)
+                ?.Value;
 
-    internal static void SetHttpRequestData(this ExecutionOptions options, HttpRequestData httpRequestData)
-        => options.UserContext[nameof(HttpRequestData)] = httpRequestData;
-
-    internal static HttpResponseData GetHttpResponseData(this IResolveFieldContext context)
-        => (HttpResponseData)context.UserContext[nameof(HttpResponseData)]!;
-
-    internal static void SetHttpResponseData(this ExecutionOptions options, HttpResponseData httpResponseData)
-        => options.UserContext[nameof(HttpResponseData)] = httpResponseData;
+        public void Set(string name, string value, DateTime expiration)
+            => httpResponseData.Headers.Add(
+                HeaderNames.SetCookie,
+                new SetCookieHeaderValue(name, value)
+                {
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    HttpOnly = true,
+                    Expires = expiration
+                }.ToString()
+            );
+    }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { createBrowserRouter, Navigate, Outlet, useMatch } from "react-router";
 import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
 import { ActiveAccountHintsRoute } from "./AccountHints";
@@ -8,53 +8,66 @@ import { IndexedDatabaseScoped } from "./IndexedDatabaseScoped";
 import { LoginRoute } from "./Login";
 import { SignUpRoute } from "./SignUp";
 import { UserProfileRoute } from "./User";
+import { useWindow } from "./WindowContext";
 
-export const AppRouter = createBrowserRouter([
-    {
-        path: "/",
-        Component() {
-            const { user } = useAuthentication();
-            const match = useMatch({
-                path: "/",
-                end: true
-            });
+export function useAppRouter(): ReturnType<typeof createBrowserRouter> {
+    const window = useWindow();
 
-            if (match && user === null)
-                return <HomePage />;
+    return useMemo(
+        () => createBrowserRouter(
+            [
+                {
+                    path: "/",
+                    Component() {
+                        const { user } = useAuthentication();
+                        const match = useMatch({
+                            path: "/",
+                            end: true
+                        });
 
-            return <Outlet />;
-        },
-        children: [
+                        if (match && user === null)
+                            return <HomePage />;
+
+                        return <Outlet />;
+                    },
+                    children: [
+                        {
+                            Component: IndexedDatabaseScoped,
+                            children: [
+                                LoginRoute,
+                                SignUpRoute,
+                                {
+                                    Component() {
+                                        const { user } = useAuthentication();
+
+                                        if (user === null)
+                                            return <Navigate to="/" />;
+
+                                        return <Outlet />;
+                                    },
+                                    children: [
+                                        ActiveAccountsRoute,
+                                        UserProfileRoute,
+                                        ArchivedAccountsRoute,
+                                        ArchivedAccountDetailsRoute,
+                                        AccountAddRoute,
+                                        ActiveAccountDetailsRoute,
+                                        ActiveAccountHintsRoute
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    path: "*",
+                    element: <Navigate to="/" />
+                }
+            ],
             {
-                Component: IndexedDatabaseScoped,
-                children: [
-                    LoginRoute,
-                    SignUpRoute,
-                    {
-                        Component() {
-                            const { user } = useAuthentication();
-
-                            if (user === null)
-                                return <Navigate to="/" />;
-
-                            return <Outlet />;
-                        },
-                        children: [
-                            ActiveAccountsRoute,
-                            UserProfileRoute,
-                            ArchivedAccountsRoute,
-                            ArchivedAccountDetailsRoute,
-                            AccountAddRoute,
-                            ActiveAccountDetailsRoute,
-                            ActiveAccountHintsRoute
-                        ]
-                    }
-                ]
+                window
             }
-        ]
-    },
-    {
-        path: "*",
-        element: <Navigate to="/" />
-    }
-]);
+        ),
+        [window]
+    );
+}

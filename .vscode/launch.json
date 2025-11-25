@@ -5,6 +5,18 @@
             "name": "Attach to .NET Functions",
             "type": "coreclr",
             "request": "attach"
+        },
+        {
+            "name": "Run FeatureMarkdownWriter",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/.docs/FeatureMarkdownWriter/FeatureMarkdownWriter.csproj"
+        },
+        {
+            "name": "Run HandlebarsMarkdownWriter",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/.docs/HandlebarsMarkdownWriter/HandlebarsMarkdownWriter.csproj"
         }
     ]
 }

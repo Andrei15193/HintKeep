@@ -1,15 +1,36 @@
 {
     "files.watcherExclude": {
+        "**/.git/**/*": true,
         "**/bin/**/*": true,
         "**/obj/**/*": true,
         "**/node_modules/**/*": true,
         "WebClient/**/*": true,
         "GraphQL/./data/**/*": true
     },
+    "files.exclude": {
+        "**/.git": true,
+        "**/bin": true,
+        "**/obj": true,
+        "**/node_modules": true,
+        "GraphQL/.data/": true
+    },
     "eslint.format.enable": true,
     "eslint.workingDirectories": [
         "WebClient"
     ],
+    "cucumber.features": [
+        "Features/**/*.feature"
+    ],
+    "cucumber.glue": [
+        "GraphQL/**/*feature.cs",
+        "WebClient/Features/**/*.feature.ts",
+        "WebClient/Features/**/*.feature.tsx",
+
+        // ".docs/FeatureMarkdownWriter/**/*.feature.cs",
+    ],
+    "[csharp]": {
+        "editor.defaultFormatter": "ms-dotnettools.csharp"
+    },
     "[typescript]": {
         "editor.indentSize": 4,
         "editor.detectIndentation": false,

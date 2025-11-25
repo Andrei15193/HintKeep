@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace HintKeep.GraphQL.AppSetup.Registrations;
 
-public static class AzureStorage
+internal static class AzureStorage
 {
     public const string ConnectionConfigurationName = "AzureWebJobsStorage";
 

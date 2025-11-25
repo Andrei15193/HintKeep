@@ -1,5 +1,6 @@
 import type { IUser } from "../../Models";
 import React, { type PropsWithChildren, createContext, useCallback, useContext, useMemo, useState } from "react";
+import { useWindow } from "../../../Pages/WindowContext";
 
 /** It is expected to have this configured in app startup. */
 const AuthenticationContext = createContext<IAuthenticationContext | null>(null);
@@ -19,6 +20,7 @@ export interface IUserContextProviderProps {
 }
 
 export function AuthenticationContextProvider({ children }: PropsWithChildren<IUserContextProviderProps>): React.JSX.Element {
+    const { sessionStorage } = useWindow();
     const [user, setUser] = useState<IUser | null>(JSON.parse(sessionStorage.getItem("user") ?? "null"));
 
     const authenticateCallback = useCallback(
@@ -26,7 +28,7 @@ export function AuthenticationContextProvider({ children }: PropsWithChildren<IU
             setUser(user);
             sessionStorage.setItem("user", JSON.stringify(user));
         },
-        [setUser]
+        [sessionStorage, setUser]
     );
 
     const logOutCallback = useCallback(
@@ -34,7 +36,7 @@ export function AuthenticationContextProvider({ children }: PropsWithChildren<IU
             setUser(null);
             sessionStorage.removeItem("user");
         },
-        [setUser]
+        [sessionStorage, setUser]
     );
 
     const authenticationContext = useMemo<IAuthenticationContext>(

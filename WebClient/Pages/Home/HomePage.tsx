@@ -5,8 +5,10 @@ import { HintKeepDatabaseDefinition } from "../../Core/Data/IndexedDatabase/Hint
 import { Button } from "../../Core/Forms/Components";
 import { Content, Header } from "../../Core/PageParts";
 import { useShowConfirmationPrompt } from "../../Core/Prompt";
+import { useWindow } from "../WindowContext";
 
 export function HomePage(): React.JSX.Element {
+    const { indexedDB } = useWindow();
     const navigate = useNavigate();
     const { isOpening, initializeAsync, closeDatabase } = useIndexedDatabase();
 
@@ -20,12 +22,17 @@ export function HomePage(): React.JSX.Element {
         [initializeAsync, navigate]
     );
 
+    const deleteAllLocalDataCallback = useCallback(
+        () => indexedDB.deleteDatabase(HintKeepDatabaseDefinition.name),
+        [indexedDB]
+    );
+
     // Temporary, only for dev/testing!
     const dropDatabaseCallback = useShowConfirmationPrompt({
         message: "This action will remove all locally stored data, all user accounts and their stored hints. Are you sure you want to continue?",
         confirmButtonLabel: "Yes, delete everything, I'm done with this app",
         dismissButtonLabel: "No, I do not want to remove all data",
-        onConfirm: deleteAllLocalData
+        onConfirm: deleteAllLocalDataCallback
     });
 
     useEffect(
@@ -65,8 +72,4 @@ export function HomePage(): React.JSX.Element {
             </Content>
         </>
     );
-}
-
-function deleteAllLocalData(): void {
-    indexedDB.deleteDatabase(HintKeepDatabaseDefinition.name);
 }

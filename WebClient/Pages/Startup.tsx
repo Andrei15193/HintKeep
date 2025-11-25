@@ -6,16 +6,18 @@ import { HintKeepDatabaseDefinition } from "../Core/Data/IndexedDatabase/HintKee
 import { HintKeepDependencyContainerProvider } from "../Core/Dependencies";
 import { GlobalNotificationsContainer } from "../Core/Notifications";
 import { ConfirmationPromptProvider } from "../Core/Prompt";
-import { AppRouter } from "./AppRouter";
+import { useAppRouter } from "./AppRouter";
 import { ConfirmationPrompt } from "./ConfirmationPrompt";
 
 export function Startup(): React.JSX.Element {
+    const appRouter = useAppRouter();
+
     return (
         <AuthenticationContextProvider>
             <ConfirmationPromptProvider>
                 <IndexedDatabaseProvider databaseDefinition={HintKeepDatabaseDefinition}>
                     <HintKeepDependencyContainerProvider>
-                        <RouterProvider router={AppRouter} />
+                        <RouterProvider router={appRouter} />
 
                         <ConfirmationPrompt />
                         <aside className="global-notifications">

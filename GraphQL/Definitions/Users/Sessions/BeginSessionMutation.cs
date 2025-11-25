@@ -16,10 +16,6 @@ public class BeginSessionMutation : RequestFieldType<BeginSessionRequest, Authen
 
     protected override BeginSessionRequest GetInput(IResolveFieldContext context)
         => new(
-            SessionTicket: context
-                .GetHttpRequestData()
-                .Cookies
-                .SingleOrDefault(cookie => cookie.Name == HintKeepHttp.SessionTicketCookieName)
-                ?.Value
+            SessionTicket: context.GetHttpCookie(HintKeepHttp.SessionTicketCookieName)
         );
 }

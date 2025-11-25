@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace HintKeep.GraphQL.AppSetup.Registrations;
 
-public static class GraphQL
+internal static class GraphQL
 {
     public static IServiceCollection AddGraphQL(this IServiceCollection services, string defaultAuthorizationPolicyName)
     {

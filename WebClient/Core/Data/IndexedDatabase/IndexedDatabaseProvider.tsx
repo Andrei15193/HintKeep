@@ -1,6 +1,7 @@
 import type { IIndexedDatabase } from "./IIndexedDatabase";
 import type { IIndexedDatabaseDefinition } from "./IIndexedDatabaseDefinition";
 import React, { type PropsWithChildren, useRef, useState, useCallback, useMemo } from "react";
+import { useWindow } from "../../../Pages/WindowContext";
 import { IndexedDatabaseContext } from "./IndexedDatabaseContext";
 
 export interface IIndexedDatabaseProviderProps {
@@ -10,6 +11,7 @@ export interface IIndexedDatabaseProviderProps {
 export function IndexedDatabaseProvider({ databaseDefinition: { name, structureDefinitions }, children }: PropsWithChildren<IIndexedDatabaseProviderProps>): React.JSX.Element {
     const databaseRef = useRef<IDBDatabase | null>(null);
     const errorRef = useRef<unknown | null>(null);
+    const { indexedDB } = useWindow();
     const [state, setState] = useState<IIndexedDatabase["state"]>("uninitialized");
 
     const initializeAsyncCallback = useCallback(
@@ -17,7 +19,7 @@ export function IndexedDatabaseProvider({ databaseDefinition: { name, structureD
             try {
                 setState("opening");
 
-                const databaseRequest = window.indexedDB.open(name, structureDefinitions.length);
+                const databaseRequest = indexedDB.open(name, structureDefinitions.length);
 
                 databaseRequest.addEventListener("upgradeneeded", ({ oldVersion, newVersion }) => {
                     for (let databaseStructureChangeIndex = oldVersion; databaseStructureChangeIndex < newVersion!; databaseStructureChangeIndex++)
@@ -41,7 +43,7 @@ export function IndexedDatabaseProvider({ databaseDefinition: { name, structureD
                 setState("unavailable");
             }
         }),
-        [name, structureDefinitions]
+        [name, structureDefinitions, indexedDB]
     );
 
     const closeDatabaseCallback = useCallback(

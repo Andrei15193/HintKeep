@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HintKeep.GraphQL.AppSetup.Registrations;
 
-public static class RequestHandlers
+internal static class RequestHandlers
 {
     public static IServiceCollection AddRequestHandlers(this IServiceCollection services)
     {

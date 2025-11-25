@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace HintKeep.GraphQL.AppSetup.Middlewares;
 
-public class GraphiQLMiddlewareAdapter : IFunctionsWorkerMiddleware
+internal class GraphiQLMiddlewareAdapter : IFunctionsWorkerMiddleware
 {
     private static readonly string _graphQlFunctionPath = $"/api/{typeof(GraphQlFunction).GetMethod(nameof(GraphQlFunction.Run))!.GetCustomAttribute<FunctionAttribute>()!.Name}";
 
