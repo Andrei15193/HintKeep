@@ -2,7 +2,7 @@
   "profiles": {
     "Debug": {
       "commandName": "Project",
-      "commandLineArgs": "dev . ../Output",
+      "commandLineArgs": ".. ../Output",
       "workingDirectory": "."
     }
   }

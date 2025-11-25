@@ -11,6 +11,12 @@
             "type": "dotnet",
             "request": "launch",
             "projectPath": "${workspaceFolder}/.docs/FeatureMarkdownWriter/FeatureMarkdownWriter.csproj"
+        },
+        {
+            "name": "Run HandlebarsMarkdownWriter",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/.docs/HandlebarsMarkdownWriter/HandlebarsMarkdownWriter.csproj"
         }
     ]
 }

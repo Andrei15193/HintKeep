@@ -130,6 +130,10 @@ jobs:
             -SourceDirectory 'src/Features' `
             -DestinationDirectory 'wiki'
 
+          Convert-HandlebarsToMarkdown `
+            -TemplatesDirectory 'src/.docs' `
+            -DestinationDirectory 'wiki'
+
           Set-Location wiki
 
           git config --local user.name 'GitHub Action'
