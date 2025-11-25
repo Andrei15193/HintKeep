@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - vNext
-      - vNext-bdd
 
 concurrency:
   group: test
