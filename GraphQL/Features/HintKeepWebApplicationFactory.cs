@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Azure.Data.Tables;
 using GraphQL;
 using GraphQL.Transport;
@@ -18,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json.Linq;
 using NSubstitute;
 using SameSiteMode = Microsoft.Net.Http.Headers.SameSiteMode;
 
@@ -31,15 +34,26 @@ public class HintKeepWebApplicationFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
         => builder
             .UseContentRoot(".")
-            .ConfigureServices(services =>
+            .ConfigureServices((context, services) =>
             {
+                using var settingsFileStream = context
+                    .HostingEnvironment
+                    .ContentRootFileProvider
+                    .GetFileInfo("local.settings.json")
+                    .CreateReadStream();
+
                 services
                     .AddSingleton<IConfiguration>(new ConfigurationBuilder()
-                        .AddInMemoryCollection(new Dictionary<string, string?>
-                        {
-                            { "HINTKEEP_HASH_KEY", "HintKeep test hash key" },
-                            { "HINTKEEP_SIGNING_KEY", "HintKeep test signing key" }
-                        })
+                        .AddInMemoryCollection(
+                            JsonSerializer
+                                .Deserialize<JsonObject>(settingsFileStream)
+                                ?["Values"]
+                                ?.AsObject()
+                                .ToDictionary(
+                                    jsonProperty => jsonProperty.Key,
+                                    jsonProperty => Convert.ToString(jsonProperty.Value?.GetValue<object?>())
+                                )
+                        )
                         .Build()
                     )
 
