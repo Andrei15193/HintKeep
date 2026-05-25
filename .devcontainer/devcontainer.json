@@ -1,9 +1,10 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/alpine
 {
-    "name": "HintKeep Dev Container (Ubuntu)",
+    "name": "HintKeep Dev Container (Debian)",
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
+    // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
         "ghcr.io/devcontainers/features/dotnet:2": {
             "tabCompletions": true,
@@ -16,8 +17,6 @@
             "nvmVersion": "none"
         }
     },
-    // Features to add to the dev container. More info: https://containers.dev/features.
-    // "features": {},
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     "forwardPorts": [
         8080,
@@ -25,15 +24,20 @@
     ],
     // Use 'postCreateCommand' to run commands after the container is created.
     // "postCreateCommand": "uname -a",
+    "postCreateCommand": {
+        "GraphQL npm install": "cd GraphQL; npm install",
+        "WebClient npm install": "cd WebClient; npm install"
+    },
     // Configure tool-specific properties.
     "customizations": {
         "vscode": {
             "settings": {
-                "remote.autoForwardPorts": false,
+                "remote.autoForwardPorts": false
             },
             "extensions": [
                 "ms-dotnettools.csdevkit",
                 "dbaeumer.vscode-eslint",
+                "ms-azuretools.vscode-azurefunctions",
                 "github.vscode-github-actions",
                 "ms-azuretools.vscode-bicep",
                 "cucumberopen.cucumber-official"
