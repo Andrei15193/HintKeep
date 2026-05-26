@@ -1,9 +1,10 @@
 ﻿using System.Text.Json.Nodes;
+using HintKeep.GraphQL.Definitions.Users.Accounts;
 using Xunit.Gherkin.Quick;
 
 namespace HintKeep.GraphQL.Features;
 
-public class Authentication(HintKeepWebApplicationFactory factory) : HintKeepFeature(factory)
+public class Authentication : HintKeepFeature
 {
     private JsonNode? _result = null;
 
@@ -20,6 +21,12 @@ public class Authentication(HintKeepWebApplicationFactory factory) : HintKeepFea
     [And("I see {string}")]
     public void AndGivenSeenText(string text)
     {
+    }
+
+    [And("there is an existing user with {string} username, {string} password and {string} hint")]
+    public async Task AndGivenExistingUser(string username, string password, string hint)
+    {
+        await DispatchRequestAsync(new RegisterRequest(username, password, $"{username}@email.com"));
     }
 
     [When("I enter {string} for {string}")]
