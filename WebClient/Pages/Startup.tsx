@@ -1,28 +1,18 @@
-import React from "react";
-import { RouterProvider } from "react-router";
+import React, { type PropsWithChildren } from "react";
 import { AuthenticationContextProvider } from "../Core/Contexts/AuthenticationContext";
 import { IndexedDatabaseProvider } from "../Core/Data/IndexedDatabase";
 import { HintKeepDatabaseDefinition } from "../Core/Data/IndexedDatabase/HintKeep";
 import { HintKeepDependencyContainerProvider } from "../Core/Dependencies";
-import { GlobalNotificationsContainer } from "../Core/Notifications";
 import { ConfirmationPromptProvider } from "../Core/Prompt";
-import { useAppRouter } from "./AppRouter";
-import { ConfirmationPrompt } from "./ConfirmationPrompt";
+import { App } from "./App";
 
-export function Startup(): React.JSX.Element {
-    const appRouter = useAppRouter();
-
+export function Startup({ children = <App /> }: PropsWithChildren<{}>): React.JSX.Element {
     return (
         <AuthenticationContextProvider>
             <ConfirmationPromptProvider>
                 <IndexedDatabaseProvider databaseDefinition={HintKeepDatabaseDefinition}>
                     <HintKeepDependencyContainerProvider>
-                        <RouterProvider router={appRouter} />
-
-                        <ConfirmationPrompt />
-                        <aside className="global-notifications">
-                            <GlobalNotificationsContainer />
-                        </aside>
+                        {children}
                     </HintKeepDependencyContainerProvider>
                 </IndexedDatabaseProvider>
             </ConfirmationPromptProvider>

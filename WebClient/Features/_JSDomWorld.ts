@@ -1,9 +1,11 @@
 import type { JSDOM } from "jsdom";
 import { World } from "@cucumber/cucumber";
-import { type Context, type PropsWithChildren, createElement } from "react";
+import { type ComponentType, type Context, type PropsWithChildren, createElement } from "react";
+import { type ResolvableSimpleDependency, useDependencyResolver, type IDependencyResolver } from "react-model-view-viewmodel";
 import { type Matcher, type RenderResult, findByText, render, createJsDom } from "./_TestingLibraryBootstrap";
 
 export class JSDomWorld extends World {
+    private _dependencyResolver: IDependencyResolver | null = null;
     public readonly dom: JSDOM = createJsDom();
 
     public get document(): Document {
@@ -14,15 +16,39 @@ export class JSDomWorld extends World {
         return this.dom.window.document.body;
     }
 
-    public render(element: React.JSX.Element): RenderResult {
+    public get dependencyResolver(): IDependencyResolver {
+        if (this._dependencyResolver === null)
+            throw new Error("App dependency resolver has not been initialized, please check feature test configuration.");
+
+        return this._dependencyResolver;
+    }
+
+    public resolve<T>(dependency: ResolvableSimpleDependency<T>): T {
+        return this.dependencyResolver.resolve(dependency);
+    }
+
+    public render(element: React.JSX.Element = createElement(require("../Pages/App").App)): RenderResult {
+        const Startup: ComponentType<PropsWithChildren<{}>> = require("../Pages/Startup").Startup;
         const WindowContext: Context<Window> = require("../Pages/WindowContext").WindowContext;
 
         return render(element, {
             container: this.container,
-            wrapper: ({ children }: PropsWithChildren<{}>): React.JSX.Element => createElement(
+            wrapper: ({ children }: PropsWithChildren<{}>): React.ReactNode => createElement(
                 WindowContext.Provider,
                 { value: this.dom.window as any },
-                children
+                createElement(
+                    Startup,
+                    {},
+                    createElement(
+                        ({ children }: PropsWithChildren<{}>): React.ReactNode => {
+                            this._dependencyResolver = useDependencyResolver();
+
+                            return children;
+                        },
+                        {},
+                        children
+                    )
+                )
             )
         });
     }

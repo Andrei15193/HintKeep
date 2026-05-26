@@ -1,10 +1,13 @@
-import { Given, When, Then } from "@cucumber/cucumber";
+import { Given, When, Then, Before } from "@cucumber/cucumber";
 import { fireEvent } from "@testing-library/react";
-import React from "react";
-import { Startup } from "../Pages/Startup";
+import { SignUpFormHandler } from "../Pages/SignUp/FormHandlers/SignUpFormHandler";
+import { SignUpForm } from "../Pages/SignUp/Forms/SignUpForm";
 
-Given("the landing page", async function () {
-    this.render(<Startup />);
+Before(function () {
+    this.render();
+});
+
+Given("the landing page", function () {
 });
 
 Given("I click on {string}", async function (text: string) {
@@ -14,6 +17,18 @@ Given("I click on {string}", async function (text: string) {
 
 Given("I see {string}", async function (text: string) {
     await this.findByTextAsync(text);
+});
+
+Given("there is an existing user with {string} username, {string} password and {string} hint", async function (username: string, password: string, hint: string) {
+    const signUpForm = this.resolve(SignUpForm);
+
+    signUpForm.username.value = username;
+    signUpForm.password.value = password;
+    signUpForm.hint.value = hint;
+
+    await this
+        .resolve(SignUpFormHandler)
+        .handleAsync(signUpForm);
 });
 
 When("I enter {string} for {string}", async function (value: string, inputLabel: string) {

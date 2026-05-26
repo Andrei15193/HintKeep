@@ -14,13 +14,29 @@
             "problemMatcher": []
         },
         {
-            "label": "WebClient | npm: test",
+            "label": "WebClient | npm: test units",
             "icon": {
                 "id": "run-errors",
                 "color": "terminal.ansiMagenta"
             },
             "type": "npm",
-            "script": "test",
+            "script": "test:units",
+            "path": "WebClient",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "detail": "webpack",
+            "problemMatcher": []
+        },
+        {
+            "label": "WebClient | npm: test features",
+            "icon": {
+                "id": "run-errors",
+                "color": "terminal.ansiMagenta"
+            },
+            "type": "npm",
+            "script": "test:features",
             "path": "WebClient",
             "group": {
                 "kind": "test",
