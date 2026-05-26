@@ -1,7 +1,9 @@
+import type { IFormHandler } from "../Core/FormHandlers/IFormHandler";
+import type { HintKeepForm, HintKeepFormField } from "../Core/Forms/ViewModels";
 import type { JSDOM } from "jsdom";
 import { World } from "@cucumber/cucumber";
 import { type ComponentType, type Context, type PropsWithChildren, createElement } from "react";
-import { type ResolvableSimpleDependency, useDependencyResolver, type IDependencyResolver } from "react-model-view-viewmodel";
+import { type ResolvableSimpleDependency, type IDependencyResolver, useDependencyResolver } from "react-model-view-viewmodel";
 import { type Matcher, type RenderResult, findByText, render, createJsDom } from "./_TestingLibraryBootstrap";
 
 export class JSDomWorld extends World {
@@ -13,7 +15,7 @@ export class JSDomWorld extends World {
     }
 
     public get container(): HTMLElement {
-        return this.dom.window.document.body;
+        return this.dom.window.document.getElementById("app")!;
     }
 
     public get dependencyResolver(): IDependencyResolver {
@@ -25,6 +27,29 @@ export class JSDomWorld extends World {
 
     public resolve<T>(dependency: ResolvableSimpleDependency<T>): T {
         return this.dependencyResolver.resolve(dependency);
+    }
+
+    public async submitFormAsync<TForm extends HintKeepForm, TFormHandler extends IFormHandler<TForm, TResult>, TResult>(formHandler: ResolvableSimpleDependency<TFormHandler>, form: ResolvableSimpleDependency<TForm>, formData: HintKeepFormData<TForm>): Promise<TResult | null> {
+        const resolvedForm = Object
+            .getOwnPropertyNames(formData)
+            .reduce(
+                (form, field) => {
+                    (form[field as keyof TForm] as HintKeepFormField<any>).value = formData[field as keyof HintKeepFormData<TForm>];
+
+                    return form;
+                },
+                this.resolve(form)
+            );
+
+        if (resolvedForm.isInvalid)
+            throw new Error("Cannot submit invalid form.");
+
+        const resolvedFormHandler = this.resolve(formHandler);
+        const result = await resolvedFormHandler.handleAsync(resolvedForm);
+        if (resolvedForm.isInvalid || result === null || result === undefined)
+            throw new Error("Form submission failed.");
+
+        return result;
     }
 
     public render(element: React.JSX.Element = createElement(require("../Pages/App").App)): RenderResult {
@@ -81,3 +106,11 @@ export class JSDomWorld extends World {
         return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 }
+
+type HintKeepFormData<TForm extends HintKeepForm> = {
+    readonly [field in HintKeepFormFields<TForm>]: TForm[field] extends HintKeepFormField<infer TValue> ? TValue : void
+};
+
+type HintKeepFormFields<TForm extends HintKeepForm> = {
+    readonly [field in keyof TForm]: TForm[field] extends HintKeepFormField<any> ? field : never
+}[keyof TForm];

@@ -22,8 +22,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json.Linq;
-using NSubstitute;
 using SameSiteMode = Microsoft.Net.Http.Headers.SameSiteMode;
 
 namespace HintKeep.GraphQL.Features;
