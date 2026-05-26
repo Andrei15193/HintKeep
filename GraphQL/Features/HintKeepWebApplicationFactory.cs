@@ -1,8 +1,10 @@
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Azure.Data.Tables;
+using CloudStub.AzureDataTables;
 using GraphQL;
 using GraphQL.Transport;
 using GraphQL.Types;
@@ -63,11 +65,20 @@ public class HintKeepWebApplicationFactory : WebApplicationFactory<Program>
             })
             .ConfigureTestServices(services =>
             {
-                services.AddSingleton<HintKeepTableStorage>(services =>
+                services
+                    .AddSingleton<TableServiceClient, TableServiceClientStub>()
+                    .AddSingleton(services =>
                 {
-                    var tableServiceClient = Substitute.For<TableServiceClient>();
+                    var hintKeepTableStorage = new HintKeepTableStorage(services.GetRequiredService<TableServiceClient>());
 
-                    return new HintKeepTableStorage(tableServiceClient);
+                    var hintKeepTables = typeof(HintKeepTableStorage)
+                        .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty)
+                        .Where(property => typeof(TableClient).IsAssignableFrom(property.PropertyType))
+                        .Select(property => (TableClient)property.GetValue(hintKeepTableStorage)!);
+                    foreach (var hintKeepTable in hintKeepTables)
+                        hintKeepTable.CreateIfNotExists();
+
+                    return hintKeepTableStorage;
                 });
             })
             .Configure(builder => builder
