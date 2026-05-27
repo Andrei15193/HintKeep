@@ -35,7 +35,7 @@ public abstract class HintKeepFeature : Feature
 
         var requestHandler = _factory.Services.GetRequiredService(requestHandlerType);
 
-        var valueTaskResult = executeAsyncMethod.Invoke(requestHandler, [request, cancellationToken])!;
+        var valueTaskResult = executeAsyncMethod.Invoke(requestHandler, [request.EnsureValid(), cancellationToken])!;
         var task = (Task)valueTaskResult
             .GetType()
             .GetMethod(nameof(ValueTask<object>.AsTask), BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod)
