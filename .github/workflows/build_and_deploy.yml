@@ -95,11 +95,16 @@ jobs:
 
       - name: Accessibility Checker (be-a11y)
         id: a11ychecker
-        uses: be-lenka/be-a11y@v2.2.8
+        uses: be-lenka/be-a11y@v2.2.9
         continue-on-error: true
         with:
           url: ./FeaturesTestReport
           report: ./FeaturesTestReport/a11y-report.json
+
+      - name: list files
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse *.json
 
       - name: Publish Build Artifact
         uses: actions/upload-artifact@v4
