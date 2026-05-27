@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - vNext
+      - vNext-a11y-feature-test
 
 concurrency:
   group: test
@@ -91,6 +92,14 @@ jobs:
         env:
           templateFilePath: ./publish/index.html
           htmlSnapshotDirectoryPath: ./FeaturesTestReport
+
+      - name: Accessibility Checker (be-a11y)
+        id: a11ychecker
+        uses: be-lenka/be-a11y@v2.2.8
+        continue-on-error: true
+        with:
+          url: ./FeaturesTestReport
+          report: ./FeaturesTestReport/a11y-report.json
 
       - name: Publish Build Artifact
         uses: actions/upload-artifact@v4
