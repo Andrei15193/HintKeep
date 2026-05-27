@@ -98,8 +98,8 @@ jobs:
         uses: be-lenka/be-a11y@v2.2.9
         continue-on-error: true
         with:
-          url: ./FeaturesTestReport
-          report: a11y-report.json
+          url: ./WebClient/FeaturesTestReport
+          report: ./WebClient/FeaturesTestReport/a11y-report.json
 
       - name: list files
         shell: pwsh
