@@ -19,6 +19,7 @@ public class Authentication : HintKeepFeature
     }
 
     [And("I see {string}")]
+    [Then("I see {string}")]
     public void AndGivenSeenText(string text)
     {
     }
