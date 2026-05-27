@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - vNext
+      - vNext-a11y-feature-test
 
 concurrency:
   group: test
@@ -83,14 +84,27 @@ jobs:
         working-directory: WebClient
         run: |
           mkdir ./FeaturesTestReport
-          cp ./publish/*.css ./FeaturesTestReport
+
+          mkdir ./FeaturesTestReport/FailedScenariosSnapshots
+          cp ./publish/*.css ./FeaturesTestReport/FailedScenariosSnapshots
+
+          mkdir ./FeaturesTestReport/StepSnapshots
+          cp ./publish/*.css ./FeaturesTestReport/StepSnapshots
 
       - name: Test Features
         working-directory: WebClient
         run: npm run test:features
         env:
           templateFilePath: ./publish/index.html
-          htmlSnapshotDirectoryPath: ./FeaturesTestReport
+          failedScenarioHtmlSnapshotDirectoryPath: ./FeaturesTestReport/FailedScenariosSnapshots
+          stepHtmlSnapshotDirectoryPath: ./FeaturesTestReport/StepSnapshots
+
+      - name: Check Accessibility (be-a11y)
+        uses: be-lenka/be-a11y@v2.2.9
+        continue-on-error: true
+        with:
+          url: ./WebClient/FeaturesTestReport/StepSnapshots
+          report: ./WebClient/FeaturesTestReport/a11y-report.json
 
       - name: Publish Build Artifact
         uses: actions/upload-artifact@v4

@@ -1,0 +1,16 @@
+{
+    "rules": {
+        "heading-order": true,
+        "heading-empty": true,
+        "missing-alt": true,
+        "alt-empty": true,
+        "alt-too-long": false,
+        "alt-decorative-incorrect": true,
+        "alt-functional-empty": true,
+        "aria-invalid": true,
+        "missing-aria": true,
+        "aria-role-invalid": true,
+        "missing-landmark": false,
+        "contrast": true
+    }
+}

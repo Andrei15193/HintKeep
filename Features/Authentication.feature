@@ -31,4 +31,4 @@ Feature: Authentication
     When I enter "test" for "Username"
     And I enter "pa$$w0rd123" for "Password"
     And I click on 'Login'
-    And I see "HintKeep - Accounts"
+    Then I see "HintKeep - Accounts"
