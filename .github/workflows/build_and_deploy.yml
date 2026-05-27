@@ -93,18 +93,12 @@ jobs:
           templateFilePath: ./publish/index.html
           htmlSnapshotDirectoryPath: ./FeaturesTestReport
 
-      - name: Accessibility Checker (be-a11y)
-        id: a11ychecker
+      - name: Check Accessibility (be-a11y)
         uses: be-lenka/be-a11y@v2.2.9
         continue-on-error: true
         with:
           url: ./WebClient/FeaturesTestReport
           report: ./WebClient/FeaturesTestReport/a11y-report.json
-
-      - name: list files
-        shell: pwsh
-        run: |
-          Get-ChildItem -Recurse *.json
 
       - name: Publish Build Artifact
         uses: actions/upload-artifact@v4
