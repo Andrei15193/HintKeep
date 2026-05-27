@@ -91,13 +91,14 @@ jobs:
         run: npm run test:features
         env:
           templateFilePath: ./publish/index.html
-          htmlSnapshotDirectoryPath: ./FeaturesTestReport
+          failedScenarioHtmlSnapshotDirectoryPath: ./FeaturesTestReport/FailedScenariosSnapshots
+          stepHtmlSnapshotDirectoryPath: ./FeaturesTestReport/StepsSnapshots
 
       - name: Check Accessibility (be-a11y)
         uses: be-lenka/be-a11y@v2.2.9
         continue-on-error: true
         with:
-          url: ./WebClient/FeaturesTestReport
+          url: ./WebClient/FeaturesTestReport/StepsSnapshots
           report: ./WebClient/FeaturesTestReport/a11y-report.json
 
       - name: Publish Build Artifact
