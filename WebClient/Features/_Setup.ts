@@ -20,14 +20,31 @@ Before(function () {
 });
 
 AfterStep(async function (context) {
-    if (featureTestOptions.stepHtmlSnapshotDirectoryPath)
+    if (featureTestOptions.stepHtmlSnapshotDirectoryPath) {
+        const stepNumber = (1 + context.pickle.steps.findIndex((step) => step.id === context.pickleStep.id)).toLocaleString("en-GB", { minimumIntegerDigits: 3 });
+        let stepKeyword = "";
+        switch (context.pickleStep.type) {
+            case "Context":
+                stepKeyword = "Given";
+                break;
+
+            case "Action":
+                stepKeyword = "When";
+                break;
+
+            case "Outcome":
+                stepKeyword = "Then";
+                break;
+        }
+
         await writeFileAsync(
             path.join(
                 featureTestOptions.stepHtmlSnapshotDirectoryPath,
-                `${context.gherkinDocument.feature?.name} - ${context.pickle.name} - ${context.pickleStep.text.replace(/[^a-zA-Z0-9-_]/g, "_")}.html`
+                `${context.gherkinDocument.feature?.name} - ${context.pickle.name} - ${stepNumber} ${stepKeyword} ${context.pickleStep.text.replace(/[^a-zA-Z0-9-_]/g, "_")}.html`
             ),
             this.dom.serialize()
         );
+    }
 });
 
 After(async function (context) {
