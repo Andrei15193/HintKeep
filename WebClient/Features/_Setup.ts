@@ -24,7 +24,7 @@ AfterStep(async function (context) {
         await writeFileAsync(
             path.join(
                 featureTestOptions.stepHtmlSnapshotDirectoryPath,
-                `${context.gherkinDocument.feature?.name} - ${context.pickle.name} - ${context.pickleStep.text}.html`
+                `${context.gherkinDocument.feature?.name} - ${context.pickle.name} - ${context.pickleStep.text.replace(/[^a-zA-Z0-9-_]/g, "_")}.html`
             ),
             this.dom.serialize()
         );
