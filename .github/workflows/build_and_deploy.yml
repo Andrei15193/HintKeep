@@ -83,6 +83,8 @@ jobs:
       - name: Prepare Features Test Report Output Directory
         working-directory: WebClient
         run: |
+          mkdir ./FeaturesTestReport
+
           mkdir ./FeaturesTestReport/FailedScenariosSnapshots
           cp ./publish/*.css ./FeaturesTestReport/FailedScenariosSnapshots
 
