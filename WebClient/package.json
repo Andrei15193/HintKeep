@@ -23,7 +23,7 @@
     "build-dev": "webpack",
     "build-release": "webpack --mode production",
     "test:units": "jest",
-    "test:features": "cucumber-js --require-module ts-node/register --require './Features/_Setup.ts' --require './Features/**/*.feature.{ts,tsx}' '../Features/**/*.feature'"
+    "test:features": "cucumber-js --require-module ts-node/register --require './Features/_Setup.ts' --require './Features/**/*.feature.{ts,tsx}' --tags 'not @ignore' '../Features/**/*.feature'"
   },
   "jest": {
     "preset": "ts-jest",

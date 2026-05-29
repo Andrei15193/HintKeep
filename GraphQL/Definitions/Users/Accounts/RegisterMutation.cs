@@ -22,6 +22,10 @@ public class RegisterMutation : RequestFieldType<RegisterRequest, Authentication
             },
             new QueryArgument<NonNullGraphType<StringGraphType>>
             {
+                Name = nameof(RegisterRequest.Hint)
+            },
+            new QueryArgument<NonNullGraphType<StringGraphType>>
+            {
                 Name = nameof(RegisterRequest.EmailAddress)
             }
         ];
@@ -32,6 +36,7 @@ public class RegisterMutation : RequestFieldType<RegisterRequest, Authentication
         => new(
             Username: context.GetArgument<string>(nameof(RegisterRequest.Username)),
             Password: context.GetArgument<string>(nameof(RegisterRequest.Password)),
+            Hint: context.GetArgument<string>(nameof(RegisterRequest.Hint)),
             EmailAddress: context.GetArgument<string>(nameof(RegisterRequest.EmailAddress))
         );
 }

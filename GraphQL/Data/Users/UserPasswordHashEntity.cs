@@ -7,6 +7,7 @@ public record struct UserPasswordHashEntity(
     string UsernameHash,
     string PasswordHash,
     Guid UserId,
+    string Hint,
     ETag ETag = default
 ) :
     ITableEntityProvider
@@ -14,6 +15,7 @@ public record struct UserPasswordHashEntity(
     public const string Type = "user-password-hash";
     public const string RowKeyPrefix = "password-hash:";
     public const string UserIdProperty = "userId";
+    public const string HintProperty = "hint";
 
     public static TableEntityKey GetEntityKey(string usernameHash, string passwordHash)
         => new(usernameHash, RowKeyPrefix + passwordHash);
@@ -23,6 +25,7 @@ public record struct UserPasswordHashEntity(
             UsernameHash: tableEntity.GetString(nameof(TableEntity.PartitionKey)),
             PasswordHash: tableEntity.RowKey[RowKeyPrefix.Length..],
             UserId: tableEntity.GetGuid(UserIdProperty)!.Value,
+            Hint: tableEntity.GetString(HintProperty)!,
             ETag: tableEntity.ETag
         )
         => TableEntityCommon.ValidateType(tableEntity, Type);
@@ -36,7 +39,8 @@ public record struct UserPasswordHashEntity(
             RowKey = RowKeyPrefix + PasswordHash,
             ETag = ETag,
 
-            [UserIdProperty] = UserId
+            [UserIdProperty] = UserId,
+            [HintProperty] = Hint
         };
 }
 

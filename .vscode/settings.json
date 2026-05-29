@@ -28,6 +28,10 @@
 
         // ".docs/FeatureMarkdownWriter/**/*.feature.cs",
     ],
+    "[cucumber]": {
+        "editor.indentSize": 2,
+        "editor.detectIndentation": false
+    },
     "[csharp]": {
         "editor.defaultFormatter": "ms-dotnettools.csharp"
     },

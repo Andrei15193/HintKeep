@@ -1,0 +1,138 @@
+using Xunit.Gherkin.Quick;
+
+namespace HintKeep.GraphQL.Features;
+
+public class UserSignUp : HintKeepFeature
+{
+    private IPageContext _pageContext = null!;
+
+    [Given("the landing page")]
+    public void GivenTheLandingPage()
+        => _pageContext = new LandingPageContext();
+
+    [Given("the sign up page")]
+    public void GivenTheSignUpPage()
+        => _pageContext = new SignUpPageContext(this);
+
+    [Given("the {string} fields filled with {string}")]
+    [And("the {string} fields filled with {string}")]
+    public void GivenFieldValue(string fieldId, string fieldValue)
+        => _pageContext.SetFieldValue(fieldId, fieldValue);
+
+    [When("I click on the {string} button")]
+    public Task WhenIClickButton(string buttonId)
+        => _pageContext.ClickButtonAsync(buttonId);
+
+    [Then("I can see the {string} page")]
+    public void ThenISeePage(string pageTitle)
+    {
+    }
+
+    [Then("I can see the {string} field")]
+    [And("I can see the {string} field")]
+    public void ThenISeeField(string fieldId)
+    {
+    }
+
+    [Then("I can see the {string} button")]
+    [And("I can see the {string} button")]
+    public void ThenISeeButton(string buttonId)
+    {
+    }
+
+    [Then("the current user is {string}")]
+    [And("the current user is {string}")]
+    public void ThenCurrentUser(string username)
+    {
+        Assert.NotNull(DataResult);
+        Assert.Equal(username, DataResult["username"]!.GetValue<string>());
+        Assert.NotNull(DataResult["userId"]!.GetValue<string>());
+        Assert.NotNull(DataResult["sessionId"]!.GetValue<string>());
+        Assert.NotNull(DataResult["sessionRenewTicket"]!.GetValue<string>());
+    }
+
+    [Then("I can see {string} error message for the {string} field")]
+    [And("I can see {string} error message for the {string} field")]
+    public void ThenFieldError(string errorMessage, string fieldId)
+        => Assert.Equal(errorMessage, _pageContext.GetFieldError(fieldId));
+
+    private interface IPageContext
+    {
+        Task ClickButtonAsync(string buttonId);
+        void SetFieldValue(string fieldId, string fieldValue);
+        string? GetFieldError(string fieldId);
+    }
+
+    private class LandingPageContext : IPageContext
+    {
+        public Task ClickButtonAsync(string buttonText)
+            => Task.CompletedTask;
+
+        public void SetFieldValue(string fieldId, string fieldValue)
+        {
+        }
+
+        public string? GetFieldError(string fieldId)
+            => null;
+    }
+
+    private class SignUpPageContext(HintKeepFeature feature) : IPageContext
+    {
+        private string _username = string.Empty;
+        private string _password = string.Empty;
+        private string _hint = string.Empty;
+        private string _emailAddress = string.Empty;
+
+        public Task ClickButtonAsync(string buttonId)
+            => feature.ExecuteQueryAsync(@"
+                mutation($username: String!, $password: String!, $hint: String!, $emailAddress: String!) {
+                    register(username: $username, password: $password, hint: $hint, emailAddress: $emailAddress) {
+                        userId
+                        sessionId
+                        sessionRenewTicket
+                        username
+                    }
+                }
+            ",
+            new
+            {
+                username = _username,
+                password = _password,
+                hint = _hint,
+                emailAddress = _emailAddress
+            }
+        );
+
+        public void SetFieldValue(string fieldId, string fieldValue)
+        {
+            switch (fieldId)
+            {
+                case "username":
+                    _username = fieldValue;
+                    break;
+
+                case "password":
+                    _password = fieldValue;
+                    break;
+
+                case "hint":
+                    _hint = fieldValue;
+                    break;
+
+                case "email":
+                    _emailAddress = fieldValue;
+                    break;
+            }
+        }
+
+        public string? GetFieldError(string fieldId)
+            => fieldId switch
+            {
+                "username" => feature.FieldsErrorResult!.AsObject()["username"]!.GetValue<string>(),
+                "password" => feature.FieldsErrorResult!.AsObject()["password"]!.GetValue<string>(),
+                "hint" => feature.FieldsErrorResult!.AsObject()["hint"]!.GetValue<string>(),
+                "email" => feature.FieldsErrorResult!.AsObject()["emailAddress"]!.GetValue<string>(),
+                _ => throw new ArgumentException($"Unhandled '{fieldId}' field ID.")
+            };
+    }
+}

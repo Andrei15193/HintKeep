@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - vNext
-      - vNext-a11y-feature-test
+      - vNext-features/sign-up
 
 concurrency:
   group: test

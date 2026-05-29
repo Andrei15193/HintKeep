@@ -20,9 +20,14 @@ public abstract class HintKeepFeature : Feature
         HttpClient = _factory.CreateClient();
     }
 
-    protected HttpClient HttpClient { get; }
+    internal HttpClient HttpClient { get; }
 
-    protected ValueTask DispatchRequestAsync(IRequest request, CancellationToken cancellationToken = default)
+    internal JsonNode? RawResult { get; private set; }
+    internal JsonNode? DataResult { get; private set; }
+    internal JsonNode? ErrorResult { get; private set; }
+    internal JsonNode? FieldsErrorResult { get; private set; }
+
+    internal ValueTask DispatchRequestAsync(IRequest request, CancellationToken cancellationToken = default)
     {
         var requestType = request.GetType();
         var resultType = requestType
@@ -44,7 +49,7 @@ public abstract class HintKeepFeature : Feature
         return new ValueTask(task);
     }
 
-    protected async Task<JsonNode> ExecuteQueryAsync(string query, object? variables = null)
+    internal async Task<JsonNode> ExecuteQueryAsync(string query, object? variables = null, string? dataField = null)
     {
         var serializer = _factory.Services.GetRequiredService<IGraphQLTextSerializer>();
 
@@ -67,8 +72,12 @@ public abstract class HintKeepFeature : Feature
             }))
         );
 
-        var result = await httpResponse.Content.ReadFromJsonAsync<JsonNode>();
+        RawResult = await httpResponse.Content.ReadFromJsonAsync<JsonNode>();
+        DataResult = RawResult!.AsObject()["data"]?.AsObject().SingleOrDefault(property => string.IsNullOrWhiteSpace(dataField) || property.Key == dataField).Value;
 
-        return result!;
+        ErrorResult = RawResult.AsObject()["errors"]?.AsArray().SingleOrDefault();
+        FieldsErrorResult = ErrorResult?.AsObject()["extensions"]?.AsObject()["fields"];
+
+        return RawResult;
     }
 }

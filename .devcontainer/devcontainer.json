@@ -15,6 +15,12 @@
             "npmVersion": "latest",
             "pnpmVersion": "none",
             "nvmVersion": "none"
+        },
+        "ghcr.io/devcontainers/features/powershell:2": {
+            "version": "lts"
+        },
+        "ghcr.io/devcontainers/features/azure-cli:1": {
+            "installBicep": true
         }
     },
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -26,7 +32,8 @@
     // "postCreateCommand": "uname -a",
     "postCreateCommand": {
         "GraphQL npm install": "cd GraphQL; npm install",
-        "WebClient npm install": "cd WebClient; npm install"
+        "WebClient npm install": "cd WebClient; npm install",
+        "PowerShell Profile": "mkdir ~/.config/powershell/; echo 'Import-Module ${containerWorkspaceFolder}/dev-tools.psm1' >> ~/.config/powershell/Microsoft.PowerShell_profile.ps1"
     },
     // Configure tool-specific properties.
     "customizations": {

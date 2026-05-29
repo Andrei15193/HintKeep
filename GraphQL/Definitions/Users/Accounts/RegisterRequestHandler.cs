@@ -18,6 +18,9 @@ public record RegisterRequest(
     [property: Required(ErrorMessage = "A password is required.")]
     string Password,
 
+    [property: Required(ErrorMessage = "A hint is required.")]
+    string Hint,
+
     [property: Required(ErrorMessage = "An email address is required.")]
     string EmailAddress
 ) :
@@ -64,7 +67,7 @@ public class RegisterRequestHandler(
                     ),
                     new TableTransactionAction(
                         TableTransactionActionType.Add,
-                        new UserPasswordHashEntity(usernameHash, passwordHash, userId).ToTableEntity()
+                        new UserPasswordHashEntity(usernameHash, passwordHash, userId, request.Hint).ToTableEntity()
                     ),
                     new TableTransactionAction(
                         TableTransactionActionType.Add,
