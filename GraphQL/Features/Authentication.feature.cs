@@ -27,7 +27,7 @@ public class Authentication : HintKeepFeature
     [And("there is an existing user with {string} username, {string} password and {string} hint")]
     public async Task AndGivenExistingUser(string username, string password, string hint)
     {
-        await DispatchRequestAsync(new RegisterRequest(username, password, hint, $"{username}@email.com"));
+        await DispatchRequestAsync(new RegisterUserAccountRequest(username, password, hint, $"{username}@email.com"));
     }
 
     [When("I enter {string} for {string}")]

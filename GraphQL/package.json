@@ -19,7 +19,7 @@
   },
   "private": true,
   "scripts": {
-    "dev": "dotnet watch run --configuration Debug -- --inspect",
+    "dev": "dotnet run --configuration Debug",
     "azurite": "azurite --disableTelemetry --location .data"
   },
   "devDependencies": {

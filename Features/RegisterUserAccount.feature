@@ -1,4 +1,4 @@
-Feature: User sign-up
+Feature: Register user account
 
 As a user
 I want to sign up
@@ -31,15 +31,24 @@ Scenario: Error messages for mandatory input fields
   And I can see "A hint is required." error message for the "hint" field
   And I can see "An email address is required." error message for the "email" field
 
-@ignore
+Scenario: Error messages for invalid email address
+  Given the sign up page
+  And the "username" fields filled with "username"
+  And the "password" fields filled with "passWORD$123"
+  And the "hint" fields filled with "account hint"
+  And the "email" fields filled with "invalid"
+  When I click on the "sign up" button
+  And I can see "A valid email address is required." error message for the "email" field
+
 Scenario: Duplicate Account
   Given the sign up page
   And the "username" fields filled with "username"
   And the "password" fields filled with "passWORD$123"
   And the "hint" fields filled with "account hint"
-  But a user with "username" username already exists
+  And the "email" fields filled with "test@email.com"
+  But a user with "username" username and "different@email.com" email already exists
   When I click on the "sign up" button
-  Then I can see "The username is unavailable" error message for the "username" field
+  Then I can see "The username is unavailable." error message for the "username" field
 
 @ignore
 Scenario: Field Character Limit
@@ -48,9 +57,9 @@ Scenario: Field Character Limit
   And the "password" fields filled with 251 characters
   And the "hint" fields filled with 251 characters
   When I click on the "sign up" button
-  Then I can see "The username must be at most 250 characters" error message for the "username" field
-  And I can see "The password must be at most 250 characters" error message for the "password" field
-  And I can see "The hint must be at most 250 characters" error message for the "hint" field
+  Then I can see "The username must be at most 250 characters." error message for the "username" field
+  And I can see "The password must be at most 250 characters." error message for the "password" field
+  And I can see "The hint must be at most 250 characters." error message for the "hint" field
 
 @ignore
 Scenario: Password Strength

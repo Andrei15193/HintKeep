@@ -27,7 +27,7 @@ public abstract class HintKeepFeature : Feature
     internal JsonNode? ErrorResult { get; private set; }
     internal JsonNode? FieldsErrorResult { get; private set; }
 
-    internal ValueTask DispatchRequestAsync(IRequest request, CancellationToken cancellationToken = default)
+    internal Task DispatchRequestAsync(IRequest request, CancellationToken cancellationToken = default)
     {
         var requestType = request.GetType();
         var resultType = requestType
@@ -46,7 +46,7 @@ public abstract class HintKeepFeature : Feature
             .GetMethod(nameof(ValueTask<object>.AsTask), BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod)
             !.Invoke(valueTaskResult, [])!;
 
-        return new ValueTask(task);
+        return task;
     }
 
     internal async Task<JsonNode> ExecuteQueryAsync(string query, object? variables = null, string? dataField = null)

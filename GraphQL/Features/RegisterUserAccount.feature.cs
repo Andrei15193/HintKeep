@@ -1,8 +1,9 @@
+using HintKeep.GraphQL.Definitions.Users.Accounts;
 using Xunit.Gherkin.Quick;
 
 namespace HintKeep.GraphQL.Features;
 
-public class UserSignUp : HintKeepFeature
+public class RegisterUserAccount : HintKeepFeature
 {
     private IPageContext _pageContext = null!;
 
@@ -18,6 +19,16 @@ public class UserSignUp : HintKeepFeature
     [And("the {string} fields filled with {string}")]
     public void GivenFieldValue(string fieldId, string fieldValue)
         => _pageContext.SetFieldValue(fieldId, fieldValue);
+
+    [Given("a user with {string} username and {string} email already exists")]
+    [But("a user with {string} username and {string} email already exists")]
+    public Task GivenExistingUser(string username, string emailAddress)
+        => DispatchRequestAsync(new RegisterUserAccountRequest(
+            Username: username,
+            Password: "pa$$WORD123",
+            Hint: "Hint",
+            EmailAddress: emailAddress
+        ));
 
     [When("I click on the {string} button")]
     public Task WhenIClickButton(string buttonId)
@@ -86,7 +97,7 @@ public class UserSignUp : HintKeepFeature
         public Task ClickButtonAsync(string buttonId)
             => feature.ExecuteQueryAsync(@"
                 mutation($username: String!, $password: String!, $hint: String!, $emailAddress: String!) {
-                    register(username: $username, password: $password, hint: $hint, emailAddress: $emailAddress) {
+                    registerUserAccount(username: $username, password: $password, hint: $hint, emailAddress: $emailAddress) {
                         userId
                         sessionId
                         sessionRenewTicket
@@ -128,10 +139,10 @@ public class UserSignUp : HintKeepFeature
         public string? GetFieldError(string fieldId)
             => fieldId switch
             {
-                "username" => feature.FieldsErrorResult!.AsObject()["username"]!.GetValue<string>(),
-                "password" => feature.FieldsErrorResult!.AsObject()["password"]!.GetValue<string>(),
-                "hint" => feature.FieldsErrorResult!.AsObject()["hint"]!.GetValue<string>(),
-                "email" => feature.FieldsErrorResult!.AsObject()["emailAddress"]!.GetValue<string>(),
+                "username" => feature.FieldsErrorResult!.AsObject()["username"]?.GetValue<string>(),
+                "password" => feature.FieldsErrorResult!.AsObject()["password"]?.GetValue<string>(),
+                "hint" => feature.FieldsErrorResult!.AsObject()["hint"]?.GetValue<string>(),
+                "email" => feature.FieldsErrorResult!.AsObject()["emailAddress"]?.GetValue<string>(),
                 _ => throw new ArgumentException($"Unhandled '{fieldId}' field ID.")
             };
     }

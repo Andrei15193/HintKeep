@@ -4,6 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 using Azure;
 using Azure.Data.Tables;
+using GraphQL;
+using GraphQL.Types;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Data.Users;
 using HintKeep.GraphQL.Definitions.Users.Sessions;
@@ -11,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HintKeep.GraphQL.Definitions.Users.Accounts;
 
-public record RegisterRequest(
+public record RegisterUserAccountRequest(
     [property: Required(ErrorMessage = "A username is required.")]
     string Username,
 
@@ -21,12 +23,50 @@ public record RegisterRequest(
     [property: Required(ErrorMessage = "A hint is required.")]
     string Hint,
 
-    [property: Required(ErrorMessage = "An email address is required.")]
+    [property: Required(ErrorMessage = "An email address is required."), EmailAddress(ErrorMessage = "A valid email address is required.")]
     string EmailAddress
 ) :
     IRequest<AuthenticationResult>;
 
-public class RegisterRequestHandler(
+[MutationField(AllowAnonymous = true)]
+public class RegisterUserAccountRequestMutation : RequestFieldType<RegisterUserAccountRequest, AuthenticationResult>
+{
+    public RegisterUserAccountRequestMutation()
+    {
+        Name = "RegisterUserAccount";
+
+        Arguments =
+        [
+            new QueryArgument<NonNullGraphType<StringGraphType>>
+            {
+                Name = nameof(RegisterUserAccountRequest.Username)
+            },
+            new QueryArgument<NonNullGraphType<StringGraphType>>
+            {
+                Name = nameof(RegisterUserAccountRequest.Password)
+            },
+            new QueryArgument<NonNullGraphType<StringGraphType>>
+            {
+                Name = nameof(RegisterUserAccountRequest.Hint)
+            },
+            new QueryArgument<NonNullGraphType<StringGraphType>>
+            {
+                Name = nameof(RegisterUserAccountRequest.EmailAddress)
+            }
+        ];
+        Type = typeof(AuthenticationResultGraphType);
+    }
+
+    protected override RegisterUserAccountRequest GetInput(IResolveFieldContext context)
+        => new(
+            Username: context.GetArgument<string>(nameof(RegisterUserAccountRequest.Username)),
+            Password: context.GetArgument<string>(nameof(RegisterUserAccountRequest.Password)),
+            Hint: context.GetArgument<string>(nameof(RegisterUserAccountRequest.Hint)),
+            EmailAddress: context.GetArgument<string>(nameof(RegisterUserAccountRequest.EmailAddress))
+        );
+}
+
+public class RegisterUserAccountRequestHandler(
     HintKeepTableStorage hintKeepTableStorage,
 
     [FromKeyedServices(ServiceKeys.UsernameHashAlgorithm)] HashAlgorithm usernameHashAlgorithm,
@@ -36,9 +76,9 @@ public class RegisterRequestHandler(
     IRequestHandler<CreateSessionTicketRequest, CreateSessionTicketResult> sessionTicketRequestHandler,
     IRequestHandler<CreateSessionTokenRequest, CreateSessionTokenResult> sessionTokenRequestHandler
 ) :
-    IRequestHandler<RegisterRequest, AuthenticationResult>
+    IRequestHandler<RegisterUserAccountRequest, AuthenticationResult>
 {
-    public async ValueTask<AuthenticationResult> ExecuteAsync(RegisterRequest request, CancellationToken cancellationToken)
+    public async ValueTask<AuthenticationResult> ExecuteAsync(RegisterUserAccountRequest request, CancellationToken cancellationToken)
     {
         var usernameHash = Convert.ToHexString(usernameHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Username.ToLowerInvariant())));
         var passwordHash = Convert.ToHexString(passwordHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
@@ -50,7 +90,7 @@ public class RegisterRequestHandler(
                 .GetEntityIfExistsAsync<TableEntity>(UserUniqueEntity.GetEntityKey(usernameHash), cancellationToken)
                 .ToUserUniqueEntity() is not null
         )
-            throw new ValidationException(new ValidationResult("Usernames must be unique.", [nameof(RegisterRequest.Username)]), null, null);
+            throw new ValidationException(new ValidationResult("The username is unavailable.", [nameof(RegisterUserAccountRequest.Username)]), null, null);
 
         var userId = await _ReserveUserIdAsync(usernameHash, request.Username, cancellationToken);
 
@@ -79,7 +119,7 @@ public class RegisterRequestHandler(
         }
         catch (TableTransactionFailedException tableTransactionFailedException) when (tableTransactionFailedException.Status == (int)HttpStatusCode.Conflict)
         {
-            throw new ValidationException(new ValidationResult("Usernames must be unique.", [nameof(RegisterRequest.Username)]), null, null);
+            throw new ValidationException(new ValidationResult("The username is unavailable.", [nameof(RegisterUserAccountRequest.Username)]), null, null);
         }
 
         var sessionTicketResult = await sessionTicketRequestHandler.ExecuteAsync(
