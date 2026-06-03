@@ -9,18 +9,19 @@ using GraphQL.Types;
 using HintKeep.GraphQL.Data;
 using HintKeep.GraphQL.Data.Users;
 using HintKeep.GraphQL.Definitions.Users.Sessions;
+using HintKeep.GraphQL.Definitions.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HintKeep.GraphQL.Definitions.Users.Accounts;
 
 public record RegisterUserAccountRequest(
-    [property: Required(ErrorMessage = "A username is required.")]
+    [property: Required(ErrorMessage = "A username is required."), MaxLength(250, ErrorMessage = "The username can be at most 250 characters.")]
     string Username,
 
-    [property: Required(ErrorMessage = "A password is required.")]
+    [property: Required(ErrorMessage = "A password is required."), MaxLength(250, ErrorMessage = "The password can be at most 250 characters."), PasswordStrength(ErrorMessage = "The password must be strong, at least 8 characters long containing both lowercase and uppercase letters alongside at least one numeric and special character.")]
     string Password,
 
-    [property: Required(ErrorMessage = "A hint is required.")]
+    [property: Required(ErrorMessage = "A hint is required."), MaxLength(250, ErrorMessage = "The hint can be at most 250 characters.")]
     string Hint,
 
     [property: Required(ErrorMessage = "An email address is required."), EmailAddress(ErrorMessage = "A valid email address is required.")]

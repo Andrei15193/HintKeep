@@ -15,10 +15,15 @@ public class RegisterUserAccount : HintKeepFeature
     public void GivenTheSignUpPage()
         => _pageContext = new SignUpPageContext(this);
 
-    [Given("the {string} fields filled with {string}")]
-    [And("the {string} fields filled with {string}")]
+    [Given("the {string} field filled with {string}")]
+    [And("the {string} field filled with {string}")]
     public void GivenFieldValue(string fieldId, string fieldValue)
         => _pageContext.SetFieldValue(fieldId, fieldValue);
+
+    [Given("the {string} field filled with {int} characters")]
+    [And("the {string} field filled with {int} characters")]
+    public void GivenFieldValueLength(string fieldId, int fieldValueLength)
+        => _pageContext.SetFieldValue(fieldId, new string('a', fieldValueLength));
 
     [Given("a user with {string} username and {string} email already exists")]
     [But("a user with {string} username and {string} email already exists")]
@@ -67,6 +72,27 @@ public class RegisterUserAccount : HintKeepFeature
     public void ThenFieldError(string errorMessage, string fieldId)
         => Assert.Equal(errorMessage, _pageContext.GetFieldError(fieldId));
 
+    [Then("I can see the landing page")]
+    public void ThenSuccessfulResult()
+        => Assert.Multiple(
+            () =>
+            {
+                if (RawResult is null)
+                    Assert.Null(DataResult);
+                else
+                {
+                    Assert.NotNull(DataResult);
+                    Assert.Multiple(
+                        () => Assert.Contains("username", DataResult.AsObject()),
+                        () => Assert.Contains("userId", DataResult.AsObject()),
+                        () => Assert.Contains("sessionId", DataResult.AsObject()),
+                        () => Assert.Contains("sessionRenewTicket", DataResult.AsObject())
+                    );
+                }
+            },
+            () => Assert.Null(ErrorResult)
+        );
+
     private interface IPageContext
     {
         Task ClickButtonAsync(string buttonId);
@@ -95,24 +121,28 @@ public class RegisterUserAccount : HintKeepFeature
         private string _emailAddress = string.Empty;
 
         public Task ClickButtonAsync(string buttonId)
-            => feature.ExecuteQueryAsync(@"
-                mutation($username: String!, $password: String!, $hint: String!, $emailAddress: String!) {
-                    registerUserAccount(username: $username, password: $password, hint: $hint, emailAddress: $emailAddress) {
-                        userId
-                        sessionId
-                        sessionRenewTicket
-                        username
-                    }
-                }
-            ",
-            new
+            => buttonId switch
             {
-                username = _username,
-                password = _password,
-                hint = _hint,
-                emailAddress = _emailAddress
-            }
-        );
+                "sign up" => feature.ExecuteQueryAsync(@"
+                        mutation($username: String!, $password: String!, $hint: String!, $emailAddress: String!) {
+                            registerUserAccount(username: $username, password: $password, hint: $hint, emailAddress: $emailAddress) {
+                                userId
+                                sessionId
+                                sessionRenewTicket
+                                username
+                            }
+                        }
+                    ",
+                    new
+                    {
+                        username = _username,
+                        password = _password,
+                        hint = _hint,
+                        emailAddress = _emailAddress
+                    }
+                ),
+                _ => Task.CompletedTask
+            };
 
         public void SetFieldValue(string fieldId, string fieldValue)
         {
