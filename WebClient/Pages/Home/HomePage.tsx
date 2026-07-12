@@ -1,14 +1,13 @@
-import React, { type MouseEvent, useCallback, useEffect } from "react";
+import React, { type MouseEvent, useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { useIndexedDatabase } from "../../Core/Data/IndexedDatabase";
+import { mapDbRequestToPromise, useIndexedDatabase } from "../../Core/Data/IndexedDatabase";
 import { HintKeepDatabaseDefinition } from "../../Core/Data/IndexedDatabase/HintKeep";
 import { Button } from "../../Core/Forms/Components";
+import { Modal } from "../../Core/Modals";
 import { Content, Header } from "../../Core/PageParts";
-import { useShowConfirmationPrompt } from "../../Core/Prompt";
 import { useWindow } from "../WindowContext";
 
 export function HomePage(): React.JSX.Element {
-    const { indexedDB } = useWindow();
     const navigate = useNavigate();
     const { isOpening, initializeAsync, closeDatabase } = useIndexedDatabase();
 
@@ -21,19 +20,6 @@ export function HomePage(): React.JSX.Element {
         },
         [initializeAsync, navigate]
     );
-
-    const deleteAllLocalDataCallback = useCallback(
-        () => indexedDB.deleteDatabase(HintKeepDatabaseDefinition.name),
-        [indexedDB]
-    );
-
-    // Temporary, only for dev/testing!
-    const dropDatabaseCallback = useShowConfirmationPrompt({
-        message: "This action will remove all locally stored data, all user accounts and their stored hints. Are you sure you want to continue?",
-        confirmButtonLabel: "Yes, delete everything, I'm done with this app",
-        dismissButtonLabel: "No, I do not want to remove all data",
-        onConfirm: deleteAllLocalDataCallback
-    });
 
     useEffect(
         () => {
@@ -63,13 +49,71 @@ export function HomePage(): React.JSX.Element {
                         Use application locally
                     </Link>
 
-                    <Button
-                        text="Drop database"
-                        danger
-                        onClick={dropDatabaseCallback}
-                    />
+                    <DropDatabaseModal />
                 </div>
             </Content>
+        </>
+    );
+}
+
+// Temporary, only for dev/testing!
+function DropDatabaseModal(): React.JSX.Element {
+    const { indexedDB } = useWindow();
+
+    const [deleteDatabaseStatus, setDeleteDatabaseStatus] = useState<"ready" | "confirming" | "confirmed" | "deleting">("ready");
+
+    const showDatabaseDeleteModal = useCallback(() => setDeleteDatabaseStatus("confirming"), [setDeleteDatabaseStatus]);
+    const dismissDatabaseDeleteModal = useCallback(() => setDeleteDatabaseStatus("ready"), [setDeleteDatabaseStatus]);
+    const confiemDatabaseDeletion = useCallback(() => setDeleteDatabaseStatus("confirmed"), [setDeleteDatabaseStatus]);
+
+    const deleteDatabaseAsyncCallback = useCallback(
+        async () => {
+            try {
+                setDeleteDatabaseStatus("deleting");
+                await mapDbRequestToPromise(indexedDB.deleteDatabase(HintKeepDatabaseDefinition.name));
+            }
+            finally {
+                setDeleteDatabaseStatus("ready");
+            }
+        },
+        [indexedDB, setDeleteDatabaseStatus]
+    );
+
+    useLayoutEffect(
+        () => {
+            if (deleteDatabaseStatus === "confirmed")
+                deleteDatabaseAsyncCallback();
+        },
+        [deleteDatabaseStatus, deleteDatabaseAsyncCallback]
+    );
+
+    return (
+        <>
+            <Button
+                text="Drop database"
+                danger
+                onClick={showDatabaseDeleteModal}
+            />
+
+            <Modal isVisible={deleteDatabaseStatus === "confirming" || deleteDatabaseStatus === "confirmed" || deleteDatabaseStatus === "deleting"}>
+                <div className="confirmation-prompt-message">
+                    This action will remove all locally stored data, all user accounts and their stored hints. Are you sure you want to continue?
+                </div>
+                <nav className="confirmation-prompt-actions">
+                    <Button
+                        danger
+                        onClick={confiemDatabaseDeletion}
+                        text="Yes, delete everything, I'm done with this app"
+                        disabled={deleteDatabaseStatus === "deleting"}
+                    />
+                    <Button
+                        neutral
+                        onClick={dismissDatabaseDeleteModal}
+                        text="No, I do not want to remove all data"
+                        disabled={deleteDatabaseStatus === "deleting"}
+                    />
+                </nav>
+            </Modal>
         </>
     );
 }
