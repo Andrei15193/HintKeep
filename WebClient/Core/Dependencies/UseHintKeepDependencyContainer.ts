@@ -1,14 +1,12 @@
 import { useMemo } from "react";
 import { DependencyContainer } from "react-model-view-viewmodel";
-import { useAuthentication } from "../Contexts/AuthenticationContext";
+import { CurrentUser, CurrentUserProvider, UserHandler } from "../Authentication";
 import { useIndexedDatabase, IndexedDatabase } from "../Data/IndexedDatabase";
 import { HintKeepFormField } from "../Forms/ViewModels";
-import { User } from "../Models";
 import { Notifications } from "../Notifications";
 import { AccountsSearchTextFieldToken, ArchivedAccountsSearchTextFieldToken } from "./DependencyTokens";
 
 export function useHintKeepDependencyContainer(): DependencyContainer {
-    const { user } = useAuthentication();
     const { database } = useIndexedDatabase();
 
     return useMemo(
@@ -21,7 +19,6 @@ export function useHintKeepDependencyContainer(): DependencyContainer {
                 dependencyContainer.registerInstanceToToken(IndexedDatabase, database);
             }
 
-            dependencyContainer.registerInstanceToToken(User, user);
             dependencyContainer.registerInstanceToToken(AccountsSearchTextFieldToken, new HintKeepFormField<string>({
                 name: "search",
                 label: "Search",
@@ -35,8 +32,12 @@ export function useHintKeepDependencyContainer(): DependencyContainer {
 
             dependencyContainer.registerSingletonType(Notifications);
 
+            dependencyContainer.registerSingletonType(UserHandler);
+            dependencyContainer.registerSingletonFactoryToToken(CurrentUserProvider, ({ resolve }) => resolve(UserHandler));
+            dependencyContainer.registerTransientFactoryToToken(CurrentUser, ({ resolve }) => resolve(CurrentUserProvider).user);
+
             return dependencyContainer;
         },
-        [user, database]
+        [database]
     );
 }

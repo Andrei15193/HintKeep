@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
+import { useDependency } from "react-model-view-viewmodel";
 import { type NonIndexRouteObject, Link } from "react-router";
-import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
+import { UserHandler } from "../../Core/Authentication";
 import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { FormFieldGroup } from "../../Core/Forms/Components/FormFields/FormField";
@@ -16,7 +17,7 @@ export const SignUpRoute: NonIndexRouteObject = {
 };
 
 function SignUpPage(): React.JSX.Element {
-    const { authenticate } = useAuthentication();
+    const userHandler = useDependency(UserHandler);
     const {
         form,
         result: user,
@@ -35,15 +36,15 @@ function SignUpPage(): React.JSX.Element {
             if (isSignedUp) {
                 const navigationResult = navigate("/");
                 if (navigationResult === true)
-                    authenticate(user);
+                    userHandler.authenticate(user);
                 else if (typeof navigationResult === "object")
                     navigationResult.then((result) => {
                         if (result)
-                            authenticate(user);
+                            userHandler.authenticate(user);
                     });
             }
         },
-        [isSignedUp, user, authenticate, navigate]
+        [isSignedUp, user, userHandler, navigate]
     );
 
     return (

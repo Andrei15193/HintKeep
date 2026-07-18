@@ -1,9 +1,10 @@
 import type { AccountObjectType, IAccountHintObject, IAccountSummaryObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
 import type { IDataSource } from "../../../Core/DataSources";
+import type { IUser } from "../../../Core/Models";
 import type { IAccountHintListItem } from "../Models/IAccountHintListItem";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
+import { CurrentUser } from "../../../Core/Authentication";
 import { IndexedDatabase, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
-import { type IUser, User } from "../../../Core/Models";
 
 export interface IAccountScoped {
     readonly accountId: string;
@@ -27,7 +28,7 @@ export class AccountHintsDataSource implements IDataSource<IAccountScoped, IList
     private readonly _database: IDBDatabase;
 
     public constructor({ resolve }: IDependencyResolver) {
-        this._user = resolve(User);
+        this._user = resolve(CurrentUser);
         this._database = resolve(IndexedDatabase);
     }
 

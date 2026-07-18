@@ -1,9 +1,10 @@
 import type { AccountObjectType, IAccountSummaryObject } from "../../../Core/Data/IndexedDatabase/HintKeep/Model/IAccountObject";
 import type { IDataSource } from "../../../Core/DataSources";
+import type { IUser } from "../../../Core/Models";
 import type { IAccountDetails } from "../Models/IAcountDetails";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
+import { CurrentUser } from "../../../Core/Authentication";
 import { IndexedDatabase, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
-import { type IUser, User } from "../../../Core/Models";
 
 export interface IEntityScoped {
     readonly id: string;
@@ -14,7 +15,7 @@ export class AccountDetailsDataSource implements IDataSource<IEntityScoped, IAcc
     private readonly _database: IDBDatabase;
 
     public constructor({ resolve }: IDependencyResolver) {
-        this._user = resolve(User);
+        this._user = resolve(CurrentUser);
         this._database = resolve(IndexedDatabase);
     }
 

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
+import { useDependency } from "react-model-view-viewmodel";
 import { type NonIndexRouteObject, Link, useNavigate } from "react-router";
-import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
+import { UserHandler } from "../../Core/Authentication";
 import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { FormFieldGroup } from "../../Core/Forms/Components/FormFields/FormField";
@@ -16,7 +17,7 @@ export const LoginRoute: NonIndexRouteObject = {
 
 function LoginPage(): React.JSX.Element {
     const navigate = useNavigate();
-    const { authenticate } = useAuthentication();
+    const userHandler = useDependency(UserHandler);
 
     const {
         form,
@@ -32,11 +33,11 @@ function LoginPage(): React.JSX.Element {
     useEffect(
         () => {
             if (isLoggedIn) {
-                authenticate(user);
+                userHandler.authenticate(user);
                 navigate("/");
             }
         },
-        [isLoggedIn, user, authenticate, navigate]
+        [isLoggedIn, user, userHandler, navigate]
     );
 
     return (

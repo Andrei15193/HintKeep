@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
+import { useDependency } from "react-model-view-viewmodel";
 import { type NonIndexRouteObject, useNavigate } from "react-router";
-import { useAuthentication } from "../../Core/Contexts/AuthenticationContext";
+import { UserHandler } from "../../Core/Authentication";
 import { Button } from "../../Core/Forms/Components";
 import { Breadcrumbs, GlobalNavigation, Header } from "../../Core/PageParts";
 import { useShowConfirmationPrompt } from "../../Core/Prompt";
@@ -11,7 +12,7 @@ export const UserProfileRoute: NonIndexRouteObject = {
 };
 
 function UserProfilePage(): React.JSX.Element {
-    const { logOut } = useAuthentication();
+    const userHandler = useDependency(UserHandler);
     const navigate = useNavigate();
 
     const showGreatPrompt = useShowConfirmationPrompt({
@@ -24,14 +25,18 @@ function UserProfilePage(): React.JSX.Element {
             },
             [navigate]
         ),
-        onDismiss: logOut
+        onDismiss() {
+            userHandler.logOut();
+        }
     });
 
     const showLogoutPrompt = useShowConfirmationPrompt({
         message: "We will really miss you! Are you sure you don't want to stay?",
         confirmButtonLabel: "Seriously, log me out",
         dismissButtonLabel: "I wouldn't mind staying for a bit longer",
-        onConfirm: logOut,
+        onConfirm() {
+            userHandler.logOut();
+        },
         onDismiss: useCallback(
             () => setTimeout(() => showGreatPrompt(), 0),
             [showGreatPrompt]

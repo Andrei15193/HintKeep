@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
+import { useViewModelDependency } from "react-model-view-viewmodel";
 import { createBrowserRouter, Navigate, Outlet, useMatch } from "react-router";
-import { useAuthentication } from "../Core/Contexts/AuthenticationContext";
+import { CurrentUserProvider } from "../Core/Authentication";
 import { ActiveAccountHintsRoute } from "./AccountHints";
 import { AccountAddRoute, ActiveAccountDetailsRoute, ActiveAccountsRoute, ArchivedAccountDetailsRoute, ArchivedAccountsRoute } from "./Accounts";
 import { HomePage } from "./Home";
@@ -19,7 +20,7 @@ export function useAppRouter(): ReturnType<typeof createBrowserRouter> {
                 {
                     path: "/",
                     Component() {
-                        const { user } = useAuthentication();
+                        const { user } = useViewModelDependency(CurrentUserProvider);
                         const match = useMatch({
                             path: "/",
                             end: true
@@ -38,7 +39,7 @@ export function useAppRouter(): ReturnType<typeof createBrowserRouter> {
                                 SignUpRoute,
                                 {
                                     Component() {
-                                        const { user } = useAuthentication();
+                                        const { user } = useViewModelDependency(CurrentUserProvider);
 
                                         if (user === null)
                                             return <Navigate to="/" />;
