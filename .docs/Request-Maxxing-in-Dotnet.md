@@ -39,7 +39,7 @@ Wait a minute, in both cases a JWT is generated and it needs to be the same to e
 
 How would this be solved? Quite simply, extract the common part, the one that generates the token into a separate _service_ which is an object exposing one or more methods for a specific purpose. Now we have the common part in one place, testable and reused in both request handlers.
 
-## Maxing
+## Maxxing
 
 This is common and quite useful, to have different helper/service types for different purposes and reusing them across the code base, it is a natural progression when writing code.
 
@@ -51,7 +51,7 @@ On the other hand, I already have an infrastructure set in place that does exact
 
 I can just as easily extract the common part that generates JSON Web Tokens in a 3rd request handler and have it invoked from the other 2. This reduces _[bad]_ code duplication, maintains unit test readiness and there is no need to think about how _services_ are structured and registered with DI, it is already done.
 
-This is where the idea of **Request Maxing** came to mind: everything goes through a request handler. The only helper types would be extension methods to help with the infrastructure as we will see shortly.
+This is where the idea of **Request Maxxing** came to mind: everything goes through a request handler. The only helper types would be extension methods to help with the infrastructure as we will see shortly.
 
 ## Implicit vs Explicit
 
@@ -144,7 +144,7 @@ else
 
 ## Extensions
 
-In the beginning I made an exception to request maxing and that was extension methods. If we are to strictly follow this pattern then whenever we would want to validate a request we would need a separate handler just for that, however this is unnecessary as it would make code rather more complicated than easier to follow.
+In the beginning I made an exception to request maxxing and that was extension methods. If we are to strictly follow this pattern then whenever we would want to validate a request we would need a separate handler just for that, however this is unnecessary as it would make code rather more complicated than easier to follow.
 
 A useful utility could be defined to ensure a request is valid, this will allow the use of data validation attributes at any level and before making a call to a dependent handler.
 
@@ -193,6 +193,6 @@ A request-only approach does check a lot of boxes when it comes to code isolatio
 
 A trade-off that needs to be considered is between explicit vs implicit dependent request handlers, having a dispatcher seems very convenient, however it can hide a significant part of the complexity of a handler making it harder to follow, test and safeguard against circular dependencies.
 
-HintKeep is a small project, just about any approach will work, however there is a high likelihood that _request maxing_ can work even on large projects as long as a clear structure is implemented along side request handlers, having an unstructured mix of types makes code much harder to navigate.
+HintKeep is a small project, just about any approach will work, however there is a high likelihood that _request maxxing_ can work even on large projects as long as a clear structure is implemented along side request handlers, having an unstructured mix of types makes code much harder to navigate.
 
 As a final thought, I do want to include dependency chains in the wiki, preferably have this generated automatically. Having a list of request handlers and if they have any such subsequent dependencies is useful for a high-level overview or just to see how different parts communicate with one another.
