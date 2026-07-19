@@ -1,11 +1,10 @@
 import React, { type MouseEvent, useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useDependency } from "react-model-view-viewmodel";
 import { Link, useNavigate } from "react-router";
-import { mapDbRequestToPromise, useIndexedDatabase } from "../../Core/Data/IndexedDatabase";
-import { HintKeepDatabaseDefinition } from "../../Core/Data/IndexedDatabase/HintKeep";
+import { IndexedDatabaseHandler, useIndexedDatabase } from "../../Core/Data/IndexedDatabase";
 import { Button } from "../../Core/Forms/Components";
 import { Modal } from "../../Core/Modals";
 import { Content, Header } from "../../Core/PageParts";
-import { useWindow } from "../WindowContext";
 
 export function HomePage(): React.JSX.Element {
     const navigate = useNavigate();
@@ -61,7 +60,7 @@ export function HomePage(): React.JSX.Element {
 
 // Temporary, only for dev/testing!
 function DropDatabaseModal(): React.JSX.Element | null {
-    const { indexedDB } = useWindow();
+    const indexedDatabaseHandler = useDependency(IndexedDatabaseHandler);
 
     const [deleteDatabaseStatus, setDeleteDatabaseStatus] = useState<"ready" | "confirming" | "confirmed" | "deleting">("ready");
 
@@ -73,13 +72,13 @@ function DropDatabaseModal(): React.JSX.Element | null {
         async () => {
             try {
                 setDeleteDatabaseStatus("deleting");
-                await mapDbRequestToPromise(indexedDB.deleteDatabase(HintKeepDatabaseDefinition.name));
+                await indexedDatabaseHandler.dropDatabaseAsync();
             }
             finally {
                 setDeleteDatabaseStatus("ready");
             }
         },
-        [indexedDB, setDeleteDatabaseStatus]
+        [indexedDatabaseHandler, setDeleteDatabaseStatus]
     );
 
     useLayoutEffect(

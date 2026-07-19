@@ -1,7 +1,7 @@
 import type { DependencyContainer } from "react-model-view-viewmodel";
 import React from "react";
 import { RouterProvider } from "react-router";
-import { IndexedDatabaseProvider } from "../Core/Data/IndexedDatabase";
+import { IndexedDatabaseContextProvider } from "../Core/Data/IndexedDatabase";
 import { HintKeepDatabaseDefinition } from "../Core/Data/IndexedDatabase/HintKeep";
 import { HintKeepDependencyContainerProvider } from "../Core/Dependencies";
 import { ModalContextProvider, ModalsDisplay } from "../Core/Modals";
@@ -25,7 +25,7 @@ export function App({ configure }: IAppProps): React.JSX.Element {
     return (
         <ModalContextProvider>
             <ConfirmationPromptProvider>
-                <IndexedDatabaseProvider databaseDefinition={HintKeepDatabaseDefinition}>
+                <IndexedDatabaseContextProvider databaseDefinition={HintKeepDatabaseDefinition}>
                     <HintKeepDependencyContainerProvider configure={configure}>
                         <RouterProvider router={appRouter} />
 
@@ -35,7 +35,7 @@ export function App({ configure }: IAppProps): React.JSX.Element {
                             <GlobalNotificationsContainer />
                         </aside>
                     </HintKeepDependencyContainerProvider>
-                </IndexedDatabaseProvider>
+                </IndexedDatabaseContextProvider>
             </ConfirmationPromptProvider>
         </ModalContextProvider>
     );

@@ -1,13 +1,16 @@
 import { useMemo } from "react";
 import { DependencyContainer } from "react-model-view-viewmodel";
+import { useWindow } from "../../Pages/WindowContext";
 import { CurrentUser, CurrentUserProvider, UserHandler } from "../Authentication";
-import { useIndexedDatabase, IndexedDatabase } from "../Data/IndexedDatabase";
+import { useIndexedDatabase, IndexedDatabase, IndexedDatabaseProvider, IndexedDatabaseHandler, IndexedDatabaseHandlerService } from "../Data/IndexedDatabase";
+import { HintKeepDatabaseDefinition } from "../Data/IndexedDatabase/HintKeep";
 import { HintKeepFormField } from "../Forms/ViewModels";
 import { Notifications } from "../Notifications";
 import { AccountsSearchTextFieldToken, ArchivedAccountsSearchTextFieldToken } from "./DependencyTokens";
 
 export function useHintKeepDependencyContainer(configure?: (dependencyContainer: DependencyContainer) => DependencyContainer): DependencyContainer {
     const { database } = useIndexedDatabase();
+    const window = useWindow();
 
     return useMemo(
         () => {
@@ -30,6 +33,9 @@ export function useHintKeepDependencyContainer(configure?: (dependencyContainer:
                 initialValue: ""
             }));
 
+            dependencyContainer.registerSingletonFactoryToToken(IndexedDatabaseHandler, () => new IndexedDatabaseHandlerService(HintKeepDatabaseDefinition, window));
+            dependencyContainer.registerSingletonFactoryToToken(IndexedDatabaseProvider, ({ resolve }) => resolve(IndexedDatabaseHandler));
+
             dependencyContainer.registerSingletonType(Notifications);
 
             dependencyContainer.registerSingletonType(UserHandler);
@@ -41,6 +47,6 @@ export function useHintKeepDependencyContainer(configure?: (dependencyContainer:
 
             return dependencyContainer;
         },
-        [database, configure]
+        [database, window, configure]
     );
 }
