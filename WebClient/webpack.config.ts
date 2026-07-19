@@ -20,7 +20,7 @@ interface IBuildOptions {
  */
 const developmentEnvironmentVariables: Readonly<Record<string, string>> = {
     HINTKEEP_API_URL: "http://localhost:8081/",
-    HINTKEEP_ENVIRONMENT_TYPE: "Development"
+    HINTKEEP_ENVIRONMENT_TYPE: "development"
 };
 
 let lastGeneratedChunkId = 0;

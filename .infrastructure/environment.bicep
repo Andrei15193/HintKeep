@@ -12,7 +12,7 @@ param signingKey string
 param hashAlgoritmKey string
 
 @export()
-type EnvironmentType = 'development' | 'production'
+type EnvironmentType = 'development' | 'staging' | 'production'
 
 @export()
 var tableNames = [
@@ -80,7 +80,7 @@ resource FunctionsApp 'Microsoft.Web/sites@2024-11-01' = {
         // HintKeep Config
         {
           name: 'DOTNET_ENVIRONMENT'
-          value: type == 'development' ? 'Development' : 'Production'
+          value: type
         }
         {
           name: 'HINTKEEP_SIGNING_KEY'
