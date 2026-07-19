@@ -10,6 +10,11 @@ import { ConfirmationPromptProvider } from "../Core/Prompt";
 import { useAppRouter } from "./AppRouter";
 import { ConfirmationPrompt } from "./ConfirmationPrompt";
 
+declare global {
+    const HINTKEEP_API_URL: string;
+    const HINTKEEP_ENVIRONMENT_TYPE: string;
+}
+
 export interface IAppProps {
     configure?(dependencyContainer: DependencyContainer): DependencyContainer;
 }

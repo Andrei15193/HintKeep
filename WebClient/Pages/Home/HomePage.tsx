@@ -49,7 +49,10 @@ export function HomePage(): React.JSX.Element {
                         Use application locally
                     </Link>
 
-                    <DropDatabaseModal />
+                    {
+                        HINTKEEP_ENVIRONMENT_TYPE === "development"
+                        && <DropDatabaseModal />
+                    }
                 </div>
             </Content>
         </>
@@ -57,7 +60,7 @@ export function HomePage(): React.JSX.Element {
 }
 
 // Temporary, only for dev/testing!
-function DropDatabaseModal(): React.JSX.Element {
+function DropDatabaseModal(): React.JSX.Element | null {
     const { indexedDB } = useWindow();
 
     const [deleteDatabaseStatus, setDeleteDatabaseStatus] = useState<"ready" | "confirming" | "confirmed" | "deleting">("ready");
