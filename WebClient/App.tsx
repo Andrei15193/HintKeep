@@ -4,10 +4,10 @@ Promise
     .all([
         import("react"),
         import("react-dom/client"),
-        import("./Pages/Startup"),
+        import("./Pages/App"),
         import("react-model-view-viewmodel")
     ])
-    .then(([{ createElement }, { createRoot }, { Startup }]) => {
+    .then(([{ createElement }, { createRoot }, { App: Startup }]) => {
         const appElement = document.getElementById("app")!;
         Array
             .from(appElement.children)

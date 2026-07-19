@@ -1,9 +1,10 @@
 import type { IFormHandler } from "../Core/FormHandlers/IFormHandler";
 import type { HintKeepForm, HintKeepFormField } from "../Core/Forms/ViewModels";
+import type { IAppProps } from "../Pages/App";
 import type { JSDOM } from "jsdom";
+import type { ResolvableSimpleDependency, IDependencyResolver } from "react-model-view-viewmodel";
 import { World } from "@cucumber/cucumber";
-import { type ComponentType, type Context, type PropsWithChildren, createElement } from "react";
-import { type ResolvableSimpleDependency, type IDependencyResolver, useDependencyResolver } from "react-model-view-viewmodel";
+import { type ComponentType, type Context, createElement } from "react";
 import { type Matcher, type RenderResult, findByText, render, createJsDom } from "./_TestingLibraryBootstrap";
 
 export class JSDomWorld extends World {
@@ -52,30 +53,27 @@ export class JSDomWorld extends World {
         return result;
     }
 
-    public render(element: React.JSX.Element = createElement(require("../Pages/App").App)): RenderResult {
-        const Startup: ComponentType<PropsWithChildren<{}>> = require("../Pages/Startup").Startup;
+    public render(): RenderResult {
+        const App: ComponentType<IAppProps> = require("../Pages/App").App;
         const WindowContext: Context<Window> = require("../Pages/WindowContext").WindowContext;
 
-        return render(element, {
-            container: this.container,
-            wrapper: ({ children }: PropsWithChildren<{}>): React.ReactNode => createElement(
+        return render(
+            createElement(
                 WindowContext.Provider,
                 { value: this.dom.window as any },
                 createElement(
-                    Startup,
-                    {},
-                    createElement(
-                        ({ children }: PropsWithChildren<{}>): React.ReactNode => {
-                            this._dependencyResolver = useDependencyResolver();
-
-                            return children;
-                        },
-                        {},
-                        children
-                    )
+                    App,
+                    {
+                        configure: (dependencyContainer) => {
+                            return this._dependencyResolver = dependencyContainer;
+                        }
+                    }
                 )
-            )
-        });
+            ),
+            {
+                container: this.container
+            }
+        );
     }
 
     public findByTextAsync<TElement extends HTMLElement = HTMLElement>(text: Matcher, container?: HTMLElement | null): Promise<TElement> {
