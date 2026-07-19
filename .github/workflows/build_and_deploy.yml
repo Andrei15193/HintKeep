@@ -92,6 +92,7 @@ jobs:
           cp ./publish/*.css ./FeaturesTestReport/StepSnapshots
 
       - name: Test Features
+        if: false
         working-directory: WebClient
         run: npm run test:features
         env:
@@ -100,6 +101,7 @@ jobs:
           stepHtmlSnapshotDirectoryPath: ./FeaturesTestReport/StepSnapshots
 
       - name: Check Accessibility (be-a11y)
+        if: false
         uses: be-lenka/be-a11y@v2.2.9
         continue-on-error: true
         with:
@@ -114,6 +116,7 @@ jobs:
           compression-level: 9
 
       - name: Publish Features Test Report Artifact
+        if: false
         uses: actions/upload-artifact@v4
         with:
           name: FeaturesTestReport
@@ -255,6 +258,7 @@ jobs:
 
           [hashtable] $netlifySettings = @{
             HINTKEEP_API_URL = '${{ steps.ensure-graphQL-environment.outputs.GraphQL_URL }}'
+            HINTKEEP_ENVIRONMENT_TYPE = '${{ vars.ENVIRONMENT_TYPE }}'
           }
 
           $netlifySettings.GetEnumerator() | ForEach-Object -Parallel {

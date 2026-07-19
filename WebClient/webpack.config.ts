@@ -19,7 +19,8 @@ interface IBuildOptions {
  * Related post-process script can be found in `WebClient.Config.liquid` under `.infrastructure`.
  */
 const developmentEnvironmentVariables: Readonly<Record<string, string>> = {
-    HINTKEEP_API_URL: "http://localhost:8081/"
+    HINTKEEP_API_URL: "http://localhost:8081/",
+    HINTKEEP_ENVIRONMENT_TYPE: "Development"
 };
 
 let lastGeneratedChunkId = 0;
