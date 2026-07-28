@@ -7,7 +7,7 @@ export interface IFormProps {
     readonly className?: string;
     readonly disabled?: boolean;
 
-    onSubmit(event: FormEvent<HTMLFormElement>): void;
+    onSubmit?(event: FormEvent<HTMLFormElement>): void;
 }
 
 export function blankSubmit(event: FormEvent<HTMLFormElement>): void {

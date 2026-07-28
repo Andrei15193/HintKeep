@@ -12,7 +12,7 @@ import { ConfirmationPrompt } from "./ConfirmationPrompt";
 
 declare global {
     const HINTKEEP_API_URL: string;
-    const HINTKEEP_ENVIRONMENT_TYPE: string;
+    const HINTKEEP_ENVIRONMENT_TYPE: "development" | "staging" | "production";
 }
 
 export interface IAppProps {

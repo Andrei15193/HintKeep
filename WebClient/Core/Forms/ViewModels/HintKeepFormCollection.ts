@@ -29,7 +29,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.push](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/push)
      */
     public push(...items: readonly HintKeepForm[]): number {
-        return super.push.apply(this, arguments);
+        return super.push.apply(this, arguments as any);
     }
 
     /**
@@ -38,7 +38,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.pop](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/pop)
      */
     public pop(): HintKeepForm | undefined {
-        return super.pop.apply(this, arguments);
+        return super.pop.apply(this, arguments as any);
     }
 
     /**
@@ -48,7 +48,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.unshift](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift)
      */
     public unshift(...items: readonly HintKeepForm[]): number {
-        return super.unshift.apply(this, arguments);
+        return super.unshift.apply(this, arguments as any);
     }
 
     /**
@@ -57,7 +57,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.shift](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/shift)
      */
     public shift(): HintKeepForm | undefined {
-        return super.shift.apply(this, arguments);
+        return super.shift.apply(this, arguments as any);
     }
 
     /**
@@ -67,7 +67,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.at](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/at)
      */
     public get(index: number): HintKeepForm {
-        return super.get.apply(this, arguments);
+        return super.get.apply(this, arguments as any);
     }
 
     /**
@@ -77,7 +77,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @returns The length of the collection.
      */
     public set(index: number, item: HintKeepForm): number {
-        return super.set.apply(this, arguments);
+        return super.set.apply(this, arguments as any);
     }
 
     /**
@@ -89,7 +89,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.splice](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
      */
     public splice(start: number, deleteCount?: number, ...items: readonly HintKeepForm[]): HintKeepForm[] {
-        return super.splice.apply(this, arguments);
+        return super.splice.apply(this, arguments as any);
     }
 
     /**
@@ -99,7 +99,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.sort](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
      */
     public sort(compareCallback?: (left: HintKeepForm, right: HintKeepForm) => number): this {
-        return super.sort.apply(this, arguments);
+        return super.sort.apply(this, arguments as any);
     }
 
     /**
@@ -108,7 +108,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.reverse](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)
      */
     public reverse(): this {
-        return super.reverse.apply(this, arguments);
+        return super.reverse.apply(this, arguments as any);
     }
 
     /**
@@ -119,7 +119,7 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.copyWithin](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin)
      */
     public copyWithin(target: number, start: number, end?: number): this {
-        return super.copyWithin.apply(this, arguments);
+        return super.copyWithin.apply(this, arguments as any);
     }
 
     /**
@@ -131,6 +131,6 @@ export class HintKeepFormCollection extends HintKeepReadOnlyFormCollection imple
      * @see [Array.fill](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/fill)
      */
     public fill(item: HintKeepForm, start?: number, end?: number): this {
-        return super.fill.apply(this, arguments);
+        return super.fill.apply(this, arguments as any);
     }
 }

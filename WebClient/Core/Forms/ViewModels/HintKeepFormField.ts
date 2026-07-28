@@ -11,9 +11,9 @@ export interface IHintKeepFormFieldConfig<TValue> extends IFormFieldConfig<TValu
 }
 
 export class HintKeepFormField<TValue> extends FormField<TValue> {
-    private _label: string;
-    private _wasTouched: boolean;
-    private _isRequired: boolean;
+    private _label!: string;
+    private _wasTouched!: boolean;
+    private _isRequired!: boolean;
     private _hasChanged: boolean;
     private _areValuesEqual: EqualityComparer<any>;
 
@@ -28,7 +28,7 @@ export class HintKeepFormField<TValue> extends FormField<TValue> {
 
         this.label = label;
         this.wasTouched = wasTouched;
-        this._isRequired = !!this._isRequired;
+        this.isRequired = !!this._isRequired;
 
         this._areValuesEqual = areValuesEqual;
         this._hasChanged = !this._areValuesEqual(this.value, this.initialValue);

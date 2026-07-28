@@ -78,7 +78,7 @@ export function useFormFlow<TForm extends HintKeepForm, TResult>(options: IFormF
                         });
                     else
                         notifications.add({
-                            message: error instanceof DOMException ? error.message : error,
+                            message: error instanceof DOMException ? error.message : error as any,
                             type: "error"
                         });
                 }

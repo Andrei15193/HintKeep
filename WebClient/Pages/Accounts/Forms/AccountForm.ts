@@ -6,35 +6,36 @@ export class AccountForm extends HintKeepForm {
     public constructor(account?: IAccountDetails | null) {
         super();
 
-        this.id = account?.id || null;
+        this.id = account?.id ?? null;
+        this.archived = account?.isArchived ?? false;
         this.withFields(
             this.name = new HintKeepFormField<string>({
                 name: "name",
                 label: "Account",
-                initialValue: account?.name || "",
+                initialValue: account?.name ?? "",
                 validators: [new RequiredValidator(), new MaxLengthValidator(250)]
             }),
             this.username = new HintKeepFormField<string>({
                 name: "username",
                 label: "Username",
-                initialValue: account?.username || "",
+                initialValue: account?.username ?? "",
                 validators: [new RequiredValidator(), new MaxLengthValidator(250)]
             }),
             this.hint = new HintKeepFormField<string>({
                 name: "hint",
                 label: "Hint",
-                initialValue: account?.hint || "",
+                initialValue: account?.hint ?? "",
                 validators: [new RequiredValidator(), new MaxLengthValidator(250)]
             }),
             this.pinned = new HintKeepFormField<boolean>({
                 name: "pinned",
                 label: "Is pinned",
-                initialValue: account?.isPinned || false
+                initialValue: account?.isPinned ?? false
             }),
             this.notes = new HintKeepFormField<string>({
                 name: "notes",
                 label: "Notes",
-                initialValue: account?.notes || "",
+                initialValue: account?.notes ?? "",
                 validators: [new MaxLengthValidator(1000)]
             })
         );

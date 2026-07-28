@@ -3,9 +3,9 @@ import type { IHintKeepReadOnlyFormCollection } from "./HintKeepReadOnlyFormColl
 import { type IReadOnlyObservableCollection, type IObservableCollection, type FormCollection, Form } from "react-model-view-viewmodel";
 
 export class HintKeepForm extends Form {
-    public readonly fields: IReadOnlyObservableCollection<HintKeepFormField<unknown>>;
-    public readonly sections: IReadOnlyObservableCollection<HintKeepForm>;
-    public readonly sectionsCollections: IReadOnlyObservableCollection<IHintKeepReadOnlyFormCollection>;
+    public readonly fields!: IReadOnlyObservableCollection<HintKeepFormField<unknown>>;
+    public readonly sections!: IReadOnlyObservableCollection<HintKeepForm>;
+    public readonly sectionsCollections!: IReadOnlyObservableCollection<IHintKeepReadOnlyFormCollection>;
 
     public get hasChanges(): boolean {
         return this.fields.some((field) => field.hasChanged) || this.sectionsCollections.some((formCollection) => formCollection.hasChanges);
@@ -20,16 +20,16 @@ export class HintKeepForm extends Form {
         this.sections.forEach((section) => section.validate());
     }
 
-    protected withFields(...fields: readonly HintKeepFormField<any>[]): IObservableCollection<HintKeepFormField<any>> {
-        return super.withFields.apply(this, arguments);
+    protected override withFields(...fields: readonly HintKeepFormField<any>[]): IObservableCollection<HintKeepFormField<any>> {
+        return super.withFields.apply(this, arguments as any) as any;
     }
 
-    protected withSections(...sections: readonly HintKeepForm[]): FormCollection<HintKeepForm> {
-        return super.withFields.apply(this, arguments);
+    protected override withSections(...sections: readonly HintKeepForm[]): FormCollection<HintKeepForm> {
+        return super.withFields.apply(this, arguments as any) as any;
     }
 
-    protected withSectionsCollection(sectionsCollection: IHintKeepReadOnlyFormCollection): IHintKeepReadOnlyFormCollection {
-        return super.withFields.apply(this, arguments);
+    protected override withSectionsCollection(sectionsCollection: IHintKeepReadOnlyFormCollection): IHintKeepReadOnlyFormCollection {
+        return super.withFields.apply(this, arguments as any) as any;
     }
 
     protected override onFieldChanged(field: HintKeepFormField<unknown>, changedProperties: readonly (keyof HintKeepFormField<unknown>)[]): void {

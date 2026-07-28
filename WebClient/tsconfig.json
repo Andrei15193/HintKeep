@@ -14,14 +14,16 @@
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
+        "noUncheckedIndexedAccess": true,
+        "noUncheckedSideEffectImports": false,
+        "strictBindCallApply": true,
         "noFallthroughCasesInSwitch": true,
         "suppressImplicitAnyIndexErrors": false,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "strictFunctionTypes": true,
-        "forceConsistentCasingInFileNames": true,
-        "noUncheckedIndexedAccess": true
+        "forceConsistentCasingInFileNames": true
     },
     "ts-node": {
         "compilerOptions": {

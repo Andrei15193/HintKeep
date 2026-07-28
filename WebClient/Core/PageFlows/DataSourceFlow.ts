@@ -72,7 +72,7 @@ export function useDataSourceFlow<TOptions extends object, TResult>(options: IDa
                         });
                     else
                         notifications.add({
-                            message: error instanceof DOMException ? error.message : error,
+                            message: error instanceof DOMException ? error.message : error as any,
                             type: "error"
                         });
                 }
