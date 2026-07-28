@@ -18,11 +18,11 @@ export function useHintKeepDependencyContainer(configure?: (dependencyContainer:
 
             dependencyContainer.registerSingletonType(Notifications);
 
+            dependencyContainer.registerInstanceToToken(StorageContext, new StorageContextService("HintKeepAPI"));
+
             dependencyContainer.registerSingletonType(UserHandler);
             dependencyContainer.registerSingletonFactoryToToken(CurrentUserProvider, ({ resolve }) => resolve(UserHandler));
             dependencyContainer.registerTransientFactoryToToken(CurrentUser, ({ resolve }) => resolve(CurrentUserProvider).user);
-
-            dependencyContainer.registerInstanceToToken(StorageContext, new StorageContextService("HintKeepAPI"));
 
             dependencyContainer.registerSingletonFactoryToToken(IndexedDatabaseHandler, () => new IndexedDatabaseHandlerService(HintKeepDatabaseDefinition, window));
             dependencyContainer.registerSingletonFactoryToToken(IndexedDatabaseProvider, ({ resolve }) => resolve(IndexedDatabaseHandler));

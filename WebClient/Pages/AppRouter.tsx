@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { useViewModelDependency, DependencyResolverScope } from "react-model-view-viewmodel";
 import { createBrowserRouter, Navigate, Outlet, useMatch } from "react-router";
 import { CurrentUserProvider } from "../Core/Authentication";
+import { StorageContext } from "../Core/Data";
 import { LoginPage } from "./Login";
 import { SignUpRoute } from "./SignUp";
 import { useWindow } from "./WindowContext";
@@ -15,6 +16,7 @@ export function useAppRouter(): ReturnType<typeof createBrowserRouter> {
                 {
                     path: "/",
                     Component() {
+                        const { storageType } = useViewModelDependency(StorageContext);
                         const { user } = useViewModelDependency(CurrentUserProvider);
                         const isRootMatch = useMatch({
                             path: "/",
@@ -25,7 +27,7 @@ export function useAppRouter(): ReturnType<typeof createBrowserRouter> {
                             return <LoginPage />;
 
                         return (
-                            <DependencyResolverScope deps={[user]}>
+                            <DependencyResolverScope deps={[storageType, user]}>
                                 <Outlet />
                             </DependencyResolverScope>
                         );

@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDependency } from "react-model-view-viewmodel";
 import { Link } from "react-router";
 import { UserHandler } from "../../Core/Authentication";
+import { StorageContext } from "../../Core/Data";
 import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { FormFieldGroup } from "../../Core/Forms/Components/FormFields/FormField";
@@ -12,6 +13,7 @@ import { IndexedDbLoginFormHandler } from "./FormHandlers/IndexedDbLoginFormHand
 import { LoginForm } from "./Forms/LoginForm";
 
 export function LoginPage(): React.JSX.Element {
+    const storageContext = useDependency(StorageContext);
     const userHandler = useDependency(UserHandler);
 
     const {
@@ -27,10 +29,12 @@ export function LoginPage(): React.JSX.Element {
 
     useEffect(
         () => {
-            if (isLoggedIn)
+            if (isLoggedIn) {
+                storageContext.useIndexedDB();
                 userHandler.authenticate(user);
+            }
         },
-        [isLoggedIn, user, userHandler]
+        [isLoggedIn, storageContext, user, userHandler]
     );
 
     return (

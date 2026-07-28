@@ -1,12 +1,11 @@
-import { DependencyToken, ViewModel } from "react-model-view-viewmodel";
+import { type INotifyPropertiesChanged, DependencyToken, ViewModel } from "react-model-view-viewmodel";
 
 export type StorageType = "IndexedDB" | "HintKeepAPI";
 
-export interface IStorageContext {
+export interface IStorageContext extends INotifyPropertiesChanged {
     readonly storageType: StorageType;
 
     useIndexedDB(): void;
-
     useHintKeepApi(): void;
 }
 
