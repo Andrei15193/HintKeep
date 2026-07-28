@@ -1,6 +1,6 @@
 import { Given, When, Then } from "@cucumber/cucumber";
 import { fireEvent } from "@testing-library/react";
-import { SignUpFormHandler } from "../Pages/SignUp/FormHandlers/SignUpFormHandler";
+import { IndexedDbSignUpFormHandler } from "../Pages/SignUp/FormHandlers/IndexedDbSignUpFormHandler";
 import { SignUpForm } from "../Pages/SignUp/Forms/SignUpForm";
 
 Given("the landing page", function () {
@@ -22,7 +22,7 @@ Given("there is an existing user with {string} username, {string} password and {
     signUpForm.password.value = password;
     signUpForm.hint.value = hint;
 
-    await this.submitFormAsync(SignUpFormHandler, SignUpForm, {
+    await this.submitFormAsync(IndexedDbSignUpFormHandler, SignUpForm, {
         username,
         password,
         hint

@@ -4,6 +4,12 @@ import { After, AfterStep, Before, BeforeAll, setDefaultTimeout, setWorldConstru
 import { featureTestOptions } from "./_FeatureTestOptions";
 import { JSDomWorld } from "./_JSDomWorld";
 
+// Global Config
+Object.assign(global, {
+    HINTKEEP_ENVIRONMENT_TYPE: "development",
+    USE_INDEX_DB: true
+});
+
 // CucumberJS Config
 setWorldConstructor(JSDomWorld);
 setDefaultTimeout(60 * 1000);

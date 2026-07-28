@@ -23,7 +23,8 @@
     "build-dev": "webpack",
     "build-release": "webpack --mode production",
     "test:units": "jest",
-    "test:features": "cucumber-js --require-module ts-node/register --require './Features/_Setup.ts' --require './Features/**/*.feature.{ts,tsx}' --tags 'not @ignore' '../Features/**/*.feature'"
+    "features-indexed-db": "cucumber-js --require-module ts-node/register --require './Features/_Setup.ts' --require './Features/_Setup.IndexedDB.ts' --require './Features/**/*.feature.{ts,tsx}' --tags 'not @ignore' '../Features/**/*.feature'",
+    "features-hint-keep-api": "cucumber-js --require-module ts-node/register --require './Features/_Setup.ts' --require './Features/_Setup.HintKeepAPI.ts' --require './Features/**/*.feature.{ts,tsx}' --tags 'not @ignore' '../Features/**/*.feature'"
   },
   "jest": {
     "preset": "ts-jest",

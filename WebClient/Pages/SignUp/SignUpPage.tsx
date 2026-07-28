@@ -8,7 +8,7 @@ import { FormFieldGroup } from "../../Core/Forms/Components/FormFields/FormField
 import { useFormFlow } from "../../Core/PageFlows";
 import { Content, Header } from "../../Core/PageParts";
 import { usePromptedNavigate } from "../../Core/Prompt";
-import { SignUpFormHandler } from "./FormHandlers/SignUpFormHandler";
+import { IndexedDbSignUpFormHandler } from "./FormHandlers/IndexedDbSignUpFormHandler";
 import { SignUpForm } from "./Forms/SignUpForm";
 
 export const SignUpRoute: NonIndexRouteObject = {
@@ -26,7 +26,7 @@ function SignUpPage(): React.JSX.Element {
         submitAsync: signUpAsync
     } = useFormFlow({
         form: SignUpForm,
-        formHandler: SignUpFormHandler
+        formHandler: IndexedDbSignUpFormHandler
     });
 
     const navigate = usePromptedNavigate({ blockNavigation: !isSignedUp });

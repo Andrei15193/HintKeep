@@ -8,7 +8,7 @@ import { FormFieldGroup } from "../../Core/Forms/Components/FormFields/FormField
 import { useFormFlow } from "../../Core/PageFlows";
 import { Content, Header } from "../../Core/PageParts";
 import { DropDatabaseModal } from "./Components/DropDatabaseModal";
-import { IndexDbLoginFormHandler } from "./FormHandlers/IndexDbLoginFormHandler";
+import { IndexedDbLoginFormHandler } from "./FormHandlers/IndexedDbLoginFormHandler";
 import { LoginForm } from "./Forms/LoginForm";
 
 export function LoginPage(): React.JSX.Element {
@@ -22,7 +22,7 @@ export function LoginPage(): React.JSX.Element {
         submitAsync: logInAsync
     } = useFormFlow({
         form: LoginForm,
-        formHandler: IndexDbLoginFormHandler
+        formHandler: IndexedDbLoginFormHandler
     });
 
     useEffect(

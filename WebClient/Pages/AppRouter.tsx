@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useViewModelDependency } from "react-model-view-viewmodel";
+import { useViewModelDependency, DependencyResolverScope } from "react-model-view-viewmodel";
 import { createBrowserRouter, Navigate, Outlet, useMatch } from "react-router";
 import { CurrentUserProvider } from "../Core/Authentication";
 import { LoginPage } from "./Login";
@@ -16,15 +16,19 @@ export function useAppRouter(): ReturnType<typeof createBrowserRouter> {
                     path: "/",
                     Component() {
                         const { user } = useViewModelDependency(CurrentUserProvider);
-                        const match = useMatch({
+                        const isRootMatch = useMatch({
                             path: "/",
                             end: true
                         });
 
-                        if (match && user === null)
+                        if (isRootMatch && user === null)
                             return <LoginPage />;
 
-                        return <Outlet />;
+                        return (
+                            <DependencyResolverScope deps={[user]}>
+                                <Outlet />
+                            </DependencyResolverScope>
+                        );
                     },
                     children: [
                         SignUpRoute
@@ -49,6 +53,7 @@ export function useAppRouter(): ReturnType<typeof createBrowserRouter> {
                         // }
                     ]
                 },
+                SignUpRoute,
                 {
                     path: "*",
                     element: <Navigate to="/" />

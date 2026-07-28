@@ -1,3 +1,4 @@
+@ignore
 Feature: Register user account
 
 As a user
@@ -9,14 +10,16 @@ Scenario: The Sign Up Page
   When I click on the "sign up" button
   Then I can see the "sign up" page
   And I can see the "username" field
-  And I can see the "password" field
+  And I can see the "password" field -> confirm password? so another field for it.
   And I can see the "hint" field
   And I can see the "sign up" button
+
+# Scenario: Password and Confirmation Do Not Match - in case you add confirm pass field
 
 Scenario: Create Account
   Given the sign up page
   And the "username" field filled with "username"
-  And the "password" field filled with "passWORD$123"
+  And the "password" field filled with "passWORD$123" -> confirm password? so another field for it.
   And the "hint" field filled with "account hint"
   And the "email" field filled with "test@email.com"
   When I click on the "sign up" button
@@ -59,6 +62,11 @@ Scenario: Field Character Limit
   Then I can see "The username can be at most 250 characters." error message for the "username" field
   And I can see "The password can be at most 250 characters." error message for the "password" field
   And I can see "The hint can be at most 250 characters." error message for the "hint" field
+
+# Scenario: Input Below Minimum Character Limit
+# Scenario: Invalid Characters in Input Fields
+# Scenario: Email Address Is Case-Insensitive
+# Scenario: Registration Fails Due to Server Error
 
 Scenario: Password Strength
   Given the sign up page

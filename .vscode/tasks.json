@@ -30,13 +30,13 @@
             "problemMatcher": []
         },
         {
-            "label": "WebClient | npm: test features",
+            "label": "WebClient | npm: test features IndexedDB",
             "icon": {
                 "id": "run-errors",
                 "color": "terminal.ansiMagenta"
             },
             "type": "npm",
-            "script": "test:features",
+            "script": "features-indexed-db",
             "path": "WebClient",
             "group": {
                 "kind": "test",

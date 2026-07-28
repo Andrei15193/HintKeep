@@ -6,7 +6,7 @@ import type { IDependencyResolver } from "react-model-view-viewmodel";
 import { getHashAsync } from "../../../Core/Crypto";
 import { type IIndexedDatabaseProvider, IndexedDatabaseProvider, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
 
-export class IndexDbLoginFormHandler implements IFormHandler<LoginForm, IUser> {
+export class IndexedDbLoginFormHandler implements IFormHandler<LoginForm, IUser> {
     private readonly _indexedDatabaseProvider: IIndexedDatabaseProvider;
 
     public constructor({ resolve }: IDependencyResolver) {

@@ -91,10 +91,10 @@ jobs:
           mkdir ./FeaturesTestReport/StepSnapshots
           cp ./publish/*.css ./FeaturesTestReport/StepSnapshots
 
-      - name: Test Features
+      - name: Test Features (IndexedDB)
         if: false
         working-directory: WebClient
-        run: npm run test:features
+        run: npm run test:features-indexed-db
         env:
           templateFilePath: ./publish/index.html
           failedScenarioHtmlSnapshotDirectoryPath: ./FeaturesTestReport/FailedScenariosSnapshots
