@@ -1,65 +1,10 @@
-import React, { type MouseEvent, useCallback, useEffect, useLayoutEffect, useState } from "react";
+import React, { useState, useCallback, useLayoutEffect } from "react";
 import { useDependency } from "react-model-view-viewmodel";
-import { Link, useNavigate } from "react-router";
-import { IndexedDatabaseHandler, useIndexedDatabase } from "../../Core/Data/IndexedDatabase";
-import { Button } from "../../Core/Forms/Components";
-import { Modal } from "../../Core/Modals";
-import { Content, Header } from "../../Core/PageParts";
+import { IndexedDatabaseHandler } from "../../../Core/Data/IndexedDatabase";
+import { Button } from "../../../Core/Forms/Components";
+import { Modal } from "../../../Core/Modals";
 
-export function HomePage(): React.JSX.Element {
-    const navigate = useNavigate();
-    const { isOpening, initializeAsync, closeDatabase } = useIndexedDatabase();
-
-    const initializeIndexedDatabaseCallback = useCallback(
-        async (event: MouseEvent<HTMLAnchorElement>) => {
-            event.preventDefault();
-            await initializeAsync();
-
-            navigate("/login", { replace: true });
-        },
-        [initializeAsync, navigate]
-    );
-
-    useEffect(
-        () => {
-            closeDatabase();
-        },
-        [closeDatabase]
-    );
-
-    return (
-        <>
-            <Header>
-                HintKeep
-            </Header>
-            <Content>
-                <p>
-                    Welcome to HintKeep! Currently, we only have the option to sign up and store your hints locally, in the browser. Don't worry, we save the data if you close it!
-                </p>
-                <p>
-                    Click on the link below to get started.
-                </p>
-                <div className="toolbar">
-                    <Link
-                        to="/login"
-                        className={isOpening ? "prevent-pointer-events" : undefined}
-                        onClick={initializeIndexedDatabaseCallback}
-                    >
-                        Use application locally
-                    </Link>
-
-                    {
-                        HINTKEEP_ENVIRONMENT_TYPE === "development"
-                        && <DropDatabaseModal />
-                    }
-                </div>
-            </Content>
-        </>
-    );
-}
-
-// Temporary, only for dev/testing!
-function DropDatabaseModal(): React.JSX.Element | null {
+export function DropDatabaseModal(): React.JSX.Element {
     const indexedDatabaseHandler = useDependency(IndexedDatabaseHandler);
 
     const [deleteDatabaseStatus, setDeleteDatabaseStatus] = useState<"ready" | "confirming" | "confirmed" | "deleting">("ready");
@@ -72,7 +17,7 @@ function DropDatabaseModal(): React.JSX.Element | null {
         async () => {
             try {
                 setDeleteDatabaseStatus("deleting");
-                await indexedDatabaseHandler.dropDatabaseAsync();
+                await indexedDatabaseHandler.dropAsync();
             }
             finally {
                 setDeleteDatabaseStatus("ready");
@@ -92,7 +37,8 @@ function DropDatabaseModal(): React.JSX.Element | null {
     return (
         <>
             <Button
-                text="Drop database"
+                type="button"
+                text="Drop Local DB"
                 danger
                 onClick={showDatabaseDeleteModal}
             />

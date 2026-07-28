@@ -5,4 +5,4 @@ export { useIndexedDatabase } from "./UseIndexedDatabase";
 
 export { mapDbRequestToPromise } from "./MapDbRequestToPromise";
 
-export { type IIndexedDatabaseProvider, IndexedDatabaseProvider, IndexedDatabaseHandler, IndexedDatabaseHandlerService } from "./IndexedDatabaseProvider";
+export { type IIndexedDatabaseProvider, IndexedDatabaseProvider, IndexedDatabaseHandler, IndexedDatabaseService as IndexedDatabaseHandlerService } from "./IndexedDatabaseProvider";

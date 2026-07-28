@@ -1,22 +1,17 @@
 import React, { useEffect } from "react";
 import { useDependency } from "react-model-view-viewmodel";
-import { type NonIndexRouteObject, Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { UserHandler } from "../../Core/Authentication";
 import { Form, Button } from "../../Core/Forms/Components";
 import { FormField, FormFieldLabel, FormFieldTextInput } from "../../Core/Forms/Components/FormFields";
 import { FormFieldGroup } from "../../Core/Forms/Components/FormFields/FormField";
 import { useFormFlow } from "../../Core/PageFlows";
 import { Content, Header } from "../../Core/PageParts";
-import { LoginFormHandler } from "./FormHandlers/LoginFormHandler";
+import { DropDatabaseModal } from "./Components/DropDatabaseModal";
+import { IndexDbLoginFormHandler } from "./FormHandlers/IndexDbLoginFormHandler";
 import { LoginForm } from "./Forms/LoginForm";
 
-export const LoginRoute: NonIndexRouteObject = {
-    path: "/login",
-    Component: LoginPage
-};
-
-function LoginPage(): React.JSX.Element {
-    const navigate = useNavigate();
+export function LoginPage(): React.JSX.Element {
     const userHandler = useDependency(UserHandler);
 
     const {
@@ -27,17 +22,15 @@ function LoginPage(): React.JSX.Element {
         submitAsync: logInAsync
     } = useFormFlow({
         form: LoginForm,
-        formHandler: LoginFormHandler
+        formHandler: IndexDbLoginFormHandler
     });
 
     useEffect(
         () => {
-            if (isLoggedIn) {
+            if (isLoggedIn)
                 userHandler.authenticate(user);
-                navigate("/");
-            }
         },
-        [isLoggedIn, user, userHandler, navigate]
+        [isLoggedIn, user, userHandler]
     );
 
     return (
@@ -48,13 +41,10 @@ function LoginPage(): React.JSX.Element {
 
             <Content>
                 <p>
-                    Welcome to HintKeep, please provide your credentials to start using the app!
+                    Welcome to HintKeep! Currently, we only have the option to sign up and store your hints locally, in the browser. Don't worry, we save the data if you close it!
                 </p>
 
-                <Form
-                    isLoading={isLoggingIn}
-                    onSubmit={logInAsync}
-                >
+                <Form isLoading={isLoggingIn}>
                     <FormFieldGroup>
                         <FormField field={form.username}>
                             <FormFieldLabel />
@@ -74,15 +64,23 @@ function LoginPage(): React.JSX.Element {
                         <Button
                             type="submit"
                             text="Login"
+                            disabled
                             processing={isLoggingIn}
+                        />
+                        <Button
+                            type="submit"
+                            text="Login with LocalDB"
+                            processing={isLoggingIn}
+                            onClick={logInAsync}
                         />
                         <Link to="/sign-up">
                             Sign up
                         </Link>
 
-                        <Link to="/">
-                            Cancel
-                        </Link>
+                        {
+                            HINTKEEP_ENVIRONMENT_TYPE === "development"
+                            && <DropDatabaseModal />
+                        }
                     </div>
                 </Form>
             </Content>

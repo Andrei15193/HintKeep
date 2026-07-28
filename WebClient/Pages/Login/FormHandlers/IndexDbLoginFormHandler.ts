@@ -4,19 +4,21 @@ import type { IUser } from "../../../Core/Models";
 import type { LoginForm } from "../Forms/LoginForm";
 import type { IDependencyResolver } from "react-model-view-viewmodel";
 import { getHashAsync } from "../../../Core/Crypto";
-import { IndexedDatabase, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
+import { type IIndexedDatabaseProvider, IndexedDatabaseProvider, mapDbRequestToPromise } from "../../../Core/Data/IndexedDatabase";
 
-export class LoginFormHandler implements IFormHandler<LoginForm, IUser> {
-    private readonly _database: IDBDatabase;
+export class IndexDbLoginFormHandler implements IFormHandler<LoginForm, IUser> {
+    private readonly _indexedDatabaseProvider: IIndexedDatabaseProvider;
 
     public constructor({ resolve }: IDependencyResolver) {
-        this._database = resolve(IndexedDatabase);
+        this._indexedDatabaseProvider = resolve(IndexedDatabaseProvider);
     }
 
     public async handleAsync(form: LoginForm): Promise<IUser | null> {
+        const database = await this._indexedDatabaseProvider.openAsync();
+
         const passwordHash = await getHashAsync(form.password.value, "SHA-256");
 
-        const transaction = this._database.transaction("Users", "readonly");
+        const transaction = database.transaction("Users", "readonly");
         try {
             const usersAuthenticationIndex = transaction
                 .objectStore("Users")

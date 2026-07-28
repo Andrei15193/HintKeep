@@ -23,7 +23,7 @@ div#app {
     --hk-action-color-hover: var(--hk---color-accent-hover);
     --hk-action-color-text: var(--hk---color-accent-text);
 
-    gap: var(--hk---spacing-narrow);
+    gap: var(--hk---spacing-normal);
 
     .prevent-pointer-events {
         pointer-events: none;
@@ -155,6 +155,11 @@ div#app {
         &:disabled {
             color: var(--hk-action-color-text-disabled);
             background-color: var(--hk-action-color-background-disabled);
+
+            .loader {
+                height: 0;
+                visibility: hidden;
+            }
 
             &:hover {
                 cursor: not-allowed;

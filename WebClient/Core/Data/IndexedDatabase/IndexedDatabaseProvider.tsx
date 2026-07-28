@@ -9,15 +9,15 @@ import { mapDbRequestToPromise } from "./MapDbRequestToPromise";
 export const IndexedDatabaseProvider = new DependencyToken<IIndexedDatabaseProvider>("indexed database provider");
 
 export interface IIndexedDatabaseProvider {
-    openDatabaseAsync(): Promise<IDBDatabase>;
+    openAsync(): Promise<IDBDatabase>;
 }
 
 export const IndexedDatabaseHandler = new DependencyToken<IIndexedDatabaseHandler>("indexed database handler");
 export interface IIndexedDatabaseHandler extends IIndexedDatabaseProvider {
-    dropDatabaseAsync(): Promise<void>;
+    dropAsync(): Promise<void>;
 }
 
-export class IndexedDatabaseHandlerService implements IIndexedDatabaseHandler {
+export class IndexedDatabaseService implements IIndexedDatabaseHandler {
     private _databasePromise: Promise<IDBDatabase> | null = null;
     private readonly _databaseDefinition: IIndexedDatabaseDefinition;
     private readonly _window: Window;
@@ -27,7 +27,7 @@ export class IndexedDatabaseHandlerService implements IIndexedDatabaseHandler {
         this._window = window;
     }
 
-    public openDatabaseAsync(): Promise<IDBDatabase> {
+    public openAsync(): Promise<IDBDatabase> {
         if (this._databasePromise === null)
             this._databasePromise = new Promise<IDBDatabase>((resolve, reject) => {
                 try {
@@ -55,7 +55,7 @@ export class IndexedDatabaseHandlerService implements IIndexedDatabaseHandler {
         return this._databasePromise;
     }
 
-    public async dropDatabaseAsync(): Promise<void> {
+    public async dropAsync(): Promise<void> {
         const { name } = this._databaseDefinition;
         const databases = await this._window.indexedDB.databases();
 
