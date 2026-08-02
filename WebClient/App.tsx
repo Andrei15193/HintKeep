@@ -7,7 +7,7 @@ Promise
         import("./Pages/App"),
         import("react-model-view-viewmodel")
     ])
-    .then(([{ createElement }, { createRoot }, { App: Startup }]) => {
+    .then(([{ createElement }, { createRoot }, { App }]) => {
         const appElement = document.getElementById("app")!;
         Array
             .from(appElement.children)
@@ -15,5 +15,5 @@ Promise
         appElement.removeAttribute("class");
 
         createRoot(appElement)
-            .render(createElement(Startup));
+            .render(createElement(App));
     });

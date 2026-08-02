@@ -4,29 +4,34 @@ As a user
 I want to be able to log in
 So that I can use the app
 
+Scenario: Login page
+  Given the landing page
+  Then I see the "Login" page
+  * I see the "username" field
+  * I see the "password" field
+  * I see the "login" button
+  * I see the "login with LocalDB" button
+  * I see the "sign up" link
+
 Scenario: Login with missing account
   Given the landing page
-  And I see "HintKeep - Login"
   When I enter "test" for "Username"
   And I enter "pa$$w0rd123" for "Password"
   And I click on the login button
-  Then I see the "Wrong credentials. Try again or follow the password recovery steps." error message for "Username"
+  Then I see "Wrong credentials. Try again or follow the password recovery steps." error message for the "Username" field
 
 Scenario: Login with existing account and wrong credentials
   Given the landing page
-  And I see "HintKeep - Login"
   And there is an existing user with "test" username, "pa$$w0rd123" password and "test hint" hint
   When I enter "test" for "Username"
   And I enter "wrong pa$$w0rd123" for "Password"
   And I click on the login button
-  Then I see the "Wrong credentials. Try again or follow the password recovery steps." error message for "Username"
+  Then I see "Wrong credentials. Try again or follow the password recovery steps." error message for the "Username" field
 
-@ignore
 Scenario: Login with existing account and matching credentials
   Given the landing page
-  And I see "HintKeep - Login"
   And there is an existing user with "test" username, "pa$$w0rd123" password and "test hint" hint
   When I enter "test" for "Username"
   And I enter "pa$$w0rd123" for "Password"
   And I click on the login button
-  Then I see "HintKeep - Accounts"
+  Then I see the "Accounts" page

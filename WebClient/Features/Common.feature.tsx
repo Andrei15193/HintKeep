@@ -1,3 +1,4 @@
+import Assert from "assert";
 import { Given, When, Then } from "@cucumber/cucumber";
 import { fireEvent } from "@testing-library/react";
 import { IndexedDbSignUpFormHandler } from "../Pages/SignUp/FormHandlers/IndexedDbSignUpFormHandler";
@@ -35,7 +36,47 @@ When("I enter {string} for {string}", async function (value: string, inputLabel:
     fireEvent.change(input, { target: { value } });
 });
 
-Then("I see the {string} error message for {string}", async function (error: string, inputLabel: string) {
+When("I click on the {string} link", async function (buttonText: string) {
+    const element = await this.findByTextAsync(buttonText);
+    Assert.equal(element.tagName, "A");
+
+    fireEvent.click(element);
+});
+
+When("I click on the {string} button", async function (buttonText: string) {
+    let element = await this.findByTextAsync(buttonText);
+
+    if (element.tagName === "SPAN" && element.parentElement)
+        element = element.parentElement;
+    Assert.equal(element.tagName, "BUTTON");
+
+    fireEvent.click(element);
+});
+
+Then("I see the {string} page", async function (pageTitle: string) {
+    await this.findByTextAsync(`HintKeep - ${pageTitle}`);
+});
+
+Then("I see the {string} field", async function (inputLabel: string) {
+    const element = await this.findByTextAsync(inputLabel);
+    Assert.equal(element.tagName, "LABEL");
+});
+
+Then("I see the {string} button", async function (buttonText: string) {
+    let element = await this.findByTextAsync(buttonText);
+    if (element.tagName === "SPAN" && element.parentElement)
+        element = element.parentElement;
+
+    Assert.equal(element.tagName, "BUTTON");
+});
+
+Then("I see the {string} link", async function (linkText: string) {
+    let element = await this.findByTextAsync(linkText);
+
+    Assert.equal(element.tagName, "A");
+});
+
+Then("I see {string} error message for the {string} field", async function (error: string, inputLabel: string) {
     const labelElement = await this.findByTextAsync(inputLabel);
 
     await this.findByTextAsync(error, labelElement.parentElement);

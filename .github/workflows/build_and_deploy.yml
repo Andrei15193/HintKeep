@@ -92,7 +92,6 @@ jobs:
           cp ./publish/*.css ./FeaturesTestReport/StepSnapshots
 
       - name: Test Features (IndexedDB)
-        if: false
         working-directory: WebClient
         run: npm run test:features-indexed-db
         env:
@@ -101,7 +100,6 @@ jobs:
           stepHtmlSnapshotDirectoryPath: ./FeaturesTestReport/StepSnapshots
 
       - name: Check Accessibility (be-a11y)
-        if: false
         uses: be-lenka/be-a11y@v2.2.9
         continue-on-error: true
         with:
@@ -116,7 +114,6 @@ jobs:
           compression-level: 9
 
       - name: Publish Features Test Report Artifact
-        if: false
         uses: actions/upload-artifact@v4
         with:
           name: FeaturesTestReport

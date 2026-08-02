@@ -33,7 +33,16 @@ export function useAppRouter(): ReturnType<typeof createBrowserRouter> {
                         );
                     },
                     children: [
-                        SignUpRoute
+                        {
+                            path: "/",
+                            Component() {
+                                return (
+                                    <div>
+                                        HintKeep - Accounts
+                                    </div>
+                                );
+                            }
+                        }
                         // {
                         //     Component() {
                         //         const { user } = useViewModelDependency(CurrentUserProvider);
