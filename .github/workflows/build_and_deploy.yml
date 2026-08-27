@@ -32,7 +32,8 @@ jobs:
         working-directory: GraphQL
         run: |
           dotnet test 'HintKeep.GraphQL.csproj' `
-            --configuration Debug
+            --configuration Debug `
+            --filter 'Category!=@ignore-graphql'
 
       - name: Build
         shell: pwsh

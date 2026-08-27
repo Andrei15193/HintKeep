@@ -9,7 +9,7 @@ using Xunit.Gherkin.Quick;
 
 namespace HintKeep.GraphQL.Features;
 
-public abstract class HintKeepFeature //: Feature
+public abstract class HintKeepFeature : Feature
 {
     private readonly HintKeepWebApplicationFactory _factory;
 

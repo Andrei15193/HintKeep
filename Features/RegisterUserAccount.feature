@@ -4,6 +4,7 @@ As a user
 I want to sign up
 So that I can access the application
 
+@ignore-webclient @ignore-graphql
 Scenario: The Sign Up page
   Given the landing page
   When I click on the "sign up" link

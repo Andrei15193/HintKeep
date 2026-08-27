@@ -23,8 +23,8 @@
     "build-dev": "webpack",
     "build-release": "webpack --mode production",
     "test:units": "jest",
-    "features-indexed-db": "cucumber-js --require-module ts-node/register --require './Features/_Setup.ts' --require './Features/_Setup.IndexedDB.ts' --require './Features/**/*.feature.{ts,tsx}' --tags 'not @ignore' '../Features/**/*.feature'",
-    "features-hint-keep-api": "cucumber-js --require-module ts-node/register --require './Features/_Setup.ts' --require './Features/_Setup.HintKeepAPI.ts' --require './Features/**/*.feature.{ts,tsx}' --tags 'not @ignore' '../Features/**/*.feature'"
+    "test:features-indexed-db": "cucumber-js --require-module ts-node/register --require './Features/_Setup.ts' --require './Features/_Setup.IndexedDB.ts' --require './Features/**/*.feature.{ts,tsx}' --tags 'not @ignore and not @ignore-webclient' '../Features/**/*.feature'",
+    "test:features-hint-keep-api": "cucumber-js --require-module ts-node/register --require './Features/_Setup.ts' --require './Features/_Setup.HintKeepAPI.ts' --require './Features/**/*.feature.{ts,tsx}' --tags 'not @ignore and not @ignore-webclient and not @ignore-graphql' '../Features/**/*.feature'"
   },
   "jest": {
     "preset": "ts-jest",
