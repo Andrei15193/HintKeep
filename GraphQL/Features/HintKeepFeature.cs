@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using GraphQL;
 using GraphQL.Transport;
 using HintKeep.GraphQL.Definitions;
+using HintKeep.GraphQL.Features.Contexts;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Gherkin.Quick;
 
@@ -12,19 +13,31 @@ namespace HintKeep.GraphQL.Features;
 public abstract class HintKeepFeature : Feature
 {
     private readonly HintKeepWebApplicationFactory _factory;
+    protected ApplicationContext ApplicationContext { get; }
 
     protected HintKeepFeature()
     {
         _factory = new HintKeepWebApplicationFactory();
 
+#pragma warning disable CS0618 // Type or member is obsolete
         HttpClient = _factory.CreateClient();
+        ApplicationContext = new(
+            _factory.Services.GetRequiredService<IGraphQLTextSerializer>(),
+            HttpClient
+        );
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
+    [Obsolete("Use the page context model")]
     internal HttpClient HttpClient { get; }
 
+    [Obsolete("Use the page context model")]
     internal JsonNode? RawResult { get; private set; }
+    [Obsolete("Use the page context model")]
     internal JsonNode? DataResult { get; private set; }
+    [Obsolete("Use the page context model")]
     internal JsonNode? ErrorResult { get; private set; }
+    [Obsolete("Use the page context model")]
     internal JsonNode? FieldsErrorResult { get; private set; }
 
     internal Task DispatchRequestAsync(IRequest request, CancellationToken cancellationToken = default)
@@ -49,6 +62,7 @@ public abstract class HintKeepFeature : Feature
         return task;
     }
 
+    [Obsolete("Use the page context model")]
     internal async Task<JsonNode> ExecuteQueryAsync(string query, object? variables = null, string? dataField = null)
     {
         var serializer = _factory.Services.GetRequiredService<IGraphQLTextSerializer>();

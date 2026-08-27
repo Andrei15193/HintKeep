@@ -1,179 +1,130 @@
 using HintKeep.GraphQL.Definitions.Users.Accounts;
+using HintKeep.GraphQL.Features.PageContexts;
 using Xunit.Gherkin.Quick;
 
 namespace HintKeep.GraphQL.Features;
 
 public class RegisterUserAccount : HintKeepFeature
 {
-    private IPageContext _pageContext = null!;
-
     [Given("the landing page")]
+    [And("the landing page")]
     public void GivenTheLandingPage()
-        => _pageContext = new LandingPageContext();
+        => ApplicationContext.PageContext = new LogInPageContext();
 
     [Given("the sign up page")]
+    [And("the sign up page")]
     public void GivenTheSignUpPage()
-        => _pageContext = new SignUpPageContext(this);
+        => ApplicationContext.PageContext = new SignUpPageContext();
 
-    [Given("the {string} field filled with {string}")]
-    [And("the {string} field filled with {string}")]
-    public void GivenFieldValue(string fieldId, string fieldValue)
-        => _pageContext.SetFieldValue(fieldId, fieldValue);
-
-    [Given("the {string} field filled with {int} characters")]
-    [And("the {string} field filled with {int} characters")]
-    public void GivenFieldValueLength(string fieldId, int fieldValueLength)
-        => _pageContext.SetFieldValue(fieldId, new string('a', fieldValueLength));
-
-    [Given("a user with {string} username and {string} email already exists")]
-    [But("a user with {string} username and {string} email already exists")]
-    public Task GivenExistingUser(string username, string emailAddress)
+    [Given("a user with {string} username and {string} email")]
+    [And("a user with {string} username and {string} email")]
+    public Task GivenUser(string username, string email)
         => DispatchRequestAsync(new RegisterUserAccountRequest(
             Username: username,
             Password: "pa$$WORD123",
             Hint: "Hint",
-            EmailAddress: emailAddress
+            Email: email
         ));
 
-    [When("I click on the {string} button")]
-    public Task WhenIClickButton(string buttonId)
-        => _pageContext.ClickButtonAsync(buttonId);
+    [When("I enter {string} in the {string} field")]
+    [And("I enter {string} in the {string} field")]
+    public void WhenIEnterValueInField(string value, string field)
+        => ApplicationContext.PageContext = ApplicationContext.PageContext with
+        {
+            FormData = new Dictionary<string, object?>(ApplicationContext.PageContext.FormData)
+            {
+                [field] = value
+            }
+        };
 
-    [Then("I can see the {string} page")]
-    public void ThenISeePage(string pageTitle)
+    [When("I enter {int} characters in the {string} field")]
+    [And("I enter {int} characters in the {string} field")]
+    public void WhenIEnterNumberOfCharactersInField(int characterCount, string field)
+        => WhenIEnterValueInField(new string('c', characterCount), field);
+
+    [When("I enter {int} character email address in the {string} field")]
+    [And("I enter {int} character email address in the {string} field")]
+    public void WhenIEnterNumberOfCharactersEmailInField(int characterCount, string field)
+        => WhenIEnterValueInField(new string('c', characterCount - "@email.com".Length) + "@email.com", field);
+
+    [When("I press the {string} link")]
+    [And("I press the {string} link")]
+    public async Task WhenIPressLink(string link)
     {
+        if (ApplicationContext.PageContext.LinkActions.TryGetValue(link, out var linkAction))
+            await linkAction(ApplicationContext);
+        else
+            Assert.Fail($"Unknown '{link}' link on '{ApplicationContext.PageContext.Name}' page.");
     }
 
-    [Then("I can see the {string} field")]
-    [And("I can see the {string} field")]
-    public void ThenISeeField(string fieldId)
+    [When("I press the {string} button")]
+    [And("I press the {string} button")]
+    public async Task WhenIPressButton(string button)
     {
+        if (ApplicationContext.PageContext.ButtonActions.TryGetValue(button, out var linkAction))
+            await linkAction(ApplicationContext);
+        else
+            Assert.Fail($"Unknown '{button}' button on '{ApplicationContext.PageContext.Name}' page.");
     }
 
-    [Then("I can see the {string} button")]
-    [And("I can see the {string} button")]
-    public void ThenISeeButton(string buttonId)
-    {
-    }
+    [When("I press the sign up button")]
+    [And("I press the sign up button")]
+    public Task WhenIPressSignUpButton()
+        => WhenIPressButton("sign up");
+
+    [Then("I am on the {string} page")]
+    [And("I am on the {string} page")]
+    public void ThenIAmOnPage(string page)
+        => Assert.Equal(
+            page,
+            ApplicationContext.PageContext.Name,
+            ignoreCase: true,
+            ignoreWhiteSpaceDifferences: true,
+            ignoreLineEndingDifferences: true
+        );
 
     [Then("the current user is {string}")]
     [And("the current user is {string}")]
-    public void ThenCurrentUser(string username)
+    public void ThenCurrentUserIs(string username)
     {
-        Assert.NotNull(DataResult);
-        Assert.Equal(username, DataResult["username"]!.GetValue<string>());
-        Assert.NotNull(DataResult["userId"]!.GetValue<string>());
-        Assert.NotNull(DataResult["sessionId"]!.GetValue<string>());
-        Assert.NotNull(DataResult["sessionRenewTicket"]!.GetValue<string>());
+        Assert.NotNull(ApplicationContext.CurrentUser);
+        Assert.Equal(
+            username,
+            ApplicationContext.CurrentUser.Username,
+            ignoreCase: true,
+            ignoreWhiteSpaceDifferences: false,
+            ignoreAllWhiteSpace: false,
+            ignoreLineEndingDifferences: false
+        );
     }
 
-    [Then("I can see {string} error message for the {string} field")]
-    [And("I can see {string} error message for the {string} field")]
-    public void ThenFieldError(string errorMessage, string fieldId)
-        => Assert.Equal(errorMessage, _pageContext.GetFieldError(fieldId));
+    [Then("I have the {string} field")]
+    [And("I have the {string} field")]
+    public void ThenIHaveField(string field)
+        => Assert.Contains(field, ApplicationContext.PageContext.FormData);
 
-    [Then("I can see the landing page")]
-    public void ThenSuccessfulResult()
+    [Then("I have {string} error message for the {string} field")]
+    [And("I have {string} error message for the {string} field")]
+    public void ThenIHaveErrorForField(string errorMessage, string field)
         => Assert.Multiple(
-            () =>
-            {
-                if (RawResult is null)
-                    Assert.Null(DataResult);
-                else
-                {
-                    Assert.NotNull(DataResult);
-                    Assert.Multiple(
-                        () => Assert.Contains("username", DataResult.AsObject()),
-                        () => Assert.Contains("userId", DataResult.AsObject()),
-                        () => Assert.Contains("sessionId", DataResult.AsObject()),
-                        () => Assert.Contains("sessionRenewTicket", DataResult.AsObject())
-                    );
-                }
-            },
-            () => Assert.Null(ErrorResult)
+            () => Assert.Contains(field, ApplicationContext.PageContext.FormData),
+            () => Assert.Contains(field, ApplicationContext.PageContext.FormErrorData),
+            () => Assert.Equal(
+                errorMessage,
+                ApplicationContext.PageContext.FormErrorData[field],
+                ignoreCase: false,
+                ignoreWhiteSpaceDifferences: false,
+                ignoreLineEndingDifferences: true
+            )
         );
 
-    private interface IPageContext
-    {
-        Task ClickButtonAsync(string buttonId);
-        void SetFieldValue(string fieldId, string fieldValue);
-        string? GetFieldError(string fieldId);
-    }
+    [Then("I have the {string} link")]
+    [And("I have the {string} link")]
+    public void ThenIHaveLink(string link)
+        => Assert.Contains(link, ApplicationContext.PageContext.LinkActions);
 
-    private class LandingPageContext : IPageContext
-    {
-        public Task ClickButtonAsync(string buttonText)
-            => Task.CompletedTask;
-
-        public void SetFieldValue(string fieldId, string fieldValue)
-        {
-        }
-
-        public string? GetFieldError(string fieldId)
-            => null;
-    }
-
-    private class SignUpPageContext(HintKeepFeature feature) : IPageContext
-    {
-        private string _username = string.Empty;
-        private string _password = string.Empty;
-        private string _hint = string.Empty;
-        private string _emailAddress = string.Empty;
-
-        public Task ClickButtonAsync(string buttonId)
-            => buttonId switch
-            {
-                "sign up" => feature.ExecuteQueryAsync(@"
-                        mutation($username: String!, $password: String!, $hint: String!, $emailAddress: String!) {
-                            registerUserAccount(username: $username, password: $password, hint: $hint, emailAddress: $emailAddress) {
-                                userId
-                                sessionId
-                                sessionRenewTicket
-                                username
-                            }
-                        }
-                    ",
-                    new
-                    {
-                        username = _username,
-                        password = _password,
-                        hint = _hint,
-                        emailAddress = _emailAddress
-                    }
-                ),
-                _ => Task.CompletedTask
-            };
-
-        public void SetFieldValue(string fieldId, string fieldValue)
-        {
-            switch (fieldId)
-            {
-                case "username":
-                    _username = fieldValue;
-                    break;
-
-                case "password":
-                    _password = fieldValue;
-                    break;
-
-                case "hint":
-                    _hint = fieldValue;
-                    break;
-
-                case "email":
-                    _emailAddress = fieldValue;
-                    break;
-            }
-        }
-
-        public string? GetFieldError(string fieldId)
-            => fieldId switch
-            {
-                "username" => feature.FieldsErrorResult!.AsObject()["username"]?.GetValue<string>(),
-                "password" => feature.FieldsErrorResult!.AsObject()["password"]?.GetValue<string>(),
-                "hint" => feature.FieldsErrorResult!.AsObject()["hint"]?.GetValue<string>(),
-                "email" => feature.FieldsErrorResult!.AsObject()["emailAddress"]?.GetValue<string>(),
-                _ => throw new ArgumentException($"Unhandled '{fieldId}' field ID.")
-            };
-    }
+    [Then("I have the {string} button")]
+    [And("I have the {string} button")]
+    public void ThenIHaveButton(string button)
+        => Assert.Contains(button, ApplicationContext.PageContext.ButtonActions);
 }

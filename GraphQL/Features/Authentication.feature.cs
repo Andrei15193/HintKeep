@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿#pragma warning disable CS0618 // Type or member is obsolete
+using System.Text.Json.Nodes;
 using HintKeep.GraphQL.Definitions.Users.Accounts;
 using Xunit.Gherkin.Quick;
 

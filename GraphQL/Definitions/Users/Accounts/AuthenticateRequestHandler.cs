@@ -44,12 +44,12 @@ public class AuthenticateRequestHandler(
 {
     public async ValueTask<AuthenticationResult> ExecuteAsync(AuthenticationRequest request, CancellationToken cancellationToken)
     {
-        var usernameHash = Convert.ToHexString(usernameHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Username.ToLowerInvariant())));
+        var prefixedUsernameHash = UserUniqueEntity.UsernamePrefix + Convert.ToHexString(usernameHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Username.ToLowerInvariant())));
         var passwordHash = Convert.ToHexString(passwordHashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
 
         var userPasswordHashEntity = await hintKeepTableStorage
             .Users
-            .GetEntityIfExistsAsync<TableEntity>(UserPasswordHashEntity.GetEntityKey(usernameHash, passwordHash), cancellationToken)
+            .GetEntityIfExistsAsync<TableEntity>(UserPasswordHashEntity.GetEntityKey(prefixedUsernameHash, passwordHash), cancellationToken)
             .ToUserPasswordHashEntity()
             ?? throw new ValidationException(
                 new ValidationResult("Invalid credentials.", [nameof(AuthenticationRequest.Username), nameof(AuthenticationRequest.Password)]),

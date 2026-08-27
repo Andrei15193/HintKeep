@@ -15,7 +15,7 @@
     <None Condition="'$(Configuration)' == 'Release'" Remove="local.settings.json" />
 
     <Compile Condition="'$(Configuration)' == 'Release'" Remove="**/*.Tests.cs" />
-    <Compile Condition="'$(Configuration)' == 'Release'" Remove="Features/*.cs" />
+    <Compile Condition="'$(Configuration)' == 'Release'" Remove="Features/**/*.cs" />
   </ItemGroup>
 
   <ItemGroup>
