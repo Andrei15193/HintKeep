@@ -1,10 +1,17 @@
 import Assert from "assert";
 import { Given, When, Then } from "@cucumber/cucumber";
 import { fireEvent } from "@testing-library/react";
+import { CurrentUser } from "../Core/Authentication";
+import { SignUpRoute } from "../Pages/SignUp";
 import { IndexedDbSignUpFormHandler } from "../Pages/SignUp/FormHandlers/IndexedDbSignUpFormHandler";
 import { SignUpForm } from "../Pages/SignUp/Forms/SignUpForm";
 
 Given("the landing page", function () {
+});
+
+Given("the sign up page", async function () {
+    await this.router.navigate(SignUpRoute.path!);
+    await this.findByTextAsync("HintKeep - Sign Up");
 });
 
 Given("I click on {string}", async function (text: string) {
@@ -16,18 +23,20 @@ Given("I see {string}", async function (text: string) {
     await this.findByTextAsync(text);
 });
 
-Given("there is an existing user with {string} username, {string} password and {string} hint", async function (username: string, password: string, hint: string) {
-    const signUpForm = this.resolve(SignUpForm);
-
-    signUpForm.username.value = username;
-    signUpForm.password.value = password;
-    signUpForm.hint.value = hint;
-
+Given("there is an existing user with {string} username, {string} password, {string} hint and {string} email", async function (username: string, password: string, hint: string, email: string) {
     await this.submitFormAsync(IndexedDbSignUpFormHandler, SignUpForm, {
         username,
         password,
-        hint
+        passwordConfirmation: password,
+        hint,
+        email
     });
+});
+
+When("I fill the {string} field with {int} characters", async function (inputLabel: string, characterCount: number) {
+    const input = await this.findInputByLabelTextAsync(inputLabel);
+
+    fireEvent.change(input, { target: { value: "a".repeat(characterCount) } });
 });
 
 When("I enter {string} for {string}", async function (value: string, inputLabel: string) {
@@ -80,4 +89,10 @@ Then("I see {string} error message for the {string} field", async function (erro
     const labelElement = await this.findByTextAsync(inputLabel);
 
     await this.findByTextAsync(error, labelElement.parentElement);
+});
+
+Then("the current user is {string}", async function (username: string) {
+    const currentUser = this.dependencyResolver.resolve(CurrentUser);
+
+    Assert.equal(currentUser.username, username);
 });

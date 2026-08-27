@@ -1,3 +1,4 @@
+import type { createBrowserRouter } from "react-router";
 import { useMemo } from "react";
 import { DependencyContainer } from "react-model-view-viewmodel";
 import { useWindow } from "../../Pages/WindowContext";
@@ -9,7 +10,7 @@ import { HintKeepFormField } from "../Forms/ViewModels";
 import { Notifications } from "../Notifications";
 import { AccountsSearchTextFieldToken, ArchivedAccountsSearchTextFieldToken } from "./DependencyTokens";
 
-export function useHintKeepDependencyContainer(configure?: (dependencyContainer: DependencyContainer) => DependencyContainer): DependencyContainer {
+export function useHintKeepDependencyContainer(router: ReturnType<typeof createBrowserRouter>, configure?: (dependencyContainer: DependencyContainer, router: ReturnType<typeof createBrowserRouter>) => DependencyContainer): DependencyContainer {
     const window = useWindow();
 
     return useMemo(
@@ -39,10 +40,10 @@ export function useHintKeepDependencyContainer(configure?: (dependencyContainer:
             }));
 
             if (configure)
-                configure(dependencyContainer);
+                configure(dependencyContainer, router);
 
             return dependencyContainer;
         },
-        [window, configure]
+        [window, router, configure]
     );
 }

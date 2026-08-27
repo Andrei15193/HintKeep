@@ -75,6 +75,14 @@ function SignUpPage(): React.JSX.Element {
                                 placeholder="super admin"
                             />
                         </FormField>
+
+                        <FormField field={form.passwordConfirmation}>
+                            <FormFieldLabel />
+                            <FormFieldTextInput
+                                type="password"
+                                placeholder="still super admin"
+                            />
+                        </FormField>
                     </FormFieldGroup>
 
                     <FormField field={form.hint}>
@@ -82,6 +90,14 @@ function SignUpPage(): React.JSX.Element {
                         <FormFieldTextInput
                             multiline
                             placeholder="sudo"
+                        />
+                    </FormField>
+
+                    <FormField field={form.email}>
+                        <FormFieldLabel />
+                        <FormFieldTextInput
+                            type="email"
+                            placeholder="jimmy@address.com"
                         />
                     </FormField>
 

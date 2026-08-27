@@ -3,11 +3,13 @@ import type { HintKeepForm, HintKeepFormField } from "../Core/Forms/ViewModels";
 import type { IAppProps } from "../Pages/App";
 import type { JSDOM } from "jsdom";
 import type { ResolvableSimpleDependency, IDependencyResolver } from "react-model-view-viewmodel";
+import type { createBrowserRouter } from "react-router";
 import { World } from "@cucumber/cucumber";
 import { type ComponentType, type Context, createElement } from "react";
 import { type Matcher, type RenderResult, findByText, render, createJsDom } from "./_TestingLibraryBootstrap";
 
 export class JSDomWorld extends World {
+    private _router: ReturnType<typeof createBrowserRouter> | null = null;
     private _dependencyResolver: IDependencyResolver | null = null;
     public readonly dom: JSDOM = createJsDom();
 
@@ -17,6 +19,13 @@ export class JSDomWorld extends World {
 
     public get container(): HTMLElement {
         return this.dom.window.document.getElementById("app")!;
+    }
+
+    public get router(): ReturnType<typeof createBrowserRouter> {
+        if (this._router === null)
+            throw new Error("App router has not been initialized, please check feature test configuration.");
+
+        return this._router;
     }
 
     public get dependencyResolver(): IDependencyResolver {
@@ -64,8 +73,11 @@ export class JSDomWorld extends World {
                 createElement(
                     App,
                     {
-                        configure: (dependencyContainer) => {
-                            return this._dependencyResolver = dependencyContainer;
+                        configure: (dependencyContainer, router) => {
+                            this._router = router;
+                            this._dependencyResolver = dependencyContainer;
+
+                            return dependencyContainer;
                         }
                     }
                 )

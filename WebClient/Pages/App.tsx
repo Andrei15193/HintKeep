@@ -1,6 +1,6 @@
 import type { DependencyContainer } from "react-model-view-viewmodel";
 import React from "react";
-import { RouterProvider } from "react-router";
+import { type createBrowserRouter, RouterProvider } from "react-router";
 import { IndexedDatabaseContextProvider } from "../Core/Data/IndexedDatabase";
 import { HintKeepDatabaseDefinition } from "../Core/Data/IndexedDatabase/HintKeep";
 import { HintKeepDependencyContainerProvider } from "../Core/Dependencies";
@@ -16,7 +16,7 @@ declare global {
 }
 
 export interface IAppProps {
-    configure?(dependencyContainer: DependencyContainer): DependencyContainer;
+    configure?(dependencyContainer: DependencyContainer, router: ReturnType<typeof createBrowserRouter>): DependencyContainer;
 }
 
 export function App({ configure }: IAppProps): React.JSX.Element {
@@ -26,7 +26,10 @@ export function App({ configure }: IAppProps): React.JSX.Element {
         <ModalContextProvider>
             <ConfirmationPromptProvider>
                 <IndexedDatabaseContextProvider databaseDefinition={HintKeepDatabaseDefinition}>
-                    <HintKeepDependencyContainerProvider configure={configure}>
+                    <HintKeepDependencyContainerProvider
+                        router={appRouter}
+                        configure={configure}
+                    >
                         <RouterProvider router={appRouter} />
 
                         <ModalsDisplay />
