@@ -15,25 +15,37 @@ public record SignUpPageContext() : PageContext(
 {
     public override string Name => "sign up";
 
-    public override IReadOnlyDictionary<string, Func<ApplicationContext, Task>> LinkActions
-        => _linkActions;
-    private static readonly IReadOnlyDictionary<string, Func<ApplicationContext, Task>> _linkActions = new Dictionary<string, Func<ApplicationContext, Task>>
+    public override IReadOnlyDictionary<string, string> FormFieldMappings { get; } = new Dictionary<string, string>
+    {
+        { "confirm password", "confirmPassword" }
+    };
+
+    public override IReadOnlyDictionary<string, PageContextAction> LinkActions { get; } = new Dictionary<string, PageContextAction>
     {
         {
-            "cancel", applicationContext => {
+            "cancel", (applicationContext, cancellationToken) => {
                 applicationContext.PageContext = new LogInPageContext();
                 return Task.CompletedTask;
             }
         }
     };
 
-    public override IReadOnlyDictionary<string, Func<ApplicationContext, Task>> ButtonActions
-        => _buttonActions;
-    private static readonly IReadOnlyDictionary<string, Func<ApplicationContext, Task>> _buttonActions = new Dictionary<string, Func<ApplicationContext, Task>>
+    public override IReadOnlyDictionary<string, PageContextAction> ButtonActions { get; } = new Dictionary<string, PageContextAction>
     {
         {
-            "sign up", async applicationContext =>
+            "sign up", async (applicationContext, cancellationToken) =>
             {
+                const string RegisterUserAccountMutation = @"
+                    mutation($username: String!, $password: String!, $hint: String!, $email: String!) {
+                        registerUserAccount(username: $username, password: $password, hint: $hint, email: $email) {
+                            userId
+                            sessionId
+                            sessionRenewTicket
+                            username
+                        }
+                    }
+                ";
+
                 if (!Equals(applicationContext.PageContext.FormData["password"], applicationContext.PageContext.FormData["confirm password"]))
                     applicationContext.PageContext = applicationContext.PageContext with
                     {
@@ -43,7 +55,7 @@ public record SignUpPageContext() : PageContext(
                         }
                     };
                 else {
-                    var dataResult = await applicationContext.CallGraphAsync(RegisterUserAccountMutation, applicationContext.PageContext.FormData);
+                    var dataResult = await applicationContext.CallGraphFormAsync(RegisterUserAccountMutation, cancellationToken);
 
                     if (
                         dataResult is not null
@@ -87,14 +99,4 @@ public record SignUpPageContext() : PageContext(
             }
         }
     };
-
-    private const string RegisterUserAccountMutation = @"
-        mutation($username: String!, $password: String!, $hint: String!, $email: String!) {
-            registerUserAccount(username: $username, password: $password, hint: $hint, email: $email) {
-                userId
-                sessionId
-                sessionRenewTicket
-                username
-            }
-        }";
 }

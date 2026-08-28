@@ -26,7 +26,7 @@ internal class GraphiQLMiddlewareAdapter : IFunctionsWorkerMiddleware
             && environment.IsDevelopment()
             && HttpMethods.Get.Equals(httpContext.Request.Method, StringComparison.OrdinalIgnoreCase)
             && _graphQlFunctionPath.Equals(httpContext.Request.Path, StringComparison.OrdinalIgnoreCase))
-        {
+        {              
             logger.LogInformation("GraphQL Playground Request Started.");
 
             var graphiQLMiddleware = new GraphiQLMiddleware(

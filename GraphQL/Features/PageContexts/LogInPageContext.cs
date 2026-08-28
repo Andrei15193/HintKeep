@@ -12,21 +12,21 @@ public record LogInPageContext() : PageContext(
 {
     public override string Name => "login";
 
-    public override IReadOnlyDictionary<string, Func<ApplicationContext, Task>> LinkActions
+    public override IReadOnlyDictionary<string, PageContextAction> LinkActions
         => _linkActions;
-    private static readonly IReadOnlyDictionary<string, Func<ApplicationContext, Task>> _linkActions = new Dictionary<string, Func<ApplicationContext, Task>>
+    private static readonly IReadOnlyDictionary<string, PageContextAction> _linkActions = new Dictionary<string, PageContextAction>
     {
         {
-            "sign up", applicationContext => {
+            "sign up", (applicationContext, cancellationToken) => {
                 applicationContext.PageContext = new SignUpPageContext();
                 return Task.CompletedTask;
             }
         }
     };
 
-    public override IReadOnlyDictionary<string, Func<ApplicationContext, Task>> ButtonActions
+    public override IReadOnlyDictionary<string, PageContextAction> ButtonActions
         => _buttonActions;
-    private static readonly IReadOnlyDictionary<string, Func<ApplicationContext, Task>> _buttonActions = new Dictionary<string, Func<ApplicationContext, Task>>
+    private static readonly IReadOnlyDictionary<string, PageContextAction> _buttonActions = new Dictionary<string, PageContextAction>
     {
     };
 }
