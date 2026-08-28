@@ -1,41 +1,40 @@
 Feature: Authentication
-
 As a user
 I want to be able to log in
 So that I can use the app
 
-@ignore
-Scenario: Login page
-  Given the landing page
-  Then I see the "Login" page
-  * I see the "username" field
-  * I see the "password" field
-  * I see the "login" button
-  * I see the "login with LocalDB" button
-  * I see the "sign up" link
+  @ignore-webclient
+  Scenario: Login page
+    Given the landing page
+    Then I am on the "login" page
+    And I have the "username" field
+    And I have the "password" field
+    And I have the "login" button
+    And I have the "login with localDB" button
+    And I have the "sign up" link
 
-@ignore
-Scenario: Login with missing account
-  Given the landing page
-  When I enter "test" for "Username"
-  And I enter "pa$$w0rd123" for "Password"
-  And I click on the login button
-  Then I see "Wrong credentials. Try again or follow the password recovery steps." error message for the "Username" field
+  @ignore-webclient
+  Scenario: Login with missing account
+    Given the landing page
+    When I enter "test" in the "username" field
+    And I enter "pa$$w0rd123" in the "password" field
+    And I press the login button
+    Then I have "Wrong credentials. Please try again or follow the password recovery steps" error message for the "username" field
 
-@ignore
-Scenario: Login with existing account and wrong credentials
-  Given the landing page
-  And there is an existing user with "test" username, "pa$$w0rd123" password and "test hint" hint
-  When I enter "test" for "Username"
-  And I enter "wrong pa$$w0rd123" for "Password"
-  And I click on the login button
-  Then I see "Wrong credentials. Try again or follow the password recovery steps." error message for the "Username" field
+  @ignore-webclient
+  Scenario: Login with existing account and wrong credentials
+    Given the landing page
+    And a user with "test" username and "PA$$w0rd123" password
+    When I enter "test" in the "username" field
+    And I enter "wrong password" in the "password" field
+    And I press the login button
+    Then I have "Wrong credentials. Please try again or follow the password recovery steps" error message for the "username" field
 
-@ignore
-Scenario: Login with existing account and matching credentials
-  Given the landing page
-  And there is an existing user with "test" username, "pa$$w0rd123" password and "test hint" hint
-  When I enter "test" for "Username"
-  And I enter "pa$$w0rd123" for "Password"
-  And I click on the login button
-  Then I see the "Accounts" page
+  @ignore-webclient
+  Scenario: Login with existing account and matching credentials
+    Given the landing page
+    And a user with "test" username and "PA$$w0rd123" password
+    When I enter "test" in the "username" field
+    And I enter "PA$$w0rd123" in the "password" field
+    And I press the login button
+    Then I am on the "accounts" page

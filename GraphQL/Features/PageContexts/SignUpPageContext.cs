@@ -39,9 +39,9 @@ public record SignUpPageContext() : PageContext(
                     mutation($username: String!, $password: String!, $hint: String!, $email: String!) {
                         registerUserAccount(username: $username, password: $password, hint: $hint, email: $email) {
                             userId
+                            username
                             sessionId
                             sessionRenewTicket
-                            username
                         }
                     }
                 ";

@@ -22,7 +22,8 @@
         "Features/**/*.feature"
     ],
     "cucumber.glue": [
-        "GraphQL/**/*feature.cs",
+        "GraphQL/**/HintKeepFeature.cs",
+        "GraphQL/**/*.feature.cs",
         "WebClient/Features/**/*.feature.ts",
         "WebClient/Features/**/*.feature.tsx",
 
